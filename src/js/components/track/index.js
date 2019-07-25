@@ -135,18 +135,18 @@ export default ( Splide, Components ) => {
 		},
 
 		/**
-		 * Calculate coordinate by index.
+		 * Calculate position by index.
 		 *
 		 * @param {number} index - Slide index.
 		 *
-		 * @return {Object} - Calculated coordinate.
+		 * @return {Object} - Calculated position.
 		 */
 		toPosition( index ) {
 			return Resolver.toPosition( index );
 		},
 
 		/**
-		 * Calculate the closest slide index from the given coordinates.
+		 * Calculate the closest slide index by the given position.
 		 *
 		 * @return {number} - The closest slide index.
 		 */
