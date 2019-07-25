@@ -27,11 +27,11 @@ const js = [
 const css = {
 	core: {
 		path: './src/sass/core/splide-core.scss',
-		dest: './dist',
+		dest: './dist/css',
 	},
 	theme: {
 		path: './src/sass/theme/splide-theme.scss',
-		dest: './dist',
+		dest: './dist/css',
 	},
 };
 
@@ -42,7 +42,7 @@ gulp.task( 'build:js', () => {
 	js.forEach( path => {
 		return webpackStream( { config: require( path ) } )
 			.pipe( rename( { suffix: '.min' } ) )
-			.pipe( gulp.dest( './dist' ) );
+			.pipe( gulp.dest( './dist/js' ) );
 	} );
 } );
 
@@ -69,7 +69,7 @@ gulp.task( 'build:sass', () => {
 		mergedStream
 			.pipe( concat( 'splide.min.css' ) )
 			.pipe( postcss( [ cssnano( { reduceIdents: false } ) ] ) )
-			.pipe( gulp.dest( './dest' ) );
+			.pipe( gulp.dest( './dist/css' ) );
 	}
 } );
 
