@@ -1,0 +1,114 @@
+/**
+ * The component for cloning some slides for "loop" mode of the track.
+ *
+ * @author    Naotoshi Fujita
+ * @copyright Naotoshi Fujita. All rights reserved.
+ */
+
+import { LOOP } from '../../constants/types';
+import { addClass, removeAttribute } from '../../utils/dom';
+
+
+/**
+ * The component for cloning some slides for "loop" mode of the track.
+ *
+ * @param {Splide} Splide     - A Splide instance.
+ * @param {Object} Components - An object containing components.
+ *
+ * @return {Object} - The component object.
+ */
+export default ( Splide, Components ) => {
+	/**
+	 * Store information of all clones.
+	 *
+	 * @type {Array}
+	 */
+	const clones = [];
+
+	/**
+	 * Clones component object.
+	 *
+	 * @type {Object}
+	 */
+	const Clones = {
+		/**
+		 * Called when the component is mounted.
+		 */
+		mount() {
+			if ( Splide.is( LOOP ) ) {
+				generateClones();
+			}
+		},
+
+		/**
+		 * Return all clones.
+		 *
+		 * @return {Element[]} - Cloned elements.
+		 */
+		get clones() {
+			return clones;
+		},
+
+		/**
+		 * Return clone length.
+		 *
+		 * @return {number} - A length of clones.
+		 */
+		get length() {
+			return clones.length;
+		},
+	};
+
+	/**
+	 * Generate and append clones.
+	 * Clone count is determined by:
+	 * - Max pages a flick action can move.
+	 * - Whether the slide length is enough for perView.
+	 */
+	function generateClones() {
+		const { Slides, Elements: { list } }  = Components;
+		const { perView, drag, flickMaxPages = 1 } = Splide.options;
+		const length = Slides.length;
+		const count  = perView * ( drag ? flickMaxPages + 1 : 1 ) + ( length < perView ? perView : 0 );
+
+		let slides = Slides.getSlides( false, false );
+
+		while ( slides.length < count ) {
+			slides = slides.concat( slides );
+		}
+
+		slides.slice( 0, count ).forEach( ( elm, index ) => {
+			const clone = cloneDeeply( elm );
+			list.appendChild( clone );
+			clones.push( clone );
+
+			Slides.register( index + length, index, clone );
+		} );
+
+		slides.slice( -count ).forEach( ( elm, index ) => {
+			const clone = cloneDeeply( elm );
+			list.insertBefore( clone, slides[0] );
+			clones.push( clone );
+
+			Slides.register( index - count, index, clone );
+		} );
+	}
+
+	/**
+	 * Clone deeply the given element.
+	 *
+	 * @param {Element} elm - An element being duplicated.
+	 *
+	 * @return {Node} - A cloned node(element).
+	 */
+	function cloneDeeply( elm ) {
+		const clone = elm.cloneNode( true );
+		addClass( clone, Splide.classes.clone );
+
+		// ID should not be duplicated.
+		removeAttribute( clone, 'id' );
+		return clone;
+	}
+
+	return Clones;
+}

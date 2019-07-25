@@ -1,0 +1,272 @@
+/**
+ * The component for controlling the track.
+ *
+ * @author    Naotoshi Fujita
+ * @copyright Naotoshi Fujita. All rights reserved.
+ */
+
+import { LOOP } from "../../constants/types";
+import { RTL } from '../../constants/directions';
+import { between } from '../../utils/utils';
+
+const { floor } = Math;
+
+
+/**
+ * The component for controlling the track.
+ *
+ * @param {Splide} Splide     - A Splide instance.
+ * @param {Object} Components - An object containing components.
+ *
+ * @return {Object} - The component object.
+ */
+export default ( Splide, Components ) => {
+	/**
+	 * Store current options.
+	 *
+	 * @type {Object}
+	 */
+	let options;
+
+	/**
+	 * Controller component object.
+	 *
+	 * @type {Object}
+	 */
+	const Controller = {
+		/**
+		 * Called when the component is mounted.
+		 */
+		mount() {
+			options = Splide.options;
+			bind();
+		},
+
+		/**
+		 * Make track run by the given control.
+		 * - "+{i}" : Increment the slide index by i.
+		 * - "-{i}" : Decrement the slide index by i.
+		 * - "{i}"  : Go to the slide whose index is i.
+		 * - ">"    : Go to next page.
+		 * - "<"    : Go to prev page.
+		 * - ">{i}" : Go to page i.
+		 *
+		 * @param {string|number} control  - A control pattern.
+		 * @param {boolean}       silently - Go to the destination without event emission.
+		 */
+		go( control, silently ) {
+			const destIndex = this.trim( this.parse( control ) );
+			Components.Track.go( destIndex, this.rewind( destIndex ), silently );
+		},
+
+		/**
+		 * Parse the given control and return the destination index for the track.
+		 *
+		 * @param {string} control - A control target pattern.
+		 *
+		 * @return {string|number} - A parsed target.
+		 */
+		parse( control ) {
+			let index = Splide.index;
+
+			const matches   = String( control ).match( /([+\-<>])(\d+)?/ );
+			const indicator = matches ? matches[ 1 ] || '' : '';
+			const number    = matches ? parseInt( matches[ 2 ] ) : 0;
+
+			switch ( indicator ) {
+				case '+':
+					index += number || 1;
+					break;
+
+				case '-':
+					index -= number || 1;
+					break;
+
+				case '>':
+					index = this.pageToIndex( number > -1 ? number : this.indexToPage( index ) + 1 );
+					break;
+
+				case '<':
+					index = this.pageToIndex( number > -1 ? number : this.indexToPage( index ) - 1 );
+					break;
+
+				default:
+					index = parseInt( control );
+			}
+
+			return index;
+		},
+
+		/**
+		 * Compute index from the given page number.
+		 *
+		 * @param {number} page - Page number.
+		 *
+		 * @return {number} - A computed page number.
+		 */
+		pageToIndex( page ) {
+			if ( options.focus ) {
+				return page;
+			}
+
+			const length  = Splide.length;
+			const perView = options.perView;
+
+			let index = page * perView;
+			index = index - ( this.pageLength * perView - length ) * floor( index / length );
+
+			// Adjustment for the last page.
+			if ( length - perView <= index && index < length ) {
+				index = length - perView;
+			}
+
+			return index;
+		},
+
+		/**
+		 * Compute page number from the given slide index.
+		 *
+		 * @param index - Slide index.
+		 *
+		 * @return {number} - A computed page number.
+		 */
+		indexToPage( index ) {
+			if ( options.focus ) {
+				return index;
+			}
+
+			const length  = Splide.length;
+			const perView = options.perView;
+
+			// Make the last "perView" number of slides belong to the last page.
+			if ( length - perView <= index && index < length ) {
+				return floor( ( length - 1 ) / perView );
+			}
+
+			return floor( index / perView );
+		},
+
+		/**
+		 * Trim the given index according to the current mode.
+		 * Index being returned could be less than 0 or greater than the length in Loop mode.
+		 *
+		 * @param {number} index - An index being trimmed.
+		 *
+		 * @return {number} - A trimmed index.
+		 */
+		trim( index ) {
+			if ( ! Splide.is( LOOP ) ) {
+				index = options.rewind ? this.rewind( index ) : between( index, 0, this.edgeIndex );
+			}
+
+			return index;
+		},
+
+		/**
+		 * Rewind the given index if it's out of range.
+		 *
+		 * @param {number} index - An index.
+		 *
+		 * @return {number} - A rewound index.
+		 */
+		rewind( index ) {
+			const edge = this.edgeIndex;
+
+			if ( Splide.is( LOOP ) ) {
+				while( index > edge ) {
+					index -= edge + 1;
+				}
+
+				while( index < 0 ) {
+					index += edge + 1;
+				}
+			} else {
+				if ( index > edge ) {
+					index = 0;
+				} else if ( index < 0 ) {
+					index = edge;
+				}
+			}
+
+			return index;
+		},
+
+		/**
+		 * Check if the direction is "rtl" or not.
+		 *
+		 * @return {boolean} - True if "rtl" or false if not.
+		 */
+		isRtl() {
+			return options.direction === RTL;
+		},
+
+		/**
+		 * Return the page length.
+		 *
+		 * @return {number} - Max page number.
+		 */
+		get pageLength() {
+			const length = Splide.length;
+			return options.focus ? length : Math.ceil( length / options.perView );
+		},
+
+		/**
+		 * Return the edge index.
+		 *
+		 * @return {number} - Edge index.
+		 */
+		get edgeIndex() {
+			const length = Splide.length;
+
+			if ( options.focus || options.isNavigation || Splide.is( LOOP ) ) {
+				return length - 1;
+			}
+
+			return length - options.perView;
+		},
+
+		/**
+		 * Return the index of the previous slide.
+		 *
+		 * @return {number} - The index of the previous slide if available. -1 otherwise.
+		 */
+		get prevIndex() {
+			let prev = this.parse( '-' );
+
+			if ( Splide.is( LOOP ) || options.rewind ) {
+				prev = this.rewind( prev );
+			}
+
+			return prev > -1 ? prev : -1;
+		},
+
+		/**
+		 * Return the index of the next slide.
+		 *
+		 * @return {number} - The index of the next slide if available. -1 otherwise.
+		 */
+		get nextIndex() {
+			let next = this.parse( '+' );
+
+			if ( Splide.is( LOOP ) || options.rewind ) {
+				next = this.rewind( next );
+			}
+
+			return ( Splide.index < next && next <= this.edgeIndex ) || next === 0 ? next : -1;
+		},
+	};
+
+	/**
+	 * Listen some events.
+	 */
+	function bind() {
+		Splide
+			.on( 'move', newIndex => { Splide.index = newIndex } )
+			.on( 'updated', newOptions => {
+				options = newOptions;
+				Splide.index = Controller.rewind( Controller.trim( Splide.index ) );
+			} );
+	}
+
+	return Controller;
+}

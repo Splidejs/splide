@@ -1,0 +1,27 @@
+{
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
+  "env": {
+    "browser": true,
+    "jest": true,
+    "node": true
+  },
+  "rules": {
+    "array-bracket-spacing": [ "error", "always" ],
+    "camelcase": "error",
+    "comma-dangle": [ "error", {
+      "arrays": "always-multiline",
+      "objects": "always-multiline",
+      "imports": "always-multiline",
+      "exports": "always-multiline",
+      "functions": "never"
+    } ],
+    "comma-spacing": [ "error", { "before": false, "after": true } ],
+    "eqeqeq": "error",
+    "indent": [ "error", "tab", { "SwitchCase": 1 } ],
+    "no-console": [ "error", { "allow": [ "warn", "error" ] } ]
+  }
+}

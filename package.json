@@ -1,0 +1,44 @@
+{
+  "name": "splide",
+  "version": "1.0.0",
+  "description": "Splide is a lightweight and powerful slider without any dependencies.",
+  "author": "Naotoshi Fujita",
+  "license": "MIT",
+  "main": "dist/splide.min.js",
+  "keywords": [
+    "splide",
+    "slider",
+    "carousel",
+    "slideshow",
+    "lightweight",
+    "touch",
+    "responsive"
+  ],
+  "devDependencies": {
+    "@babel/core": "^7.5.4",
+    "@babel/preset-env": "^7.5.4",
+    "autoprefixer": "^8.4.1",
+    "babel-jest": "^24.8.0",
+    "babel-loader": "^8.0.6",
+    "cssnano": "^3.10.0",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-eslint": "^6.0.0",
+    "gulp-postcss": "^7.0.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-rollup": "^2.16.2",
+    "gulp-sass": "^4.0.1",
+    "gulp-uglify": "^3.0.0",
+    "jest": "^24.8.0",
+    "merge-stream": "^2.0.0",
+    "uglifyjs-webpack-plugin": "^2.1.3",
+    "webpack": "^4.37.0",
+    "webpack-stream": "^5.2.1"
+  },
+  "scripts": {
+    "build:js": "gulp build:js",
+    "build:sass": "gulp build:sass",
+    "test": "jest",
+    "lint": "gulp lint"
+  }
+}
