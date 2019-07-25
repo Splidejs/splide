@@ -1,5 +1,5 @@
 {
-  "name": "splide",
+  "name": "@splidejs/splide",
   "version": "1.0.0",
   "description": "Splide is a lightweight and powerful slider without any dependencies.",
   "author": "Naotoshi Fujita",
@@ -14,6 +14,13 @@
     "touch",
     "responsive"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Splidejs/splide.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Splidejs/splide/issues"
+  },
   "devDependencies": {
     "@babel/core": "^7.5.4",
     "@babel/preset-env": "^7.5.4",
