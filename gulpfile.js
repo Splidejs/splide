@@ -48,18 +48,20 @@ const css = {
 /*
  * Build a script file.
  */
-gulp.task( 'build:js', () => {
+gulp.task( 'build:js', done => {
 	js.forEach( path => {
-		return webpackStream( { config: require( path ) } )
+		webpackStream( { config: require( path ) } )
 			.pipe( rename( { suffix: '.min' } ) )
 			.pipe( gulp.dest( './dist/js' ) );
 	} );
+
+	done();
 } );
 
 /*
  * Build sass files.
  */
-gulp.task( 'build:sass', () => {
+gulp.task( 'build:sass', done => {
 	Object.values( css ).forEach( settings => {
 		let stream = gulp.src( settings.path );
 
@@ -73,11 +75,13 @@ gulp.task( 'build:sass', () => {
 			.pipe( sass() )
 			.pipe( postcss( [
 				cssnano( { reduceIdents: false } ),
-				autoprefixer( { browsers: [ '> 5%' ] } )
+				autoprefixer( { overrideBrowserslist: [ '> 5%' ] } )
 			] ) )
 			.pipe( rename( { suffix: '.min' } ) )
 			.pipe( gulp.dest( settings.dest ) );
 	} );
+
+	done();
 } );
 
 gulp.task( 'lint', () => {
