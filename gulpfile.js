@@ -25,13 +25,23 @@ const js = [
  * Path definitions.
  */
 const css = {
+	all: {
+		path : './src/sass/core/*.scss',
+		dest : './dist/css',
+		merge: {
+			filename: 'splide.css',
+			path    : './src/sass/themes/default/*.scss',
+		},
+	},
 	core: {
-		path: './src/sass/core/splide-core.scss',
+		path: './src/sass/core/*.scss',
 		dest: './dist/css',
 	},
-	theme: {
-		path: './src/sass/theme/splide-theme.scss',
-		dest: './dist/css',
+	themes: {
+		path: [
+			'./src/sass/themes/default/*.scss',
+		],
+		dest: './dist/css/themes',
 	},
 };
 
@@ -50,10 +60,16 @@ gulp.task( 'build:js', () => {
  * Build sass files.
  */
 gulp.task( 'build:sass', () => {
-	let mergedStream;
-
 	Object.values( css ).forEach( settings => {
-		const stream = gulp.src( settings.path )
+		let stream = gulp.src( settings.path );
+
+		if ( settings.merge ) {
+			stream = merge( stream, gulp.src( settings.merge.path ) )
+				.pipe( sass() )
+				.pipe( concat( settings.merge.filename ) );
+		}
+
+		stream
 			.pipe( sass() )
 			.pipe( postcss( [
 				cssnano( { reduceIdents: false } ),
@@ -61,16 +77,7 @@ gulp.task( 'build:sass', () => {
 			] ) )
 			.pipe( rename( { suffix: '.min' } ) )
 			.pipe( gulp.dest( settings.dest ) );
-
-		mergedStream = ! mergedStream ? stream : merge( mergedStream, stream );
 	} );
-
-	if ( mergedStream ) {
-		mergedStream
-			.pipe( concat( 'splide.min.css' ) )
-			.pipe( postcss( [ cssnano( { reduceIdents: false } ) ] ) )
-			.pipe( gulp.dest( './dist/css' ) );
-	}
 } );
 
 gulp.task( 'lint', () => {

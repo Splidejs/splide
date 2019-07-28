@@ -16,6 +16,7 @@
 
   &__slide {
     position: relative;
+    box-sizing: border-box;
 
     &.is-loading {
       display: flex;
@@ -23,13 +24,13 @@
       align-items: center;
     }
 
-    &.is-active {
-      box-shadow: 0 0 3px 3px blue;
-    }
-
     img {
       vertical-align: bottom;
     }
+  }
+
+  &__container {
+    box-sizing: border-box;
   }
 
   &__spinner {

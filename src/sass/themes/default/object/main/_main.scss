@@ -24,6 +24,10 @@
       opacity: .9;
     }
 
+    &:focus {
+      outline: none;
+    }
+
     &--prev {
       left: 1em;
 
@@ -64,6 +68,10 @@
       &:hover {
         cursor: pointer;
         opacity: .9;
+      }
+
+      &:focus {
+        outline: none;
       }
     }
   }
