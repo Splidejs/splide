@@ -14,7 +14,7 @@ export const DEFAULTS = {
 	 * Determine a slider type.
 	 * - 'slide': Regular slider.
 	 * - 'loop' : Carousel slider.
-	 * - 'fade' : Change slides with fade transition. perView, drag options are ignored.
+	 * - 'fade' : Change slides with fade transition. perPage, drag options are ignored.
 	 *
 	 * @type {string}
 	 */
@@ -44,7 +44,7 @@ export const DEFAULTS = {
 
 	/**
 	 * Fix width of slides. CSS format is allowed such as 10em, 80% or 80vw.
-	 * perView number will be ignored when this option is falsy.
+	 * perPage number will be ignored when this option is falsy.
 	 *
 	 * @type {number|string}
 	 */
@@ -71,7 +71,7 @@ export const DEFAULTS = {
 	 *
 	 * @type {number}
 	 */
-	perView: 1,
+	perPage: 1,
 
 	/**
 	 * Determine how many slides should be moved when a slider goes to next or perv.
@@ -279,11 +279,11 @@ export const DEFAULTS = {
 	 * @example
 	 * {
 	 *   '1000': {
-	 *     perView: 3,
+	 *     perPage: 3,
 	 *     gap: 20
 	 *   },
 	 *   '600': {
-	 *     perView: 1,
+	 *     perPage: 1,
 	 *     gap: 5,
 	 *   }
 	 * }

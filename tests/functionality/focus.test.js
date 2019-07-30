@@ -14,11 +14,11 @@ describe( 'Splide with "focus" option', () => {
 	test( 'should locate the active slide on the center of the slider if the value is "center".', () => {
 		const { Track, Elements: { track } } = splide.Components;
 		const width      = 900;
-		const perView    = 3;
-		const slideWidth = width / perView;
+		const perPage    = 3;
+		const slideWidth = width / perPage;
 
 		Object.defineProperty( track, 'clientWidth', { value: width } );
-		splide.options = { focus: 'center', perView };
+		splide.options = { focus: 'center', perPage };
 
 		expect( Track.offset ).toBe( - ( width / 2 - slideWidth / 2 ) );
 	} );
@@ -26,12 +26,12 @@ describe( 'Splide with "focus" option', () => {
 	test( 'should locate the active slide according to the focus index.', () => {
 		const { Track, Elements: { track } } = splide.Components;
 		const width      = 900;
-		const perView    = 3;
+		const perPage    = 3;
 		const focus      = 2;
-		const slideWidth = width / perView;
+		const slideWidth = width / perPage;
 
 		Object.defineProperty( track, 'clientWidth', { value: width } );
-		splide.options = { focus, perView };
+		splide.options = { focus, perPage };
 
 		expect( Track.offset ).toBe( - slideWidth * focus );
 	} );

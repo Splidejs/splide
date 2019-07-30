@@ -58,15 +58,15 @@ describe( 'The A11y', () => {
 			} );
 		}
 
-		test( 'with "go to slide X" when perView is 1.', () => {
+		test( 'with "go to slide X" when perPage is 1.', () => {
 			const splide = new Splide( '#splide', { pagination: true }, COMPLETE );
 			splide.mount();
 
 			confirm( splide, splide.i18n.slideX );
 		} );
 
-		test( 'with "go to page X" when perView is not 1.', () => {
-			const splide = new Splide( '#splide', { pagination: true, perView: 2 }, COMPLETE );
+		test( 'with "go to page X" when perPage is not 1.', () => {
+			const splide = new Splide( '#splide', { pagination: true, perPage: 2 }, COMPLETE );
 			splide.mount();
 
 			confirm( splide, splide.i18n.pageX );

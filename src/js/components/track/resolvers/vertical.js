@@ -64,7 +64,7 @@ export default ( Splide, Components ) => {
 		 * @return {number} - Trimmed position.
 		 */
 		trim( position ) {
-			const edge = -( Layout.listHeight - Splide.options.perView * Layout.slideHeight );
+			const edge = -( Layout.listHeight - Splide.options.perPage * Layout.slideHeight );
 			return between( position, edge, 0 );
 		},
 

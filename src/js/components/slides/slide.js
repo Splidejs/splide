@@ -108,22 +108,22 @@ export default function Slide( index, realIndex, slide, Splide ) {
 		 * @return {boolean} - True if the slide is visible or false if not.
 		 */
 		isVisible() {
-			const { focus, perView, trimSpace }  = Splide.options;
+			const { focus, perPage, trimSpace }  = Splide.options;
 			const { index: activeIndex, length } = Splide;
 			const isCenter = 'center' === focus;
-			const offset   = isCenter ? perView / 2 : parseInt( focus ) || 0;
+			const offset   = isCenter ? perPage / 2 : parseInt( focus ) || 0;
 
 			if ( trimSpace ) {
 				if ( activeIndex < offset ) {
-					return index < perView;
-				} else if ( activeIndex >= length - ( perView - offset ) ) {
-					return index >= length - perView;
+					return index < perPage;
+				} else if ( activeIndex >= length - ( perPage - offset ) ) {
+					return index >= length - perPage;
 				}
 			}
 
-			const min = activeIndex - offset + ( isCenter && perView % 2 === 0 ? 1 : 0 );
+			const min = activeIndex - offset + ( isCenter && perPage % 2 === 0 ? 1 : 0 );
 
-			return min <= index && index < activeIndex + perView - offset;
+			return min <= index && index < activeIndex + perPage - offset;
 		},
 
 		/**

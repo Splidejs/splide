@@ -69,7 +69,7 @@ export default ( Splide, Components, options ) => {
 		 * @return {number} - Slide height in px.
 		 */
 		getSlideHeight( includeGap ) {
-			const height = ( this.listHeight + this.gap ) / options.perView;
+			const height = ( this.listHeight + this.gap ) / options.perPage;
 			return includeGap ? height : height - this.gap;
 		},
 

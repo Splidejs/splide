@@ -75,7 +75,7 @@ export default ( Splide, Components, options ) => {
 				return includeGap ? fixedWidth + this.gap : fixedWidth;
 			}
 
-			const width = ( this.width + this.gap ) / options.perView;
+			const width = ( this.width + this.gap ) / options.perPage;
 			return includeGap ? width : width - this.gap;
 		},
 

@@ -109,7 +109,7 @@ export default ( Splide, Components ) => {
 
 		/**
 		 * Return slide width including gap size.
-		 * Note that slideWidth * perView is NOT equal to slider width.
+		 * Note that slideWidth * perPage is NOT equal to slider width.
 		 *
 		 * @return {number} - Current slide width including gap size.
 		 */
@@ -179,7 +179,7 @@ export default ( Splide, Components ) => {
 		Splide.on( 'mounted resize', resize ).on( 'updated', init );
 
 		if ( ! isVertical ) {
-			Splide.on( 'resize', updatePerView );
+			Splide.on( 'resize', updatePerPage );
 		}
 	}
 
@@ -201,16 +201,16 @@ export default ( Splide, Components ) => {
 	}
 
 	/**
-	 * Update the perView number automatically according to the fixedWidth.
+	 * Update the perPage number automatically according to the fixedWidth.
 	 */
-	function updatePerView() {
+	function updatePerPage() {
 		const options = Splide.options;
 
 		if ( options.fixedWidth ) {
-			const perView = Math.floor( ( Layout.width + Resolver.gap ) / Layout.slideWidth ) || 1;
+			const perPage = Math.floor( ( Layout.width + Resolver.gap ) / Layout.slideWidth ) || 1;
 
-			if ( options.perView !== perView ) {
-				Splide.options = { perView };
+			if ( options.perPage !== perPage ) {
+				Splide.options = { perPage };
 			}
 		}
 	}

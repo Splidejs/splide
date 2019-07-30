@@ -17,7 +17,7 @@ import { applyStyle } from '../../utils/dom';
  * @return {Object} - The component object.
  */
 export default ( Splide, Components ) => {
-	Components.Options.fix( { perView: 1, gap: 0, padding: 0 } );
+	Components.Options.fix( { perPage: 1, gap: 0, padding: 0 } );
 
 	if ( Components.Drag ) {
 		Components.Drag.required = false;

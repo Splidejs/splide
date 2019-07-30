@@ -91,7 +91,7 @@ export default ( Splide, Components ) => {
 		getSlidesByPage( page ) {
 			const idx     = Components.Controller.pageToIndex( page );
 			const options = Splide.options;
-			const max     = options.focus ? 1 : options.perView;
+			const max     = options.focus ? 1 : options.perPage;
 
 			return Slides.filter( ( { index } ) => idx <= index && index < idx + max );
 		},

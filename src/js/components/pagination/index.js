@@ -166,7 +166,7 @@ export default ( Splide, Components, name ) => {
 		const Slides  = Components.Slides;
 
 		const items = Slides.getSlides( false, true )
-			.filter( Slide => options.focus || Slide.index % options.perView === 0 )
+			.filter( Slide => options.focus || Slide.index % options.perPage === 0 )
 			.map( ( Slide, page ) => {
 				const li      = create( 'li', {} );
 				const button  = create( 'button', { class: classes.page } );

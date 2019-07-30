@@ -57,13 +57,13 @@ export default ( Splide, Components, name ) => {
 
 		/**
 		 * Called when the component is mounted.
-		 * Note that autoplay starts only if there are slides over perView number.
+		 * Note that autoplay starts only if there are slides over perPage number.
 		 */
 		mount() {
 			const options = Splide.options;
 			const { slides, bar } = Components.Elements;
 
-			if ( slides.length > options.perView ) {
+			if ( slides.length > options.perPage ) {
 				interval = createInterval( () => { Splide.go( '>' ) }, options.interval, rate => {
 					Splide.emit( `${ name }:playing`, rate );
 					bar && applyStyle( bar, { width: `${ rate * 100 }%` } );

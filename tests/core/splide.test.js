@@ -20,8 +20,8 @@ describe( 'Splide ', () => {
 	} );
 
 	test( 'should overwrite default options with a given ones on construction.', () => {
-		const splide = new Splide( '#splide', { perView: 3 } );
-		expect( splide.options ).toEqual( { ...DEFAULTS, perView: 3 } );
+		const splide = new Splide( '#splide', { perPage: 3 } );
+		expect( splide.options ).toEqual( { ...DEFAULTS, perPage: 3 } );
 	} );
 
 	test( '"is" should verify if a given type is a current one.', () => {

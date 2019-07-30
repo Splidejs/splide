@@ -63,13 +63,13 @@ export default ( Splide, Components ) => {
 	 * Generate and append clones.
 	 * Clone count is determined by:
 	 * - Max pages a flick action can move.
-	 * - Whether the slide length is enough for perView.
+	 * - Whether the slide length is enough for perPage.
 	 */
 	function generateClones() {
 		const { Slides, Elements: { list } }  = Components;
-		const { perView, drag, flickMaxPages = 1 } = Splide.options;
+		const { perPage, drag, flickMaxPages = 1 } = Splide.options;
 		const length = Slides.length;
-		const count  = perView * ( drag ? flickMaxPages + 1 : 1 ) + ( length < perView ? perView : 0 );
+		const count  = perPage * ( drag ? flickMaxPages + 1 : 1 ) + ( length < perPage ? perPage : 0 );
 
 		let slides = Slides.getSlides( false, false );
 

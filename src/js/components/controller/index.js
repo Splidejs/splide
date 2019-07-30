@@ -110,14 +110,14 @@ export default ( Splide, Components ) => {
 			}
 
 			const length  = Splide.length;
-			const perView = options.perView;
+			const perPage = options.perPage;
 
-			let index = page * perView;
-			index = index - ( this.pageLength * perView - length ) * floor( index / length );
+			let index = page * perPage;
+			index = index - ( this.pageLength * perPage - length ) * floor( index / length );
 
 			// Adjustment for the last page.
-			if ( length - perView <= index && index < length ) {
-				index = length - perView;
+			if ( length - perPage <= index && index < length ) {
+				index = length - perPage;
 			}
 
 			return index;
@@ -136,14 +136,14 @@ export default ( Splide, Components ) => {
 			}
 
 			const length  = Splide.length;
-			const perView = options.perView;
+			const perPage = options.perPage;
 
-			// Make the last "perView" number of slides belong to the last page.
-			if ( length - perView <= index && index < length ) {
-				return floor( ( length - 1 ) / perView );
+			// Make the last "perPage" number of slides belong to the last page.
+			if ( length - perPage <= index && index < length ) {
+				return floor( ( length - 1 ) / perPage );
 			}
 
-			return floor( index / perView );
+			return floor( index / perPage );
 		},
 
 		/**
@@ -207,7 +207,7 @@ export default ( Splide, Components ) => {
 		 */
 		get pageLength() {
 			const length = Splide.length;
-			return options.focus ? length : Math.ceil( length / options.perView );
+			return options.focus ? length : Math.ceil( length / options.perPage );
 		},
 
 		/**
@@ -222,7 +222,7 @@ export default ( Splide, Components ) => {
 				return length - 1;
 			}
 
-			return length - options.perView;
+			return length - options.perPage;
 		},
 
 		/**

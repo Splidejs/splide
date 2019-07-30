@@ -9,8 +9,8 @@ describe( 'The Controller', () => {
 	} );
 
 	test( 'should parse control patterns.', () => {
-		const perView    = 3;
-		const splide     = new Splide( '#splide', { perView }, COMPLETE ).mount();
+		const perPage    = 3;
+		const splide     = new Splide( '#splide', { perPage }, COMPLETE ).mount();
 		const Controller = splide.Components.Controller;
 
 		expect( Controller.parse( '+' ) ).toBe( 1 );
@@ -18,25 +18,25 @@ describe( 'The Controller', () => {
 		expect( Controller.parse( '-' ) ).toBe( -1 );
 		expect( Controller.parse( '-2' ) ).toBe( -2 );
 
-		expect( Controller.parse( '>' ) ).toBe( perView );
-		expect( Controller.parse( '<' ) ).toBe( -perView );
-		expect( Controller.parse( '>2' ) ).toBe( perView * 2 );
+		expect( Controller.parse( '>' ) ).toBe( perPage );
+		expect( Controller.parse( '<' ) ).toBe( -perPage );
+		expect( Controller.parse( '>2' ) ).toBe( perPage * 2 );
 
 		expect( Controller.parse( '5' ) ).toBe( 5 );
 	} );
 
 	test( 'should trim index depending on a slider type and rewind option.', () => {
-		const perView    = 3;
-		const splide     = new Splide( '#splide', { perView }, COMPLETE ).mount();
+		const perPage    = 3;
+		const splide     = new Splide( '#splide', { perPage }, COMPLETE ).mount();
 		const slides     = splide.Components.Elements.slides;
 		const Controller = splide.Components.Controller;
 
-		expect( Controller.edgeIndex ).toBe( slides.length - perView );
+		expect( Controller.edgeIndex ).toBe( slides.length - perPage );
 		expect( Controller.trim( 100 ) ).toBe( Controller.edgeIndex );
 		expect( Controller.trim( -100 ) ).toBe( 0 );
 
 		splide.options = { rewind: true };
-		expect( Controller.edgeIndex ).toBe( slides.length - perView );
+		expect( Controller.edgeIndex ).toBe( slides.length - perPage );
 		expect( Controller.trim( 100 ) ).toBe( 0 );
 		expect( Controller.trim( -100 ) ).toBe( Controller.edgeIndex );
 

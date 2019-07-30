@@ -28,7 +28,7 @@ describe( 'Event', () => {
 
 		expect( callback ).not.toHaveBeenCalled();
 
-		splide.options = { perView: 2 };
+		splide.options = { perPage: 2 };
 
 		expect( callback ).toHaveBeenCalledTimes( 1 );
 	} );
@@ -54,7 +54,7 @@ describe( 'Event', () => {
 
 		expect( callback ).not.toHaveBeenCalled();
 
-		splide.options = { perView: 2 };
+		splide.options = { perPage: 2 };
 
 		expect( callback ).toHaveBeenCalledTimes( 1 );
 	} );

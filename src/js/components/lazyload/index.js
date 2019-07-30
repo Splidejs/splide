@@ -101,7 +101,7 @@ export default ( Splide, Components, name ) => {
 		const options = Splide.options;
 
 		images = images.filter( image => {
-			if ( image.Slide.isWithin( index, options.perView * ( options.preloadPages + 1 ) ) ) {
+			if ( image.Slide.isWithin( index, options.perPage * ( options.preloadPages + 1 ) ) ) {
 				load( image.img, image.Slide );
 				return false;
 			}
