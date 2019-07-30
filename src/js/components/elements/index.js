@@ -77,6 +77,9 @@ export default ( Splide ) => {
 				next: find( arrows, `.${ classes.next }` ),
 			};
 
+			console.log( arrows );
+			console.log( this.arrows );
+
 			const autoplay = findParts( classes.autoplay );
 			this.bar   = find( findParts( classes.progress ), `.${ classes.bar }` );
 			this.play  = find( autoplay, `.${ classes.play }` );

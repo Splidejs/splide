@@ -35,7 +35,7 @@ export function child( parent, className ) {
 		for ( let i in children ) {
 			const child = children[ i ];
 
-			if ( hasClass( child, className ) ) {
+			if ( hasClass( child, className.split( ' ' )[ 0 ] ) ) {
 				return child;
 			}
 		}
