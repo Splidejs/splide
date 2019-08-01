@@ -30,9 +30,11 @@ export default ( Splide, Components ) => {
 			const list    = Components.Elements.list;
 			const options = Splide.options;
 
-			const removers = subscribe( list, 'transitionend', () => {
-				onEnd();
-				removers[0]();
+			const removers = subscribe( list, 'transitionend', e => {
+				if ( e.target === list ) {
+					onEnd();
+					removers[0]();
+				}
 			} );
 
 			applyStyle( list, {
