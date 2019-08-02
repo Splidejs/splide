@@ -91,7 +91,7 @@ export default ( Splide, Components ) => {
 			if ( focus === 'center' ) {
 				focusOffset = ( width - slideWidth + gap ) / 2;
 			} else {
-				focusOffset = parseInt( focus || 0 ) * slideWidth;
+				focusOffset = ( parseInt( focus ) || 0 ) * slideWidth;
 			}
 
 			return slideWidth * Components.Clones.length / 2 - focusOffset;

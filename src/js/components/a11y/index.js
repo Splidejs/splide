@@ -132,7 +132,7 @@ export default ( Splide, Components ) => {
 
 		data.items.forEach( item => {
 			const options  = Splide.options;
-			const text     = ! options.focus && options.perPage > 1 ? i18n.pageX : i18n.slideX;
+			const text     = options.focus === false && options.perPage > 1 ? i18n.pageX : i18n.slideX;
 			const label    = sprintf( text, item.page + 1 );
 			const srt      = createSrt( label );
 			const button   = item.button;

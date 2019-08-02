@@ -64,7 +64,7 @@ export default ( Splide, Components ) => {
 		 * @return {number} - Trimmed position.
 		 */
 		trim( position ) {
-			const edge = -( Layout.listHeight - Splide.options.perPage * Layout.slideHeight );
+			const edge = -( Layout.slideHeight * ( Splide.length - Splide.options.perPage ) );
 			return between( position, edge, 0 );
 		},
 
@@ -82,7 +82,7 @@ export default ( Splide, Components ) => {
 			if ( focus === 'center' ) {
 				focusOffset = ( listHeight - slideHeight + gap ) / 2;
 			} else {
-				focusOffset = parseInt( focus || 0 ) * slideHeight;
+				focusOffset = ( parseInt( focus ) || 0 ) * slideHeight;
 			}
 
 			return slideHeight * Components.Clones.length / 2 - focusOffset;

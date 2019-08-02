@@ -105,7 +105,7 @@ export default ( Splide, Components ) => {
 		 * @return {number} - A computed page number.
 		 */
 		pageToIndex( page ) {
-			if ( options.focus ) {
+			if ( options.focus !== false ) {
 				return page;
 			}
 
@@ -131,7 +131,7 @@ export default ( Splide, Components ) => {
 		 * @return {number} - A computed page number.
 		 */
 		indexToPage( index ) {
-			if ( options.focus ) {
+			if ( options.focus !== false ) {
 				return index;
 			}
 
@@ -207,7 +207,7 @@ export default ( Splide, Components ) => {
 		 */
 		get pageLength() {
 			const length = Splide.length;
-			return options.focus ? length : Math.ceil( length / options.perPage );
+			return options.focus !== false ? length : Math.ceil( length / options.perPage );
 		},
 
 		/**
@@ -218,7 +218,7 @@ export default ( Splide, Components ) => {
 		get edgeIndex() {
 			const length = Splide.length;
 
-			if ( options.focus || options.isNavigation || Splide.is( LOOP ) ) {
+			if ( options.focus !== false || options.isNavigation || Splide.is( LOOP ) ) {
 				return length - 1;
 			}
 

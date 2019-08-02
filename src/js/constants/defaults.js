@@ -98,9 +98,9 @@ export const DEFAULTS = {
 	 * Determine which slide should be focused if there are multiple slides in a page.
 	 * A string "center" is acceptable for centering slides.
 	 *
-	 * @type {number|string}
+	 * @type {boolean|number|string}
 	 */
-	focus: 0,
+	focus: false,
 
 	/**
 	 * Gap between slides. CSS format is allowed such as 1em.
