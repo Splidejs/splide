@@ -34,6 +34,20 @@ export default ( Splide, Components, options ) => {
 	 */
 	const track = Elements.track;
 
+	/**
+	 * Keep the fixed width if available.
+	 *
+	 * @type {number}
+	 */
+	let fixedWidth;
+
+	/**
+	 * Keep the fixed height if available.
+	 *
+	 * @type {number}
+	 */
+	let fixedHeight;
+
 	return {
 		/**
 		 * Margin property name.
@@ -59,6 +73,20 @@ export default ( Splide, Components, options ) => {
 				paddingLeft : unit( left ),
 				paddingRight: unit( right ),
 			} );
+
+			const firstSlide = Elements.slides[ 0 ];
+			const width      = options.fixedWidth;
+			const height     = options.height || options.fixedHeight;
+
+			if ( width ) {
+				applyStyle( firstSlide, { width: unit( width ) } );
+				fixedWidth = parseFloat( getComputedStyle( firstSlide ).width );
+			}
+
+			if ( height ) {
+				applyStyle( firstSlide, { height: unit( height ) } );
+				fixedHeight = parseFloat( getComputedStyle( firstSlide ).height );
+			}
 		},
 
 		/**
@@ -69,8 +97,6 @@ export default ( Splide, Components, options ) => {
 		 * @return {number} - Slide width in px.
 		 */
 		getSlideWidth( includeGap ) {
-			const fixedWidth = options.fixedWidth;
-
 			if ( fixedWidth ) {
 				return includeGap ? fixedWidth + this.gap : fixedWidth;
 			}
@@ -85,8 +111,7 @@ export default ( Splide, Components, options ) => {
 		 * @return {number} - Slide height in px.
 		 */
 		getSlideHeight() {
-			const heightRatio = options.heightRatio;
-			return heightRatio > 0 ? this.width * heightRatio : options.fixedHeight;
+			return fixedHeight || this.width * options.heightRatio || 0;
 		},
 
 		/**

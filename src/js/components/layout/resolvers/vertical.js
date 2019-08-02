@@ -6,6 +6,7 @@
  */
 import { applyStyle } from "../../../utils/dom";
 import { unit } from "../../../utils/utils";
+import { exist } from "../../../utils/error";
 
 
 /**
@@ -32,6 +33,27 @@ export default ( Splide, Components, options ) => {
 	 */
 	const track = Elements.track;
 
+	/**
+	 * Keep the fixed width if available.
+	 *
+	 * @type {number}
+	 */
+	let fixedWidth;
+
+	/**
+	 * Keep the fixed height if available.
+	 *
+	 * @type {number}
+	 */
+	let fixedHeight;
+
+	/**
+	 * Keep the temporary listHeight.
+	 *
+	 * @type {number}
+	 */
+	let listHeight;
+
 	return {
 		/**
 		 * Margin property name.
@@ -50,6 +72,25 @@ export default ( Splide, Components, options ) => {
 				paddingTop   : unit( top ),
 				paddingBottom: unit( bottom ),
 			} );
+
+			const firstSlide = Elements.slides[ 0 ];
+			const { fixedWidth: fixedW, fixedHeight: fixedH, height } = options;
+
+			if ( fixedW ) {
+				applyStyle( firstSlide, { width: unit( fixedW ) } );
+				fixedWidth = parseFloat( getComputedStyle( firstSlide ).width );
+			}
+
+			if ( fixedH ) {
+				applyStyle( firstSlide, { height: unit( fixedH ) } );
+				fixedHeight = parseFloat( getComputedStyle( firstSlide ).height );
+			}
+
+			if ( height ) {
+				const list = Elements.list;
+				applyStyle( list, { height: unit( height ) } );
+				listHeight = parseFloat( getComputedStyle( list ).height );
+			}
 		},
 
 		/**
@@ -58,7 +99,7 @@ export default ( Splide, Components, options ) => {
 		 * @return {number} - Slide width in px.
 		 */
 		getSlideWidth() {
-			return this.width;
+			return fixedWidth || this.width;
 		},
 
 		/**
@@ -69,7 +110,7 @@ export default ( Splide, Components, options ) => {
 		 * @return {number} - Slide height in px.
 		 */
 		getSlideHeight( includeGap ) {
-			const height = ( this.listHeight + this.gap ) / options.perPage;
+			const height = fixedHeight || ( this.listHeight + this.gap ) / options.perPage;
 			return includeGap ? height : height - this.gap;
 		},
 
@@ -97,13 +138,8 @@ export default ( Splide, Components, options ) => {
 		 * @return {number} - Current list height.
 		 */
 		get listHeight() {
-			const heightRatio = options.heightRatio;
-			let height = options.height;
-
-			if ( heightRatio > 0 ) {
-				height = this.width * heightRatio;
-			}
-
+			const height = listHeight || this.width * options.heightRatio;
+			exist( height, '"height" or "heightRatio" must be given in TTB mode.' );
 			return height - this.padding.top - this.padding.bottom;
 		},
 

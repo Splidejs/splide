@@ -15,11 +15,24 @@ describe( 'The Layout ', () => {
 	} );
 
 	test( 'should apply height to a slide element when a "height" option is provided.', () => {
-		const splide = new Splide( '#splide', { fixedHeight: '40em' }, COMPLETE );
+		const splide = new Splide( '#splide', { height: 400 }, COMPLETE );
 		splide.mount();
 
-		const slide = splide.Components.Elements.slides.pop();
-		expect( slide.style.height ).toBe( '40em' );
+		const slide = splide.Components.Elements.slides[ 0 ];
+		expect( slide.style.height ).toBe( '400px' );
+
+		global.innerHeight = 100;
+
+		splide.options = { height: '10vh' };
+		expect( slide.style.height ).toBe( 100 / 10 + 'px' ); // window height / 10.
+	} );
+
+	test( 'should apply height to a slide element when a "fixedHeight" option is provided.', () => {
+		const splide = new Splide( '#splide', { fixedHeight: 400 }, COMPLETE );
+		splide.mount();
+
+		const slide = splide.Components.Elements.slides[ 0 ];
+		expect( slide.style.height ).toBe( '400px' );
 	} );
 
 	test( 'should set proper width of a slide element according to a perPage option in horizontal mode.', () => {
@@ -33,7 +46,7 @@ describe( 'The Layout ', () => {
 
 		splide.emit( 'resize' );
 
-		const slide = splide.Components.Elements.slides.pop();
+		const slide = splide.Components.Elements.slides[ 0 ];
 		expect( slide.style.width ).toBe( '400px' );
 
 		// Is the width updated correctly after perPage option is updated?
@@ -49,7 +62,7 @@ describe( 'The Layout ', () => {
 
 		Object.defineProperty( track, 'clientWidth', { value: 800 } );
 
-		const slide = splide.Components.Elements.slides.pop();
+		const slide = splide.Components.Elements.slides[ 0 ];
 		expect( slide.style.height ).toBe( '200px' );
 
 		splide.options = { perPage: 4 };
@@ -59,7 +72,7 @@ describe( 'The Layout ', () => {
 	test( 'should set margin according to a gap size.', () => {
 		const splide = new Splide( '#splide', { gap: 10 }, COMPLETE );
 		splide.mount();
-		const slide  = splide.Components.Elements.slides.pop();
+		const slide  = splide.Components.Elements.slides[ 0 ];
 		expect( slide.style.marginRight ).toBe( '10px' );
 	} );
 } );

@@ -43,6 +43,13 @@ export const DEFAULTS = {
 	width: 0,
 
 	/**
+	 * Define slider height.
+	 *
+	 * @type {number}
+	 */
+	height: 0,
+
+	/**
 	 * Fix width of slides. CSS format is allowed such as 10em, 80% or 80vw.
 	 * perPage number will be ignored when this option is falsy.
 	 *

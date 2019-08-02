@@ -18,6 +18,13 @@ import { find, applyStyle } from '../../utils/dom';
  */
 export default ( Splide, Components ) => {
 	/**
+	 * Hold options.
+	 *
+	 * @type {Object}
+	 */
+	const options = Splide.options;
+
+	/**
 	 * Cover component object.
 	 *
 	 * @type {Object}
@@ -28,7 +35,7 @@ export default ( Splide, Components ) => {
 		 *
 		 * @type {boolean}
 		 */
-		required: Splide.options.cover && ( Splide.options.fixedHeight || Splide.options.heightRatio ),
+		required: options.cover	&& ( options.height || options.heightRatio || options.fixedHeight ),
 
 		/**
 		 * Called when the component is mounted.
