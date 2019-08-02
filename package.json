@@ -1,6 +1,6 @@
 {
   "name": "@splidejs/splide",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Splide is a lightweight and powerful slider without any dependencies.",
   "author": "Naotoshi Fujita",
   "license": "MIT",
@@ -38,8 +38,8 @@
     "gulp-uglify": "^3.0.2",
     "jest": "^24.8.0",
     "merge-stream": "^2.0.0",
-    "uglifyjs-webpack-plugin": "^2.1.3",
-    "webpack": "^4.38.0",
+    "uglifyjs-webpack-plugin": "^2.2.0",
+    "webpack": "^4.39.0",
     "webpack-stream": "^5.2.1"
   },
   "scripts": {
