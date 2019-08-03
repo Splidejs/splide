@@ -71,7 +71,7 @@ export default ( Splide, Components, options ) => {
 			applyStyle( track, { paddingTop: unit( top ), paddingBottom: unit( bottom ) } );
 
 			const firstSlide = Elements.slides[ 0 ];
-			const position   = firstSlide.style.position;
+			const position   = firstSlide.style.position || 'static';
 			const { fixedWidth: fixedW, fixedHeight: fixedH, height } = options;
 
 			applyStyle( firstSlide, { position: 'absolute' } );
