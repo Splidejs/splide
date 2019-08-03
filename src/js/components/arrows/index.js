@@ -47,12 +47,11 @@ export default ( Splide, Components, name ) => {
 	 */
 	const Arrows = {
 		/**
-		 * Required when the arrows option is true or arrow elements were found.
+		 * Required when the arrows option is true.
 		 *
-		 * @return {boolean} - True if the option is true or arrow elements were found.
+		 * @type {boolean}
 		 */
-		required: Splide.options.arrows
-			|| ( Components.Elements.arrows && Components.Elements.arrows.prev && Components.Elements.arrows.next ),
+		required: Splide.options.arrows,
 
 		/**
 		 * Called when the component is mounted.
