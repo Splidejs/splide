@@ -13,13 +13,19 @@ const merge         = require( 'merge-stream' );
 const concat        = require( 'gulp-concat' );
 const webpackStream = require( 'webpack-stream' );
 const eslint        = require( 'gulp-eslint' );
+const gzip          = require( 'gulp-gzip' );
 
 /*
  * Webpack config paths.
  */
-const js = [
-	'./build/complete/config',
-];
+const js = {
+	complete: {
+		path: './build/complete/config',
+		dest: './dist/js',
+		gzip: true,
+	},
+};
+
 
 /*
  * Path definitions.
@@ -49,10 +55,14 @@ const css = {
  * Build a script file.
  */
 gulp.task( 'build:js', done => {
-	js.forEach( path => {
-		webpackStream( { config: require( path ) } )
+	Object.values( js ).forEach( settings => {
+		const stream = webpackStream( { config: require( settings.path ) } )
 			.pipe( rename( { suffix: '.min' } ) )
-			.pipe( gulp.dest( './dist/js' ) );
+			.pipe( gulp.dest( settings.dest ) );
+
+		if ( settings.gzip ) {
+			stream.pipe( gzip() ).pipe( gulp.dest( settings.dest ) );
+		}
 	} );
 
 	done();
