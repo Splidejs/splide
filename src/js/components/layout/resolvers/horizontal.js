@@ -69,14 +69,14 @@ export default ( Splide, Components, options ) => {
 		init() {
 			const { left = 0, right = 0 } = options.padding;
 
-			applyStyle( track, {
-				paddingLeft : unit( left ),
-				paddingRight: unit( right ),
-			} );
+			applyStyle( track, { paddingLeft : unit( left ), paddingRight: unit( right ) } );
 
 			const firstSlide = Elements.slides[ 0 ];
 			const width      = options.fixedWidth;
 			const height     = options.height || options.fixedHeight;
+			const position   = firstSlide.style.position;
+
+			applyStyle( firstSlide, { position: 'absolute' } );
 
 			if ( width ) {
 				applyStyle( firstSlide, { width: unit( width ) } );
@@ -87,6 +87,9 @@ export default ( Splide, Components, options ) => {
 				applyStyle( firstSlide, { height: unit( height ) } );
 				fixedHeight = parseFloat( getComputedStyle( firstSlide ).height );
 			}
+
+			// Restore the position.
+			applyStyle( firstSlide, { position } );
 		},
 
 		/**

@@ -68,13 +68,13 @@ export default ( Splide, Components, options ) => {
 		init() {
 			const { top = 0, bottom = 0 } = options.padding;
 
-			applyStyle( track, {
-				paddingTop   : unit( top ),
-				paddingBottom: unit( bottom ),
-			} );
+			applyStyle( track, { paddingTop: unit( top ), paddingBottom: unit( bottom ) } );
 
 			const firstSlide = Elements.slides[ 0 ];
+			const position   = firstSlide.style.position;
 			const { fixedWidth: fixedW, fixedHeight: fixedH, height } = options;
+
+			applyStyle( firstSlide, { position: 'absolute' } );
 
 			if ( fixedW ) {
 				applyStyle( firstSlide, { width: unit( fixedW ) } );
@@ -85,6 +85,8 @@ export default ( Splide, Components, options ) => {
 				applyStyle( firstSlide, { height: unit( fixedH ) } );
 				fixedHeight = parseFloat( getComputedStyle( firstSlide ).height );
 			}
+
+			applyStyle( firstSlide, { position } );
 
 			if ( height ) {
 				const list = Elements.list;

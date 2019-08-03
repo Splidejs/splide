@@ -64,6 +64,13 @@ export default ( Splide, Components ) => {
 	const isVertical = Splide.options.direction === 'ttb';
 
 	/**
+	 * Keep the Elements component.
+	 *
+	 * @type {string}
+	 */
+	const Elements = Components.Elements;
+
+	/**
 	 * Layout component object.
 	 *
 	 * @type {Object}
@@ -73,7 +80,7 @@ export default ( Splide, Components ) => {
 		 * Called when the component is mounted.
 		 */
 		mount() {
-			list   = Components.Elements.list;
+			list   = Elements.list;
 			Slides = Components.Slides.getSlides( true, true );
 
 			bind();
