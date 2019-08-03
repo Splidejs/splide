@@ -41,6 +41,13 @@ export default ( Splide, Components, name ) => {
 	const root = Splide.root;
 
 	/**
+	 * Store Elements component.
+	 *
+	 * @type {Object}
+	 */
+	const Elements = Components.Elements;
+
+	/**
 	 * Arrows component object.
 	 *
 	 * @type {Object}
@@ -52,7 +59,7 @@ export default ( Splide, Components, name ) => {
 		 * @return {boolean} - True if the option is true or arrow elements were found.
 		 */
 		required: Splide.options.arrows
-			|| ( Components.Elements.arrows.prev && Components.Elements.arrows.next ),
+			|| ( Elements.arrows && Elements.arrows.prev && Elements.arrows.next ),
 
 		/**
 		 * Called when the component is mounted.
