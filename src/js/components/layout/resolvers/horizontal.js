@@ -74,7 +74,7 @@ export default ( Splide, Components, options ) => {
 			const firstSlide = Elements.slides[ 0 ];
 			const width      = options.fixedWidth;
 			const height     = options.height || options.fixedHeight;
-			const position   = firstSlide.style.position || 'static';
+			const position   = firstSlide.style.position;
 
 			applyStyle( firstSlide, { position: 'absolute' } );
 

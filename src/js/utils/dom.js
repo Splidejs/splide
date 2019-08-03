@@ -68,7 +68,7 @@ export function create( tag, attrs ) {
 export function applyStyle( elm, styles ) {
 	if ( elm ) {
 		each( styles, ( value, prop ) => {
-			elm.style[ prop ] = value || null;
+			elm.style[ prop ] = value || '';
 		} );
 	}
 }
