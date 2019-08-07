@@ -251,12 +251,14 @@ export default ( Splide, Components ) => {
 
 			if ( absV > options.flickThreshold && Math.abs( info.offset[ axis ] ) < SWIPE_THRESHOLD ) {
 				destination += sign * Math.min( absV * options.flickPower, Layout.width * ( options.flickMaxPages || 1 ) );
-			} else {
-				// Do not allow the track to go to a previous position.
-				destination += sign * Layout.slideWidth / 2;
 			}
 
 			let index = Track.toIndex( destination );
+
+			// Do not allow the track to go to a previous position.
+			if ( index === Splide.index ) {
+				index += Controller.isRtl() ? sign : -sign;
+			}
 
 			if ( ! Splide.is( LOOP ) ) {
 				index = between( index, 0, Controller.edgeIndex );
