@@ -1,0 +1,15 @@
+.splide {
+  &__pagination {
+    display: inline-flex;
+    align-items: center;
+
+    li {
+      display: inline-flex;
+    }
+
+    &__page {
+      &.is-active {
+      }
+    }
+  }
+}

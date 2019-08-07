@@ -6,6 +6,7 @@
 const gulp          = require( 'gulp' );
 const rename        = require( 'gulp-rename' );
 const sass          = require( 'gulp-sass' );
+const sassGlob      = require( 'gulp-sass-glob' );
 const postcss       = require( 'gulp-postcss' );
 const autoprefixer  = require( 'autoprefixer' );
 const cssnano       = require( 'cssnano' );
@@ -77,11 +78,13 @@ gulp.task( 'build:sass', done => {
 
 		if ( settings.merge ) {
 			stream = merge( stream, gulp.src( settings.merge.path ) )
+				.pipe( sassGlob() )
 				.pipe( sass() )
 				.pipe( concat( settings.merge.filename ) );
 		}
 
 		stream
+			.pipe( sassGlob() )
 			.pipe( sass() )
 			.pipe( postcss( [
 				cssnano( { reduceIdents: false } ),

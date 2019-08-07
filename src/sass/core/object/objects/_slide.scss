@@ -1,0 +1,10 @@
+.splide {
+  &__slide {
+    position: relative;
+    box-sizing: border-box;
+
+    img {
+      vertical-align: bottom;
+    }
+  }
+}
