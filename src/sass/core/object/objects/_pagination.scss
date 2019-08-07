@@ -4,7 +4,8 @@
     align-items: center;
 
     li {
-      display: inline-flex;
+      list-style-type: none;
+      display: inline-block;
     }
 
     &__page {

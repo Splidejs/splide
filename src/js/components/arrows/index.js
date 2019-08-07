@@ -98,10 +98,10 @@ export default ( Splide, Components, name ) => {
 		Splide.on( 'mounted move updated', () => {
 			const { prev, next } = arrows;
 			const { prevIndex, nextIndex } = Components.Controller;
-			const isSame = prevIndex === nextIndex;
+			const hasSlides = Splide.length > 1;
 
-			prev.disabled = prevIndex < 0 || isSame;
-			next.disabled = nextIndex < 0 || isSame;
+			prev.disabled = prevIndex < 0 || ! hasSlides;
+			next.disabled = nextIndex < 0 || ! hasSlides;
 
 			Splide.emit( `${ name }:updated`, prev, next, prevIndex, nextIndex );
 		} );
