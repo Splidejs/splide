@@ -15,22 +15,24 @@
     position: relative;
     box-sizing: border-box;
 
-    &.is-loading {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
     img {
       vertical-align: bottom;
     }
   }
 
   &__container {
+    position: relative;
     box-sizing: border-box;
   }
 
   &__spinner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+
     display: inline-block;
     width: $spinner-size;
     height: $spinner-size;
