@@ -97,6 +97,15 @@ export default ( Splide, Components ) => {
 		},
 
 		/**
+		 * Return slider height without padding.
+		 *
+		 * @return {number}
+		 */
+		get height() {
+			return Resolver.height;
+		},
+
+		/**
 		 * Return list width.
 		 *
 		 * @return {number} - Current list width.
@@ -121,7 +130,7 @@ export default ( Splide, Components ) => {
 		 * @return {number} - Current slide width including gap size.
 		 */
 		get slideWidth() {
-			return Resolver.getSlideWidth( true );
+			return Resolver.slideWidth;
 		},
 
 		/**
@@ -130,7 +139,7 @@ export default ( Splide, Components ) => {
 		 * @return {number} - Computed slide height.
 		 */
 		get slideHeight() {
-			return Resolver.getSlideHeight( true );
+			return Resolver.slideHeight;
 		},
 
 		/**
@@ -195,9 +204,10 @@ export default ( Splide, Components ) => {
 	 */
 	function resize() {
 		applyStyle( list, { width: unit( Layout.listWidth ), height: unit( Layout.listHeight ) } );
+		applyStyle( Components.Elements.track, { height: unit( Layout.height ) } );
 
-		const slideWidth  = unit( Resolver.getSlideWidth( false ) );
-		const slideHeight = unit( Resolver.getSlideHeight( false ) );
+		const slideWidth  = unit( Resolver.slideWidth );
+		const slideHeight = unit( Resolver.slideHeight );
 
 		for ( let i in Slides ) {
 			const { slide, container } = Slides[ i ];
@@ -214,7 +224,7 @@ export default ( Splide, Components ) => {
 		const options = Splide.options;
 
 		if ( options.fixedWidth ) {
-			const perPage = Math.floor( ( Layout.width + Resolver.gap ) / Layout.slideWidth ) || 1;
+			const perPage = Math.floor( ( Layout.width + Resolver.gap ) / ( Layout.slideWidth + Resolver.gap ) ) || 1;
 
 			if ( options.perPage !== perPage ) {
 				Splide.options = { perPage };

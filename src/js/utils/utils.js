@@ -5,6 +5,8 @@
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
+import { create, applyStyle } from "./dom";
+
 
 /**
  * Check if the given value is between min and max.
@@ -51,4 +53,33 @@ export function unit( value ) {
 	}
 
 	return '';
+}
+
+/**
+ * Convert the given value to pixel.
+ *
+ * @param {Element}       root  - Root element where a dummy div is appended.
+ * @param {string|number} value - CSS value to be converted, such as 10rem.
+ *
+ * @return {number} - Pixel.
+ */
+export function toPixel( root, value ) {
+	if ( typeof value === 'number' ) {
+		return value;
+	}
+
+	const div = create( 'div', {} );
+
+	applyStyle( div, {
+		position: 'absolute',
+		width: value,
+	} );
+
+	root.appendChild( div );
+
+	const px = div.clientWidth;
+
+	root.removeChild( div );
+
+	return px;
 }

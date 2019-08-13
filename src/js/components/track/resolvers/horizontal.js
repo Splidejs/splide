@@ -44,7 +44,7 @@ export default ( Splide, Components ) => {
 		 * @return {Object} - Calculated position.
 		 */
 		toPosition( index ) {
-			return this.sign * ( index * Layout.slideWidth + this.offset )
+			return this.sign * ( index * ( Layout.slideWidth + Layout.gap ) + this.offset )
 		},
 
 		/**
@@ -53,7 +53,7 @@ export default ( Splide, Components ) => {
 		 * @return {number} - The closest slide position.
 		 */
 		toIndex( position ) {
-			return Math.round( ( this.sign * position - this.offset ) / Layout.slideWidth );
+			return Math.round( ( this.sign * position - this.offset ) / ( Layout.slideWidth + Layout.gap ) );
 		},
 
 		/**
@@ -89,12 +89,12 @@ export default ( Splide, Components ) => {
 			let focusOffset;
 
 			if ( focus === 'center' ) {
-				focusOffset = ( width - slideWidth + gap ) / 2;
+				focusOffset = ( width - slideWidth ) / 2 + gap;
 			} else {
-				focusOffset = ( parseInt( focus ) || 0 ) * slideWidth;
+				focusOffset = ( parseInt( focus ) || 0 ) * ( slideWidth + gap );
 			}
 
-			return slideWidth * Components.Clones.length / 2 - focusOffset;
+			return ( slideWidth + gap ) * Components.Clones.length / 2 - focusOffset;
 		},
 	};
 }

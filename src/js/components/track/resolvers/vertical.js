@@ -44,7 +44,7 @@ export default ( Splide, Components ) => {
 		 * @return {Object} - Calculated position.
 		 */
 		toPosition( index ) {
-			return - ( index * Layout.slideHeight + this.offset )
+			return - ( index * ( Layout.slideHeight + Layout.gap ) + this.offset )
 		},
 
 		/**
@@ -53,7 +53,7 @@ export default ( Splide, Components ) => {
 		 * @return {number} - The closest slide index.
 		 */
 		toIndex( position ) {
-			return Math.round( - ( position + this.offset ) / Layout.slideHeight );
+			return Math.round( - ( position + this.offset ) / ( Layout.slideHeight + Layout.gap ) );
 		},
 
 		/**
@@ -64,7 +64,7 @@ export default ( Splide, Components ) => {
 		 * @return {number} - Trimmed position.
 		 */
 		trim( position ) {
-			const edge = -( Layout.slideHeight * ( Splide.length - Splide.options.perPage ) );
+			const edge = -( Layout.listHeight - ( Layout.height + Layout.gap ) );
 			return between( position, edge, 0 );
 		},
 
@@ -80,12 +80,12 @@ export default ( Splide, Components ) => {
 			let focusOffset;
 
 			if ( focus === 'center' ) {
-				focusOffset = ( listHeight - slideHeight + gap ) / 2;
+				focusOffset = ( listHeight - slideHeight ) / 2 + gap;
 			} else {
-				focusOffset = ( parseInt( focus ) || 0 ) * slideHeight;
+				focusOffset = ( parseInt( focus ) || 0 ) * ( slideHeight + gap );
 			}
 
-			return slideHeight * Components.Clones.length / 2 - focusOffset;
+			return ( slideHeight + gap ) * Components.Clones.length / 2 - focusOffset;
 		},
 	};
 }  

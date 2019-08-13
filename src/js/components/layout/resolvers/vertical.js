@@ -4,8 +4,9 @@
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
+
 import { applyStyle } from "../../../utils/dom";
-import { unit } from "../../../utils/utils";
+import { toPixel, unit } from "../../../utils/utils";
 import { exist } from "../../../utils/error";
 
 
@@ -33,27 +34,6 @@ export default ( Splide, Components, options ) => {
 	 */
 	const track = Elements.track;
 
-	/**
-	 * Keep the fixed width if available.
-	 *
-	 * @type {number}
-	 */
-	let fixedWidth;
-
-	/**
-	 * Keep the fixed height if available.
-	 *
-	 * @type {number}
-	 */
-	let fixedHeight;
-
-	/**
-	 * Keep the temporary listHeight.
-	 *
-	 * @type {number}
-	 */
-	let listHeight;
-
 	return {
 		/**
 		 * Margin property name.
@@ -67,62 +47,27 @@ export default ( Splide, Components, options ) => {
 		 */
 		init() {
 			const { top = 0, bottom = 0 } = options.padding;
-
 			applyStyle( track, { paddingTop: unit( top ), paddingBottom: unit( bottom ) } );
-
-			const firstSlide = Elements.slides[ 0 ];
-			const position   = firstSlide.style.position;
-			const { fixedWidth: fixedW, fixedHeight: fixedH, height } = options;
-
-			applyStyle( firstSlide, { position: 'absolute' } );
-
-			if ( fixedW ) {
-				applyStyle( firstSlide, { width: unit( fixedW ) } );
-				fixedWidth = parseFloat( getComputedStyle( firstSlide ).width );
-			}
-
-			if ( fixedH ) {
-				applyStyle( firstSlide, { height: unit( fixedH ) } );
-				fixedHeight = parseFloat( getComputedStyle( firstSlide ).height );
-			}
-
-			applyStyle( firstSlide, { position } );
-
-			if ( height ) {
-				const list = Elements.list;
-				applyStyle( list, { height: unit( height ) } );
-				listHeight = parseFloat( getComputedStyle( list ).height );
-			}
-		},
-
-		/**
-		 * Return the slide width with/without a gap space.
-		 *
-		 * @return {number} - Slide width in px.
-		 */
-		getSlideWidth() {
-			return fixedWidth || this.width;
-		},
-
-		/**
-		 * Return the slide height with/without a gap space.
-		 *
-		 * @param {boolean} includeGap - Whether to include a gap space or not.
-		 *
-		 * @return {number} - Slide height in px.
-		 */
-		getSlideHeight( includeGap ) {
-			const height = fixedHeight || ( this.listHeight + this.gap ) / options.perPage;
-			return includeGap ? height : height - this.gap;
 		},
 
 		/**
 		 * Return slider width without padding.
 		 *
-		 * @return {number} - Current slide width.
+		 * @return {number} - Current slider width.
 		 */
 		get width() {
 			return track.clientWidth;
+		},
+
+		/**
+		 * Return slide height without padding.
+		 *
+		 * @return {number} - Slider height.
+		 */
+		get height() {
+			const height = options.height || this.width * options.heightRatio;
+			exist( height, '"height" or "heightRatio" must be given in TTB mode.' );
+			return toPixel( Splide.root, height );
 		},
 
 		/**
@@ -140,9 +85,31 @@ export default ( Splide, Components, options ) => {
 		 * @return {number} - Current list height.
 		 */
 		get listHeight() {
-			const height = listHeight || this.width * options.heightRatio;
-			exist( height, '"height" or "heightRatio" must be given in TTB mode.' );
-			return height - this.padding.top - this.padding.bottom;
+			return ( this.slideHeight + this.gap ) * Components.Slides.total;
+		},
+
+		/**
+		 * Return the slide width in px.
+		 *
+		 * @return {number} - The slide width.
+		 */
+		get slideWidth() {
+			return toPixel( Splide.root, options.fixedWidth || this.width );
+		},
+
+		/**
+		 * Return the slide height in px.
+		 *
+		 * @return {number} - The slide height.
+		 */
+		get slideHeight() {
+			let height = options.fixedHeight;
+
+			if ( ! height ) {
+				height = ( this.height + this.gap ) / options.perPage - this.gap;
+			}
+
+			return toPixel( Splide.root, height );
 		},
 
 		/**

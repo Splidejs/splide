@@ -20,11 +20,6 @@ describe( 'The Layout ', () => {
 
 		const slide = splide.Components.Elements.slides[ 0 ];
 		expect( slide.style.height ).toBe( '400px' );
-
-		global.innerHeight = 100;
-
-		splide.options = { height: '10vh' };
-		expect( slide.style.height ).toBe( 100 / 10 + 'px' ); // window height / 10.
 	} );
 
 	test( 'should apply height to a slide element when a "fixedHeight" option is provided.', () => {

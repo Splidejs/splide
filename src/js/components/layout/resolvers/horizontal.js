@@ -6,7 +6,7 @@
  */
 
 import { applyStyle } from "../../../utils/dom";
-import { unit } from "../../../utils/utils";
+import { unit, toPixel } from "../../../utils/utils";
 import { RTL } from '../../../constants/directions';
 
 
@@ -34,20 +34,6 @@ export default ( Splide, Components, options ) => {
 	 */
 	const track = Elements.track;
 
-	/**
-	 * Keep the fixed width if available.
-	 *
-	 * @type {number}
-	 */
-	let fixedWidth;
-
-	/**
-	 * Keep the fixed height if available.
-	 *
-	 * @type {number}
-	 */
-	let fixedHeight;
-
 	return {
 		/**
 		 * Margin property name.
@@ -61,6 +47,13 @@ export default ( Splide, Components, options ) => {
 		 *
 		 * @type {number}
 		 */
+		height: 0,
+
+		/**
+		 * Always 0 because the height will be determined by inner contents.
+		 *
+		 * @type {number}
+		 */
 		listHeight: 0,
 
 		/**
@@ -68,63 +61,27 @@ export default ( Splide, Components, options ) => {
 		 */
 		init() {
 			const { left = 0, right = 0 } = options.padding;
-
 			applyStyle( track, { paddingLeft : unit( left ), paddingRight: unit( right ) } );
-
-			const firstSlide = Elements.slides[ 0 ];
-			const width      = options.fixedWidth;
-			const height     = options.height || options.fixedHeight;
-			const position   = firstSlide.style.position;
-
-			applyStyle( firstSlide, { position: 'absolute' } );
-
-			if ( width ) {
-				applyStyle( firstSlide, { width: unit( width ) } );
-				fixedWidth = parseFloat( getComputedStyle( firstSlide ).width );
-			}
-
-			if ( height ) {
-				applyStyle( firstSlide, { height: unit( height ) } );
-				fixedHeight = parseFloat( getComputedStyle( firstSlide ).height );
-			}
-
-			// Restore the position.
-			applyStyle( firstSlide, { position } );
-		},
-
-		/**
-		 * Return the slide width with/without a gap space.
-		 *
-		 * @param {boolean} includeGap - Whether to include a gap space or not.
-		 *
-		 * @return {number} - Slide width in px.
-		 */
-		getSlideWidth( includeGap ) {
-			if ( fixedWidth ) {
-				return includeGap ? fixedWidth + this.gap : fixedWidth;
-			}
-
-			const width = ( this.width + this.gap ) / options.perPage;
-			return includeGap ? width : width - this.gap;
-		},
-
-		/**
-		 * Return the slide height.
-		 *
-		 * @return {number} - Slide height in px.
-		 */
-		getSlideHeight() {
-			return fixedHeight || this.width * options.heightRatio || 0;
 		},
 
 		/**
 		 * Return slider width without padding.
 		 *
-		 * @return {number} - Current slide width.
+		 * @return {number} - Current slider width.
 		 */
 		get width() {
 			return track.clientWidth - this.padding.left - this.padding.right;
 		},
+
+		/**
+		 * Return slide height without padding.
+		 *
+		 * @return {number} - Slider height.
+		 */
+		// get height() {
+		// 	const height = options.height || options.fixedHeight || this.width * options.heightRatio;
+		// 	return toPixel( Splide.root, height );
+		// },
 
 		/**
 		 * Return list width.
@@ -132,7 +89,32 @@ export default ( Splide, Components, options ) => {
 		 * @return {number} - Current list width.
 		 */
 		get listWidth() {
-			return this.getSlideWidth( true ) * Components.Slides.total;
+			return ( this.slideWidth + this.gap ) * Components.Slides.total;
+		},
+
+		/**
+		 * Return the slide width in px.
+		 *
+		 * @return {number} - The slide width.
+		 */
+		get slideWidth() {
+			let width = options.fixedWidth;
+
+			if ( ! width ) {
+				width = ( ( this.width + this.gap ) / options.perPage ) - this.gap;
+			}
+
+			return toPixel( Splide.root, width );
+		},
+
+		/**
+		 * Return the slide height in px.
+		 *
+		 * @return {number} - The slide height.
+		 */
+		get slideHeight() {
+			const height = options.height || options.fixedHeight || this.width * options.heightRatio;
+			return toPixel( Splide.root, height );
 		},
 
 		/**
