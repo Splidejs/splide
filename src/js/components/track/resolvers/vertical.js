@@ -74,13 +74,13 @@ export default ( Splide, Components ) => {
 		 * @return {number} - Offset amount.
 		 */
 		get offset() {
-			const { listHeight, slideHeight, gap } = Layout;
+			const { height, slideHeight, gap } = Layout;
 			const { focus } = Splide.options;
 
 			let focusOffset;
 
 			if ( focus === 'center' ) {
-				focusOffset = ( listHeight - slideHeight ) / 2 + gap;
+				focusOffset = ( height - slideHeight ) / 2;
 			} else {
 				focusOffset = ( parseInt( focus ) || 0 ) * ( slideHeight + gap );
 			}
