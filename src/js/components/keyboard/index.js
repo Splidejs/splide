@@ -13,11 +13,20 @@ import { subscribe } from "../../utils/dom";
  * @type {Object}
  */
 const KEY_MAP = {
-	ArrowLeft : '<',
-	ArrowRight: '>',
-	// For IE.
-	Left : '<',
-	Right: '>',
+	horizontal: {
+		ArrowLeft : '<',
+		ArrowRight: '>',
+		// For IE.
+		Left : '<',
+		Right: '>',
+	},
+	vertical: {
+		ArrowUp  : '<',
+		ArrowDown: '>',
+		// For IE.
+		Up  : '<',
+		Down: '>',
+	},
 };
 
 
@@ -41,6 +50,8 @@ export default ( Splide ) => {
 		 * Called when the component is mounted.
 		 */
 		mount() {
+			const map = KEY_MAP[ Splide.options.direction === 'ttb' ? 'vertical' : 'horizontal' ];
+
 			Splide.on( 'mounted updated', () => {
 				if ( removers ) {
 					removers[ 0 ]();
@@ -49,8 +60,8 @@ export default ( Splide ) => {
 
 				if ( Splide.options.keyboard ) {
 					removers = subscribe( Splide.root, 'keydown', e => {
-						if ( KEY_MAP[ e.key ] ) {
-							Splide.go( KEY_MAP[ e.key ] );
+						if ( map[ e.key ] ) {
+							Splide.go( map[ e.key ] );
 						}
 					} );
 				}
