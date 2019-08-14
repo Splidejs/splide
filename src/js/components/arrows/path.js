@@ -17,11 +17,11 @@ export const XML_NAME_SPACE = 'http://www.w3.org/2000/svg';
  *
  * @type {number}
  */
-export const PATH = 'm7.61 0.807-2.12 2.12 7.11 7.07-7.11 7.1 2.12 2.1 7.09-7.1 2.1-2.1-2.1-2.12-7.09-7.07z';
+export const PATH = 'm15.5 0.932-4.3 4.38 14.5 14.6-14.5 14.5 4.3 4.4 14.6-14.6 4.4-4.3-4.4-4.4-14.6-14.6z';
 
 /**
  * SVG width and height.
  *
  * @type {number}
  */
-export const SIZE = 20;
+export const SIZE = 40;
