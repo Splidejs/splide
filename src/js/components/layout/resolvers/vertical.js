@@ -46,8 +46,18 @@ export default ( Splide, Components, options ) => {
 		 * Init slider styles according to options.
 		 */
 		init() {
-			const { top = 0, bottom = 0 } = options.padding;
-			applyStyle( track, { paddingTop: unit( top ), paddingBottom: unit( bottom ) } );
+			let padding = options.padding;
+
+			if ( padding ) {
+				if ( typeof padding !== 'object' ) {
+					padding = {
+						top   : padding,
+						bottom: padding,
+					}
+				}
+
+				applyStyle( track, { paddingTop : unit( padding.top ), paddingBottom: unit( padding.bottom ) } );
+			}
 		},
 
 		/**

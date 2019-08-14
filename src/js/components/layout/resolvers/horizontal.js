@@ -60,8 +60,18 @@ export default ( Splide, Components, options ) => {
 		 * Initialization.
 		 */
 		init() {
-			const { left = 0, right = 0 } = options.padding;
-			applyStyle( track, { paddingLeft : unit( left ), paddingRight: unit( right ) } );
+			let padding = options.padding;
+
+			if ( padding ) {
+				if ( typeof padding !== 'object' ) {
+					padding = {
+						left : padding,
+						right: padding,
+					}
+				}
+
+				applyStyle( track, { paddingLeft : unit( padding.left ), paddingRight: unit( padding.right ) } );
+			}
 		},
 
 		/**
@@ -72,16 +82,6 @@ export default ( Splide, Components, options ) => {
 		get width() {
 			return track.clientWidth - this.padding.left - this.padding.right;
 		},
-
-		/**
-		 * Return slide height without padding.
-		 *
-		 * @return {number} - Slider height.
-		 */
-		// get height() {
-		// 	const height = options.height || options.fixedHeight || this.width * options.heightRatio;
-		// 	return toPixel( Splide.root, height );
-		// },
 
 		/**
 		 * Return list width.
