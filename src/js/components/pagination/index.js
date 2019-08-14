@@ -92,7 +92,7 @@ export default ( Splide, Components, name ) => {
 				Splide.root.removeChild( data.list );
 			}
 
-			Splide.off( ATTRIBUTES_UPDATE_EVENT ).off( UPDATE_EVENT );
+			Splide.off( ATTRIBUTES_UPDATE_EVENT );
 			data = null;
 		},
 
