@@ -251,12 +251,12 @@ export const DEFAULTS = {
 
 	/**
 	 * Set img src to background-image of its parent element.
-	 * Images with various sizes can be displayed as same dimension without cropping step.
+	 * Images with various sizes can be displayed as same dimension without cropping work.
 	 * fixedHeight or heightRatio is required.
 	 *
 	 * @type {boolean}
 	 */
-	cover: true,
+	cover: false,
 
 	/**
 	 * Whether to enable accessibility(aria and screen reader texts) or not.
