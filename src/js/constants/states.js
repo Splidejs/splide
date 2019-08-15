@@ -24,11 +24,11 @@ export const MOUNTED = 2;
  *
  * @type {number}
  */
-export const IDLE = 2;
+export const IDLE = 3;
 
 /**
  * Splide is moving.
  *
  * @type {number}
  */
-export const MOVING = 3;
+export const MOVING = 4;
