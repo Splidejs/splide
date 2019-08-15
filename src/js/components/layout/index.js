@@ -195,7 +195,7 @@ export default ( Splide, Components ) => {
 		Splide.on( 'mounted resize', resize ).on( 'updated', init );
 
 		if ( ! isVertical ) {
-			Splide.on( 'resize', updatePerPage );
+			Splide.on( 'mounted resize', updatePerPage );
 		}
 	}
 

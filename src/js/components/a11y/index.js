@@ -179,9 +179,9 @@ export default ( Splide, Components ) => {
 				setAttribute( slide, 'role', 'button' )
 			}
 
-			const realIndex = Slide.realIndex;
-			const label     = sprintf( i18n.slideX, realIndex + 1 );
-			const mainSlide = main.Components.Slides.getSlide( realIndex );
+			const slideIndex = Slide.realIndex > -1 ? Slide.realIndex : Slide.index;
+			const label      = sprintf( i18n.slideX, slideIndex + 1 );
+			const mainSlide  = main.Components.Slides.getSlide( slideIndex );
 
 			setAttribute( slide, ARIA_LABEL, label );
 			slide.appendChild( createSrt( label ) );

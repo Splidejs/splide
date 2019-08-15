@@ -33,11 +33,18 @@ const TRIGGER_KEYS = [ ' ', 'Enter', 'Spacebar' ];
  */
 export default ( Splide ) => {
 	/**
-	 * Keep the sub Splide instance.
+	 * Keep the sibling Splide instance.
 	 *
 	 * @type {Splide}
 	 */
-	let sub = Splide.sub;
+	let sibling = Splide.sibling;
+
+	/**
+	 * Whether the sibling slider is navigation or not.
+	 *
+	 * @type {Splide|boolean}
+	 */
+	const isNavigation = sibling && sibling.options.isNavigation;
 
 	/**
 	 * Layout component object.
@@ -50,32 +57,41 @@ export default ( Splide ) => {
 		 *
 		 * @type {boolean}
 		 */
-		required: !! sub,
+		required: !! sibling,
 
 		/**
 		 * Called when the component is mounted.
 		 */
 		mount() {
-			sync();
-			syncSub();
+			syncMain();
+			syncSibling();
 
-			if ( sub.options.isNavigation ) {
+			if ( isNavigation ) {
 				bind();
 			}
 		},
+
+		/**
+		 * Called after all components are mounted.
+		 */
+		mounted() {
+			if ( isNavigation ) {
+				sibling.emit( 'navigation:mounted', Splide );
+			}
+		}
 	};
 
 	/**
 	 * Listen the primary slider event to move secondary one.
 	 * Must unbind a handler at first to avoid infinite loop.
 	 */
-	function sync() {
+	function syncMain() {
 		Splide.on( SYNC_EVENT, ( newIndex, prevIndex, destIndex ) => {
-			sub
+			sibling
 				.off( SYNC_EVENT )
-				.go( sub.is( LOOP ) ? destIndex : newIndex, false );
+				.go( sibling.is( LOOP ) ? destIndex : newIndex, false );
 
-			syncSub();
+			syncSibling();
 		} );
 	}
 
@@ -83,13 +99,13 @@ export default ( Splide ) => {
 	 * Listen the secondary slider event to move primary one.
 	 * Must unbind a handler at first to avoid infinite loop.
 	 */
-	function syncSub() {
-		sub.on( SYNC_EVENT, ( newIndex, prevIndex, destIndex ) => {
+	function syncSibling() {
+		sibling.on( SYNC_EVENT, ( newIndex, prevIndex, destIndex ) => {
 			Splide
 				.off( SYNC_EVENT )
 				.go( Splide.is( LOOP ) ? destIndex : newIndex, false );
 
-			sync();
+			syncMain();
 		} );
 	}
 
@@ -97,7 +113,7 @@ export default ( Splide ) => {
 	 * Listen some events on each slide.
 	 */
 	function bind() {
-		const Slides = sub.Components.Slides.getSlides( true, true );
+		const Slides = sibling.Components.Slides.getSlides( true, true );
 
 		Slides.forEach( Slide => {
 			const slide = Slide.slide;
@@ -109,7 +125,7 @@ export default ( Splide ) => {
 			subscribe( slide, 'mouseup touchend', e => {
 				// Ignore a middle or right click.
 				if ( ! e.button || e.button === 0 ) {
-					moveSub( Slide.index );
+					moveSibling( Slide.index );
 				}
 			} );
 
@@ -120,15 +136,15 @@ export default ( Splide ) => {
 			subscribe( slide, 'keyup', e => {
 				if ( TRIGGER_KEYS.indexOf( e.key ) > -1 ) {
 					e.preventDefault();
-					moveSub( Slide.index );
+					moveSibling( Slide.index );
 				}
 			}, false );
 		} );
 	}
 
-	function moveSub( index ) {
+	function moveSibling( index ) {
 		if ( Splide.State.is( IDLE ) ) {
-			sub.go( index );
+			sibling.go( index );
 		}
 	}
 

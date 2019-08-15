@@ -97,7 +97,7 @@ export default class Splide {
 	 * @return {Splide} - This instance.
 	 */
 	sync( splide ) {
-		this.sub = splide;
+		this.sibling = splide;
 		return this;
 	}
 
@@ -155,7 +155,7 @@ export default class Splide {
 	 *
 	 * @param {string} type - A slider type.
 	 *
-	 * @return {boolean} - True if the slide is the provided type or false if not.
+	 * @return {boolean} - True if the slider type is the provided type or false if not.
 	 */
 	is( type ) {
 		return type === this._options.type;
