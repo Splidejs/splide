@@ -69,7 +69,7 @@ export default function Slide( index, realIndex, slide, Splide ) {
 			Splide.on( 'mounted moved updated', () => {
 				this.update( this.isActive(), false );
 				this.update( this.isVisible(), true );
-			} );
+			} ).on( 'resize', () => { this.update( this.isVisible(), true ) } );
 		},
 
 		/**
@@ -108,22 +108,23 @@ export default function Slide( index, realIndex, slide, Splide ) {
 		 * @return {boolean} - True if the slide is visible or false if not.
 		 */
 		isVisible() {
-			const { focus, perPage, trimSpace }  = Splide.options;
+			const { focus, trimSpace }  = Splide.options;
 			const { index: activeIndex, length } = Splide;
-			const isCenter = 'center' === focus;
-			const offset   = isCenter ? perPage / 2 : parseInt( focus ) || 0;
+			const isCenter  = 'center' === focus;
+			const numInView = Splide.Components.Layout.numInView;
+			const offset    = isCenter ? numInView / 2 : parseInt( focus ) || 0;
 
 			if ( trimSpace ) {
 				if ( activeIndex < offset ) {
-					return index < perPage;
-				} else if ( activeIndex >= length - ( perPage - offset ) ) {
-					return index >= length - perPage;
+					return index < numInView;
+				} else if ( activeIndex >= length - ( numInView - offset ) ) {
+					return index >= length - numInView;
 				}
 			}
 
-			const min = activeIndex - offset + ( isCenter && perPage % 2 === 0 ? 1 : 0 );
+			const min = activeIndex - offset + ( isCenter && numInView % 2 === 0 ? 1 : 0 );
 
-			return min <= index && index < activeIndex + perPage - offset;
+			return min <= index && index < activeIndex + numInView - offset;
 		},
 
 		/**

@@ -29,6 +29,11 @@ export default () => {
 		 */
 		on( event, handler ) {
 			event.split( ' ' ).forEach( name => {
+				// Prevent an event with a namespace from being registered twice.
+				if ( name.indexOf( '.' ) > -1 && handlers[ name ] ) {
+					return;
+				}
+
 				if ( ! handlers[ name ] ) {
 					handlers[ name ] = [];
 				}

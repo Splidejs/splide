@@ -28,6 +28,13 @@ export default ( Splide, Components, options ) => {
 	const Elements = Components.Elements;
 
 	/**
+	 * Keep the root element.
+	 *
+	 * @type {Element}
+	 */
+	const root = Splide.root;
+
+	/**
 	 * Keep the track element.
 	 *
 	 * @type {Element}
@@ -43,21 +50,35 @@ export default ( Splide, Components, options ) => {
 		marginProp: 'marginBottom',
 
 		/**
+		 * Gap in px.
+		 *
+		 * @type {number}
+		 */
+		gap: toPixel( root, options.gap ),
+
+		/**
+		 * An object containing padding left and right in px.
+		 *
+		 * @type {Object}
+		 */
+		padding: ( () => {
+			const padding = options.padding;
+			const { top = padding, bottom = padding } = padding;
+
+			return {
+				top   : toPixel( root, top ),
+				bottom: toPixel( root, bottom ),
+			};
+		} )(),
+
+		/**
 		 * Init slider styles according to options.
 		 */
 		init() {
-			let padding = options.padding;
-
-			if ( padding ) {
-				if ( typeof padding !== 'object' ) {
-					padding = {
-						top   : padding,
-						bottom: padding,
-					}
-				}
-
-				applyStyle( track, { paddingTop : unit( padding.top ), paddingBottom: unit( padding.bottom ) } );
-			}
+			applyStyle( track, {
+				paddingTop   : unit( this.padding.top ),
+				paddingBottom: unit( this.padding.bottom ),
+			} );
 		},
 
 		/**
@@ -77,7 +98,7 @@ export default ( Splide, Components, options ) => {
 		get height() {
 			const height = options.height || this.width * options.heightRatio;
 			exist( height, '"height" or "heightRatio" must be given in TTB mode.' );
-			return toPixel( Splide.root, height );
+			return toPixel( Splide.root, height ) - this.padding.top - this.padding.bottom;
 		},
 
 		/**
@@ -113,37 +134,21 @@ export default ( Splide, Components, options ) => {
 		 * @return {number} - The slide height.
 		 */
 		get slideHeight() {
-			let height = options.fixedHeight;
-
-			if ( ! height ) {
-				height = ( this.height + this.gap ) / options.perPage - this.gap;
-			}
-
+			const height = options.fixedHeight || ( this.height + this.gap ) / options.perPage - this.gap;
 			return toPixel( Splide.root, height );
 		},
 
 		/**
-		 * Return gap in px.
+		 * Return the number of slides in the current view.
 		 *
-		 * @return {Object} - Gap amount in px.
+		 * @return {number} - The number of slides in view.
 		 */
-		get gap() {
-			const style = getComputedStyle( Elements.slides[ 0 ] );
-			return parseFloat( style[ this.marginProp ] ) || 0;
-		},
+		get numInView() {
+			if ( options.fixedHeight ) {
+				return Math.floor( ( this.height + this.gap ) / ( this.slideHeight + this.gap ) ) || 1;
+			}
 
-		/**
-		 * Return padding object.
-		 *
-		 * @return {Object} - An object containing padding top and bottom.
-		 */
-		get padding() {
-			const style = getComputedStyle( track );
-
-			return {
-				top   : parseFloat( style.paddingTop ) || 0,
-				bottom: parseFloat( style.paddingBottom ) || 0,
-			};
-		},
+			return options.perPage;
+		}
 	}
 }

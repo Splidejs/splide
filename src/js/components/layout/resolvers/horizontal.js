@@ -28,6 +28,13 @@ export default ( Splide, Components, options ) => {
 	const Elements = Components.Elements;
 
 	/**
+	 * Keep the root element.
+	 *
+	 * @type {Element}
+	 */
+	const root = Splide.root;
+
+	/**
 	 * Keep the track element.
 	 *
 	 * @type {Element}
@@ -57,21 +64,35 @@ export default ( Splide, Components, options ) => {
 		listHeight: 0,
 
 		/**
+		 * Gap in px.
+		 *
+		 * @type {number}
+		 */
+		gap: toPixel( root, options.gap ),
+
+		/**
+		 * An object containing padding left and right in px.
+		 *
+		 * @type {Object}
+		 */
+		padding: ( () => {
+			const padding = options.padding;
+			const { left = padding, right = padding } = padding;
+
+			return {
+				left : toPixel( root, left ),
+				right: toPixel( root, right ),
+			};
+		} )(),
+
+		/**
 		 * Initialization.
 		 */
 		init() {
-			let padding = options.padding;
-
-			if ( padding ) {
-				if ( typeof padding !== 'object' ) {
-					padding = {
-						left : padding,
-						right: padding,
-					}
-				}
-
-				applyStyle( track, { paddingLeft : unit( padding.left ), paddingRight: unit( padding.right ) } );
-			}
+			applyStyle( track, {
+				paddingLeft : unit( this.padding.left ),
+				paddingRight: unit( this.padding.right ),
+			} );
 		},
 
 		/**
@@ -98,13 +119,8 @@ export default ( Splide, Components, options ) => {
 		 * @return {number} - The slide width.
 		 */
 		get slideWidth() {
-			let width = options.fixedWidth;
-
-			if ( ! width ) {
-				width = ( ( this.width + this.gap ) / options.perPage ) - this.gap;
-			}
-
-			return toPixel( Splide.root, width );
+			const width = options.fixedWidth || ( ( this.width + this.gap ) / options.perPage ) - this.gap;
+			return toPixel( root, width );
 		},
 
 		/**
@@ -114,31 +130,20 @@ export default ( Splide, Components, options ) => {
 		 */
 		get slideHeight() {
 			const height = options.height || options.fixedHeight || this.width * options.heightRatio;
-			return toPixel( Splide.root, height );
+			return toPixel( root, height );
 		},
 
 		/**
-		 * Return gap in px.
+		 * Return the number of slides in the current view.
 		 *
-		 * @return {Object} - Gap amount in px.
+		 * @return {number} - The number of slides in view.
 		 */
-		get gap() {
-			const style = getComputedStyle( Elements.slides[ 0 ] );
-			return parseFloat( style[ this.marginProp ] ) || 0;
-		},
+		get numInView() {
+			if ( options.fixedWidth ) {
+				return Math.floor( ( this.width + this.gap ) / ( this.slideWidth + this.gap ) ) || 1;
+			}
 
-		/**
-		 * Return padding object.
-		 *
-		 * @return {Object} - An object containing padding left and right.
-		 */
-		get padding() {
-			const style = getComputedStyle( track );
-
-			return {
-				left  : parseFloat( style.paddingLeft ) || 0,
-				right : parseFloat( style.paddingRight ) || 0,
-			};
-		},
+			return options.perPage;
+		}
 	}
 }

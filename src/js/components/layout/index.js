@@ -17,7 +17,7 @@ import { subscribe, applyStyle } from '../../utils/dom';
  *
  * @type {number}
  */
-const THROTTLE = 30;
+const THROTTLE = 50;
 
 
 /**
@@ -160,6 +160,15 @@ export default ( Splide, Components ) => {
 		get padding() {
 			return Resolver.padding;
 		},
+
+		/**
+		 * Return the number of slides in the current view.
+		 *
+		 * @return {number} - The number of slides in view.
+		 */
+		get numInView() {
+			return Resolver.numInView;
+		}
 	};
 
 	/**
@@ -193,10 +202,6 @@ export default ( Splide, Components ) => {
 		const throttledResize = throttle( () => { Splide.emit( 'resize' ) }, THROTTLE );
 		subscribe( window, 'resize', throttledResize );
 		Splide.on( 'mounted resize', resize ).on( 'updated', init );
-
-		if ( ! isVertical ) {
-			Splide.on( 'mounted resize', updatePerPage );
-		}
 	}
 
 	/**
@@ -214,21 +219,6 @@ export default ( Splide, Components ) => {
 
 			applyStyle( container, { height: slideHeight } );
 			applyStyle( slide, { width: slideWidth,	height: ! container ? slideHeight : '' } );
-		}
-	}
-
-	/**
-	 * Update the perPage number automatically according to the fixedWidth.
-	 */
-	function updatePerPage() {
-		const options = Splide.options;
-
-		if ( options.fixedWidth ) {
-			const perPage = Math.floor( ( Layout.width + Resolver.gap ) / ( Layout.slideWidth + Resolver.gap ) ) || 1;
-
-			if ( options.perPage !== perPage ) {
-				Splide.options = { perPage };
-			}
 		}
 	}
 
