@@ -34,8 +34,8 @@ export const ELEMENT_CLASSES = {
 	progress  : `${ ROOT }__progress`,
 	bar       : `${ ROOT }__progress__bar`,
 	autoplay  : `${ ROOT }__autoplay`,
-	play      : `${ ROOT }__autoplay__play`,
-	pause     : `${ ROOT }__autoplay__pause`,
+	play      : `${ ROOT }__play`,
+	pause     : `${ ROOT }__pause`,
 	spinner   : `${ ROOT }__spinner`,
 	sr        : `${ ROOT }__sr`,
 };
