@@ -62,7 +62,9 @@ export default ( Splide ) => {
 		mount() {
 			const message = 'was not found.';
 
-			this.track = child( root, classes.track );
+			this.slider = child( root, classes.slider );
+
+			this.track = find( root, `.${ classes.track }` );
 			exist( this.track, `A track ${ message }` );
 
 			this.list = child( this.track, classes.list );
@@ -109,7 +111,7 @@ export default ( Splide ) => {
 	 * @return {Element|null} - A found element or null.
 	 */
 	function findParts( className ) {
-		return child( root, className ) || child( Elements.track, className );
+		return child( root, className ) || child( Elements.slider, className );
 	}
 
 	/**

@@ -57,13 +57,17 @@ export default ( Splide, Components, name ) => {
 		 * Called when the component is mounted.
 		 */
 		mount() {
-			const Elements = Components.Elements;
+			const Elements     = Components.Elements;
+			const arrowsOption = Splide.options.arrows;
+
 			arrows = Elements.arrows;
 
 			// If arrows were not found in HTML, let's generate them.
-			if ( ( ! arrows.prev || ! arrows.next ) && Splide.options.arrows ) {
+			if ( ( ! arrows.prev || ! arrows.next ) && arrowsOption ) {
 				arrows = createArrows();
-				root.insertBefore( arrows.wrapper, Elements.track );
+				const slider = Elements.slider;
+				const parent = arrowsOption === 'slider' && slider ? slider : root;
+				parent.insertBefore( arrows.wrapper, parent.firstChild );
 			}
 
 			if ( arrows ) {

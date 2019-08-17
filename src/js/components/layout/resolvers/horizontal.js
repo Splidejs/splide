@@ -144,6 +144,6 @@ export default ( Splide, Components, options ) => {
 			}
 
 			return options.perPage;
-		}
+		},
 	}
 }

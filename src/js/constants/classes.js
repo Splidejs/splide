@@ -20,6 +20,7 @@ const ROOT = 'splide';
  */
 export const ELEMENT_CLASSES = {
 	root      : ROOT,
+	slider    : `${ ROOT }__slider`,
 	track     : `${ ROOT }__track`,
 	list      : `${ ROOT }__list`,
 	slide     : `${ ROOT }__slide`,

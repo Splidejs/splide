@@ -78,7 +78,7 @@ export default ( Splide ) => {
 			if ( isNavigation ) {
 				sibling.emit( 'navigation:mounted', Splide );
 			}
-		}
+		},
 	};
 
 	/**

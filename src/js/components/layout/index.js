@@ -168,7 +168,7 @@ export default ( Splide, Components ) => {
 		 */
 		get numInView() {
 			return Resolver.numInView;
-		}
+		},
 	};
 
 	/**

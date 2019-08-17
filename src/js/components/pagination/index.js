@@ -44,6 +44,13 @@ export default ( Splide, Components, name ) => {
 	let data = {};
 
 	/**
+	 * Hold a parent element of pagination.
+	 *
+	 * @type {Element}
+	 */
+	let parent;
+
+	/**
 	 * Pagination component object.
 	 *
 	 * @type {Object}
@@ -62,13 +69,9 @@ export default ( Splide, Components, name ) => {
 		mount() {
 			data = createPagination();
 
-			const root = Splide.root;
-
-			if ( Splide.options.pagination === 'top' ) {
-				root.insertBefore( data.list, Components.Elements.track );
-			} else {
-				root.appendChild( data.list );
-			}
+			const slider = Components.Elements.slider;
+			parent = Splide.options.pagination === 'slider' && slider ? slider : Splide.root;
+			parent.appendChild( data.list );
 
 			bind();
 		},
@@ -89,7 +92,7 @@ export default ( Splide, Components, name ) => {
 		 */
 		destroy() {
 			if ( data && data.list ) {
-				Splide.root.removeChild( data.list );
+				parent.removeChild( data.list );
 			}
 
 			Splide.off( ATTRIBUTES_UPDATE_EVENT );
