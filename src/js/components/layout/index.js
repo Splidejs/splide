@@ -188,7 +188,7 @@ export default ( Splide, Components ) => {
 		applyStyle( root, { maxWidth: unit( options.width ) } );
 
 		for ( const i in Slides ) {
-			applyStyle( Slides[ i ].slide, { [ Resolver.marginProp ]: unit( options.gap ) } )
+			applyStyle( Slides[ i ].slide, { [ Resolver.marginProp ]: unit( Resolver.gap ) } )
 		}
 
 		resize();
