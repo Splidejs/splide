@@ -57,6 +57,8 @@ export default ( Splide, Components ) => {
 					.on( 'active', Slide => { updateNavigation( Slide, true ) } )
 					.on( 'inactive', Slide => { updateNavigation( Slide, false ) } );
 			}
+
+			initAutoplay();
 		},
 	};
 
@@ -146,6 +148,24 @@ export default ( Splide, Components ) => {
 	}
 
 	/**
+	 * Initialize autoplay buttons.
+	 */
+	function initAutoplay() {
+		const Elements = Components.Elements;
+
+		[ Elements.play, Elements.pause ].forEach( ( elm, index ) => {
+			if ( elm ) {
+				if ( ! isButton( elm ) ) {
+					setAttribute( elm, 'role', 'button' );
+				}
+
+				setAttribute( elm, ARIA_CONTROLS, Elements.track.id );
+				setAttribute( elm, ARIA_LABEL, i18n[ index === 0 ? 'play' : 'pause' ] );
+			}
+		} );
+	}
+
+	/**
 	 * Initialize navigation slider.
 	 * Add button role, aria-label, aria-controls to slide elements and append screen reader text to them.
 	 *
@@ -157,8 +177,8 @@ export default ( Splide, Components ) => {
 		Slides.forEach( Slide => {
 			const slide = Slide.slide;
 
-			if ( slide.tagName.toLowerCase() !== 'button' ) {
-				setAttribute( slide, 'role', 'button' )
+			if ( ! isButton( slide ) ) {
+				setAttribute( slide, 'role', 'button' );
 			}
 
 			const slideIndex = Slide.realIndex > -1 ? Slide.realIndex : Slide.index;
@@ -185,6 +205,17 @@ export default ( Splide, Components ) => {
 		} else {
 			removeAttribute( slide, ARIA_CURRENRT );
 		}
+	}
+
+	/**
+	 * Check if the given element is button or not.
+	 *
+	 * @param {Element} elm - An element to be checked.
+	 *
+	 * @return {boolean} - True if the given element is button.
+	 */
+	function isButton( elm ) {
+		return elm.tagName.toLowerCase() === 'button';
 	}
 
 	return A11y;
