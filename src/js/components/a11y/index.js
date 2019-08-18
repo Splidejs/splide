@@ -5,7 +5,7 @@
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
-import { create, setAttribute, removeAttribute } from '../../utils/dom';
+import { setAttribute, removeAttribute } from '../../utils/dom';
 import { sprintf } from '../../utils/utils';
 import { ARIA_CONTROLS, ARIA_CURRENRT, ARIA_HIDDEN, ARIA_LABEL, TAB_INDEX } from '../../constants/a11y';
 
@@ -19,13 +19,6 @@ import { ARIA_CONTROLS, ARIA_CURRENRT, ARIA_HIDDEN, ARIA_LABEL, TAB_INDEX } from
  * @return {Object} - The component object.
  */
 export default ( Splide, Components ) => {
-	/**
-	 * Hold elements for screen reader text.
-	 *
-	 * @type {Element}
-	 */
-	let prevSrt, nextSrt;
-
 	/**
 	 * Hold a i18n object.
 	 *
@@ -86,12 +79,6 @@ export default ( Splide, Components ) => {
 	 * @param {Element} next - Next arrow element.
 	 */
 	function initArrows( prev, next ) {
-		prevSrt = createSrt( i18n.prev );
-		nextSrt = createSrt( i18n.next );
-
-		prev.appendChild( prevSrt );
-		next.appendChild( nextSrt );
-
 		const controls = Components.Elements.track.id;
 
 		setAttribute( prev, ARIA_CONTROLS, controls );
@@ -110,9 +97,6 @@ export default ( Splide, Components ) => {
 		const index = Splide.index;
 		const prevLabel = prevIndex > -1 && index < prevIndex ? i18n.last : i18n.prev;
 		const nextLabel = nextIndex > -1 && index > nextIndex ? i18n.first : i18n.next;
-
-		prevSrt.innerHTML = prevLabel;
-		nextSrt.innerHTML = nextLabel;
 
 		setAttribute( prev, ARIA_LABEL, prevLabel );
 		setAttribute( next, ARIA_LABEL, nextLabel );
@@ -134,11 +118,9 @@ export default ( Splide, Components ) => {
 			const options  = Splide.options;
 			const text     = options.focus === false && options.perPage > 1 ? i18n.pageX : i18n.slideX;
 			const label    = sprintf( text, item.page + 1 );
-			const srt      = createSrt( label );
 			const button   = item.button;
 			const controls = [];
 
-			button.appendChild( srt );
 			item.Slides.forEach( Slide => { controls.push( Slide.slide.id ) } );
 
 			setAttribute( button, ARIA_CONTROLS, controls.join( ' ' ) );
@@ -184,7 +166,6 @@ export default ( Splide, Components ) => {
 			const mainSlide  = main.Components.Slides.getSlide( slideIndex );
 
 			setAttribute( slide, ARIA_LABEL, label );
-			slide.appendChild( createSrt( label ) );
 
 			if ( mainSlide ) {
 				setAttribute( slide, ARIA_CONTROLS, mainSlide.slide.id );
@@ -204,19 +185,6 @@ export default ( Splide, Components ) => {
 		} else {
 			removeAttribute( slide, ARIA_CURRENRT );
 		}
-	}
-
-	/**
-	 * Create an element for screen reader text.
-	 *
-	 * @param {string} text - A screen reader text.
-	 *
-	 * @return {Element} - A created element.
-	 */
-	function createSrt( text ) {
-		const srt = create( 'span', { class: Splide.classes.sr } );
-		srt.textContent = text;
-		return srt;
 	}
 
 	return A11y;
