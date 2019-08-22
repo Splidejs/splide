@@ -97,7 +97,7 @@ export default ( Splide, Components, options ) => {
 		 */
 		get height() {
 			const height = options.height || this.width * options.heightRatio;
-			exist( height, '"height" or "heightRatio" must be given in TTB mode.' );
+			exist( height, '"height" or "heightRatio" is missing.' );
 			return toPixel( Splide.root, height ) - this.padding.top - this.padding.bottom;
 		},
 

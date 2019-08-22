@@ -17,28 +17,47 @@ import { subscribe, applyStyle } from '../../utils/dom';
  * @return {Object} - The component object.
  */
 export default ( Splide, Components ) => {
+	/**
+	 * Hold the list element.
+	 *
+	 * @type {Element}
+	 */
+	let list;
+
+	/**
+	 * Hold the onEnd callback function.
+	 *
+	 * @type {function}
+	 */
+	let endCallback;
+
 	return {
+		/**
+		 * Called when the component is mounted.
+		 */
+		mount() {
+			list = Components.Elements.list;
+
+			subscribe( list, 'transitionend', e => {
+				if ( e.target === list && endCallback ) {
+					endCallback();
+				}
+			} );
+		},
+
 		/**
 		 * Start transition.
 		 *
-		 * @param {number}    destIndex - Destination slide index that might be clone's.
-		 * @param {number}    newIndex  - New index.
-		 * @param {Object}    coord     - Destination coordinates.
-		 * @param {function}  onEnd     - Callback function must be invoked when transition is completed.
+		 * @param {number}   destIndex - Destination slide index that might be clone's.
+		 * @param {number}   newIndex  - New index.
+		 * @param {Object}   coord     - Destination coordinates.
+		 * @param {function} onEnd     - Callback function must be invoked when transition is completed.
 		 */
 		start( destIndex, newIndex, coord, onEnd ) {
-			const list    = Components.Elements.list;
-			const options = Splide.options;
-
-			const removers = subscribe( list, 'transitionend', e => {
-				if ( e.target === list ) {
-					onEnd();
-					removers[0]();
-				}
-			} );
+			endCallback = onEnd;
 
 			applyStyle( list, {
-				transition: `transform ${ options.speed }ms ${ options.easing }`,
+				transition: `transform ${ Splide.options.speed }ms ${ Splide.options.easing }`,
 				transform : `translate(${ coord.x }px,${ coord.y }px)`,
 			} );
 		},

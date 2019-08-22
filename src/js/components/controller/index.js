@@ -105,7 +105,7 @@ export default ( Splide, Components ) => {
 		 * @return {number} - A computed page number.
 		 */
 		pageToIndex( page ) {
-			if ( options.focus !== false ) {
+			if ( hasFocus() ) {
 				return page;
 			}
 
@@ -131,7 +131,7 @@ export default ( Splide, Components ) => {
 		 * @return {number} - A computed page number.
 		 */
 		indexToPage( index ) {
-			if ( options.focus !== false ) {
+			if ( hasFocus() ) {
 				return index;
 			}
 
@@ -207,7 +207,7 @@ export default ( Splide, Components ) => {
 		 */
 		get pageLength() {
 			const length = Splide.length;
-			return options.focus !== false ? length : Math.ceil( length / options.perPage );
+			return hasFocus() ? length : Math.ceil( length / options.perPage );
 		},
 
 		/**
@@ -218,7 +218,7 @@ export default ( Splide, Components ) => {
 		get edgeIndex() {
 			const length = Splide.length;
 
-			if ( options.focus !== false || options.isNavigation || Splide.is( LOOP ) ) {
+			if ( hasFocus() || options.isNavigation || Splide.is( LOOP ) ) {
 				return length - 1;
 			}
 
@@ -231,7 +231,7 @@ export default ( Splide, Components ) => {
 		 * @return {number} - The index of the previous slide if available. -1 otherwise.
 		 */
 		get prevIndex() {
-			let prev = this.parse( '-' );
+			let prev = Splide.index - 1;
 
 			if ( Splide.is( LOOP ) || options.rewind ) {
 				prev = this.rewind( prev );
@@ -246,7 +246,7 @@ export default ( Splide, Components ) => {
 		 * @return {number} - The index of the next slide if available. -1 otherwise.
 		 */
 		get nextIndex() {
-			let next = this.parse( '+' );
+			let next = Splide.index + 1;
 
 			if ( Splide.is( LOOP ) || options.rewind ) {
 				next = this.rewind( next );
@@ -266,6 +266,15 @@ export default ( Splide, Components ) => {
 				options = newOptions;
 				Splide.index = Controller.rewind( Controller.trim( Splide.index ) );
 			} );
+	}
+
+	/**
+	 * Verify if the focus option is available or not.
+	 *
+	 * @return {boolean} - True if a slider has the focus option.
+	 */
+	function hasFocus() {
+		return Splide.options.focus !== false;
 	}
 
 	return Controller;

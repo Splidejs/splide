@@ -1,6 +1,7 @@
 import { minimum } from '../data/html';
 import Splide from '../../src/js/splide';
 import { DEFAULTS } from '../../src/js/constants/defaults';
+import { COMPLETE } from '../../src/js/components';
 
 
 describe( 'Splide ', () => {
@@ -9,23 +10,23 @@ describe( 'Splide ', () => {
 	} );
 
 	test( 'should find an element with the given selector.', () => {
-		const splide = new Splide( '#splide' );
+		const splide = new Splide( '#splide', {}, COMPLETE );
 		expect( splide.root.id ).toBe( 'splide' );
 	} );
 
 	test( 'should accept an element as a root on construction.', () => {
 		const root   = document.getElementById( 'splide' );
-		const splide = new Splide( root );
+		const splide = new Splide( root, {}, COMPLETE );
 		expect( splide.root.id ).toBe( 'splide' );
 	} );
 
 	test( 'should overwrite default options with a given ones on construction.', () => {
-		const splide = new Splide( '#splide', { perPage: 3 } );
+		const splide = new Splide( '#splide', { perPage: 3 }, COMPLETE );
 		expect( splide.options ).toEqual( { ...DEFAULTS, perPage: 3 } );
 	} );
 
 	test( '"is" should verify if a given type is a current one.', () => {
-		const splide = new Splide( '#splide', { type: 'loop' } ).mount();
+		const splide = new Splide( '#splide', { type: 'loop' }, COMPLETE ).mount();
 		expect( splide.is( 'slide' ) ).toBe( false );
 		expect( splide.is( 'loop' ) ).toBe( true );
 	} );
@@ -34,7 +35,7 @@ describe( 'Splide ', () => {
 		const root = document.getElementById( 'splide' );
 		root.style.visibility = 'hidden';
 
-		const splide = new Splide( root );
+		const splide = new Splide( root, {}, COMPLETE );
 		expect( splide.root.style.visibility ).toBe( 'hidden' );
 
 		splide.mount();
