@@ -11,7 +11,7 @@
 * Multiple slides
 * Slide or fade transition by CSS
 * Responsive, supporting breakpoints
-* Accepting CSS relative units, such as vw, %, rem, etc.
+* Accepting CSS relative units, such as vw, %, rem, etc
 * No need to crop images
 * Autoplay with progress bar and play/pause buttons
 * "Right to left" and vertical direction
@@ -27,6 +27,7 @@ There are 3 ways to install the Splide on your site.
 * NPM
 * Download
 * CDN
+
 Only NPM way is explained in the following steps. Visit [this page](https://splidejs.com/getting-started/) for other methods.
 
 1. Get the latest version by NPM:
