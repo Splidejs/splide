@@ -28,7 +28,7 @@ There are 3 ways to install the Splide on your site.
 * Download
 * CDN
 
-Only NPM way is explained in the following steps. Visit [this page](https://splidejs.com/getting-started/) for other methods.
+Only the NPM way is explained in the following steps. Visit [this page](https://splidejs.com/getting-started/) for other methods.
 
 1. Get the latest version by NPM:
     ```bash
