@@ -72,7 +72,7 @@ Or set a ```data-splide``` attribute to a root element in a JSON format:
 </div>
 ```
 ### Available Options
-Here is a list of options and brief explanations. Visit [this page] for more details.
+Here is a list of options and brief explanations. Visit [this page](https://splidejs.com/options/) for more details.
 
 * **type**: Determine a slider type.
 * **rewind**: Whether to rewind a slider before the first slide or after the last one.
