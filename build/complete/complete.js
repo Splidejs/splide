@@ -5,21 +5,18 @@
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
-import Splide from '../../src/js/splide';
+import { default as Core } from '../../src/js/splide';
 import { COMPLETE } from '../../src/js/components';
 
 
 /**
- * Create and return a new Splide instance.
- *
- * @param {Element|string} root    - A root element or a selector for it.
- * @param {Object}         options - Optional. Options overwriting defaults.
- *
- * @return {Splide} - A Splide instance.
+ * Export Splide with all components.
  */
-export default function splide( root, options = {} ) {
-	return new Splide( root, options, COMPLETE );
+export class Splide extends Core {
+	constructor( root, options ) {
+		super( root, options, COMPLETE );
+	}
 }
 
-// Register the function above as global for non-ES6 environment.
-window.splide = splide;
+// Register the class as a global variable for non-ES6 environment.
+window.Splide = Splide;

@@ -4,9 +4,7 @@ const webpack = require( 'webpack' );
 module.exports = {
 	entry: './build/complete/complete.js',
 	output: {
-		filename     : 'splide.js',
-		library      : 'Splide',
-		libraryTarget: 'umd',
+		filename: 'splide.js',
 	},
 	module: {
 		rules: [
