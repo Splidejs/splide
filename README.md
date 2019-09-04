@@ -41,29 +41,29 @@ Only the NPM way is explained in the following steps. Visit [this page](https://
 1. Write HTML for building a slider:
     ```html
     <div id="#splide" class="splide">
-        <div class="splide__track">
-            <ul class="splide__list">
-                <li class="splide__slide">Slide 01</li>
-                <li class="splide__slide">Slide 02</li>
-                <li class="splide__slide">Slide 03</li>
-            </ul>
-        </div>
+      <div class="splide__track">
+        <ul class="splide__list">
+          <li class="splide__slide">Slide 01</li>
+          <li class="splide__slide">Slide 02</li>
+          <li class="splide__slide">Slide 03</li>
+        </ul>
+      </div>
     </div>
     ```
 1. Initialize Splide. The selector accepts an ID, a class name or an Element itself:
     ```javascript
-    import splide from '@splidejs/splide';
-    splide( '#splide' ).mount();
+    import Splide from '@splidejs/splide';
+    new Splide( '#splide' ).mount();
     ```
     Note that only the first element will be initialized even if using a class name.
 
 ## Options
 ### Changing Options
-Pass an object to the second argument of ```splide()```:
+Pass an object to the second argument of the ```Splide``` constructor:
 ```javascript
-splide( '#splide', {
-	type   : 'loop',
-	perPage: 3,
+new Splide( '#splide', {
+  type   : 'loop',
+  perPage: 3,
 } );
 ```
 Or set a ```data-splide``` attribute to a root element in a JSON format: 
