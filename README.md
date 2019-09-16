@@ -40,7 +40,7 @@ Only the NPM way is explained in the following steps. Visit [this page](https://
     ```
 1. Write HTML for building a slider:
     ```html
-    <div id="#splide" class="splide">
+    <div id="splide" class="splide">
       <div class="splide__track">
         <ul class="splide__list">
           <li class="splide__slide">Slide 01</li>
