@@ -7,7 +7,7 @@
 
 import { each, merge } from '../../utils/object';
 import { error } from '../../utils/error';
-
+import { getAttribute } from "../../utils/dom";
 
 /**
  * The component for initializing options.
@@ -28,7 +28,7 @@ export default ( Splide ) => {
 	 *
 	 * @type {string}
 	 */
-	const options = root.getAttribute( 'data-splide' );
+	const options = getAttribute( root, 'data-splide' );
 
 	if ( options ) {
 		try {

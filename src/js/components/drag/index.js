@@ -10,6 +10,7 @@ import { TTB } from '../../constants/directions';
 import { subscribe } from '../../utils/dom';
 import { between } from '../../utils/utils';
 import { IDLE } from '../../constants/states';
+import { each } from "../../utils/object";
 
 
 /**
@@ -130,6 +131,11 @@ export default ( Splide, Components ) => {
 			subscribe( list, 'touchstart mousedown', start );
 			subscribe( list, 'touchmove mousemove', move, false );
 			subscribe( list, 'touchend touchcancel mouseleave mouseup dragend', end );
+
+			// Prevent dragging an image itself.
+			each( list.getElementsByTagName( 'img' ), img => {
+				subscribe( img, 'dragstart', e => { e.preventDefault() }, false );
+			} );
 		},
 	};
 

@@ -127,6 +127,22 @@ export function setAttribute( elm, name, value ) {
 }
 
 /**
+ * Get attribute from the given element.
+ *
+ * @param {Element} elm  - An element where an attribute is assigned.
+ * @param {string}  name - Attribute name.
+ *
+ * @return {string|null} - The value of the given attribute if available. Null if not.
+ */
+export function getAttribute( elm, name ) {
+	if ( elm ) {
+		return elm.getAttribute( name );
+	}
+
+	return null;
+}
+
+/**
  * Remove attribute from the given element.
  *
  * @param {Element} elm   - An element where an attribute is removed.

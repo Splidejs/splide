@@ -827,6 +827,22 @@ function setAttribute(elm, name, value) {
   }
 }
 /**
+ * Get attribute from the given element.
+ *
+ * @param {Element} elm  - An element where an attribute is assigned.
+ * @param {string}  name - Attribute name.
+ *
+ * @return {string|null} - The value of the given attribute if available. Null if not.
+ */
+
+function getAttribute(elm, name) {
+  if (elm) {
+    return elm.getAttribute(name);
+  }
+
+  return null;
+}
+/**
  * Remove attribute from the given element.
  *
  * @param {Element} elm   - An element where an attribute is removed.
@@ -1438,6 +1454,7 @@ function () {
  */
 
 
+
 /**
  * The component for initializing options.
  *
@@ -1458,7 +1475,7 @@ function () {
    * @type {string}
    */
 
-  var options = root.getAttribute('data-splide');
+  var options = getAttribute(root, 'data-splide');
 
   if (options) {
     try {
@@ -3447,6 +3464,7 @@ var THROTTLE = 50;
 
 
 
+
 /**
  * Adjust how much the track can be pulled on the first or last page.
  * The larger number this is, the farther the track moves.
@@ -3563,7 +3581,13 @@ var SWIPE_THRESHOLD = 150;
       var list = Components.Elements.list;
       subscribe(list, 'touchstart mousedown', start);
       subscribe(list, 'touchmove mousemove', move, false);
-      subscribe(list, 'touchend touchcancel mouseleave mouseup dragend', end);
+      subscribe(list, 'touchend touchcancel mouseleave mouseup dragend', end); // Prevent dragging an image itself.
+
+      each(list.getElementsByTagName('img'), function (img) {
+        subscribe(img, 'dragstart', function (e) {
+          e.preventDefault();
+        }, false);
+      });
     }
   };
   /**
@@ -3759,6 +3783,94 @@ var SWIPE_THRESHOLD = 150;
   }
 
   return Drag;
+});
+// CONCATENATED MODULE: ./src/js/components/links/index.js
+/**
+ * The component for disabling a link while a slider is dragged.
+ *
+ * @author    Naotoshi Fujita
+ * @copyright Naotoshi Fujita. All rights reserved.
+ */
+
+
+
+/**
+ * The name for a data attribute.
+ *
+ * @type {string}
+ */
+
+var HREF_DATA_NAME = 'data-splide-href';
+/**
+ * The component for disabling a link while a slider is dragged.
+ *
+ * @param {Splide} Splide     - A Splide instance.
+ * @param {Object} Components - An object containing components.
+ *
+ * @return {Object} - The component object.
+ */
+
+/* harmony default export */ var components_links = (function (Splide, Components) {
+  /**
+   * Hold all anchor elements under the list.
+   *
+   * @type {Array}
+   */
+  var links = [];
+  /**
+   * Links component object.
+   *
+   * @type {Object}
+   */
+
+  var Links = {
+    /**
+     * Mount only when the drag is activated and the slide type is not "fade".
+     *
+     * @type {boolean}
+     */
+    required: Splide.options.drag && !Splide.is(FADE),
+
+    /**
+     * Called when the component is mounted.
+     */
+    mount: function mount() {
+      links = values(Components.Elements.list.getElementsByTagName('a'));
+      links.forEach(function (link) {
+        setAttribute(link, HREF_DATA_NAME, getAttribute(link, 'href'));
+      });
+      bind();
+    }
+  };
+  /**	 * Listen some events.
+   */
+
+  function bind() {
+    Splide.on('drag', disable);
+    Splide.on('moved', enable);
+  }
+  /**
+   * Disable links by removing href attributes.
+   */
+
+
+  function disable() {
+    links.forEach(function (link) {
+      return removeAttribute(link, 'href');
+    });
+  }
+  /**
+   * Enable links by restoring href attributes.
+   */
+
+
+  function enable() {
+    links.forEach(function (link) {
+      return setAttribute(link, 'href', getAttribute(link, HREF_DATA_NAME));
+    });
+  }
+
+  return Links;
 });
 // CONCATENATED MODULE: ./src/js/components/autoplay/index.js
 /**
@@ -4533,7 +4645,7 @@ var SRC_DATA_NAME = 'data-splide-lazy';
       loaded(img, spinner, Slide, true);
     };
 
-    setAttribute(img, 'src', img.getAttribute(SRC_DATA_NAME));
+    setAttribute(img, 'src', getAttribute(img, SRC_DATA_NAME));
   }
   /**
    * Start loading a next image in images array.
@@ -5199,6 +5311,7 @@ var TRIGGER_KEYS = [' ', 'Enter', 'Spacebar'];
 
 
 
+
 var COMPLETE = {
   Options: components_options,
   Elements: components_elements,
@@ -5208,6 +5321,7 @@ var COMPLETE = {
   Clones: components_clones,
   Layout: layout,
   Drag: drag,
+  Links: components_links,
   Autoplay: components_autoplay,
   Cover: components_cover,
   Arrows: components_arrows,

@@ -6,7 +6,7 @@
  */
 
 import { STATUS_CLASSES } from '../../constants/classes';
-import { create, find, addClass, removeClass, setAttribute, applyStyle } from '../../utils/dom';
+import { create, find, addClass, removeClass, setAttribute, getAttribute, applyStyle } from '../../utils/dom';
 
 /**
  * The name for a data attribute.
@@ -132,7 +132,7 @@ export default ( Splide, Components, name ) => {
 		img.onload  = () => { loaded( img, spinner, Slide, false ) };
 		img.onerror = () => { loaded( img, spinner, Slide, true ) };
 
-		setAttribute( img, 'src', img.getAttribute( SRC_DATA_NAME ) );
+		setAttribute( img, 'src', getAttribute( img, SRC_DATA_NAME ) );
 	}
 
 	/**

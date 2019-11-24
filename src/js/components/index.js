@@ -13,6 +13,7 @@ import Track       from './track';
 import Clones      from './clones';
 import Layout      from './layout';
 import Drag        from './drag';
+import Links       from './links';
 import Autoplay    from './autoplay';
 import Cover       from './cover';
 import Arrows      from './arrows';
@@ -32,6 +33,7 @@ export const COMPLETE = {
 	Clones,
 	Layout,
 	Drag,
+	Links,
 	Autoplay,
 	Cover,
 	Arrows,
