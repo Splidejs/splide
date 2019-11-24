@@ -25,6 +25,10 @@ const js = {
 		dest: './dist/js',
 		gzip: true,
 	},
+	module: {
+		path: './build/module/config',
+		dest: './dist/js',
+	},
 };
 
 
@@ -58,7 +62,6 @@ const css = {
 gulp.task( 'build:js', done => {
 	Object.values( js ).forEach( settings => {
 		const stream = webpackStream( { config: require( settings.path ) } )
-			.pipe( rename( { suffix: '.min' } ) )
 			.pipe( gulp.dest( settings.dest ) );
 
 		if ( settings.gzip ) {

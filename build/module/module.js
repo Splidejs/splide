@@ -1,5 +1,5 @@
 /**
- * Export "Splide" class for frontend with full components.
+ * Export Splide class for import.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
@@ -10,13 +10,10 @@ import { COMPLETE } from '../../src/js/components';
 
 
 /**
- * Export Splide with all components.
+ * Export Splide class for import from other projects.
  */
-export class Splide extends Core {
+export default class Splide extends Core {
 	constructor( root, options ) {
 		super( root, options, COMPLETE );
 	}
 }
-
-// Register the class as a global variable for non-ES6 environment.
-window.Splide = Splide;

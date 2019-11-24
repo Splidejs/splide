@@ -4,7 +4,7 @@
   "description": "Splide is a lightweight and powerful slider without any dependencies.",
   "author": "Naotoshi Fujita",
   "license": "MIT",
-  "main": "dist/js/splide.min.js",
+  "main": "dist/js/splide.js",
   "keywords": [
     "splide",
     "slider",
