@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 1.2.1
+ * Version  : 1.2.3
  * License  : MIT
  * Copyright: 2019 Naotoshi Fujita
  */
@@ -554,7 +554,7 @@ var DEFAULTS = {
 
   /**
    * Loading images lazily.
-   * Image src must be provided by a data-splide-src attribute.
+   * Image src must be provided by a data-splide-lazy attribute.
    *
    * - false: Do nothing.
    * - 'nearby': Only images around an active slide will be loaded.

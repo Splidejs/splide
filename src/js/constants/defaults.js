@@ -177,7 +177,7 @@ export const DEFAULTS = {
 
 	/**
 	 * Loading images lazily.
-	 * Image src must be provided by a data-splide-src attribute.
+	 * Image src must be provided by a data-splide-lazy attribute.
 	 *
 	 * - false: Do nothing.
 	 * - 'nearby': Only images around an active slide will be loaded.
