@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 1.2.3
+ * Version  : 1.2.4
  * License  : MIT
  * Copyright: 2019 Naotoshi Fujita
  */
@@ -3842,7 +3842,8 @@ var HREF_DATA_NAME = 'data-splide-href';
       bind();
     }
   };
-  /**	 * Listen some events.
+  /**
+   * Listen some events.
    */
 
   function bind() {
