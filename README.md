@@ -6,7 +6,7 @@
 
 ## Features
 * Pure JavaScript without any dependencies
-* Small size, less than 26kB(10kB gzipped)
+* Small size, less than 27kB(10kB gzipped)
 * Flexible and extensible
 * Multiple slides
 * Slide or fade transition by CSS
