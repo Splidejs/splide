@@ -76,6 +76,7 @@ export default ( Splide, Components, name ) => {
 
 				if ( img ) {
 					images.push( { img, Slide } );
+					applyStyle( img, { visibility: 'hidden' } );
 				}
 			} );
 
@@ -131,7 +132,6 @@ export default ( Splide, Components, name ) => {
 		img.onload  = () => { loaded( img, spinner, Slide, false ) };
 		img.onerror = () => { loaded( img, spinner, Slide, true ) };
 
-		applyStyle( img, { visibility: 'hidden' } );
 		setAttribute( img, 'src', img.getAttribute( SRC_DATA_NAME ) );
 	}
 

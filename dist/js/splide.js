@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 1.2.0
+ * Version  : 1.2.1
  * License  : MIT
  * Copyright: 2019 Naotoshi Fujita
  */
@@ -4467,6 +4467,9 @@ var SRC_DATA_NAME = 'data-splide-lazy';
             img: img,
             Slide: Slide
           });
+          applyStyle(img, {
+            visibility: 'hidden'
+          });
         }
       });
 
@@ -4530,9 +4533,6 @@ var SRC_DATA_NAME = 'data-splide-lazy';
       loaded(img, spinner, Slide, true);
     };
 
-    applyStyle(img, {
-      visibility: 'hidden'
-    });
     setAttribute(img, 'src', img.getAttribute(SRC_DATA_NAME));
   }
   /**
