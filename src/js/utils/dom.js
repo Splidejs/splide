@@ -160,14 +160,14 @@ export function removeAttribute( elm, name ) {
  * @param {Element|Window}  elm     - An element or window object.
  * @param {string}          event   - An event name or event names separated with space.
  * @param {function}        handler - Callback function.
- * @param {boolean}         passive - Optional. Set false if the event is not passive.
+ * @param {Object}          options - Optional. Options.
  *
  * @return {function[]} - Functions to stop subscription.
  */
-export function subscribe( elm, event, handler, passive = true ) {
+export function subscribe( elm, event, handler, options = {} ) {
 	if ( elm ) {
 		return event.split( ' ' ).map( e => {
-			elm.addEventListener( e, handler, { passive } );
+			elm.addEventListener( e, handler, options );
 			return () => elm.removeEventListener( e, handler );
 		} );
 	}

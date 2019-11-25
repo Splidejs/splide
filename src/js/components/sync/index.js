@@ -138,7 +138,7 @@ export default ( Splide ) => {
 					e.preventDefault();
 					moveSibling( Slide.index );
 				}
-			}, false );
+			}, { passive: false } );
 		} );
 	}
 

@@ -129,12 +129,12 @@ export default ( Splide, Components ) => {
 			const list = Components.Elements.list;
 
 			subscribe( list, 'touchstart mousedown', start );
-			subscribe( list, 'touchmove mousemove', move, false );
+			subscribe( list, 'touchmove mousemove', move, { passive: false } );
 			subscribe( list, 'touchend touchcancel mouseleave mouseup dragend', end );
 
-			// Prevent dragging an image itself.
-			each( list.getElementsByTagName( 'img' ), img => {
-				subscribe( img, 'dragstart', e => { e.preventDefault() }, false );
+			// Prevent dragging an image or anchor itself.
+			each( list.querySelectorAll( 'img, a' ), elm => {
+				subscribe( elm, 'dragstart', e => { e.preventDefault() }, { passive: false } );
 			} );
 		},
 	};

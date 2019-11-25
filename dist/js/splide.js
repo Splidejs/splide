@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 1.2.4
+ * Version  : 1.2.5
  * License  : MIT
  * Copyright: 2019 Naotoshi Fujita
  */
@@ -860,21 +860,19 @@ function removeAttribute(elm, name) {
  * @param {Element|Window}  elm     - An element or window object.
  * @param {string}          event   - An event name or event names separated with space.
  * @param {function}        handler - Callback function.
- * @param {boolean}         passive - Optional. Set false if the event is not passive.
+ * @param {Object}          options - Optional. Options.
  *
  * @return {function[]} - Functions to stop subscription.
  */
 
-function subscribe(elm, event, handler, passive) {
-  if (passive === void 0) {
-    passive = true;
+function subscribe(elm, event, handler, options) {
+  if (options === void 0) {
+    options = {};
   }
 
   if (elm) {
     return event.split(' ').map(function (e) {
-      elm.addEventListener(e, handler, {
-        passive: passive
-      });
+      elm.addEventListener(e, handler, options);
       return function () {
         return elm.removeEventListener(e, handler);
       };
@@ -3580,13 +3578,17 @@ var SWIPE_THRESHOLD = 150;
     mount: function mount() {
       var list = Components.Elements.list;
       subscribe(list, 'touchstart mousedown', start);
-      subscribe(list, 'touchmove mousemove', move, false);
-      subscribe(list, 'touchend touchcancel mouseleave mouseup dragend', end); // Prevent dragging an image itself.
+      subscribe(list, 'touchmove mousemove', move, {
+        passive: false
+      });
+      subscribe(list, 'touchend touchcancel mouseleave mouseup dragend', end); // Prevent dragging an image or anchor itself.
 
-      each(list.getElementsByTagName('img'), function (img) {
-        subscribe(img, 'dragstart', function (e) {
+      each(list.querySelectorAll('img, a'), function (elm) {
+        subscribe(elm, 'dragstart', function (e) {
           e.preventDefault();
-        }, false);
+        }, {
+          passive: false
+        });
       });
     }
   };
@@ -3784,25 +3786,18 @@ var SWIPE_THRESHOLD = 150;
 
   return Drag;
 });
-// CONCATENATED MODULE: ./src/js/components/links/index.js
+// CONCATENATED MODULE: ./src/js/components/click/index.js
 /**
- * The component for disabling a link while a slider is dragged.
+ * The component for handling a click event.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
 
-
 /**
- * The name for a data attribute.
- *
- * @type {string}
- */
-
-var HREF_DATA_NAME = 'data-splide-href';
-/**
- * The component for disabling a link while a slider is dragged.
+ * The component for handling a click event.
+ * Click should be disabled during drag/swipe.
  *
  * @param {Splide} Splide     - A Splide instance.
  * @param {Object} Components - An object containing components.
@@ -3810,20 +3805,20 @@ var HREF_DATA_NAME = 'data-splide-href';
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ var components_links = (function (Splide, Components) {
+/* harmony default export */ var components_click = (function (Splide, Components) {
   /**
-   * Hold all anchor elements under the list.
+   * Whether click is disabled or not.
    *
-   * @type {Array}
+   * @type {boolean}
    */
-  var links = [];
+  var disabled = false;
   /**
-   * Links component object.
+   * Click component object.
    *
    * @type {Object}
    */
 
-  var Links = {
+  var Click = {
     /**
      * Mount only when the drag is activated and the slide type is not "fade".
      *
@@ -3835,43 +3830,31 @@ var HREF_DATA_NAME = 'data-splide-href';
      * Called when the component is mounted.
      */
     mount: function mount() {
-      links = values(Components.Elements.list.getElementsByTagName('a'));
-      links.forEach(function (link) {
-        setAttribute(link, HREF_DATA_NAME, getAttribute(link, 'href'));
+      subscribe(Components.Elements.track, 'click', click, {
+        capture: true
       });
-      bind();
+      Splide.on('drag', function () {
+        disabled = true;
+      }).on('moved', function () {
+        disabled = false;
+      });
     }
   };
   /**
-   * Listen some events.
+   * Called when a track element is clicked.
+   *
+   * @param {Event} e - A click event.
    */
 
-  function bind() {
-    Splide.on('drag', disable);
-    Splide.on('moved', enable);
-  }
-  /**
-   * Disable links by removing href attributes.
-   */
-
-
-  function disable() {
-    links.forEach(function (link) {
-      return removeAttribute(link, 'href');
-    });
-  }
-  /**
-   * Enable links by restoring href attributes.
-   */
-
-
-  function enable() {
-    links.forEach(function (link) {
-      return setAttribute(link, 'href', getAttribute(link, HREF_DATA_NAME));
-    });
+  function click(e) {
+    if (disabled) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+    }
   }
 
-  return Links;
+  return Click;
 });
 // CONCATENATED MODULE: ./src/js/components/autoplay/index.js
 /**
@@ -5165,7 +5148,9 @@ var TRIGGER_KEYS = [' ', 'Enter', 'Spacebar'];
           e.preventDefault();
           moveSibling(Slide.index);
         }
-      }, false);
+      }, {
+        passive: false
+      });
     });
   }
 
@@ -5322,7 +5307,7 @@ var COMPLETE = {
   Clones: components_clones,
   Layout: layout,
   Drag: drag,
-  Links: components_links,
+  Click: components_click,
   Autoplay: components_autoplay,
   Cover: components_cover,
   Arrows: components_arrows,
