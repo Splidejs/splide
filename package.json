@@ -22,9 +22,9 @@
     "url": "https://github.com/Splidejs/splide/issues"
   },
   "devDependencies": {
-    "@babel/core": "^7.5.5",
-    "@babel/preset-env": "^7.5.5",
-    "autoprefixer": "^9.6.1",
+    "@babel/core": "^7.7.5",
+    "@babel/preset-env": "^7.7.6",
+    "autoprefixer": "^9.7.3",
     "babel-jest": "^24.9.0",
     "babel-loader": "^8.0.6",
     "cssnano": "^4.1.10",
@@ -41,7 +41,7 @@
     "jest": "^24.9.0",
     "merge-stream": "^2.0.0",
     "uglifyjs-webpack-plugin": "^2.2.0",
-    "webpack": "^4.39.3",
+    "webpack": "^4.41.2",
     "webpack-stream": "^5.2.1"
   },
   "scripts": {
