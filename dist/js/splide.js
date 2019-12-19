@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 1.2.7
+ * Version  : 1.3.0
  * License  : MIT
  * Copyright: 2019 Naotoshi Fujita
  */
@@ -2096,7 +2096,6 @@ function slide_Slide(index, realIndex, slide, Splide) {
       }
 
       var events = 'mounted updated ' + (Splide.options.updateOnMove ? 'move' : 'moved');
-      console.log(events);
       Splide.on(events, function () {
         _this.update(_this.isActive(), false);
 
