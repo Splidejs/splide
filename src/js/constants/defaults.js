@@ -281,6 +281,14 @@ export const DEFAULTS = {
 	trimSpace: true,
 
 	/**
+	 * Slide status is updated after move as default.
+	 * If true, it will be updated before move.
+	 *
+	 * @type {boolean}
+	 */
+	updateOnMove: false,
+
+	/**
 	 * Breakpoints definitions.
 	 *
 	 * @example

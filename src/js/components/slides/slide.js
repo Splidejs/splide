@@ -66,10 +66,14 @@ export default function Slide( index, realIndex, slide, Splide ) {
 				slide.id = `${ Splide.root.id }-slide${ number < 10 ? '0' + number : number }`;
 			}
 
-			Splide.on( 'mounted moved updated', () => {
-				this.update( this.isActive(), false );
-				this.update( this.isVisible(), true );
-			} ).on( 'resize', () => { this.update( this.isVisible(), true ) } );
+			const events = 'mounted updated ' + ( Splide.options.updateOnMove ? 'move' : 'moved' );
+
+			Splide
+				.on( events, () => {
+					this.update( this.isActive(), false );
+					this.update( this.isVisible(), true );
+				} )
+				.on( 'resize', () => { this.update( this.isVisible(), true ) } );
 		},
 
 		/**

@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 1.2.5
+ * Version  : 1.2.7
  * License  : MIT
  * Copyright: 2019 Naotoshi Fujita
  */
@@ -656,6 +656,14 @@ var DEFAULTS = {
    * @type {boolean}
    */
   trimSpace: true,
+
+  /**
+   * Slide status is updated after move as default.
+   * If true, it will be updated before move.
+   *
+   * @type {boolean}
+   */
+  updateOnMove: false,
 
   /**
    * Breakpoints definitions.
@@ -2087,7 +2095,9 @@ function slide_Slide(index, realIndex, slide, Splide) {
         slide.id = Splide.root.id + "-slide" + (number < 10 ? '0' + number : number);
       }
 
-      Splide.on('mounted moved updated', function () {
+      var events = 'mounted updated ' + (Splide.options.updateOnMove ? 'move' : 'moved');
+      console.log(events);
+      Splide.on(events, function () {
         _this.update(_this.isActive(), false);
 
         _this.update(_this.isVisible(), true);
