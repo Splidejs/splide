@@ -108,6 +108,7 @@ Here is a list of options and brief explanations. Visit [this page](https://spli
 * **accessibility**: Whether to enable accessibility(ARIA attributes) or not.
 * **isNavigation**: Determine if a slider is navigation for another.
 * **trimSpace**: Whether to trim spaces before the fist slide or after the last one.
+* **updateOnMove**: Whether to update slide status(eg. "is-active" class) before/after transition.
 * **breakpoints**: Breakpoints definitions.
 * **classes**: Collection of class names.
 * **i18n**: Collection of texts for i18n.
