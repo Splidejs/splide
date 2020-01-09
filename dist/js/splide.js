@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 1.3.2
+ * Version  : 1.3.3
  * License  : MIT
  * Copyright: 2019 Naotoshi Fujita
  */
@@ -4230,11 +4230,12 @@ var SIZE = 40;
    */
 
   function listen() {
-    var perMove = Splide.options.perMove;
     subscribe(arrows.prev, 'click', function () {
+      var perMove = Splide.options.perMove;
       Splide.go(perMove ? "-" + perMove : '<');
     });
     subscribe(arrows.next, 'click', function () {
+      var perMove = Splide.options.perMove;
       Splide.go(perMove ? "+" + perMove : '>');
     });
   }

@@ -90,9 +90,15 @@ export default ( Splide, Components, name ) => {
 	 * Subscribe click events.
 	 */
 	function listen() {
-		const perMove = Splide.options.perMove;
-		subscribe( arrows.prev, 'click', () => { Splide.go( perMove ? `-${ perMove }` : '<' ) } );
-		subscribe( arrows.next, 'click', () => { Splide.go( perMove ? `+${ perMove }` : '>' ) } );
+		subscribe( arrows.prev, 'click', () => {
+			const perMove = Splide.options.perMove;
+			Splide.go( perMove ? `-${ perMove }` : '<' );
+		} );
+
+		subscribe( arrows.next, 'click', () => {
+			const perMove = Splide.options.perMove;
+			Splide.go( perMove ? `+${ perMove }` : '>' );
+		} );
 	}
 
 	/**
