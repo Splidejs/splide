@@ -100,6 +100,9 @@ gulp.task( 'build:sass', done => {
 	done();
 } );
 
+/*
+ * Run lint.
+ */
 gulp.task( 'lint', () => {
 	return gulp.src( [ './src/**/*.js', './tests/**/*.js' ] )
 		.pipe( eslint( { useEslintrc: true } ) )
