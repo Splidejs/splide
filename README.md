@@ -113,6 +113,9 @@ Here is a list of options and brief explanations. Visit [this page](https://spli
 * **classes**: Collection of class names.
 * **i18n**: Collection of texts for i18n.
 
+## Extensions
+* [Video](https://github.com/Splidejs/splide-extension-video): Assign YouTube or Vimeo videos to slides.
+
 ## API and Extension
 Splide provides some APIs and the way to customize the behaviour programmatically.
 * [APIs](https://splidejs.com/apis/)
