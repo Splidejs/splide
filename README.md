@@ -6,7 +6,7 @@
 
 ## News
 * [Video](https://splidejs.com/video/) extension is released.
-* [URL Hash Navigation](https://splidejs.com/url-hash/) extension is released.
+* [URL Hash Navigation](https://splidejs.com/url-hash-navigation/) extension is released.
 
 ## Features
 * Pure JavaScript without any dependencies
