@@ -4,6 +4,10 @@
 * [Demo](https://splidejs.com/)
 * [Documents](https://splidejs.com/category/users-guide/)
 
+## News
+* [Video](https://splidejs.com/video/) extension is released.
+* [URL Hash Navigation](https://splidejs.com/url-hash/) extension is released.
+
 ## Features
 * Pure JavaScript without any dependencies
 * Small size, less than 27kB(10kB gzipped)
