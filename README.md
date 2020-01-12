@@ -128,4 +128,4 @@ Splide provides some APIs and the way to customize the behaviour programmaticall
 
 ## License
 Splide is released under the MIT license.  
-© 2019 Naotoshi Fujita
+© 2020 Naotoshi Fujita
