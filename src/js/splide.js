@@ -14,7 +14,7 @@ import { applyStyle } from './utils/dom';
 import { error, exist } from './utils/error';
 import { find } from './utils/dom';
 import { merge, each } from './utils/object';
-import { CREATED, MOUNTED, IDLE, MOVING } from './constants/states';
+import * as STATES from './constants/states';
 
 
 /**
@@ -37,15 +37,16 @@ export default class Splide {
 
 		this.Components = {};
 		this.Event      = Event();
-		this.State      = State( CREATED );
+		this.State      = State( STATES.CREATED );
+		this.STATES     = STATES;
 
 		this._options    = merge( DEFAULTS, options );
 		this._index      = 0;
 		this._components = Components;
 
 		this
-			.on( 'move drag', () => this.State.set( MOVING ) )
-			.on( 'moved dragged', () => this.State.set( IDLE ) );
+			.on( 'move drag', () => this.State.set( STATES.MOVING ) )
+			.on( 'moved dragged', () => this.State.set( STATES.IDLE ) );
 	}
 
 	/**
@@ -78,10 +79,10 @@ export default class Splide {
 			component.mounted && component.mounted();
 		} );
 
-		this.State.set( MOUNTED );
+		this.State.set( STATES.MOUNTED );
 		this.emit( 'mounted' );
 
-		this.State.set( IDLE );
+		this.State.set( STATES.IDLE );
 		this.emit( 'ready' );
 
 		applyStyle( this.root, { visibility: 'visible' } );
@@ -145,7 +146,7 @@ export default class Splide {
 	 * @param {boolean}       wait    - Optional. Whether to wait for transition.
 	 */
 	go( control, wait = true ) {
-		if ( this.State.is( IDLE ) || ( this.State.is( MOVING ) && ! wait ) ) {
+		if ( this.State.is( STATES.IDLE ) || ( this.State.is( STATES.MOVING ) && ! wait ) ) {
 			this.Components.Controller.go( control, false );
 		}
 	}
@@ -206,7 +207,7 @@ export default class Splide {
 	set options( options ) {
 		this._options = merge( this._options, options );
 
-		if ( ! this.State.is( CREATED ) ) {
+		if ( ! this.State.is( STATES.CREATED ) ) {
 			this.emit( 'updated', this._options );
 		}
 	}

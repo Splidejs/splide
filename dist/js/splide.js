@@ -106,6 +106,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+var states_namespaceObject = {};
+__webpack_require__.r(states_namespaceObject);
+__webpack_require__.d(states_namespaceObject, "CREATED", function() { return CREATED; });
+__webpack_require__.d(states_namespaceObject, "MOUNTED", function() { return MOUNTED; });
+__webpack_require__.d(states_namespaceObject, "IDLE", function() { return IDLE; });
+__webpack_require__.d(states_namespaceObject, "MOVING", function() { return MOVING; });
 
 // CONCATENATED MODULE: ./src/js/utils/object.js
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
@@ -1214,6 +1220,7 @@ function () {
     this.Components = {};
     this.Event = core_event();
     this.State = state(CREATED);
+    this.STATES = states_namespaceObject;
     this._options = merge(DEFAULTS, options);
     this._index = 0;
     this._components = Components;
