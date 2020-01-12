@@ -114,7 +114,8 @@ Here is a list of options and brief explanations. Visit [this page](https://spli
 * **i18n**: Collection of texts for i18n.
 
 ## Extensions
-* [Video](https://github.com/Splidejs/splide-extension-video): Assign YouTube or Vimeo videos to slides.
+* [Video](https://github.com/Splidejs/splide-extension-video): Assign HTML video, YouTube or Vimeo to slides.
+* [URL Hash Navigation](https://github.com/Splidejs/splide-extension-url-hash): Listen to hash change and move a slider to a slide having the hash data attribute.
 
 ## API and Extension
 Splide provides some APIs and the way to customize the behaviour programmatically.
