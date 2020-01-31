@@ -39,8 +39,12 @@ describe( 'The Controller', () => {
 		expect( Controller.edgeIndex ).toBe( slides.length - perPage );
 		expect( Controller.trim( 100 ) ).toBe( 0 );
 		expect( Controller.trim( -100 ) ).toBe( Controller.edgeIndex );
+	} );
 
-		splide.options = { type: 'loop' };
-		expect( Controller.edgeIndex ).toBe( slides.length - 1 );
+	test( 'should trim index properly in LOOP mode.', () => {
+		const splide     = new Splide( '#splide', { perPage: 3, type: 'loop' }, COMPLETE ).mount();
+		const Controller = splide.Components.Controller;
+
+		expect( Controller.edgeIndex ).toBe( splide.length - 1 );
 	} );
 } );

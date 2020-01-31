@@ -5,8 +5,7 @@
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
-import { create, addClass, removeClass } from '../../utils/dom';
-import { subscribe } from '../../utils/dom';
+import { create, remove, append, addClass, removeClass } from '../../utils/dom';
 import { STATUS_CLASSES } from '../../constants/classes';
 
 /**
@@ -71,7 +70,7 @@ export default ( Splide, Components, name ) => {
 
 			const slider = Components.Elements.slider;
 			parent = Splide.options.pagination === 'slider' && slider ? slider : Splide.root;
-			parent.appendChild( data.list );
+			append( parent, data.list );
 
 			bind();
 		},
@@ -81,7 +80,6 @@ export default ( Splide, Components, name ) => {
 		 */
 		mounted() {
 			const index = Splide.index;
-
 			Splide.emit( `${ name }:mounted`, data, this.getItem( index ) );
 			update( index, -1 );
 		},
@@ -91,12 +89,14 @@ export default ( Splide, Components, name ) => {
 		 * Be aware that node.remove() is not supported by IE.
 		 */
 		destroy() {
-			if ( data && data.list ) {
-				parent.removeChild( data.list );
+			remove( data.list );
+
+			if ( data.items ) {
+				data.items.forEach( item => { Splide.off( 'click', item.button ) } );
 			}
 
-			Splide.off( ATTRIBUTES_UPDATE_EVENT );
-			data = null;
+			Splide.off( ATTRIBUTES_UPDATE_EVENT ).off( UPDATE_EVENT );
+			data = {};
 		},
 
 		/**
@@ -143,15 +143,16 @@ export default ( Splide, Components, name ) => {
 	 * @param {number} prevIndex - Prev index.
 	 */
 	function update( index, prevIndex ) {
-		const prev = Pagination.getItem( prevIndex );
-		const curr = Pagination.getItem( index );
+		const prev   = Pagination.getItem( prevIndex );
+		const curr   = Pagination.getItem( index );
+		const active = STATUS_CLASSES.active;
 
 		if ( prev ) {
-			removeClass( prev.button, STATUS_CLASSES.active );
+			removeClass( prev.button, active );
 		}
 
 		if ( curr ) {
-			addClass( curr.button, STATUS_CLASSES.active );
+			addClass( curr.button, active );
 		}
 
 		Splide.emit( `${ name }:updated`, data, prev, curr );
@@ -171,13 +172,13 @@ export default ( Splide, Components, name ) => {
 		const items = Slides.getSlides( false, true )
 			.filter( Slide => options.focus !== false || Slide.index % options.perPage === 0 )
 			.map( ( Slide, page ) => {
-				const li      = create( 'li', {} );
-				const button  = create( 'button', { class: classes.page } );
+				const li     = create( 'li', {} );
+				const button = create( 'button', { class: classes.page } );
 
-				li.appendChild( button );
-				list.appendChild( li );
+				append( li, button );
+				append( list, li );
 
-				subscribe( button, 'click', () => { Splide.go( `>${ page }` ) } );
+				Splide.on( 'click', () => { Splide.go( `>${ page }` ) }, button );
 
 				return { li, button, page, Slides: Slides.getSlidesByPage( page ) };
 			} );

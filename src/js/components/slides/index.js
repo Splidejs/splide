@@ -25,22 +25,36 @@ export default ( Splide, Components ) => {
 	let slides = [];
 
 	/**
-	 * Store slide instances.
+	 * Store Slide objects.
 	 *
 	 * @type {Array}
 	 */
-	let Slides = [];
+	let SlideObjects = [];
 
-	return {
+	/**
+	 * Slides component object.
+	 *
+	 * @type {Object}
+	 */
+	const Slides = {
 		/**
 		 * Called when the component is mounted.
 		 */
 		mount() {
-			slides = Components.Elements.slides;
+			init();
 
-			for ( const i in slides ) {
-				this.register( parseInt( i ), -1, slides[ i ] );
-			}
+			Splide.on( 'refresh', () => {
+				this.destroy();
+				init();
+			} );
+		},
+
+		/**
+		 * Destroy.
+		 */
+		destroy() {
+			SlideObjects.forEach( Slide => { Slide.destroy() } );
+			SlideObjects = [];
 		},
 
 		/**
@@ -51,18 +65,19 @@ export default ( Splide, Components ) => {
 		 * @param {Element} slide     - A slide element.
 		 */
 		register( index, realIndex, slide ) {
-			const slideObject = Slide( index, realIndex, slide, Splide );
-			slideObject.init();
-			Slides.push( slideObject );
+			const SlideObject = Slide( index, realIndex, slide, Splide );
+			SlideObject.mount();
+			SlideObjects.push( SlideObject );
 		},
 
 		/**
 		 * Return the Slide object designated by the index.
+		 * Note that "find" is not supported by IE.
 		 *
 		 * @return {Object|undefined} - A Slide object if available. Undefined if not.
 		 */
 		getSlide( index ) {
-			return Slides.filter( Slide => Slide.index === index )[ 0 ];
+			return SlideObjects.filter( Slide => Slide.index === index )[0];
 		},
 
 		/**
@@ -75,10 +90,10 @@ export default ( Splide, Components ) => {
 		 */
 		getSlides( includeClones, objects ) {
 			if ( objects ) {
-				return includeClones ? Slides : Slides.filter( Slide => ! Slide.isClone );
+				return includeClones ? SlideObjects : SlideObjects.filter( Slide => ! Slide.isClone );
 			}
 
-			return includeClones ? Slides.map( Slide => Slide.slide ) : slides;
+			return includeClones ? SlideObjects.map( Slide => Slide.slide ) : slides;
 		},
 
 		/**
@@ -93,7 +108,7 @@ export default ( Splide, Components ) => {
 			const options = Splide.options;
 			const max     = options.focus !== false ? 1 : options.perPage;
 
-			return Slides.filter( ( { index } ) => idx <= index && index < idx + max );
+			return SlideObjects.filter( ( { index } ) => idx <= index && index < idx + max );
 		},
 
 		/**
@@ -106,12 +121,22 @@ export default ( Splide, Components ) => {
 		},
 
 		/**
-		 * Return "Slides" length including clones.
+		 * Return "SlideObjects" length including clones.
 		 *
 		 * @return {number} - Slide length including clones.
 		 */
 		get total() {
-			return Slides.length;
+			return SlideObjects.length;
 		},
 	};
+
+	/**
+	 * Initialization.
+	 */
+	function init() {
+		slides = Components.Elements.slides;
+		slides.forEach( ( slide, index ) => { Slides.register( index, -1, slide ) } );
+	}
+
+	return Slides;
 }

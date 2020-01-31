@@ -5,7 +5,7 @@
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
-import { subscribe, applyStyle } from '../../utils/dom';
+import { applyStyle } from '../../utils/dom';
 
 
 /**
@@ -38,11 +38,11 @@ export default ( Splide, Components ) => {
 		mount() {
 			list = Components.Elements.list;
 
-			subscribe( list, 'transitionend', e => {
+			Splide.on( 'transitionend', e => {
 				if ( e.target === list && endCallback ) {
 					endCallback();
 				}
-			} );
+			}, list );
 		},
 
 		/**

@@ -60,6 +60,20 @@ export default ( Splide, Components ) => {
 
 			initAutoplay();
 		},
+
+		/**
+		 * Destroy.
+		 */
+		destroy() {
+			const Elements = Components.Elements;
+			const arrows   = Components.Arrows.arrows;
+
+			Elements.slides
+				.concat( [ arrows.prev, arrows.next, Elements.play, Elements.pause ] )
+				.forEach( elm => {
+					removeAttribute( elm, [ ARIA_HIDDEN, TAB_INDEX, ARIA_CONTROLS, ARIA_LABEL, ARIA_CURRENRT, 'role' ] );
+				} );
+		},
 	};
 
 	/**
@@ -121,9 +135,7 @@ export default ( Splide, Components ) => {
 			const text     = options.focus === false && options.perPage > 1 ? i18n.pageX : i18n.slideX;
 			const label    = sprintf( text, item.page + 1 );
 			const button   = item.button;
-			const controls = [];
-
-			item.Slides.forEach( Slide => { controls.push( Slide.slide.id ) } );
+			const controls = item.Slides.map( Slide => Slide.slide.id );
 
 			setAttribute( button, ARIA_CONTROLS, controls.join( ' ' ) );
 			setAttribute( button, ARIA_LABEL, label );

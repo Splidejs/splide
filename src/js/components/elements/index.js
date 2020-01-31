@@ -1,11 +1,11 @@
 /**
- * The component for the root element.
+ * The component for main elements.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
-import { find, addClass, child } from '../../utils/dom';
+import { find, addClass, removeClass, child, remove, append, before, domify } from '../../utils/dom';
 import { exist } from '../../utils/error';
 import { values } from '../../utils/object';
 
@@ -14,11 +14,11 @@ import { values } from '../../utils/object';
  *
  * @type {string}
  */
-const UID_NAME = 'splideUid';
+const UID_NAME = 'uid';
 
 
 /**
- * The component for the root element.
+ * The component for main elements.
  *
  * @param {Splide} Splide - A Splide instance.
  *
@@ -44,8 +44,9 @@ export default ( Splide ) => {
 	 * Note that IE doesn't support padStart() to fill the uid by 0.
 	 */
 	if ( ! root.id ) {
-		let uid = window[ UID_NAME ] || 0;
-		window[ UID_NAME ] = ++uid;
+		window.splide = window.splide || {};
+		let uid = window.splide[ UID_NAME ] || 0;
+		window.splide[ UID_NAME ] = ++uid;
 		root.id = `splide${ uid < 10 ? '0' + uid : uid }`;
 	}
 
@@ -71,7 +72,6 @@ export default ( Splide ) => {
 			exist( this.list, `A list ${ message }` );
 
 			this.slides = values( this.list.children );
-			exist( this.slides.length, `A slide ${ message }` );
 
 			const arrows = findParts( classes.arrows );
 			this.arrows = {
@@ -88,22 +88,74 @@ export default ( Splide ) => {
 		},
 
 		/**
-		 * Called after all components are mounted.
+		 * Destroy.
 		 */
-		mounted() {
-			const rootClass = classes.root;
-			const options   = Splide.options;
+		destroy() {
+			removeClass( root, getClasses() );
+		},
 
-			addClass(
-				root,
-				`${ rootClass }`,
-				`${ rootClass }--${ options.type }`,
-				`${ rootClass }--${ options.direction }`,
-				options.drag ? `${ rootClass }--draggable` : '',
-				options.isNavigation ? `${ rootClass }--nav` : ''
-			);
+		/**
+		 * Insert a slide to a slider.
+		 * Need to refresh Splide after adding a slide.
+		 *
+		 * @param {Node|string} slide - A slide element to be added.
+		 * @param {number}      index - A slide will be added at the position.
+		 */
+		add( slide, index ) {
+			if ( typeof slide === 'string' ) {
+				slide = domify( slide );
+			}
+
+			if ( slide instanceof Element ) {
+				const ref = this.slides[ index ];
+
+				if ( ref ) {
+					before( slide, ref );
+					this.slides.splice( index, 0, slide );
+				} else {
+					append( this.list, slide );
+					this.slides.push( slide );
+				}
+			}
+		},
+
+		/**
+		 * Remove a slide from a slider.
+		 * Need to refresh Splide after removing a slide.
+		 *
+		 * @param index - Slide index.
+		 */
+		remove( index ) {
+			const slides = this.slides.splice( index, 1 );
+			remove( slides[0] );
 		},
 	};
+
+	/**
+	 * Initialization.
+	 * Assign ID to some elements if it's not available.
+	 */
+	function init() {
+		Elements.track.id = Elements.track.id || `${ root.id }-track`;
+		Elements.list.id  = Elements.list.id || `${ root.id }-list`;
+
+		addClass( root, getClasses() );
+	}
+
+	/**
+	 * Return class names for the root element.
+	 */
+	function getClasses() {
+		const rootClass = classes.root;
+		const options   = Splide.options;
+
+		return [
+			`${ rootClass }--${ options.type }`,
+			`${ rootClass }--${ options.direction }`,
+			options.drag ? `${ rootClass }--draggable` : '',
+			options.isNavigation ? `${ rootClass }--nav` : '',
+		];
+	}
 
 	/**
 	 * Find parts only from children of the root or track.
@@ -114,19 +166,5 @@ export default ( Splide ) => {
 		return child( root, className ) || child( Elements.slider, className );
 	}
 
-	/**
-	 * Initialization.
-	 * Assign ID to some elements if it's not available.
-	 */
-	function init() {
-		if ( ! Elements.track.id ) {
-			Elements.track.id = `${ root.id }-track`;
-		}
-
-		if ( ! Elements.list.id ) {
-			Elements.list.id = `${ root.id }-list`;
-		}
-	}
-	
 	return Elements;
 }

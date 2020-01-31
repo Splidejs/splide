@@ -6,7 +6,7 @@
  */
 
 import { LOOP } from '../../constants/types';
-import { addClass, removeAttribute } from '../../utils/dom';
+import { addClass, removeAttribute, append, before, remove } from '../../utils/dom';
 
 
 /**
@@ -23,7 +23,7 @@ export default ( Splide, Components ) => {
 	 *
 	 * @type {Array}
 	 */
-	const clones = [];
+	let clones = [];
 
 	/**
 	 * Clones component object.
@@ -37,7 +37,20 @@ export default ( Splide, Components ) => {
 		mount() {
 			if ( Splide.is( LOOP ) ) {
 				generateClones();
+
+				Splide.on( 'refresh', () => {
+					this.destroy();
+					generateClones();
+				} );
 			}
+		},
+
+		/**
+		 * Destroy.
+		 */
+		destroy() {
+			remove( clones );
+			clones = [];
 		},
 
 		/**
@@ -66,32 +79,34 @@ export default ( Splide, Components ) => {
 	 * - Whether the slide length is enough for perPage.
 	 */
 	function generateClones() {
-		const { Slides, Elements: { list } }  = Components;
-		const { perPage, drag, flickMaxPages = 1 } = Splide.options;
+		const Slides = Components.Slides;
+		const { perPage, drag, flickMaxPages } = Splide.options;
 		const length = Slides.length;
 		const count  = perPage * ( drag ? flickMaxPages + 1 : 1 ) + ( length < perPage ? perPage : 0 );
 
-		let slides = Slides.getSlides( false, false );
+		if ( length ) {
+			let slides = Slides.getSlides( false, false );
 
-		while ( slides.length < count ) {
-			slides = slides.concat( slides );
+			while ( slides.length < count ) {
+				slides = slides.concat( slides );
+			}
+
+			slides.slice( 0, count ).forEach( ( elm, index ) => {
+				const clone = cloneDeeply( elm );
+				append( Components.Elements.list, clone );
+				clones.push( clone );
+
+				Slides.register( index + length, index, clone );
+			} );
+
+			slides.slice( -count ).forEach( ( elm, index ) => {
+				const clone = cloneDeeply( elm );
+				before( clone, slides[0] );
+				clones.push( clone );
+
+				Slides.register( index - count, index, clone );
+			} );
 		}
-
-		slides.slice( 0, count ).forEach( ( elm, index ) => {
-			const clone = cloneDeeply( elm );
-			list.appendChild( clone );
-			clones.push( clone );
-
-			Slides.register( index + length, index, clone );
-		} );
-
-		slides.slice( -count ).forEach( ( elm, index ) => {
-			const clone = cloneDeeply( elm );
-			list.insertBefore( clone, slides[0] );
-			clones.push( clone );
-
-			Slides.register( index - count, index, clone );
-		} );
 	}
 
 	/**

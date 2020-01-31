@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 1.3.3
+ * Version  : 1.4.0
  * License  : MIT
  * Copyright: 2019 Naotoshi Fujita
  */
@@ -113,81 +113,6 @@ __webpack_require__.d(states_namespaceObject, "MOUNTED", function() { return MOU
 __webpack_require__.d(states_namespaceObject, "IDLE", function() { return IDLE; });
 __webpack_require__.d(states_namespaceObject, "MOVING", function() { return MOVING; });
 
-// CONCATENATED MODULE: ./src/js/utils/object.js
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
-/**
- * Some utility functions related with Object, supporting IE.
- *
- * @author    Naotoshi Fujita
- * @copyright Naotoshi Fujita. All rights reserved.
- */
-
-/**
- * Iterate an object like Array.forEach.
- * IE doesn't support forEach of HTMLCollection.
- *
- * @param {Object}    obj       - An object.
- * @param {function}  callback  - A function handling each value. Arguments are value, property and index.
- */
-function each(obj, callback) {
-  Object.keys(obj).some(function (key, index) {
-    return callback(obj[key], key, index);
-  });
-}
-/**
- * Return values of the given object as an array.
- * IE doesn't support Object.values.
- *
- * @param {Object} obj - An object.
- *
- * @return {Array} - An array containing all values of the given object.
- */
-
-function values(obj) {
-  return Object.keys(obj).map(function (key) {
-    return obj[key];
-  });
-}
-/**
- * Check if the given subject is object or not.
- *
- * @param {*} subject - A subject to be verified.
- *
- * @return {boolean} - True if object, false otherwise.
- */
-
-function isObject(subject) {
-  return typeof subject === 'object';
-}
-/**
- * Merge two objects deeply.
- *
- * @param {Object} to   - An object where "from" is merged.
- * @param {Object} from - An object merged to "to".
- *
- * @return {Object} - A merged object.
- */
-
-function merge(_ref, from) {
-  var to = _extends({}, _ref);
-
-  if (isObject(to) && isObject(from)) {
-    each(from, function (value, key) {
-      if (isObject(value)) {
-        if (!isObject(to[key])) {
-          to[key] = {};
-        }
-
-        to[key] = merge(to[key], value);
-      } else {
-        to[key] = value;
-      }
-    });
-  }
-
-  return to;
-}
 // CONCATENATED MODULE: ./src/js/core/event.js
 /**
  * The function for providing an Event object simply managing events.
@@ -199,50 +124,76 @@ function merge(_ref, from) {
 /**
  * The function for providing an Event object simply managing events.
  */
-
 /* harmony default export */ var core_event = (function () {
   /**
-   * Store all handlers.
+   * Store all event data.
    *
-   * @type {Object}
+   * @type {Array}
    */
-  var handlers = {};
+  var data = [];
   return {
     /**
      * Subscribe the given event(s).
      *
-     * @param {string}    event   - An event name. Use space to separate multiple events.
-     *                              Also, namespace is accepted by dot, such as 'resize.{namespace}'.
-     * @param {function}  handler - A callback function.
+     * @param {string}   events  - An event name. Use space to separate multiple events.
+     *                             Also, namespace is accepted by dot, such as 'resize.{namespace}'.
+     * @param {function} handler - A callback function.
+     * @param {Element}  elm     - Optional. Native event will be listened to when this arg is provided.
+     * @param {Object}   options - Optional. Options for addEventListener.
      */
-    on: function on(event, handler) {
-      event.split(' ').forEach(function (name) {
-        // Prevent an event with a namespace from being registered twice.
-        if (name.indexOf('.') > -1 && handlers[name]) {
-          return;
+    on: function on(events, handler, elm, options) {
+      if (elm === void 0) {
+        elm = null;
+      }
+
+      if (options === void 0) {
+        options = {};
+      }
+
+      events.split(' ').forEach(function (event) {
+        if (elm) {
+          elm.addEventListener(event, handler, options);
         }
 
-        if (!handlers[name]) {
-          handlers[name] = [];
-        }
-
-        handlers[name].push(handler);
+        data.push({
+          event: event,
+          handler: handler,
+          elm: elm,
+          options: options
+        });
       });
     },
 
     /**
-     * Unsubscribe the given event.
+     * Unsubscribe the given event(s).
      *
-     * @param {string} event - A event name.
+     * @param {string}  events - A event name or names split by space.
+     * @param {Element} elm    - Optional. removeEventListener() will be called when this arg is provided.
      */
-    off: function off(event) {
-      event.split(' ').forEach(function (name) {
-        return delete handlers[name];
+    off: function off(events, elm) {
+      if (elm === void 0) {
+        elm = null;
+      }
+
+      events.split(' ').forEach(function (event) {
+        for (var i in data) {
+          var item = data[i];
+
+          if (item && item.event === event && item.elm === elm) {
+            if (elm) {
+              elm.removeEventListener(event, item.handler, item.options);
+            }
+
+            delete data[i];
+            break;
+          }
+        }
       });
     },
 
     /**
      * Emit an event.
+     * This method is only for custom events.
      *
      * @param {string}  event - An event name.
      * @param {*}       args  - Any number of arguments passed to handlers.
@@ -252,15 +203,23 @@ function merge(_ref, from) {
         args[_key - 1] = arguments[_key];
       }
 
-      each(handlers, function (callbacks, name) {
-        if (name.split('.')[0] === event) {
-          if (callbacks) {
-            for (var i in callbacks) {
-              callbacks[i].apply(callbacks, args);
-            }
-          }
+      data.forEach(function (item) {
+        if (!item.elm && item.event.split('.')[0] === event) {
+          item.handler.apply(item, args);
         }
       });
+    },
+
+    /**
+     * Clear event data.
+     */
+    destroy: function destroy() {
+      data.forEach(function (item) {
+        if (item.elm) {
+          item.elm.removeEventListener(item.event, item.handler, item.options);
+        }
+      });
+      data = [];
     }
   };
 });
@@ -708,6 +667,173 @@ var DEFAULTS = {
    */
   i18n: I18N
 };
+// CONCATENATED MODULE: ./src/js/utils/object.js
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
+/**
+ * Some utility functions related with Object, supporting IE.
+ *
+ * @author    Naotoshi Fujita
+ * @copyright Naotoshi Fujita. All rights reserved.
+ */
+
+/**
+ * Iterate an object like Array.forEach.
+ * IE doesn't support forEach of HTMLCollection.
+ *
+ * @param {Object}    obj       - An object.
+ * @param {function}  callback  - A function handling each value. Arguments are value, property and index.
+ */
+function each(obj, callback) {
+  Object.keys(obj).some(function (key, index) {
+    return callback(obj[key], key, index);
+  });
+}
+/**
+ * Return values of the given object as an array.
+ * IE doesn't support Object.values.
+ *
+ * @param {Object} obj - An object.
+ *
+ * @return {Array} - An array containing all values of the given object.
+ */
+
+function values(obj) {
+  return Object.keys(obj).map(function (key) {
+    return obj[key];
+  });
+}
+/**
+ * Check if the given subject is object or not.
+ *
+ * @param {*} subject - A subject to be verified.
+ *
+ * @return {boolean} - True if object, false otherwise.
+ */
+
+function isObject(subject) {
+  return typeof subject === 'object';
+}
+/**
+ * Merge two objects deeply.
+ *
+ * @param {Object} to   - An object where "from" is merged.
+ * @param {Object} from - An object merged to "to".
+ *
+ * @return {Object} - A merged object.
+ */
+
+function merge(_ref, from) {
+  var to = _extends({}, _ref);
+
+  if (isObject(to) && isObject(from)) {
+    each(from, function (value, key) {
+      if (isObject(value)) {
+        if (!isObject(to[key])) {
+          to[key] = {};
+        }
+
+        to[key] = merge(to[key], value);
+      } else {
+        to[key] = value;
+      }
+    });
+  }
+
+  return to;
+}
+// CONCATENATED MODULE: ./src/js/utils/utils.js
+/**
+ * A package of some miscellaneous utility functions.
+ *
+ * @author    Naotoshi Fujita
+ * @copyright Naotoshi Fujita. All rights reserved.
+ */
+
+/**
+ * Convert the given value to array.
+ *
+ * @param {*} value - Any value.
+ *
+ * @return {*[]} - Array containing the given value.
+ */
+
+function toArray(value) {
+  return Array.isArray(value) ? value : [value];
+}
+/**
+ * Check if the given value is between min and max.
+ * Min will be returned when the value is less than min or max will do when greater than max.
+ *
+ * @param {number} value - A number to be checked.
+ * @param {number} m1    - Minimum or maximum number.
+ * @param {number} m2    - Maximum or minimum number.
+ *
+ * @return {number} - A value itself, min or max.
+ */
+
+function between(value, m1, m2) {
+  return Math.min(Math.max(value, m1 > m2 ? m2 : m1), m1 > m2 ? m1 : m2);
+}
+/**
+ * The sprintf method with minimum functionality.
+ *
+ * @param {string}       format       - The string format.
+ * @param {string|Array} replacements - Replacements accepting multiple arguments.
+ *
+ * @returns {string} - Converted string.
+ */
+
+function sprintf(format, replacements) {
+  var i = 0;
+  return format.replace(/%s/g, function () {
+    return toArray(replacements)[i++];
+  });
+}
+/**
+ * Append px unit to the given subject if necessary.
+ *
+ * @param {number|string} value - A value that may not include an unit.
+ *
+ * @return {string} - If the value is string, return itself.
+ *                    If number, do value + "px". An empty string, otherwise.
+ */
+
+function unit(value) {
+  var type = typeof value;
+
+  if (type === 'string') {
+    return value;
+  } else if (type === 'number' && value > 0) {
+    return parseFloat(value) + 'px';
+  }
+
+  return '';
+}
+/**
+ * Convert the given value to pixel.
+ *
+ * @param {Element}       root  - Root element where a dummy div is appended.
+ * @param {string|number} value - CSS value to be converted, such as 10rem.
+ *
+ * @return {number} - Pixel.
+ */
+
+function toPixel(root, value) {
+  if (typeof value === 'number') {
+    return value;
+  }
+
+  var div = create('div', {});
+  applyStyle(div, {
+    position: 'absolute',
+    width: value
+  });
+  append(root, div);
+  value = div.clientWidth;
+  dom_remove(div);
+  return value;
+}
 // CONCATENATED MODULE: ./src/js/utils/dom.js
 /**
  * Some utility functions related with DOM.
@@ -715,6 +841,7 @@ var DEFAULTS = {
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
+
 
 /**
  * Find the first element matching the given selector.
@@ -740,15 +867,9 @@ function find(elm, selector) {
 
 function child(parent, className) {
   if (parent) {
-    var children = values(parent.children);
-
-    for (var i in children) {
-      var _child = children[i];
-
-      if (hasClass(_child, className.split(' ')[0])) {
-        return _child;
-      }
-    }
+    return values(parent.children).filter(function (child) {
+      return hasClass(child, className.split(' ')[0]);
+    })[0] || null;
   }
 
   return null;
@@ -770,6 +891,54 @@ function create(tag, attrs) {
   return elm;
 }
 /**
+ * Convert HTML string to DOM node.
+ *
+ * @param {string} html - HTML string.
+ *
+ * @return {Node} - A created node.
+ */
+
+function domify(html) {
+  var div = create('div', {});
+  div.innerHTML = html;
+  return div.firstChild;
+}
+/**
+ * Remove a given element from a DOM tree.
+ *
+ * @param {Element|Element[]} elms - Element(s) to be removed.
+ */
+
+function dom_remove(elms) {
+  toArray(elms).forEach(function (elm) {
+    elm && elm.parentElement.removeChild(elm);
+  });
+}
+/**
+ * Append a child to a given element.
+ *
+ * @param {Element} parent - A parent element.
+ * @param {Element} child  - An element to be appended.
+ */
+
+function append(parent, child) {
+  if (parent) {
+    parent.appendChild(child);
+  }
+}
+/**
+ * Insert an element before the reference element.
+ *
+ * @param {Element|Node} ref - A reference element.
+ * @param {Element}      elm - An element to be inserted.
+ */
+
+function before(elm, ref) {
+  if (elm && ref && ref.parentElement) {
+    ref.parentElement.insertBefore(elm, ref);
+  }
+}
+/**
  * Apply styles to the given element.
  *
  * @param {Element} elm     - An element where styles are applied.
@@ -784,36 +953,43 @@ function applyStyle(elm, styles) {
   }
 }
 /**
- * Add classes to the element.
+ * Add or remove classes to/from the element.
+ * This function is for internal usage.
  *
- * @param {Element} elm     - An element where classes are added.
- * @param {string}  classes - Class names being added.
+ * @param {Element}         elm     - An element where classes are added.
+ * @param {string|string[]} classes - Class names being added.
+ * @param {boolean}         remove  - Whether to remove or add classes.
  */
 
-function addClass(elm) {
+function addOrRemoveClasses(elm, classes, remove) {
   if (elm) {
-    for (var _len = arguments.length, classes = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      classes[_key - 1] = arguments[_key];
-    }
-
-    classes.forEach(function (name) {
+    toArray(classes).forEach(function (name) {
       if (name) {
-        elm.classList.add(name);
+        elm.classList[remove ? 'remove' : 'add'](name);
       }
     });
   }
 }
 /**
- * Remove a class from the element.
+ * Add classes to the element.
  *
- * @param {Element} elm       - An element where classes are removed.
- * @param {string}  className - A class name being removed.
+ * @param {Element}          elm     - An element where classes are added.
+ * @param {string|string[]}  classes - Class names being added.
  */
 
-function removeClass(elm, className) {
-  if (elm) {
-    elm.classList.remove(className);
-  }
+
+function addClass(elm, classes) {
+  addOrRemoveClasses(elm, classes, false);
+}
+/**
+ * Remove a class from the element.
+ *
+ * @param {Element}         elm     - An element where classes are removed.
+ * @param {string|string[]} classes - A class name being removed.
+ */
+
+function removeClass(elm, classes) {
+  addOrRemoveClasses(elm, classes, true);
 }
 /**
  * Verify if the provided element has the class or not.
@@ -850,50 +1026,21 @@ function setAttribute(elm, name, value) {
  */
 
 function getAttribute(elm, name) {
-  if (elm) {
-    return elm.getAttribute(name);
-  }
-
-  return null;
+  return elm ? elm.getAttribute(name) : null;
 }
 /**
  * Remove attribute from the given element.
  *
- * @param {Element} elm   - An element where an attribute is removed.
- * @param {string}  name  - Attribute name.
+ * @param {Element}      elm   - An element where an attribute is removed.
+ * @param {string|Array} names - Attribute name.
  */
 
-function removeAttribute(elm, name) {
+function removeAttribute(elm, names) {
   if (elm) {
-    elm.removeAttribute(name);
-  }
-}
-/**
- * Listen a native event.
- *
- * @param {Element|Window}  elm     - An element or window object.
- * @param {string}          event   - An event name or event names separated with space.
- * @param {function}        handler - Callback function.
- * @param {Object}          options - Optional. Options.
- *
- * @return {function[]} - Functions to stop subscription.
- */
-
-function subscribe(elm, event, handler, options) {
-  if (options === void 0) {
-    options = {};
-  }
-
-  if (elm) {
-    return event.split(' ').map(function (e) {
-      elm.addEventListener(e, handler, options);
-      return function () {
-        return elm.removeEventListener(e, handler);
-      };
+    toArray(names).forEach(function (name) {
+      elm.removeAttribute(name);
     });
   }
-
-  return [];
 }
 // CONCATENATED MODULE: ./src/js/transitions/slide/index.js
 /**
@@ -932,11 +1079,11 @@ function subscribe(elm, event, handler, options) {
      */
     mount: function mount() {
       list = Components.Elements.list;
-      subscribe(list, 'transitionend', function (e) {
+      Splide.on('transitionend', function (e) {
         if (e.target === list && endCallback) {
           endCallback();
         }
-      });
+      }, list);
     },
 
     /**
@@ -1121,16 +1268,12 @@ function error_error(message) {
  *
  * @param {*}      subject - A subject to be confirmed.
  * @param {string} message - An error message.
- *
- * @return {*} - A given subject itself.
  */
 
 function exist(subject, message) {
   if (!subject) {
     throw new Error(message);
   }
-
-  return subject;
 }
 // CONCATENATED MODULE: ./src/js/constants/states.js
 /**
@@ -1215,15 +1358,15 @@ function () {
       Components = {};
     }
 
-    this.root = root instanceof HTMLElement ? root : find(document, root);
+    this.root = root instanceof Element ? root : find(document, root);
     exist(this.root, 'An invalid root element or selector was given.');
     this.Components = {};
     this.Event = core_event();
     this.State = state(CREATED);
     this.STATES = states_namespaceObject;
-    this._options = merge(DEFAULTS, options);
-    this._index = 0;
-    this._components = Components;
+    this._o = merge(DEFAULTS, options);
+    this._i = 0;
+    this._c = Components;
     this.on('move drag', function () {
       return _this.State.set(MOVING);
     }).on('moved dragged', function () {
@@ -1253,7 +1396,7 @@ function () {
       Transition = null;
     }
 
-    this.Components = compose(this, merge(this._components, Extensions), Transition);
+    this.Components = compose(this, merge(this._c, Extensions), Transition);
 
     try {
       each(this.Components, function (component, key) {
@@ -1276,10 +1419,10 @@ function () {
     this.State.set(MOUNTED);
     this.emit('mounted');
     this.State.set(IDLE);
-    this.emit('ready');
     applyStyle(this.root, {
       visibility: 'visible'
     });
+    this.emit('ready');
     return this;
   }
   /**
@@ -1298,36 +1441,51 @@ function () {
   /**
    * Register callback fired on the given event(s).
    *
-   * @param {string}    event   - An event name. Use space to separate multiple events.
-   *                              Also, namespace is accepted by dot, such as 'resize.{namespace}'.
-   * @param {function}  handler - A callback function.
+   * @param {string}   events  - An event name. Use space to separate multiple events.
+   *                             Also, namespace is accepted by dot, such as 'resize.{namespace}'.
+   * @param {function} handler - A callback function.
+   * @param {Element}  elm     - Optional. Native event will be listened to when this arg is provided.
+   * @param {Object}   options - Optional. Options for addEventListener.
    *
    * @return {Splide} - This instance.
    */
   ;
 
-  _proto.on = function on(event, handler) {
-    this.Event.on(event, handler);
+  _proto.on = function on(events, handler, elm, options) {
+    if (elm === void 0) {
+      elm = null;
+    }
+
+    if (options === void 0) {
+      options = {};
+    }
+
+    this.Event.on(events, handler, elm, options);
     return this;
   }
   /**
    * Unsubscribe the given event.
    *
-   * @param {string} event - A event name.
+   * @param {string}  events - A event name.
+   * @param {Element} elm    - Optional. removeEventListener() will be called when this arg is provided.
    *
    * @return {Splide} - This instance.
    */
   ;
 
-  _proto.off = function off(event) {
-    this.Event.off(event);
+  _proto.off = function off(events, elm) {
+    if (elm === void 0) {
+      elm = null;
+    }
+
+    this.Event.off(events, elm);
     return this;
   }
   /**
    * Emit an event.
    *
-   * @param {string}  event - An event name.
-   * @param {*}       args  - Any number of arguments passed to handlers.
+   * @param {string} event - An event name.
+   * @param {*}      args  - Any number of arguments passed to handlers.
    */
   ;
 
@@ -1369,19 +1527,71 @@ function () {
   ;
 
   _proto.is = function is(type) {
-    return type === this._options.type;
+    return type === this._o.type;
+  }
+  /**
+   * Insert a slide.
+   *
+   * @param {Element|string} slide - A slide element to be added.
+   * @param {number}         index - A slide will be added at the position.
+   */
+  ;
+
+  _proto.add = function add(slide, index) {
+    if (index === void 0) {
+      index = -1;
+    }
+
+    this.Components.Elements.add(slide, index);
+    this.refresh();
+  }
+  /**
+   * Remove the slide designated by the index.
+   *
+   * @param {number} index - A slide index.
+   */
+  ;
+
+  _proto.remove = function remove(index) {
+    this.Components.Elements.remove(index);
+    this.refresh();
+  }
+  /**
+   * Destroy all Slide objects and clones and recreate them again.
+   * And then call "updated" event.
+   */
+  ;
+
+  _proto.refresh = function refresh() {
+    this.emit('refresh').emit('updated', this.options);
+  }
+  /**
+   * Destroy the Splide.
+   */
+  ;
+
+  _proto.destroy = function destroy() {
+    values(this.Components).reverse().forEach(function (component) {
+      component.destroy && component.destroy();
+    });
+    this.emit('destroy'); // Destroy all event handlers, including ones for native events.
+
+    this.Event.destroy();
+    delete this.Components;
+    this.State.set(CREATED);
+    return this;
   }
   /**
    * Return the current slide index.
    *
    * @return {number} - The current slide index.
-   */
+   // */
   ;
 
   _createClass(Splide, [{
     key: "index",
     get: function get() {
-      return this._index;
+      return this._i;
     }
     /**
      * Set the current slide index.
@@ -1390,7 +1600,7 @@ function () {
      */
     ,
     set: function set(index) {
-      this._index = parseInt(index);
+      this._i = parseInt(index);
     }
     /**
      * Return length of slides.
@@ -1413,7 +1623,7 @@ function () {
   }, {
     key: "options",
     get: function get() {
-      return this._options;
+      return this._o;
     }
     /**
      * Set options with merging the given object to the current one.
@@ -1422,10 +1632,10 @@ function () {
      */
     ,
     set: function set(options) {
-      this._options = merge(this._options, options);
+      this._o = merge(this._o, options);
 
       if (!this.State.is(CREATED)) {
-        this.emit('updated', this._options);
+        this.emit('updated', this._o);
       }
     }
     /**
@@ -1438,7 +1648,7 @@ function () {
   }, {
     key: "classes",
     get: function get() {
-      return this._options.classes;
+      return this._o.classes;
     }
     /**
      * Return the i18n strings.
@@ -1450,7 +1660,7 @@ function () {
   }, {
     key: "i18n",
     get: function get() {
-      return this._options.i18n;
+      return this._o.i18n;
     }
   }]);
 
@@ -1465,6 +1675,7 @@ function () {
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
+
 
 
 
@@ -1494,7 +1705,7 @@ function () {
     try {
       Splide.options = JSON.parse(options);
     } catch (e) {
-      error_error('"data-splide" must be a valid JSON.');
+      error_error(e.message);
     }
   }
 
@@ -1503,7 +1714,9 @@ function () {
      * Called when the component is mounted.
      */
     mount: function mount() {
-      Splide.index = Splide.options.start;
+      if (Splide.State.is(CREATED)) {
+        Splide.index = Splide.options.start;
+      }
     },
 
     /**
@@ -1527,7 +1740,7 @@ function () {
 });
 // CONCATENATED MODULE: ./src/js/components/elements/index.js
 /**
- * The component for the root element.
+ * The component for main elements.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
@@ -1541,9 +1754,9 @@ function () {
  * @type {string}
  */
 
-var UID_NAME = 'splideUid';
+var UID_NAME = 'uid';
 /**
- * The component for the root element.
+ * The component for main elements.
  *
  * @param {Splide} Splide - A Splide instance.
  *
@@ -1570,8 +1783,9 @@ var UID_NAME = 'splideUid';
    */
 
   if (!root.id) {
-    var uid = window[UID_NAME] || 0;
-    window[UID_NAME] = ++uid;
+    window.splide = window.splide || {};
+    var uid = window.splide[UID_NAME] || 0;
+    window.splide[UID_NAME] = ++uid;
     root.id = "splide" + (uid < 10 ? '0' + uid : uid);
   }
   /**
@@ -1594,7 +1808,6 @@ var UID_NAME = 'splideUid';
       this.list = child(this.track, classes.list);
       exist(this.list, "A list " + message);
       this.slides = values(this.list.children);
-      exist(this.slides.length, "A slide " + message);
       var arrows = findParts(classes.arrows);
       this.arrows = {
         prev: find(arrows, "." + classes.prev),
@@ -1608,37 +1821,78 @@ var UID_NAME = 'splideUid';
     },
 
     /**
-     * Called after all components are mounted.
+     * Destroy.
      */
-    mounted: function mounted() {
-      var rootClass = classes.root;
-      var options = Splide.options;
-      addClass(root, "" + rootClass, rootClass + "--" + options.type, rootClass + "--" + options.direction, options.drag ? rootClass + "--draggable" : '', options.isNavigation ? rootClass + "--nav" : '');
+    destroy: function destroy() {
+      removeClass(root, getClasses());
+    },
+
+    /**
+     * Insert a slide to a slider.
+     * Need to refresh Splide after adding a slide.
+     *
+     * @param {Node|string} slide - A slide element to be added.
+     * @param {number}      index - A slide will be added at the position.
+     */
+    add: function add(slide, index) {
+      if (typeof slide === 'string') {
+        slide = domify(slide);
+      }
+
+      if (slide instanceof Element) {
+        var ref = this.slides[index];
+
+        if (ref) {
+          before(slide, ref);
+          this.slides.splice(index, 0, slide);
+        } else {
+          append(this.list, slide);
+          this.slides.push(slide);
+        }
+      }
+    },
+
+    /**
+     * Remove a slide from a slider.
+     * Need to refresh Splide after removing a slide.
+     *
+     * @param index - Slide index.
+     */
+    remove: function remove(index) {
+      var slides = this.slides.splice(index, 1);
+
+      dom_remove(slides[0]);
     }
   };
+  /**
+   * Initialization.
+   * Assign ID to some elements if it's not available.
+   */
+
+  function init() {
+    Elements.track.id = Elements.track.id || root.id + "-track";
+    Elements.list.id = Elements.list.id || root.id + "-list";
+    addClass(root, getClasses());
+  }
+  /**
+   * Return class names for the root element.
+   */
+
+
+  function getClasses() {
+    var rootClass = classes.root;
+    var options = Splide.options;
+    return [rootClass + "--" + options.type, rootClass + "--" + options.direction, options.drag ? rootClass + "--draggable" : '', options.isNavigation ? rootClass + "--nav" : ''];
+  }
   /**
    * Find parts only from children of the root or track.
    *
    * @return {Element|null} - A found element or null.
    */
 
+
   function findParts(className) {
     return child(root, className) || child(Elements.slider, className);
-  }
-  /**
-   * Initialization.
-   * Assign ID to some elements if it's not available.
-   */
-
-
-  function init() {
-    if (!Elements.track.id) {
-      Elements.track.id = root.id + "-track";
-    }
-
-    if (!Elements.list.id) {
-      Elements.list.id = root.id + "-list";
-    }
   }
 
   return Elements;
@@ -1671,91 +1925,6 @@ var RTL = 'rtl';
  */
 
 var TTB = 'ttb';
-// CONCATENATED MODULE: ./src/js/utils/utils.js
-/**
- * A package of some miscellaneous utility functions.
- *
- * @author    Naotoshi Fujita
- * @copyright Naotoshi Fujita. All rights reserved.
- */
-
-/**
- * Check if the given value is between min and max.
- * Min will be returned when the value is less than min or max will do when greater than max.
- *
- * @param {number} value - A number to be checked.
- * @param {number} m1    - Minimum or maximum number.
- * @param {number} m2    - Maximum or minimum number.
- *
- * @return {number} - A value itself, min or max.
- */
-
-function between(value, m1, m2) {
-  return Math.min(Math.max(value, m1 > m2 ? m2 : m1), m1 > m2 ? m1 : m2);
-}
-/**
- * The sprintf method with minimum functionality.
- *
- * @param {string} format       - The string format.
- * @param {string} replacements - Replacements accepting multiple arguments.
- *
- * @returns {string} - Converted string.
- */
-
-function sprintf(format) {
-  for (var _len = arguments.length, replacements = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    replacements[_key - 1] = arguments[_key];
-  }
-
-  var i = 0;
-  return format.replace(/%s/g, function () {
-    return replacements[i++];
-  });
-}
-/**
- * Append px unit to the given subject if necessary.
- *
- * @param {number|string} value - A value that may not include an unit.
- *
- * @return {string} - If the value is string, return itself.
- *                    If number, do value + "px". An empty string, otherwise.
- */
-
-function unit(value) {
-  var type = typeof value;
-
-  if (type === 'string') {
-    return value;
-  } else if (type === 'number' && value > 0) {
-    return parseFloat(value) + 'px';
-  }
-
-  return '';
-}
-/**
- * Convert the given value to pixel.
- *
- * @param {Element}       root  - Root element where a dummy div is appended.
- * @param {string|number} value - CSS value to be converted, such as 10rem.
- *
- * @return {number} - Pixel.
- */
-
-function toPixel(root, value) {
-  if (typeof value === 'number') {
-    return value;
-  }
-
-  var div = create('div', {});
-  applyStyle(div, {
-    position: 'absolute',
-    width: value
-  });
-  root.appendChild(div);
-  var px = div.clientWidth;
-  root.removeChild(div);
-  return px;
-}
 // CONCATENATED MODULE: ./src/js/components/controller/index.js
 /**
  * The component for controlling the track.
@@ -1784,6 +1953,13 @@ var floor = Math.floor;
    */
   var options;
   /**
+   * True if the slide is LOOP mode.
+   *
+   * @type {boolean}
+   */
+
+  var isLoop;
+  /**
    * Controller component object.
    *
    * @type {Object}
@@ -1795,6 +1971,7 @@ var floor = Math.floor;
      */
     mount: function mount() {
       options = Splide.options;
+      isLoop = Splide.is(LOOP);
       bind();
     },
 
@@ -1907,7 +2084,7 @@ var floor = Math.floor;
      * @return {number} - A trimmed index.
      */
     trim: function trim(index) {
-      if (!Splide.is(LOOP)) {
+      if (!isLoop) {
         index = options.rewind ? this.rewind(index) : between(index, 0, this.edgeIndex);
       }
 
@@ -1924,7 +2101,7 @@ var floor = Math.floor;
     rewind: function rewind(index) {
       var edge = this.edgeIndex;
 
-      if (Splide.is(LOOP)) {
+      if (isLoop) {
         while (index > edge) {
           index -= edge + 1;
         }
@@ -1970,7 +2147,11 @@ var floor = Math.floor;
     get edgeIndex() {
       var length = Splide.length;
 
-      if (hasFocus() || options.isNavigation || Splide.is(LOOP)) {
+      if (!length) {
+        return 0;
+      }
+
+      if (hasFocus() || options.isNavigation || isLoop) {
         return length - 1;
       }
 
@@ -1985,7 +2166,7 @@ var floor = Math.floor;
     get prevIndex() {
       var prev = Splide.index - 1;
 
-      if (Splide.is(LOOP) || options.rewind) {
+      if (isLoop || options.rewind) {
         prev = this.rewind(prev);
       }
 
@@ -2000,7 +2181,7 @@ var floor = Math.floor;
     get nextIndex() {
       var next = Splide.index + 1;
 
-      if (Splide.is(LOOP) || options.rewind) {
+      if (isLoop || options.rewind) {
         next = this.rewind(next);
       }
 
@@ -2017,7 +2198,8 @@ var floor = Math.floor;
       Splide.index = newIndex;
     }).on('updated', function (newOptions) {
       options = newOptions;
-      Splide.index = Controller.rewind(Controller.trim(Splide.index));
+      var index = between(Splide.index, 0, Controller.edgeIndex);
+      Splide.index = Controller.rewind(Controller.trim(index));
     });
   }
   /**
@@ -2043,6 +2225,8 @@ var floor = Math.floor;
 
 
 
+
+
 /**
  * The sub component for handling each slide.
  *
@@ -2054,8 +2238,23 @@ var floor = Math.floor;
  * @return {Object} - The sub component object.
  */
 
-function slide_Slide(index, realIndex, slide, Splide) {
-  return {
+/* harmony default export */ var slides_slide = (function (index, realIndex, slide, Splide) {
+  /**
+   * Events when the slide status is updated.
+   * Append a namespace to remove listeners later.
+   *
+   * @type {string}
+   */
+  var statusUpdateEvents = ['mounted', 'updated', 'resize', Splide.options.updateOnMove ? 'move' : 'moved'].reduce(function (acc, cur) {
+    return acc + cur + '.slide ';
+  }, '').trim();
+  /**
+   * Slide sub component object.
+   *
+   * @type {Object}
+   */
+
+  var Slide = {
     /**
      * Slide element.
      *
@@ -2094,43 +2293,40 @@ function slide_Slide(index, realIndex, slide, Splide) {
     /**
      * Called when the component is mounted.
      */
-    init: function init() {
+    mount: function mount() {
       var _this = this;
 
-      if (!slide.id && !this.isClone) {
+      if (!this.isClone) {
         var number = index + 1;
         slide.id = Splide.root.id + "-slide" + (number < 10 ? '0' + number : number);
       }
 
-      var events = 'mounted updated ' + (Splide.options.updateOnMove ? 'move' : 'moved');
-      Splide.on(events, function () {
-        _this.update(_this.isActive(), false);
+      Splide.on(statusUpdateEvents, function () {
+        return _this.update();
+      }); // Update status immediately on refresh.
 
-        _this.update(_this.isVisible(), true);
-      }).on('resize', function () {
-        _this.update(_this.isVisible(), true);
+      if (!Splide.State.is(CREATED)) {
+        this.update();
+      }
+    },
+
+    /**
+     * Destroy.
+     */
+    destroy: function destroy() {
+      Splide.off(statusUpdateEvents);
+      each(STATUS_CLASSES, function (className) {
+        removeClass(slide, className);
       });
     },
 
     /**
-     * Update classes for activity or visibility.
-     *
-     * @param {boolean} active        - Is active/visible or not.
-     * @param {boolean} forVisibility - Toggle classes for activity or visibility.
+     * Update active and visible status.
      */
-    update: function update(active, forVisibility) {
-      var type = forVisibility ? 'visible' : 'active';
-      var className = STATUS_CLASSES[type];
+    update: function update() {
+      _update(this.isActive(), false);
 
-      if (active) {
-        addClass(slide, className);
-        Splide.emit("" + type, this);
-      } else {
-        if (hasClass(slide, className)) {
-          removeClass(slide, className);
-          Splide.emit("" + (forVisibility ? 'hidden' : 'inactive'), this);
-        }
-      }
+      _update(this.isVisible(), true);
     },
 
     /**
@@ -2188,7 +2384,30 @@ function slide_Slide(index, realIndex, slide, Splide) {
       return diff < within;
     }
   };
-}
+  /**
+   * Update classes for activity or visibility.
+   *
+   * @param {boolean} active        - Is active/visible or not.
+   * @param {boolean} forVisibility - Toggle classes for activity or visibility.
+   */
+
+  function _update(active, forVisibility) {
+    var type = forVisibility ? 'visible' : 'active';
+    var className = STATUS_CLASSES[type];
+
+    if (active) {
+      addClass(slide, className);
+      Splide.emit("" + type, Slide);
+    } else {
+      if (hasClass(slide, className)) {
+        removeClass(slide, className);
+        Splide.emit("" + (forVisibility ? 'hidden' : 'inactive'), Slide);
+      }
+    }
+  }
+
+  return Slide;
+});
 // CONCATENATED MODULE: ./src/js/components/slides/index.js
 /**
  * The component for handling all slides including clones.
@@ -2214,22 +2433,41 @@ function slide_Slide(index, realIndex, slide, Splide) {
    */
   var slides = [];
   /**
-   * Store slide instances.
+   * Store Slide objects.
    *
    * @type {Array}
    */
 
-  var Slides = [];
-  return {
+  var SlideObjects = [];
+  /**
+   * Slides component object.
+   *
+   * @type {Object}
+   */
+
+  var Slides = {
     /**
      * Called when the component is mounted.
      */
     mount: function mount() {
-      slides = Components.Elements.slides;
+      var _this = this;
 
-      for (var i in slides) {
-        this.register(parseInt(i), -1, slides[i]);
-      }
+      init();
+      Splide.on('refresh', function () {
+        _this.destroy();
+
+        init();
+      });
+    },
+
+    /**
+     * Destroy.
+     */
+    destroy: function destroy() {
+      SlideObjects.forEach(function (Slide) {
+        Slide.destroy();
+      });
+      SlideObjects = [];
     },
 
     /**
@@ -2240,18 +2478,19 @@ function slide_Slide(index, realIndex, slide, Splide) {
      * @param {Element} slide     - A slide element.
      */
     register: function register(index, realIndex, slide) {
-      var slideObject = slide_Slide(index, realIndex, slide, Splide);
-      slideObject.init();
-      Slides.push(slideObject);
+      var SlideObject = slides_slide(index, realIndex, slide, Splide);
+      SlideObject.mount();
+      SlideObjects.push(SlideObject);
     },
 
     /**
      * Return the Slide object designated by the index.
+     * Note that "find" is not supported by IE.
      *
      * @return {Object|undefined} - A Slide object if available. Undefined if not.
      */
     getSlide: function getSlide(index) {
-      return Slides.filter(function (Slide) {
+      return SlideObjects.filter(function (Slide) {
         return Slide.index === index;
       })[0];
     },
@@ -2266,12 +2505,12 @@ function slide_Slide(index, realIndex, slide, Splide) {
      */
     getSlides: function getSlides(includeClones, objects) {
       if (objects) {
-        return includeClones ? Slides : Slides.filter(function (Slide) {
+        return includeClones ? SlideObjects : SlideObjects.filter(function (Slide) {
           return !Slide.isClone;
         });
       }
 
-      return includeClones ? Slides.map(function (Slide) {
+      return includeClones ? SlideObjects.map(function (Slide) {
         return Slide.slide;
       }) : slides;
     },
@@ -2287,7 +2526,7 @@ function slide_Slide(index, realIndex, slide, Splide) {
       var idx = Components.Controller.pageToIndex(page);
       var options = Splide.options;
       var max = options.focus !== false ? 1 : options.perPage;
-      return Slides.filter(function (_ref) {
+      return SlideObjects.filter(function (_ref) {
         var index = _ref.index;
         return idx <= index && index < idx + max;
       });
@@ -2303,15 +2542,27 @@ function slide_Slide(index, realIndex, slide, Splide) {
     },
 
     /**
-     * Return "Slides" length including clones.
+     * Return "SlideObjects" length including clones.
      *
      * @return {number} - Slide length including clones.
      */
     get total() {
-      return Slides.length;
+      return SlideObjects.length;
     }
 
   };
+  /**
+   * Initialization.
+   */
+
+  function init() {
+    slides = Components.Elements.slides;
+    slides.forEach(function (slide, index) {
+      Slides.register(index, -1, slide);
+    });
+  }
+
+  return Slides;
 });
 // CONCATENATED MODULE: ./src/js/components/track/resolvers/vertical.js
 /**
@@ -2557,6 +2808,13 @@ function slide_Slide(index, realIndex, slide, Splide) {
    */
 
   var isVertical = Splide.options.direction === TTB;
+  /**
+   * Whether the slider type is FADE or not.
+   *
+   * @type {boolean}
+   */
+
+  var isFade = Splide.is(FADE);
   return {
     /**
      * Called when the component is mounted.
@@ -2573,7 +2831,7 @@ function slide_Slide(index, realIndex, slide, Splide) {
     mounted: function mounted() {
       var _this = this;
 
-      if (!Splide.is(FADE)) {
+      if (!isFade) {
         Splide.on('mounted resize updated', function () {
           _this.jump(Splide.index);
         });
@@ -2599,7 +2857,7 @@ function slide_Slide(index, realIndex, slide, Splide) {
         Splide.emit('move', newIndex, prevIndex, destIndex);
       }
 
-      if (Math.abs(newPosition - currPosition) >= 1 || Splide.is(FADE)) {
+      if (Math.abs(newPosition - currPosition) >= 1 || isFade) {
         Components.Transition.start(destIndex, newIndex, this.toCoord(newPosition), function () {
           _this2.end(destIndex, newIndex, prevIndex, silently);
         });
@@ -2621,7 +2879,7 @@ function slide_Slide(index, realIndex, slide, Splide) {
         transition: ''
       });
 
-      if (!Splide.is(FADE)) {
+      if (!isFade) {
         this.jump(newIndex);
       }
 
@@ -2755,9 +3013,24 @@ function slide_Slide(index, realIndex, slide, Splide) {
      * Called when the component is mounted.
      */
     mount: function mount() {
+      var _this = this;
+
       if (Splide.is(LOOP)) {
         generateClones();
+        Splide.on('refresh', function () {
+          _this.destroy();
+
+          generateClones();
+        });
       }
+    },
+
+    /**
+     * Destroy.
+     */
+    destroy: function destroy() {
+      dom_remove(clones);
+      clones = [];
     },
 
     /**
@@ -2787,33 +3060,34 @@ function slide_Slide(index, realIndex, slide, Splide) {
    */
 
   function generateClones() {
-    var Slides = Components.Slides,
-        list = Components.Elements.list;
+    var Slides = Components.Slides;
     var _Splide$options = Splide.options,
         perPage = _Splide$options.perPage,
         drag = _Splide$options.drag,
-        _Splide$options$flick = _Splide$options.flickMaxPages,
-        flickMaxPages = _Splide$options$flick === void 0 ? 1 : _Splide$options$flick;
+        flickMaxPages = _Splide$options.flickMaxPages;
     var length = Slides.length;
     var count = perPage * (drag ? flickMaxPages + 1 : 1) + (length < perPage ? perPage : 0);
-    var slides = Slides.getSlides(false, false);
 
-    while (slides.length < count) {
-      slides = slides.concat(slides);
+    if (length) {
+      var slides = Slides.getSlides(false, false);
+
+      while (slides.length < count) {
+        slides = slides.concat(slides);
+      }
+
+      slides.slice(0, count).forEach(function (elm, index) {
+        var clone = cloneDeeply(elm);
+        append(Components.Elements.list, clone);
+        clones.push(clone);
+        Slides.register(index + length, index, clone);
+      });
+      slides.slice(-count).forEach(function (elm, index) {
+        var clone = cloneDeeply(elm);
+        before(clone, slides[0]);
+        clones.push(clone);
+        Slides.register(index - count, index, clone);
+      });
     }
-
-    slides.slice(0, count).forEach(function (elm, index) {
-      var clone = cloneDeeply(elm);
-      list.appendChild(clone);
-      clones.push(clone);
-      Slides.register(index + length, index, clone);
-    });
-    slides.slice(-count).forEach(function (elm, index) {
-      var clone = cloneDeeply(elm);
-      list.insertBefore(clone, slides[0]);
-      clones.push(clone);
-      Slides.register(index - count, index, clone);
-    });
   }
   /**
    * Clone deeply the given element.
@@ -3268,6 +3542,13 @@ var THROTTLE = 50;
 
   var list;
   /**
+   * Store the track element.
+   *
+   * @type {Element}
+   */
+
+  var track;
+  /**
    * Store all Slide objects.
    *
    * @type {Object}
@@ -3306,9 +3587,18 @@ var THROTTLE = 50;
      */
     mount: function mount() {
       list = Elements.list;
-      Slides = Components.Slides.getSlides(true, true);
+      track = Elements.track;
       bind();
       init();
+    },
+
+    /**
+     * Destroy.
+     */
+    destroy: function destroy() {
+      Elements.slides.concat([list, track]).forEach(function (elm) {
+        removeAttribute(elm, 'style');
+      });
     },
 
     /**
@@ -3401,6 +3691,7 @@ var THROTTLE = 50;
 
   function init() {
     var options = Splide.options;
+    Slides = Components.Slides.getSlides(true, true);
 
     if (isVertical) {
       Resolver = resolvers_vertical(Splide, Components, options);
@@ -3412,13 +3703,11 @@ var THROTTLE = 50;
     applyStyle(root, {
       maxWidth: unit(options.width)
     });
-
-    for (var i in Slides) {
+    Slides.forEach(function (Slide) {
       var _applyStyle;
 
-      applyStyle(Slides[i].slide, (_applyStyle = {}, _applyStyle[Resolver.marginProp] = unit(Resolver.gap), _applyStyle));
-    }
-
+      applyStyle(Slide.slide, (_applyStyle = {}, _applyStyle[Resolver.marginProp] = unit(Resolver.gap), _applyStyle));
+    });
     resize();
   }
   /**
@@ -3428,11 +3717,9 @@ var THROTTLE = 50;
 
 
   function bind() {
-    var throttledResize = throttle(function () {
+    Splide.on('resize', throttle(function () {
       Splide.emit('resize');
-    }, THROTTLE);
-    subscribe(window, 'resize', throttledResize);
-    Splide.on('mounted resize', resize).on('updated', init);
+    }, THROTTLE), window).on('mounted resize', resize).on('updated', init);
   }
   /**
    * Resize the list and slides including clones.
@@ -3444,24 +3731,20 @@ var THROTTLE = 50;
       width: unit(Layout.listWidth),
       height: unit(Layout.listHeight)
     });
-    applyStyle(Components.Elements.track, {
+    applyStyle(track, {
       height: unit(Layout.height)
     });
     var slideWidth = unit(Resolver.slideWidth);
     var slideHeight = unit(Resolver.slideHeight);
-
-    for (var i in Slides) {
-      var _Slides$i = Slides[i],
-          slide = _Slides$i.slide,
-          container = _Slides$i.container;
-      applyStyle(container, {
+    Slides.forEach(function (Slide) {
+      applyStyle(Slide.container, {
         height: slideHeight
       });
-      applyStyle(slide, {
+      applyStyle(Slide.slide, {
         width: slideWidth,
-        height: !container ? slideHeight : ''
+        height: !Slide.container ? slideHeight : ''
       });
-    }
+    });
   }
 
   return Layout;
@@ -3473,7 +3756,6 @@ var THROTTLE = 50;
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
 
 
 
@@ -3511,7 +3793,7 @@ var SWIPE_THRESHOLD = 150;
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ var drag = (function (Splide, Components) {
+/* harmony default export */ var components_drag = (function (Splide, Components) {
   /**
    * Store the Move component.
    *
@@ -3593,16 +3875,14 @@ var SWIPE_THRESHOLD = 150;
      */
     mount: function mount() {
       var list = Components.Elements.list;
-      subscribe(list, 'touchstart mousedown', start);
-      subscribe(list, 'touchmove mousemove', move, {
+      Splide.on('touchstart mousedown', start, list).on('touchmove mousemove', move, list, {
         passive: false
-      });
-      subscribe(list, 'touchend touchcancel mouseleave mouseup dragend', end); // Prevent dragging an image or anchor itself.
+      }).on('touchend touchcancel mouseleave mouseup dragend', end, list); // Prevent dragging an image or anchor itself.
 
       each(list.querySelectorAll('img, a'), function (elm) {
-        subscribe(elm, 'dragstart', function (e) {
+        Splide.on('dragstart', function (e) {
           e.preventDefault();
-        }, {
+        }, elm, {
           passive: false
         });
       });
@@ -3810,7 +4090,6 @@ var SWIPE_THRESHOLD = 150;
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
-
 /**
  * The component for handling a click event.
  * Click should be disabled during drag/swipe.
@@ -3821,7 +4100,7 @@ var SWIPE_THRESHOLD = 150;
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ var components_click = (function (Splide, Components) {
+/* harmony default export */ var click = (function (Splide, Components) {
   /**
    * Whether click is disabled or not.
    *
@@ -3846,10 +4125,9 @@ var SWIPE_THRESHOLD = 150;
      * Called when the component is mounted.
      */
     mount: function mount() {
-      subscribe(Components.Elements.track, 'click', click, {
+      Splide.on('click', onClick, Components.Elements.track, {
         capture: true
-      });
-      Splide.on('drag', function () {
+      }).on('drag', function () {
         disabled = true;
       }).on('moved', function () {
         disabled = false;
@@ -3862,7 +4140,7 @@ var SWIPE_THRESHOLD = 150;
    * @param {Event} e - A click event.
    */
 
-  function click(e) {
+  function onClick(e) {
     if (disabled) {
       e.preventDefault();
       e.stopPropagation();
@@ -3943,9 +4221,12 @@ var PAUSE_FLAGS = {
           Splide.go('>');
         }, options.interval, function (rate) {
           Splide.emit(name + ":playing", rate);
-          bar && applyStyle(bar, {
-            width: rate * 100 + "%"
-          });
+
+          if (bar) {
+            applyStyle(bar, {
+              width: rate * 100 + "%"
+            });
+          }
         });
         bind();
         this.play();
@@ -4001,8 +4282,8 @@ var PAUSE_FLAGS = {
   function bind() {
     var options = Splide.options;
     var Elements = Components.Elements;
-    var sub = Splide.sub;
-    var elms = [Splide.root, sub ? sub.root : null];
+    var sibling = Splide.sibling;
+    var elms = [Splide.root, sibling ? sibling.root : null];
 
     if (options.pauseOnHover) {
       switchOn(elms, 'mouseleave', PAUSE_FLAGS.HOVER, true);
@@ -4014,16 +4295,17 @@ var PAUSE_FLAGS = {
       switchOn(elms, 'focusin', PAUSE_FLAGS.FOCUS, false);
     }
 
-    subscribe(Elements.play, 'click', function () {
+    Splide.on('click', function () {
       // Need to be removed a focus flag at first.
       Autoplay.play(PAUSE_FLAGS.FOCUS);
       Autoplay.play(PAUSE_FLAGS.MANUAL);
-    });
-    switchOn([Elements.pause], 'click', PAUSE_FLAGS.MANUAL, false); // Rewind the timer when others move the slide.
-
-    Splide.on('move', function () {
+    }, Elements.play).on('move', function () {
+      // Rewind the timer when others move the slide.
       Autoplay.play();
+    }).on('destroy', function () {
+      Autoplay.pause();
     });
+    switchOn([Elements.pause], 'click', PAUSE_FLAGS.MANUAL, false);
   }
   /**
    * Play or pause on the given event.
@@ -4037,9 +4319,9 @@ var PAUSE_FLAGS = {
 
   function switchOn(elms, event, flag, play) {
     for (var i in elms) {
-      subscribe(elms[i], event, function () {
+      Splide.on(event, function () {
         Autoplay[play ? 'play' : 'pause'](flag);
-      });
+      }, elms[i]);
     }
   }
 
@@ -4077,45 +4359,64 @@ var PAUSE_FLAGS = {
 
   var Cover = {
     /**
-     * To set an image as cover, the height option is required.
+     * Required only when "cover" option is true.
      *
      * @type {boolean}
      */
-    required: options.cover && (options.height || options.heightRatio || options.fixedHeight),
+    required: options.cover,
 
     /**
      * Called when the component is mounted.
      */
     mount: function mount() {
-      Components.Slides.getSlides(true, false).forEach(function (slide) {
-        var img = find(slide, 'img');
-
-        if (img && img.src) {
-          cover(img);
-        }
-      });
+      apply(false);
       Splide.on('lazyload:loaded', function (img) {
         cover(img);
       });
+      Splide.on('updated', function () {
+        return apply(false);
+      });
+    },
+
+    /**
+     * Destroy.
+     */
+    destroy: function destroy() {
+      apply(true);
     }
   };
   /**
-   * Set background image of the parent element, using source of the given image element.
-   *
-   * @param {Element} img - An image element.
+   * Apply "cover" to all slides.
    */
 
-  function cover(img) {
-    var parent = img.parentElement;
+  function apply(uncover) {
+    Components.Slides.getSlides(true, false).forEach(function (slide) {
+      var img = find(slide, 'img');
 
-    if (parent) {
-      applyStyle(parent, {
-        background: "center/cover no-repeat url(\"" + img.src + "\")"
-      });
-      applyStyle(img, {
-        display: 'none'
-      });
+      if (img && img.src) {
+        cover(img, uncover);
+      }
+    });
+  }
+  /**
+   * Set background image of the parent element, using source of the given image element.
+   *
+   * @param {Element} img     - An image element.
+   * @param {boolean} uncover - Optional. Reset "cover".
+   */
+
+
+  function cover(img, uncover) {
+    if (uncover === void 0) {
+      uncover = false;
     }
+
+    applyStyle(img.parentElement, {
+      background: uncover ? '' : "center/cover no-repeat url(\"" + img.src + "\")"
+    });
+    applyStyle(img, {
+      display: uncover ? '' : 'none'
+    });
   }
 
   return Cover;
@@ -4169,11 +4470,18 @@ var SIZE = 40;
 
 /* harmony default export */ var components_arrows = (function (Splide, Components, name) {
   /**
-   * Keep all created elements.
+   * Previous arrow element.
    *
-   * @type {Object}
+   * @type {Element|undefined}
    */
-  var arrows;
+  var prev;
+  /**
+   * Next arrow element.
+   *
+   * @type {Element|undefined}
+   */
+
+  var next;
   /**
    * Store the class list.
    *
@@ -4188,6 +4496,13 @@ var SIZE = 40;
    */
 
   var root = Splide.root;
+  /**
+   * Whether arrows are created programmatically or not.
+   *
+   * @type {boolean}
+   */
+
+  var created;
   /**
    * Arrows component object.
    *
@@ -4206,101 +4521,111 @@ var SIZE = 40;
      * Called when the component is mounted.
      */
     mount: function mount() {
-      var Elements = Components.Elements;
-      var arrowsOption = Splide.options.arrows;
-      arrows = Elements.arrows; // If arrows were not found in HTML, let's generate them.
+      var Elements = Components.Elements; // Attempt to get arrows from HTML source.
 
-      if ((!arrows.prev || !arrows.next) && arrowsOption) {
-        arrows = createArrows();
-        var slider = Elements.slider;
-        var parent = arrowsOption === 'slider' && slider ? slider : root;
-        parent.insertBefore(arrows.wrapper, parent.firstChild);
+      prev = Elements.arrows.prev;
+      next = Elements.arrows.next; // If arrows were not found in HTML, let's generate them.
+
+      if ((!prev || !next) && Splide.options.arrows) {
+        prev = createArrow(true);
+        next = createArrow(false);
+        created = true;
+        appendArrows();
       }
 
-      if (arrows) {
-        listen();
+      if (prev && next) {
         bind();
       }
 
-      this.arrows = arrows;
+      this.arrows = {
+        prev: prev,
+        next: next
+      };
     },
 
     /**
      * Called after all components are mounted.
      */
     mounted: function mounted() {
-      Splide.emit(name + ":mounted", arrows.prev, arrows.next);
+      Splide.emit(name + ":mounted", prev, next);
+    },
+
+    /**
+     * Destroy.
+     */
+    destroy: function destroy() {
+      [prev, next].forEach(function (elm) {
+        removeAttribute(elm, 'disabled');
+      });
+
+      if (created) {
+        dom_remove(prev.parentElement);
+      }
     }
   };
   /**
-   * Subscribe click events.
+   * Listen native and custom events.
    */
-
-  function listen() {
-    subscribe(arrows.prev, 'click', function () {
-      var perMove = Splide.options.perMove;
-      Splide.go(perMove ? "-" + perMove : '<');
-    });
-    subscribe(arrows.next, 'click', function () {
-      var perMove = Splide.options.perMove;
-      Splide.go(perMove ? "+" + perMove : '>');
-    });
-  }
-  /**
-   * Update a disable attribute.
-   */
-
 
   function bind() {
-    Splide.on('mounted move updated', function () {
-      var _arrows = arrows,
-          prev = _arrows.prev,
-          next = _arrows.next;
-      var _Components$Controlle = Components.Controller,
-          prevIndex = _Components$Controlle.prevIndex,
-          nextIndex = _Components$Controlle.nextIndex;
-      var hasSlides = Splide.length > 1;
-      prev.disabled = prevIndex < 0 || !hasSlides;
-      next.disabled = nextIndex < 0 || !hasSlides;
-      Splide.emit(name + ":updated", prev, next, prevIndex, nextIndex);
-    });
+    Splide.on('click', function () {
+      return onClick(true);
+    }, prev).on('click', function () {
+      return onClick(false);
+    }, next).on('mounted move updated', updateDisabled);
   }
   /**
-   * Create a wrapper and arrow elements.
+   * Called when an arrow is clicked.
    *
-   * @return {Object} - An object contains created elements.
+   * @param {boolean} prev - If true, the previous arrow is clicked.
    */
 
 
-  function createArrows() {
+  function onClick(prev) {
+    var perMove = Splide.options.perMove;
+    Splide.go(perMove ? "" + (prev ? '-' : '+') + perMove : prev ? '<' : '>');
+  }
+  /**
+   * Update a disabled attribute.
+   */
+
+
+  function updateDisabled() {
+    var _Components$Controlle = Components.Controller,
+        prevIndex = _Components$Controlle.prevIndex,
+        nextIndex = _Components$Controlle.nextIndex;
+    var isEnough = Splide.length > Splide.options.perPage;
+    prev.disabled = prevIndex < 0 || !isEnough;
+    next.disabled = nextIndex < 0 || !isEnough;
+    Splide.emit(name + ":updated", prev, next, prevIndex, nextIndex);
+  }
+  /**
+   * Create a wrapper element and append arrows.
+   */
+
+
+  function appendArrows() {
     var wrapper = create('div', {
       "class": classes.arrows
     });
-    var prev = createArrow(true);
-    var next = createArrow(false);
-    wrapper.appendChild(prev);
-    wrapper.appendChild(next);
-    return {
-      wrapper: wrapper,
-      prev: prev,
-      next: next
-    };
+    append(wrapper, prev);
+    append(wrapper, next);
+    var slider = Components.Elements.slider;
+    var parent = Splide.options.arrows === 'slider' && slider ? slider : root;
+    before(wrapper, parent.firstElementChild);
   }
   /**
    * Create an arrow element.
    *
-   * @param {boolean} isPrev - Determine to create a prev arrow or next arrow.
+   * @param {boolean} prev - Determine to create a prev arrow or next arrow.
    *
    * @return {Element} - A created arrow element.
    */
 
 
-  function createArrow(isPrev) {
-    var arrow = create('button', {
-      "class": classes.arrow + " " + (isPrev ? classes.prev : classes.next)
-    });
-    arrow.innerHTML = "<svg xmlns=\"" + XML_NAME_SPACE + "\"\tviewBox=\"0 0 " + SIZE + " " + SIZE + "\"\twidth=\"" + SIZE + "\"\theight=\"" + SIZE + "\">" + ("<path d=\"" + (Splide.options.arrowPath || PATH) + "\" />") + "</svg>";
-    return arrow;
+  function createArrow(prev) {
+    var arrow = "<button class=\"" + classes.arrow + " " + (prev ? classes.prev : classes.next) + "\">" + ("<svg xmlns=\"" + XML_NAME_SPACE + "\"\tviewBox=\"0 0 " + SIZE + " " + SIZE + "\"\twidth=\"" + SIZE + "\"\theight=\"" + SIZE + "\">") + ("<path d=\"" + (Splide.options.arrowPath || PATH) + "\" />");
+    return domify(arrow);
   }
 
   return Arrows;
@@ -4312,7 +4637,6 @@ var SIZE = 40;
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
 
 
 /**
@@ -4376,7 +4700,7 @@ var UPDATE_EVENT = 'updated.page';
       data = createPagination();
       var slider = Components.Elements.slider;
       parent = Splide.options.pagination === 'slider' && slider ? slider : Splide.root;
-      parent.appendChild(data.list);
+      append(parent, data.list);
       bind();
     },
 
@@ -4394,12 +4718,16 @@ var UPDATE_EVENT = 'updated.page';
      * Be aware that node.remove() is not supported by IE.
      */
     destroy: function destroy() {
-      if (data && data.list) {
-        parent.removeChild(data.list);
+      dom_remove(data.list);
+
+      if (data.items) {
+        data.items.forEach(function (item) {
+          Splide.off('click', item.button);
+        });
       }
 
-      Splide.off(ATTRIBUTES_UPDATE_EVENT);
-      data = null;
+      Splide.off(ATTRIBUTES_UPDATE_EVENT).off(UPDATE_EVENT);
+      data = {};
     },
 
     /**
@@ -4448,13 +4776,14 @@ var UPDATE_EVENT = 'updated.page';
   function update(index, prevIndex) {
     var prev = Pagination.getItem(prevIndex);
     var curr = Pagination.getItem(index);
+    var active = STATUS_CLASSES.active;
 
     if (prev) {
-      removeClass(prev.button, STATUS_CLASSES.active);
+      removeClass(prev.button, active);
     }
 
     if (curr) {
-      addClass(curr.button, STATUS_CLASSES.active);
+      addClass(curr.button, active);
     }
 
     Splide.emit(name + ":updated", data, prev, curr);
@@ -4480,11 +4809,11 @@ var UPDATE_EVENT = 'updated.page';
       var button = create('button', {
         "class": classes.page
       });
-      li.appendChild(button);
-      list.appendChild(li);
-      subscribe(button, 'click', function () {
+      append(li, button);
+      append(list, li);
+      Splide.on('click', function () {
         Splide.go(">" + page);
-      });
+      }, button);
       return {
         li: li,
         button: button,
@@ -4555,6 +4884,13 @@ var SRC_DATA_NAME = 'data-splide-lazy';
 
   var isSequential = lazyload === 'sequential';
   /**
+   * Whether to stop sequential load.
+   *
+   * @type {boolean}
+   */
+
+  var stop = false;
+  /**
    * Lazyload component object.
    *
    * @type {Object}
@@ -4590,18 +4926,23 @@ var SRC_DATA_NAME = 'data-splide-lazy';
         if (isSequential) {
           loadNext();
         } else {
-          Splide.on('mounted', function () {
-            check(Splide.index);
-          }).on("moved." + name, function (index) {
-            check(index);
+          Splide.on("mounted moved." + name, function (index) {
+            check(index || Splide.index);
           });
         }
       }
+    },
+
+    /**
+     * Destroy.
+     */
+    destroy: function destroy() {
+      stop = true;
     }
   };
   /**
    * Check how close each image is from the active slide and
-   * determine whether to start loading or not according to the distance.
+   * determine whether to start loading or not, according to the distance.
    *
    * @param {number} index - Current index.
    */
@@ -4636,7 +4977,7 @@ var SRC_DATA_NAME = 'data-splide-lazy';
     var spinner = create('span', {
       "class": Splide.classes.spinner
     });
-    img.parentElement.appendChild(spinner);
+    append(img.parentElement, spinner);
 
     img.onload = function () {
       loaded(img, spinner, Slide, false);
@@ -4675,14 +5016,14 @@ var SRC_DATA_NAME = 'data-splide-lazy';
     removeClass(Slide.slide, STATUS_CLASSES.loading);
 
     if (!error) {
-      img.parentElement.removeChild(spinner);
+      dom_remove(spinner);
       applyStyle(img, {
         visibility: 'visible'
       });
       Splide.emit(name + ":loaded", img);
     }
 
-    if (isSequential) {
+    if (isSequential && !stop) {
       loadNext();
     }
   }
@@ -4702,7 +5043,6 @@ var SRC_DATA_NAME = 'data-splide-lazy';
  *
  * @type {Object}
  */
-
 var KEY_MAP = {
   horizontal: {
     ArrowLeft: '<',
@@ -4728,12 +5068,6 @@ var KEY_MAP = {
  */
 
 /* harmony default export */ var keyboard = (function (Splide) {
-  /**
-   * Hold functions to remove event listener.
-   *
-   * @type {Array|undefined}
-   */
-  var removers;
   return {
     /**
      * Called when the component is mounted.
@@ -4741,17 +5075,14 @@ var KEY_MAP = {
     mount: function mount() {
       var map = KEY_MAP[Splide.options.direction === 'ttb' ? 'vertical' : 'horizontal'];
       Splide.on('mounted updated', function () {
-        if (removers) {
-          removers[0]();
-          removers = undefined;
-        }
+        Splide.off('keydown', Splide.root);
 
         if (Splide.options.keyboard) {
-          removers = subscribe(Splide.root, 'keydown', function (e) {
+          Splide.on('keydown', function (e) {
             if (map[e.key]) {
               Splide.go(map[e.key]);
             }
-          });
+          }, Splide.root);
         }
       });
     }
@@ -4865,6 +5196,17 @@ var TAB_INDEX = 'tabindex';
       }
 
       initAutoplay();
+    },
+
+    /**
+     * Destroy.
+     */
+    destroy: function destroy() {
+      var Elements = Components.Elements;
+      var arrows = Components.Arrows.arrows;
+      Elements.slides.concat([arrows.prev, arrows.next, Elements.play, Elements.pause]).forEach(function (elm) {
+        removeAttribute(elm, [ARIA_HIDDEN, TAB_INDEX, ARIA_CONTROLS, ARIA_LABEL, ARIA_CURRENRT, 'role']);
+      });
     }
   };
   /**
@@ -4928,9 +5270,8 @@ var TAB_INDEX = 'tabindex';
       var text = options.focus === false && options.perPage > 1 ? i18n.pageX : i18n.slideX;
       var label = sprintf(text, item.page + 1);
       var button = item.button;
-      var controls = [];
-      item.Slides.forEach(function (Slide) {
-        controls.push(Slide.slide.id);
+      var controls = item.Slides.map(function (Slide) {
+        return Slide.slide.id;
       });
       setAttribute(button, ARIA_CONTROLS, controls.join(' '));
       setAttribute(button, ARIA_LABEL, label);
@@ -5040,7 +5381,6 @@ var TAB_INDEX = 'tabindex';
  */
 
 
-
 /**
  * The event name for sync.
  *
@@ -5142,34 +5482,41 @@ var TRIGGER_KEYS = [' ', 'Enter', 'Spacebar'];
 
   function bind() {
     var Slides = sibling.Components.Slides.getSlides(true, true);
-    Slides.forEach(function (Slide) {
-      var slide = Slide.slide;
+    Slides.forEach(function (_ref) {
+      var slide = _ref.slide,
+          index = _ref.index;
+
       /*
        * Listen mouseup and touchend events to handle click.
-       * Need to check "IDLE" status because slides can be moving by Drag component.
        */
-
-      subscribe(slide, 'mouseup touchend', function (e) {
+      Splide.on('mouseup touchend', function (e) {
         // Ignore a middle or right click.
         if (!e.button || e.button === 0) {
-          moveSibling(Slide.index);
+          moveSibling(index);
         }
-      });
+      }, slide);
       /*
        * Subscribe keyup to handle Enter and Space key.
        * Note that Array.includes is not supported by IE.
        */
 
-      subscribe(slide, 'keyup', function (e) {
+      Splide.on('keyup', function (e) {
         if (TRIGGER_KEYS.indexOf(e.key) > -1) {
           e.preventDefault();
-          moveSibling(Slide.index);
+          moveSibling(index);
         }
-      }, {
+      }, slide, {
         passive: false
       });
     });
   }
+  /**
+   * Move the sibling to the given index.
+   * Need to check "IDLE" status because slides can be moving by Drag component.
+   *
+   * @param {number} index - Target index.
+   */
+
 
   function moveSibling(index) {
     if (Splide.State.is(IDLE)) {
@@ -5323,8 +5670,8 @@ var COMPLETE = {
   Track: components_track,
   Clones: components_clones,
   Layout: layout,
-  Drag: drag,
-  Click: components_click,
+  Drag: components_drag,
+  Click: click,
   Autoplay: components_autoplay,
   Cover: components_cover,
   Arrows: components_arrows,
@@ -5343,7 +5690,7 @@ var LIGHT = {
   Track: components_track,
   Clones: components_clones,
   Layout: layout,
-  Drag: drag,
+  Drag: components_drag,
   Autoplay: components_autoplay,
   Arrows: components_arrows,
   Pagination: pagination,

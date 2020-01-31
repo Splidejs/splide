@@ -41,4 +41,31 @@ describe( 'Splide ', () => {
 		splide.mount();
 		expect( splide.root.style.visibility ).toBe( 'visible' );
 	} );
+
+	test( 'should add a slide dynamically.', () => {
+		const splide = new Splide( '#splide', {}, COMPLETE ).mount();
+		const slide = document.createElement( 'li' );
+		const length = splide.length;
+
+		slide.classList.add( 'splide__slide' );
+		slide.textContent = `${ length }`;
+
+		splide.add( slide );
+
+		expect( splide.length ).toBe( length + 1 );
+
+		splide.go( splide.length - 1 );
+
+		expect( slide.classList.contains( 'is-active' ) ).toBeTruthy();
+	} );
+
+	test( 'should remove a slide dynamically.', () => {
+		const splide = new Splide( '#splide', {}, COMPLETE ).mount();
+		const length = splide.length;
+
+		splide.remove( 0 );
+
+		expect( splide.length ).toBe( length - 1 );
+		expect( splide.Components.Elements.slides[0].textContent ).toBe( '2' );
+	} );
 } );

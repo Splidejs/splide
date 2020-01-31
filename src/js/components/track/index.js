@@ -49,6 +49,13 @@ export default ( Splide, Components ) => {
 	 */
 	const isVertical = Splide.options.direction === TTB;
 
+	/**
+	 * Whether the slider type is FADE or not.
+	 *
+	 * @type {boolean}
+	 */
+	const isFade = Splide.is( FADE );
+
 	return {
 		/**
 		 * Called when the component is mounted.
@@ -63,7 +70,7 @@ export default ( Splide, Components ) => {
 		 * The resize event must be registered after the Layout's one is done.
 		 */
 		mounted() {
-			if ( ! Splide.is( FADE ) ) {
+			if ( ! isFade ) {
 				Splide.on( 'mounted resize updated', () => { this.jump( Splide.index ) } );
 			}
 		},
@@ -85,7 +92,7 @@ export default ( Splide, Components ) => {
 				Splide.emit( 'move', newIndex, prevIndex, destIndex );
 			}
 
-			if ( Math.abs( newPosition - currPosition ) >= 1 || Splide.is( FADE ) ) {
+			if ( Math.abs( newPosition - currPosition ) >= 1 || isFade ) {
 				Components.Transition.start( destIndex, newIndex, this.toCoord( newPosition ), () => {
 					this.end( destIndex, newIndex, prevIndex, silently );
 				} );
@@ -105,7 +112,7 @@ export default ( Splide, Components ) => {
 		end( destIndex, newIndex, prevIndex, silently ) {
 			applyStyle( list, { transition: '' } );
 
-			if ( ! Splide.is( FADE ) ) {
+			if ( ! isFade ) {
 				this.jump( newIndex );
 			}
 

@@ -5,7 +5,7 @@
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
-import { applyStyle, subscribe } from '../../utils/dom';
+import { applyStyle } from '../../utils/dom';
 import { createInterval } from '../../utils/time';
 
 /**
@@ -66,7 +66,10 @@ export default ( Splide, Components, name ) => {
 			if ( slides.length > options.perPage ) {
 				interval = createInterval( () => { Splide.go( '>' ) }, options.interval, rate => {
 					Splide.emit( `${ name }:playing`, rate );
-					bar && applyStyle( bar, { width: `${ rate * 100 }%` } );
+
+					if ( bar ) {
+						applyStyle( bar, { width: `${ rate * 100 }%` } );
+					}
 				} );
 
 				bind();
@@ -113,8 +116,8 @@ export default ( Splide, Components, name ) => {
 	function bind() {
 		const options  = Splide.options;
 		const Elements = Components.Elements;
-		const sub      = Splide.sub;
-		const elms     = [ Splide.root, sub ? sub.root : null ];
+		const sibling  = Splide.sibling;
+		const elms     = [ Splide.root, sibling ? sibling.root : null ];
 
 		if ( options.pauseOnHover ) {
 			switchOn( elms, 'mouseleave', PAUSE_FLAGS.HOVER, true );
@@ -126,16 +129,21 @@ export default ( Splide, Components, name ) => {
 			switchOn( elms, 'focusin', PAUSE_FLAGS.FOCUS, false );
 		}
 
-		subscribe( Elements.play, 'click', () => {
-			// Need to be removed a focus flag at first.
-			Autoplay.play( PAUSE_FLAGS.FOCUS );
-			Autoplay.play( PAUSE_FLAGS.MANUAL );
-		} );
+		Splide
+			.on( 'click', () => {
+				// Need to be removed a focus flag at first.
+				Autoplay.play( PAUSE_FLAGS.FOCUS );
+				Autoplay.play( PAUSE_FLAGS.MANUAL );
+			}, Elements.play )
+			.on( 'move', () => {
+				// Rewind the timer when others move the slide.
+				Autoplay.play();
+			} )
+			.on( 'destroy', () => {
+				Autoplay.pause();
+			} );
 
 		switchOn( [ Elements.pause ], 'click', PAUSE_FLAGS.MANUAL, false );
-
-		// Rewind the timer when others move the slide.
-		Splide.on( 'move', () => { Autoplay.play() } );
 	}
 
 	/**
@@ -148,7 +156,7 @@ export default ( Splide, Components, name ) => {
 	 */
 	function switchOn( elms, event, flag, play ) {
 		for ( let i in elms ) {
-			subscribe( elms[ i ], event, () => { Autoplay[ play ? 'play' : 'pause' ]( flag ) } );
+			Splide.on( event, () => { Autoplay[ play ? 'play' : 'pause' ]( flag ) }, elms[ i ] );
 		}
 	}
 

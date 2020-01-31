@@ -7,7 +7,6 @@
 
 import { LOOP } from '../../constants/types';
 import { TTB } from '../../constants/directions';
-import { subscribe } from '../../utils/dom';
 import { between } from '../../utils/utils';
 import { IDLE } from '../../constants/states';
 import { each } from "../../utils/object";
@@ -128,13 +127,14 @@ export default ( Splide, Components ) => {
 		mount() {
 			const list = Components.Elements.list;
 
-			subscribe( list, 'touchstart mousedown', start );
-			subscribe( list, 'touchmove mousemove', move, { passive: false } );
-			subscribe( list, 'touchend touchcancel mouseleave mouseup dragend', end );
+			Splide
+				.on( 'touchstart mousedown', start, list )
+				.on( 'touchmove mousemove', move, list, { passive: false } )
+				.on( 'touchend touchcancel mouseleave mouseup dragend', end, list );
 
 			// Prevent dragging an image or anchor itself.
 			each( list.querySelectorAll( 'img, a' ), elm => {
-				subscribe( elm, 'dragstart', e => { e.preventDefault() }, { passive: false } );
+				Splide.on( 'dragstart', e => { e.preventDefault() }, elm, { passive: false } );
 			} );
 		},
 	};

@@ -10,7 +10,7 @@ import Vertical from './resolvers/vertical';
 
 import { unit } from '../../utils/utils';
 import { throttle } from '../../utils/time';
-import { subscribe, applyStyle } from '../../utils/dom';
+import { applyStyle, removeAttribute } from '../../utils/dom';
 
 /**
  * Interval time for throttle.
@@ -42,6 +42,13 @@ export default ( Splide, Components ) => {
 	 * @type {Element}
 	 */
 	let list;
+
+	/**
+	 * Store the track element.
+	 *
+	 * @type {Element}
+	 */
+	let track;
 
 	/**
 	 * Store all Slide objects.
@@ -80,11 +87,20 @@ export default ( Splide, Components ) => {
 		 * Called when the component is mounted.
 		 */
 		mount() {
-			list   = Elements.list;
-			Slides = Components.Slides.getSlides( true, true );
+			list  = Elements.list;
+			track = Elements.track;
 
 			bind();
 			init();
+		},
+
+		/**
+		 * Destroy.
+		 */
+		destroy() {
+			Elements.slides
+				.concat( [ list, track ] )
+				.forEach( elm => { removeAttribute( elm, 'style' ) } );
 		},
 
 		/**
@@ -177,6 +193,8 @@ export default ( Splide, Components ) => {
 	function init() {
 		const options = Splide.options;
 
+		Slides = Components.Slides.getSlides( true, true );
+
 		if ( isVertical ) {
 			Resolver = Vertical( Splide, Components, options );
 		} else {
@@ -187,9 +205,9 @@ export default ( Splide, Components ) => {
 
 		applyStyle( root, { maxWidth: unit( options.width ) } );
 
-		for ( const i in Slides ) {
-			applyStyle( Slides[ i ].slide, { [ Resolver.marginProp ]: unit( Resolver.gap ) } )
-		}
+		Slides.forEach( Slide => {
+			applyStyle( Slide.slide, { [ Resolver.marginProp ]: unit( Resolver.gap ) } )
+		} );
 
 		resize();
 	}
@@ -199,9 +217,10 @@ export default ( Splide, Components ) => {
 	 * Initialize when the component is mounted or options are updated.
 	 */
 	function bind() {
-		const throttledResize = throttle( () => { Splide.emit( 'resize' ) }, THROTTLE );
-		subscribe( window, 'resize', throttledResize );
-		Splide.on( 'mounted resize', resize ).on( 'updated', init );
+		Splide
+			.on( 'resize', throttle( () => { Splide.emit( 'resize' ) }, THROTTLE ), window )
+			.on( 'mounted resize', resize )
+			.on( 'updated', init );
 	}
 
 	/**
@@ -209,17 +228,15 @@ export default ( Splide, Components ) => {
 	 */
 	function resize() {
 		applyStyle( list, { width: unit( Layout.listWidth ), height: unit( Layout.listHeight ) } );
-		applyStyle( Components.Elements.track, { height: unit( Layout.height ) } );
+		applyStyle( track, { height: unit( Layout.height ) } );
 
 		const slideWidth  = unit( Resolver.slideWidth );
 		const slideHeight = unit( Resolver.slideHeight );
 
-		for ( let i in Slides ) {
-			const { slide, container } = Slides[ i ];
-
-			applyStyle( container, { height: slideHeight } );
-			applyStyle( slide, { width: slideWidth,	height: ! container ? slideHeight : '' } );
-		}
+		Slides.forEach( Slide => {
+			applyStyle( Slide.container, { height: slideHeight } );
+			applyStyle( Slide.slide, { width: slideWidth,	height: ! Slide.container ? slideHeight : '' } );
+		} );
 	}
 
 	return Layout;

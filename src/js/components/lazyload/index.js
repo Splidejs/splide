@@ -6,7 +6,7 @@
  */
 
 import { STATUS_CLASSES } from '../../constants/classes';
-import { create, find, addClass, removeClass, setAttribute, getAttribute, applyStyle } from '../../utils/dom';
+import { create, remove, append, find, addClass, removeClass, setAttribute, getAttribute, applyStyle } from '../../utils/dom';
 
 /**
  * The name for a data attribute.
@@ -55,6 +55,13 @@ export default ( Splide, Components, name ) => {
 	const isSequential = lazyload === 'sequential';
 
 	/**
+	 * Whether to stop sequential load.
+	 *
+	 * @type {boolean}
+	 */
+	let stop = false;
+
+	/**
 	 * Lazyload component object.
 	 *
 	 * @type {Object}
@@ -84,17 +91,22 @@ export default ( Splide, Components, name ) => {
 				if ( isSequential ) {
 					loadNext();
 				} else {
-					Splide
-						.on( 'mounted', () => { check( Splide.index ) } )
-						.on( `moved.${ name }`, index => { check( index ) } );
+					Splide.on( `mounted moved.${ name }`, index => { check( index || Splide.index ) } );
 				}
 			}
+		},
+
+		/**
+		 * Destroy.
+		 */
+		destroy() {
+			stop = true;
 		},
 	};
 
 	/**
 	 * Check how close each image is from the active slide and
-	 * determine whether to start loading or not according to the distance.
+	 * determine whether to start loading or not, according to the distance.
 	 *
 	 * @param {number} index - Current index.
 	 */
@@ -127,7 +139,7 @@ export default ( Splide, Components, name ) => {
 		addClass( Slide.slide, STATUS_CLASSES.loading );
 
 		const spinner = create( 'span', { class: Splide.classes.spinner } );
-		img.parentElement.appendChild( spinner );
+		append( img.parentElement, spinner );
 
 		img.onload  = () => { loaded( img, spinner, Slide, false ) };
 		img.onerror = () => { loaded( img, spinner, Slide, true ) };
@@ -159,12 +171,12 @@ export default ( Splide, Components, name ) => {
 		removeClass( Slide.slide, STATUS_CLASSES.loading );
 
 		if ( ! error ) {
-			img.parentElement.removeChild( spinner );
+			remove( spinner );
 			applyStyle( img, { visibility: 'visible' } );
 			Splide.emit( `${ name }:loaded`, img );
 		}
 
-		if ( isSequential ) {
+		if ( isSequential && ! stop ) {
 			loadNext();
 		}
 	}

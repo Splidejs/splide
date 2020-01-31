@@ -29,6 +29,13 @@ export default ( Splide, Components ) => {
 	let options;
 
 	/**
+	 * True if the slide is LOOP mode.
+	 *
+	 * @type {boolean}
+	 */
+	let isLoop;
+
+	/**
 	 * Controller component object.
 	 *
 	 * @type {Object}
@@ -39,6 +46,7 @@ export default ( Splide, Components ) => {
 		 */
 		mount() {
 			options = Splide.options;
+			isLoop  = Splide.is( LOOP );
 			bind();
 		},
 
@@ -155,7 +163,7 @@ export default ( Splide, Components ) => {
 		 * @return {number} - A trimmed index.
 		 */
 		trim( index ) {
-			if ( ! Splide.is( LOOP ) ) {
+			if ( ! isLoop ) {
 				index = options.rewind ? this.rewind( index ) : between( index, 0, this.edgeIndex );
 			}
 
@@ -172,7 +180,7 @@ export default ( Splide, Components ) => {
 		rewind( index ) {
 			const edge = this.edgeIndex;
 
-			if ( Splide.is( LOOP ) ) {
+			if ( isLoop ) {
 				while( index > edge ) {
 					index -= edge + 1;
 				}
@@ -218,7 +226,11 @@ export default ( Splide, Components ) => {
 		get edgeIndex() {
 			const length = Splide.length;
 
-			if ( hasFocus() || options.isNavigation || Splide.is( LOOP ) ) {
+			if ( ! length ) {
+				return 0;
+			}
+
+			if ( hasFocus() || options.isNavigation || isLoop ) {
 				return length - 1;
 			}
 
@@ -233,7 +245,7 @@ export default ( Splide, Components ) => {
 		get prevIndex() {
 			let prev = Splide.index - 1;
 
-			if ( Splide.is( LOOP ) || options.rewind ) {
+			if ( isLoop || options.rewind ) {
 				prev = this.rewind( prev );
 			}
 
@@ -248,7 +260,7 @@ export default ( Splide, Components ) => {
 		get nextIndex() {
 			let next = Splide.index + 1;
 
-			if ( Splide.is( LOOP ) || options.rewind ) {
+			if ( isLoop || options.rewind ) {
 				next = this.rewind( next );
 			}
 
@@ -264,7 +276,8 @@ export default ( Splide, Components ) => {
 			.on( 'move', newIndex => { Splide.index = newIndex } )
 			.on( 'updated', newOptions => {
 				options = newOptions;
-				Splide.index = Controller.rewind( Controller.trim( Splide.index ) );
+				const index = between( Splide.index, 0, Controller.edgeIndex );
+				Splide.index = Controller.rewind( Controller.trim( index ) );
 			} );
 	}
 

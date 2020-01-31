@@ -13,7 +13,7 @@ import compose from './core/composer';
 import { applyStyle } from './utils/dom';
 import { error, exist } from './utils/error';
 import { find } from './utils/dom';
-import { merge, each } from './utils/object';
+import { merge, each, values } from './utils/object';
 import * as STATES from './constants/states';
 
 
@@ -32,7 +32,7 @@ export default class Splide {
 	 * @param {Object}          Components  - Optional. Components.
 	 */
 	constructor( root, options = {}, Components = {} ) {
-		this.root = root instanceof HTMLElement ? root : find( document, root );
+		this.root = root instanceof Element ? root : find( document, root );
 		exist( this.root, 'An invalid root element or selector was given.' );
 
 		this.Components = {};
@@ -40,9 +40,9 @@ export default class Splide {
 		this.State      = State( STATES.CREATED );
 		this.STATES     = STATES;
 
-		this._options    = merge( DEFAULTS, options );
-		this._index      = 0;
-		this._components = Components;
+		this._o = merge( DEFAULTS, options );
+		this._i = 0;
+		this._c = Components;
 
 		this
 			.on( 'move drag', () => this.State.set( STATES.MOVING ) )
@@ -58,7 +58,7 @@ export default class Splide {
 	 * @return {Splide|null} - This instance or null if an exception occurred.
 	 */
 	mount( Extensions = {}, Transition = null ) {
-		this.Components = compose( this, merge( this._components, Extensions ), Transition );
+		this.Components = compose( this, merge( this._c, Extensions ), Transition );
 
 		try {
 			each( this.Components, ( component, key ) => {
@@ -83,9 +83,9 @@ export default class Splide {
 		this.emit( 'mounted' );
 
 		this.State.set( STATES.IDLE );
-		this.emit( 'ready' );
-
 		applyStyle( this.root, { visibility: 'visible' } );
+
+		this.emit( 'ready' );
 
 		return this;
 	}
@@ -105,34 +105,37 @@ export default class Splide {
 	/**
 	 * Register callback fired on the given event(s).
 	 *
-	 * @param {string}    event   - An event name. Use space to separate multiple events.
-	 *                              Also, namespace is accepted by dot, such as 'resize.{namespace}'.
-	 * @param {function}  handler - A callback function.
+	 * @param {string}   events  - An event name. Use space to separate multiple events.
+	 *                             Also, namespace is accepted by dot, such as 'resize.{namespace}'.
+	 * @param {function} handler - A callback function.
+	 * @param {Element}  elm     - Optional. Native event will be listened to when this arg is provided.
+	 * @param {Object}   options - Optional. Options for addEventListener.
 	 *
 	 * @return {Splide} - This instance.
 	 */
-	on( event, handler ) {
-		this.Event.on( event, handler );
+	on( events, handler, elm = null, options = {} ) {
+		this.Event.on( events, handler, elm, options );
 		return this;
 	}
 
 	/**
 	 * Unsubscribe the given event.
 	 *
-	 * @param {string} event - A event name.
+	 * @param {string}  events - A event name.
+	 * @param {Element} elm    - Optional. removeEventListener() will be called when this arg is provided.
 	 *
 	 * @return {Splide} - This instance.
 	 */
-	off( event ) {
-		this.Event.off( event );
+	off( events, elm = null ) {
+		this.Event.off( events, elm );
 		return this;
 	}
 
 	/**
 	 * Emit an event.
 	 *
-	 * @param {string}  event - An event name.
-	 * @param {*}       args  - Any number of arguments passed to handlers.
+	 * @param {string} event - An event name.
+	 * @param {*}      args  - Any number of arguments passed to handlers.
 	 */
 	emit( event, ...args ) {
 		this.Event.emit( event, ...args );
@@ -159,16 +162,64 @@ export default class Splide {
 	 * @return {boolean} - True if the slider type is the provided type or false if not.
 	 */
 	is( type ) {
-		return type === this._options.type;
+		return type === this._o.type;
+	}
+
+	/**
+	 * Insert a slide.
+	 *
+	 * @param {Element|string} slide - A slide element to be added.
+	 * @param {number}         index - A slide will be added at the position.
+	 */
+	add( slide, index = -1 ) {
+		this.Components.Elements.add( slide, index );
+		this.refresh();
+	}
+
+	/**
+	 * Remove the slide designated by the index.
+	 *
+	 * @param {number} index - A slide index.
+	 */
+	remove( index ) {
+		this.Components.Elements.remove( index );
+		this.refresh();
+	}
+
+	/**
+	 * Destroy all Slide objects and clones and recreate them again.
+	 * And then call "updated" event.
+	 */
+	refresh() {
+		this.emit( 'refresh' ).emit( 'updated', this.options );
+	}
+
+	/**
+	 * Destroy the Splide.
+	 */
+	destroy() {
+		values( this.Components ).reverse().forEach( component => {
+			component.destroy && component.destroy();
+		} );
+
+		this.emit( 'destroy' );
+
+		// Destroy all event handlers, including ones for native events.
+		this.Event.destroy();
+
+		delete this.Components;
+		this.State.set( STATES.CREATED );
+
+		return this;
 	}
 
 	/**
 	 * Return the current slide index.
 	 *
 	 * @return {number} - The current slide index.
-	 */
+	 // */
 	get index() {
-		return this._index;
+		return this._i;
 	}
 
 	/**
@@ -177,7 +228,7 @@ export default class Splide {
 	 * @param {number|string} index - A new index.
 	 */
 	set index( index ) {
-		this._index = parseInt( index );
+		this._i = parseInt( index );
 	}
 
 	/**
@@ -196,7 +247,7 @@ export default class Splide {
 	 * @return {Object} - Options object.
 	 */
 	get options() {
-		return this._options;
+		return this._o;
 	}
 
 	/**
@@ -205,10 +256,10 @@ export default class Splide {
 	 * @param {Object} options - New options.
 	 */
 	set options( options ) {
-		this._options = merge( this._options, options );
+		this._o = merge( this._o, options );
 
 		if ( ! this.State.is( STATES.CREATED ) ) {
-			this.emit( 'updated', this._options );
+			this.emit( 'updated', this._o );
 		}
 	}
 
@@ -219,7 +270,7 @@ export default class Splide {
 	 * @return {Object} - An object containing all class list.
 	 */
 	get classes() {
-		return this._options.classes;
+		return this._o.classes;
 	}
 
 	/**
@@ -229,6 +280,6 @@ export default class Splide {
 	 * @return {Object} - An object containing all i18n strings.
 	 */
 	get i18n() {
-		return this._options.i18n;
+		return this._o.i18n;
 	}
 }

@@ -5,68 +5,87 @@
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
-import { each } from "../utils/object";
-
 
 /**
  * The function for providing an Event object simply managing events.
  */
 export default () => {
 	/**
-	 * Store all handlers.
+	 * Store all event data.
 	 *
-	 * @type {Object}
+	 * @type {Array}
 	 */
-	const handlers = {};
+	let data = [];
 
 	return {
 		/**
 		 * Subscribe the given event(s).
 		 *
-		 * @param {string}    event   - An event name. Use space to separate multiple events.
-		 *                              Also, namespace is accepted by dot, such as 'resize.{namespace}'.
-		 * @param {function}  handler - A callback function.
+		 * @param {string}   events  - An event name. Use space to separate multiple events.
+		 *                             Also, namespace is accepted by dot, such as 'resize.{namespace}'.
+		 * @param {function} handler - A callback function.
+		 * @param {Element}  elm     - Optional. Native event will be listened to when this arg is provided.
+		 * @param {Object}   options - Optional. Options for addEventListener.
 		 */
-		on( event, handler ) {
-			event.split( ' ' ).forEach( name => {
-				// Prevent an event with a namespace from being registered twice.
-				if ( name.indexOf( '.' ) > -1 && handlers[ name ] ) {
-					return;
+		on( events, handler, elm = null, options = {} ) {
+			events.split( ' ' ).forEach( event => {
+				if ( elm ) {
+					elm.addEventListener( event, handler, options );
 				}
 
-				if ( ! handlers[ name ] ) {
-					handlers[ name ] = [];
-				}
-
-				handlers[ name ].push( handler );
+				data.push( { event, handler, elm, options } );
 			} );
 		},
 
 		/**
-		 * Unsubscribe the given event.
+		 * Unsubscribe the given event(s).
 		 *
-		 * @param {string} event - A event name.
+		 * @param {string}  events - A event name or names split by space.
+		 * @param {Element} elm    - Optional. removeEventListener() will be called when this arg is provided.
 		 */
-		off( event ) {
-			event.split( ' ' ).forEach( name => delete handlers[ name ] );
+		off( events, elm = null ) {
+			events.split( ' ' ).forEach( event => {
+				for ( let i in data ) {
+					const item = data[ i ];
+
+					if ( item && item.event === event && item.elm === elm ) {
+						if ( elm ) {
+							elm.removeEventListener( event, item.handler, item.options );
+						}
+
+						delete data[ i ];
+						break;
+					}
+				}
+			} );
 		},
 
 		/**
 		 * Emit an event.
+		 * This method is only for custom events.
 		 *
 		 * @param {string}  event - An event name.
 		 * @param {*}       args  - Any number of arguments passed to handlers.
 		 */
 		emit( event, ...args ) {
-			each( handlers, ( callbacks, name ) => {
-				if ( name.split( '.' )[ 0 ] === event ) {
-					if ( callbacks ) {
-						for ( const i in callbacks ) {
-							callbacks[ i ]( ...args );
-						}
-					}
+			data.forEach( item => {
+				if ( ! item.elm && item.event.split( '.' )[0] === event ) {
+					item.handler( ...args );
 				}
 			} );
+		},
+
+		/**
+		 * Clear event data.
+		 */
+		destroy() {
+			data.forEach( item => {
+				if ( item.elm ) {
+					item.elm.removeEventListener( item.event, item.handler, item.options );
+				}
+			} );
+
+			data = [];
 		},
 	};
 }

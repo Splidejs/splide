@@ -31,40 +31,51 @@ export default ( Splide, Components ) => {
 	 */
 	const Cover = {
 		/**
-		 * To set an image as cover, the height option is required.
+		 * Required only when "cover" option is true.
 		 *
 		 * @type {boolean}
 		 */
-		required: options.cover	&& ( options.height || options.heightRatio || options.fixedHeight ),
+		required: options.cover,
 
 		/**
 		 * Called when the component is mounted.
 		 */
 		mount() {
-			Components.Slides.getSlides( true, false ).forEach( slide => {
-				const img = find( slide, 'img' );
-
-				if ( img && img.src ) {
-					cover( img );
-				}
-			} );
-
+			apply( false );
 			Splide.on( 'lazyload:loaded', img => { cover( img ) } );
+			Splide.on( 'updated', () => apply( false ) );
+		},
+
+		/**
+		 * Destroy.
+		 */
+		destroy() {
+			apply( true );
 		},
 	};
 
 	/**
+	 * Apply "cover" to all slides.
+	 */
+	function apply( uncover ) {
+		Components.Slides.getSlides( true, false ).forEach( slide => {
+			const img = find( slide, 'img' );
+
+			if ( img && img.src ) {
+				cover( img, uncover );
+			}
+		} );
+	}
+
+	/**
 	 * Set background image of the parent element, using source of the given image element.
 	 *
-	 * @param {Element} img - An image element.
+	 * @param {Element} img     - An image element.
+	 * @param {boolean} uncover - Optional. Reset "cover".
 	 */
-	function cover( img ) {
-		const parent = img.parentElement;
-
-		if ( parent ) {
-			applyStyle( parent, { background: `center/cover no-repeat url("${ img.src }")` } );
-			applyStyle( img, { display: 'none' } );
-		}
+	function cover( img, uncover = false ) {
+		applyStyle( img.parentElement, { background: uncover ? '' : `center/cover no-repeat url("${ img.src }")` } );
+		applyStyle( img, { display: uncover ? '' : 'none' } );
 	}
 
 	return Cover;

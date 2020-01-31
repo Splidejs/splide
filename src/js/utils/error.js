@@ -29,13 +29,9 @@ export function error( message ) {
  *
  * @param {*}      subject - A subject to be confirmed.
  * @param {string} message - An error message.
- *
- * @return {*} - A given subject itself.
  */
 export function exist( subject, message ) {
 	if ( ! subject ) {
 		throw new Error( message );
 	}
-
-	return subject;
 }

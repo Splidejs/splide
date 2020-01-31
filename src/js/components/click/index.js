@@ -6,7 +6,6 @@
  */
 
 import { FADE } from "../../constants/types";
-import { subscribe } from "../../utils/dom";
 
 
 /**
@@ -43,9 +42,8 @@ export default ( Splide, Components ) => {
 		 * Called when the component is mounted.
 		 */
 		mount() {
-			subscribe( Components.Elements.track, 'click', click, { capture: true } );
-
 			Splide
+				.on( 'click', onClick, Components.Elements.track, { capture: true } )
 				.on( 'drag', () => { disabled = true } )
 				.on( 'moved', () => { disabled = false } );
 		},
@@ -56,7 +54,7 @@ export default ( Splide, Components ) => {
 	 *
 	 * @param {Event} e - A click event.
 	 */
-	function click( e ) {
+	function onClick( e ) {
 		if ( disabled ) {
 			e.preventDefault();
 			e.stopPropagation();

@@ -5,7 +5,7 @@
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
-import { create, subscribe } from '../../utils/dom';
+import { create, append, before, domify, remove, removeAttribute } from '../../utils/dom';
 import { XML_NAME_SPACE, PATH, SIZE } from './path';
 
 
@@ -20,11 +20,18 @@ import { XML_NAME_SPACE, PATH, SIZE } from './path';
  */
 export default ( Splide, Components, name ) => {
 	/**
-	 * Keep all created elements.
+	 * Previous arrow element.
 	 *
-	 * @type {Object}
+	 * @type {Element|undefined}
 	 */
-	let arrows;
+	let prev;
+
+	/**
+	 * Next arrow element.
+	 *
+	 * @type {Element|undefined}
+	 */
+	let next;
 
 	/**
 	 * Store the class list.
@@ -39,6 +46,13 @@ export default ( Splide, Components, name ) => {
 	 * @type {Element}
 	 */
 	const root = Splide.root;
+
+	/**
+	 * Whether arrows are created programmatically or not.
+	 *
+	 * @type {boolean}
+	 */
+	let created;
 
 	/**
 	 * Arrows component object.
@@ -57,99 +71,108 @@ export default ( Splide, Components, name ) => {
 		 * Called when the component is mounted.
 		 */
 		mount() {
-			const Elements     = Components.Elements;
-			const arrowsOption = Splide.options.arrows;
+			const Elements = Components.Elements;
 
-			arrows = Elements.arrows;
+			// Attempt to get arrows from HTML source.
+			prev = Elements.arrows.prev;
+			next = Elements.arrows.next;
 
 			// If arrows were not found in HTML, let's generate them.
-			if ( ( ! arrows.prev || ! arrows.next ) && arrowsOption ) {
-				arrows = createArrows();
-				const slider = Elements.slider;
-				const parent = arrowsOption === 'slider' && slider ? slider : root;
-				parent.insertBefore( arrows.wrapper, parent.firstChild );
+			if ( ( ! prev || ! next ) && Splide.options.arrows ) {
+				prev = createArrow( true );
+				next = createArrow( false );
+				created = true;
+
+				appendArrows();
 			}
 
-			if ( arrows ) {
-				listen();
+			if ( prev && next ) {
 				bind();
 			}
 
-			this.arrows = arrows;
+			this.arrows = { prev, next };
 		},
 
 		/**
 		 * Called after all components are mounted.
 		 */
 		mounted() {
-			Splide.emit( `${ name }:mounted`, arrows.prev, arrows.next );
+			Splide.emit( `${ name }:mounted`, prev, next );
+		},
+
+		/**
+		 * Destroy.
+		 */
+		destroy() {
+			[ prev, next ].forEach( elm => { removeAttribute( elm, 'disabled' ) } );
+
+			if ( created ) {
+				remove( prev.parentElement );
+			}
 		},
 	};
 
 	/**
-	 * Subscribe click events.
-	 */
-	function listen() {
-		subscribe( arrows.prev, 'click', () => {
-			const perMove = Splide.options.perMove;
-			Splide.go( perMove ? `-${ perMove }` : '<' );
-		} );
-
-		subscribe( arrows.next, 'click', () => {
-			const perMove = Splide.options.perMove;
-			Splide.go( perMove ? `+${ perMove }` : '>' );
-		} );
-	}
-
-	/**
-	 * Update a disable attribute.
+	 * Listen native and custom events.
 	 */
 	function bind() {
-		Splide.on( 'mounted move updated', () => {
-			const { prev, next } = arrows;
-			const { prevIndex, nextIndex } = Components.Controller;
-			const hasSlides = Splide.length > 1;
-
-			prev.disabled = prevIndex < 0 || ! hasSlides;
-			next.disabled = nextIndex < 0 || ! hasSlides;
-
-			Splide.emit( `${ name }:updated`, prev, next, prevIndex, nextIndex );
-		} );
+		Splide
+			.on( 'click', () => onClick( true ), prev )
+			.on( 'click', () => onClick( false ), next )
+			.on( 'mounted move updated', updateDisabled );
 	}
 
 	/**
-	 * Create a wrapper and arrow elements.
+	 * Called when an arrow is clicked.
 	 *
-	 * @return {Object} - An object contains created elements.
+	 * @param {boolean} prev - If true, the previous arrow is clicked.
 	 */
-	function createArrows() {
+	function onClick( prev ) {
+		const perMove = Splide.options.perMove;
+		Splide.go( perMove ? `${ prev ? '-' : '+' }${ perMove }` : ( prev ? '<' : '>' ) );
+	}
+
+	/**
+	 * Update a disabled attribute.
+	 */
+	function updateDisabled() {
+		const { prevIndex, nextIndex } = Components.Controller;
+		const isEnough = Splide.length > Splide.options.perPage;
+
+		prev.disabled = prevIndex < 0 || ! isEnough;
+		next.disabled = nextIndex < 0 || ! isEnough;
+
+		Splide.emit( `${ name }:updated`, prev, next, prevIndex, nextIndex );
+	}
+
+	/**
+	 * Create a wrapper element and append arrows.
+	 */
+	function appendArrows() {
 		const wrapper = create( 'div', { class: classes.arrows } );
-		const prev    = createArrow( true );
-		const next    = createArrow( false );
 
-		wrapper.appendChild( prev );
-		wrapper.appendChild( next );
+		append( wrapper, prev );
+		append( wrapper, next );
 
-		return { wrapper, prev, next };
+		const slider = Components.Elements.slider;
+		const parent = Splide.options.arrows === 'slider' && slider ? slider : root;
+
+		before( wrapper, parent.firstElementChild );
 	}
 
 	/**
 	 * Create an arrow element.
 	 *
-	 * @param {boolean} isPrev - Determine to create a prev arrow or next arrow.
+	 * @param {boolean} prev - Determine to create a prev arrow or next arrow.
 	 *
 	 * @return {Element} - A created arrow element.
 	 */
-	function createArrow( isPrev ) {
-		const arrow = create( 'button', {
-			class: `${ classes.arrow } ${ isPrev ? classes.prev : classes.next }`,
-		} );
+	function createArrow( prev ) {
+		const arrow = `<button class="${ classes.arrow } ${ prev ? classes.prev : classes.next }">`
+			+	`<svg xmlns="${ XML_NAME_SPACE }"	viewBox="0 0 ${ SIZE } ${ SIZE }"	width="${ SIZE }"	height="${ SIZE }">`
+			+ `<path d="${ Splide.options.arrowPath || PATH }" />`;
 
-		arrow.innerHTML = `<svg xmlns="${ XML_NAME_SPACE }"	viewBox="0 0 ${ SIZE } ${ SIZE }"	width="${ SIZE }"	height="${ SIZE }">`
-			+ `<path d="${ Splide.options.arrowPath || PATH }" />`
-			+ `</svg>`;
-
-		return arrow;
+		return domify( arrow );
 	}
 
 	return Arrows;

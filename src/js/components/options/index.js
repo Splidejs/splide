@@ -8,6 +8,7 @@
 import { each, merge } from '../../utils/object';
 import { error } from '../../utils/error';
 import { getAttribute } from "../../utils/dom";
+import { CREATED } from "../../constants/states";
 
 /**
  * The component for initializing options.
@@ -34,7 +35,7 @@ export default ( Splide ) => {
 		try {
 			Splide.options = JSON.parse( options );
 		} catch ( e ) {
-			error( '"data-splide" must be a valid JSON.' );
+			error( e.message );
 		}
 	}
 
@@ -43,7 +44,9 @@ export default ( Splide ) => {
 		 * Called when the component is mounted.
 		 */
 		mount() {
-			Splide.index = Splide.options.start;
+			if ( Splide.State.is( CREATED ) ) {
+				Splide.index = Splide.options.start;
+			}
 		},
 
 		/**

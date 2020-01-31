@@ -2,13 +2,14 @@ import {
 	find,
 	child,
 	create,
+	remove,
+	domify,
 	applyStyle,
 	addClass,
 	removeClass,
 	hasClass,
 	setAttribute,
 	removeAttribute,
-	subscribe,
 } from '../../src/js/utils/dom';
 
 describe( 'DOM function ', () => {
@@ -38,6 +39,25 @@ describe( 'DOM function ', () => {
 		expect( elm.classList.contains( 'btn' ) ).toBe( true );
 	} );
 
+	test( '"remove" should remove the given element.', () => {
+		const root  = document.querySelector( '.root' );
+		const slide = child( root, 'slide' );
+
+		expect( root.children.length ).toBe( 3 );
+		remove( slide );
+		expect( root.children.length ).toBe( 2 );
+	} );
+
+	test( '"domify" should convert HTML string to elements.', () => {
+		const root  = document.querySelector( '.root' );
+		const li    = domify( '<li class="child">Forth</li>' );
+
+		root.appendChild( li );
+
+		const items = root.getElementsByTagName( 'li' );
+		expect( items[ items.length - 1 ].textContent ).toBe( 'Forth' );
+	} );
+
 	test( '"applyStyle" should apply a style or styles to an element.', () => {
 		const root = document.querySelector( '.root' );
 		applyStyle( root, { width: '200px', height: '100px' } );
@@ -47,7 +67,7 @@ describe( 'DOM function ', () => {
 
 	test( '"addClass" should add a class or classes to an element.', () => {
 		const root = document.querySelector( '.root' );
-		addClass( root, 'class1', 'class2' );
+		addClass( root, [ 'class1', 'class2' ] );
 		expect( root.classList.contains( 'class1' ) ).toBe( true );
 		expect( root.classList.contains( 'class2' ) ).toBe( true );
 	} );
@@ -75,31 +95,10 @@ describe( 'DOM function ', () => {
 
 	test( '"removeAttribute" should remove an attribute from an element.', () => {
 		const root = document.querySelector( '.root' );
-		root.dataset.root = 'a';
-		removeAttribute( root, 'data-root' );
-		expect( root.dataset.root ).toBeUndefined();
-	} );
-
-	describe( '"subscribe" should', () => {
-		test( 'listen multiple native events.', () => {
-			const callback = jest.fn();
-			subscribe( window, 'resize click', callback );
-
-			global.dispatchEvent( new Event( 'resize' ) );
-			global.dispatchEvent( new Event( 'click' ) );
-
-			expect( callback ).toHaveBeenCalledTimes( 2 );
-		} );
-
-		test( 'return an array containing functions to remove listeners.', () => {
-			const callback = jest.fn();
-			const removers = subscribe( window, 'resize click', callback );
-
-			expect( removers ).toHaveLength( 2 );
-
-			removers.forEach( remover => remover() );
-
-			expect( callback ).not.toHaveBeenCalled();
-		} );
+		root.dataset.a = 'a';
+		root.dataset.b = 'b';
+		removeAttribute( root, [ 'data-a', 'data-b' ] );
+		expect( root.dataset.a ).toBeUndefined();
+		expect( root.dataset.b ).toBeUndefined();
 	} );
 } );

@@ -5,7 +5,6 @@
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
-import { subscribe } from '../../utils/dom';
 import { LOOP } from '../../constants/types';
 import { IDLE } from "../../constants/states";
 
@@ -115,33 +114,36 @@ export default ( Splide ) => {
 	function bind() {
 		const Slides = sibling.Components.Slides.getSlides( true, true );
 
-		Slides.forEach( Slide => {
-			const slide = Slide.slide;
-
+		Slides.forEach( ( { slide, index } ) => {
 			/*
 			 * Listen mouseup and touchend events to handle click.
-			 * Need to check "IDLE" status because slides can be moving by Drag component.
 			 */
-			subscribe( slide, 'mouseup touchend', e => {
+			Splide.on( 'mouseup touchend', e => {
 				// Ignore a middle or right click.
 				if ( ! e.button || e.button === 0 ) {
-					moveSibling( Slide.index );
+					moveSibling( index );
 				}
-			} );
+			}, slide );
 
 			/*
 			 * Subscribe keyup to handle Enter and Space key.
 			 * Note that Array.includes is not supported by IE.
 			 */
-			subscribe( slide, 'keyup', e => {
+			Splide.on( 'keyup', e => {
 				if ( TRIGGER_KEYS.indexOf( e.key ) > -1 ) {
 					e.preventDefault();
-					moveSibling( Slide.index );
+					moveSibling( index );
 				}
-			}, { passive: false } );
+			}, slide, { passive: false } );
 		} );
 	}
 
+	/**
+	 * Move the sibling to the given index.
+	 * Need to check "IDLE" status because slides can be moving by Drag component.
+	 *
+	 * @param {number} index - Target index.
+	 */
 	function moveSibling( index ) {
 		if ( Splide.State.is( IDLE ) ) {
 			sibling.go( index );

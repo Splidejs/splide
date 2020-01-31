@@ -5,8 +5,18 @@
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
-import { create, applyStyle } from "./dom";
+import { create, append, remove, applyStyle } from "./dom";
 
+/**
+ * Convert the given value to array.
+ *
+ * @param {*} value - Any value.
+ *
+ * @return {*[]} - Array containing the given value.
+ */
+export function toArray( value ) {
+	return Array.isArray( value ) ? value : [ value ];
+}
 
 /**
  * Check if the given value is between min and max.
@@ -25,14 +35,14 @@ export function between( value, m1, m2 ) {
 /**
  * The sprintf method with minimum functionality.
  *
- * @param {string} format       - The string format.
- * @param {string} replacements - Replacements accepting multiple arguments.
+ * @param {string}       format       - The string format.
+ * @param {string|Array} replacements - Replacements accepting multiple arguments.
  *
  * @returns {string} - Converted string.
  */
-export function sprintf( format, ...replacements ) {
+export function sprintf( format, replacements ) {
 	let i = 0;
-	return format.replace( /%s/g, () => replacements[ i++ ] );
+	return format.replace( /%s/g, () => toArray( replacements )[ i++ ] );
 }
 
 /**
@@ -75,11 +85,11 @@ export function toPixel( root, value ) {
 		width: value,
 	} );
 
-	root.appendChild( div );
+	append( root, div );
 
-	const px = div.clientWidth;
+	value = div.clientWidth;
 
-	root.removeChild( div );
+	remove( div );
 
-	return px;
+	return value;
 }

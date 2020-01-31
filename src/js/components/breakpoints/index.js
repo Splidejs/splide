@@ -95,7 +95,7 @@ export default ( Splide ) => {
 	 * @return {number|string} - A breakpoint as number or string. -1 if no point matches.
 	 */
 	function getPoint() {
-		const item = map.filter( item => item.mql.matches )[ 0 ];
+		const item = map.filter( item => item.mql.matches )[0];
 		return item ? item.point : -1;
 	}
 

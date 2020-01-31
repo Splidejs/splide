@@ -8,6 +8,8 @@
 import { find, addClass, removeClass, hasClass } from '../../utils/dom';
 import { SLIDE } from '../../constants/types';
 import { STATUS_CLASSES } from '../../constants/classes';
+import { CREATED } from "../../constants/states";
+import { each } from "../../utils/object";
 
 
 /**
@@ -20,8 +22,23 @@ import { STATUS_CLASSES } from '../../constants/classes';
  *
  * @return {Object} - The sub component object.
  */
-export default function Slide( index, realIndex, slide, Splide ) {
-	return {
+export default ( index, realIndex, slide, Splide ) => {
+	/**
+	 * Events when the slide status is updated.
+	 * Append a namespace to remove listeners later.
+	 *
+	 * @type {string}
+	 */
+	const statusUpdateEvents = [
+		'mounted', 'updated', 'resize', Splide.options.updateOnMove ? 'move' : 'moved',
+	].reduce( ( acc, cur ) => acc + cur + '.slide ', '' ).trim();
+
+	/**
+	 * Slide sub component object.
+	 *
+	 * @type {Object}
+	 */
+	const Slide = {
 		/**
 		 * Slide element.
 		 *
@@ -60,41 +77,34 @@ export default function Slide( index, realIndex, slide, Splide ) {
 		/**
 		 * Called when the component is mounted.
 		 */
-		init() {
-			if ( ! slide.id && ! this.isClone ) {
+		mount() {
+			if ( ! this.isClone ) {
 				const number = index + 1;
 				slide.id = `${ Splide.root.id }-slide${ number < 10 ? '0' + number : number }`;
 			}
 
-			const events = 'mounted updated ' + ( Splide.options.updateOnMove ? 'move' : 'moved' );
+			Splide.on( statusUpdateEvents, () => this.update() );
 
-			Splide
-				.on( events, () => {
-					this.update( this.isActive(), false );
-					this.update( this.isVisible(), true );
-				} )
-				.on( 'resize', () => { this.update( this.isVisible(), true ) } );
+			// Update status immediately on refresh.
+			if ( ! Splide.State.is( CREATED ) ) {
+				this.update();
+			}
 		},
 
 		/**
-		 * Update classes for activity or visibility.
-		 *
-		 * @param {boolean} active        - Is active/visible or not.
-		 * @param {boolean} forVisibility - Toggle classes for activity or visibility.
+		 * Destroy.
 		 */
-		update( active, forVisibility ) {
-			const type      = forVisibility ? 'visible' : 'active';
-			const className = STATUS_CLASSES[ type ];
+		destroy() {
+			Splide.off( statusUpdateEvents );
+			each( STATUS_CLASSES, className => { removeClass( slide, className ) } );
+		},
 
-			if ( active ) {
-				addClass( slide, className );
-				Splide.emit( `${ type }`, this );
-			} else {
-				if ( hasClass( slide, className ) ) {
-					removeClass( slide, className );
-					Splide.emit( `${ forVisibility ? 'hidden' : 'inactive' }`, this );
-				}
-			}
+		/**
+		 * Update active and visible status.
+		 */
+		update() {
+			update( this.isActive(), false );
+			update( this.isVisible(), true );
 		},
 
 		/**
@@ -150,4 +160,28 @@ export default function Slide( index, realIndex, slide, Splide ) {
 			return diff < within;
 		},
 	};
+
+
+	/**
+	 * Update classes for activity or visibility.
+	 *
+	 * @param {boolean} active        - Is active/visible or not.
+	 * @param {boolean} forVisibility - Toggle classes for activity or visibility.
+	 */
+	function update( active, forVisibility ) {
+		const type      = forVisibility ? 'visible' : 'active';
+		const className = STATUS_CLASSES[ type ];
+
+		if ( active ) {
+			addClass( slide, className );
+			Splide.emit( `${ type }`, Slide );
+		} else {
+			if ( hasClass( slide, className ) ) {
+				removeClass( slide, className );
+				Splide.emit( `${ forVisibility ? 'hidden' : 'inactive' }`, Slide );
+			}
+		}
+	}
+
+	return Slide;
 }

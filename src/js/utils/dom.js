@@ -6,6 +6,8 @@
  */
 
 import { each, values } from './object';
+import { toArray } from "./utils";
+
 
 /**
  * Find the first element matching the given selector.
@@ -17,7 +19,7 @@ import { each, values } from './object';
  * @return {Element|null} - A found element or null.
  */
 export function find( elm, selector ) {
-	return elm && selector ? elm.querySelector( selector.split( ' ' )[ 0 ] ) : null;
+	return elm && selector ? elm.querySelector( selector.split( ' ' )[0] ) : null;
 }
 
 /**
@@ -30,15 +32,9 @@ export function find( elm, selector ) {
  */
 export function child( parent, className ) {
 	if ( parent ) {
-		const children = values( parent.children );
-
-		for ( let i in children ) {
-			const child = children[ i ];
-
-			if ( hasClass( child, className.split( ' ' )[ 0 ] ) ) {
-				return child;
-			}
-		}
+		return values( parent.children ).filter( child => {
+			return hasClass( child, className.split( ' ' )[0] );
+		} )[0] || null;
 	}
 
 	return null;
@@ -60,6 +56,53 @@ export function create( tag, attrs ) {
 }
 
 /**
+ * Convert HTML string to DOM node.
+ *
+ * @param {string} html - HTML string.
+ *
+ * @return {Node} - A created node.
+ */
+export function domify( html ) {
+	const div = create( 'div', {} );
+	div.innerHTML = html;
+
+	return div.firstChild;
+}
+
+/**
+ * Remove a given element from a DOM tree.
+ *
+ * @param {Element|Element[]} elms - Element(s) to be removed.
+ */
+export function remove( elms ) {
+	toArray( elms ).forEach( elm => { elm && elm.parentElement.removeChild( elm ) } );
+}
+
+/**
+ * Append a child to a given element.
+ *
+ * @param {Element} parent - A parent element.
+ * @param {Element} child  - An element to be appended.
+ */
+export function append( parent, child ) {
+	if ( parent ) {
+		parent.appendChild( child );
+	}
+}
+
+/**
+ * Insert an element before the reference element.
+ *
+ * @param {Element|Node} ref - A reference element.
+ * @param {Element}      elm - An element to be inserted.
+ */
+export function before( elm, ref ) {
+	if ( elm && ref && ref.parentElement ) {
+		ref.parentElement.insertBefore( elm, ref );
+	}
+}
+
+/**
  * Apply styles to the given element.
  *
  * @param {Element} elm     - An element where styles are applied.
@@ -74,31 +117,41 @@ export function applyStyle( elm, styles ) {
 }
 
 /**
- * Add classes to the element.
+ * Add or remove classes to/from the element.
+ * This function is for internal usage.
  *
- * @param {Element} elm     - An element where classes are added.
- * @param {string}  classes - Class names being added.
+ * @param {Element}         elm     - An element where classes are added.
+ * @param {string|string[]} classes - Class names being added.
+ * @param {boolean}         remove  - Whether to remove or add classes.
  */
-export function addClass( elm, ...classes ) {
+function addOrRemoveClasses( elm, classes, remove ) {
 	if ( elm ) {
-		classes.forEach( name => {
+		toArray( classes ).forEach( name => {
 			if ( name ) {
-				elm.classList.add( name )
+				elm.classList[ remove ? 'remove' : 'add' ]( name );
 			}
 		} );
 	}
 }
 
 /**
+ * Add classes to the element.
+ *
+ * @param {Element}          elm     - An element where classes are added.
+ * @param {string|string[]}  classes - Class names being added.
+ */
+export function addClass( elm, classes ) {
+	addOrRemoveClasses( elm, classes, false );
+}
+
+/**
  * Remove a class from the element.
  *
- * @param {Element} elm       - An element where classes are removed.
- * @param {string}  className - A class name being removed.
+ * @param {Element}         elm     - An element where classes are removed.
+ * @param {string|string[]} classes - A class name being removed.
  */
-export function removeClass( elm, className ) {
-	if ( elm ) {
-		elm.classList.remove( className )
-	}
+export function removeClass( elm, classes ) {
+	addOrRemoveClasses( elm, classes, true );
 }
 
 /**
@@ -135,42 +188,17 @@ export function setAttribute( elm, name, value ) {
  * @return {string|null} - The value of the given attribute if available. Null if not.
  */
 export function getAttribute( elm, name ) {
-	if ( elm ) {
-		return elm.getAttribute( name );
-	}
-
-	return null;
+	return elm ? elm.getAttribute( name ) : null;
 }
 
 /**
  * Remove attribute from the given element.
  *
- * @param {Element} elm   - An element where an attribute is removed.
- * @param {string}  name  - Attribute name.
+ * @param {Element}      elm   - An element where an attribute is removed.
+ * @param {string|Array} names - Attribute name.
  */
-export function removeAttribute( elm, name ) {
+export function removeAttribute( elm, names ) {
 	if ( elm ) {
-		elm.removeAttribute( name );
+		toArray( names ).forEach( name => { elm.removeAttribute( name ) } );
 	}
-}
-
-/**
- * Listen a native event.
- *
- * @param {Element|Window}  elm     - An element or window object.
- * @param {string}          event   - An event name or event names separated with space.
- * @param {function}        handler - Callback function.
- * @param {Object}          options - Optional. Options.
- *
- * @return {function[]} - Functions to stop subscription.
- */
-export function subscribe( elm, event, handler, options = {} ) {
-	if ( elm ) {
-		return event.split( ' ' ).map( e => {
-			elm.addEventListener( e, handler, options );
-			return () => elm.removeEventListener( e, handler );
-		} );
-	}
-
-	return [];
 }
