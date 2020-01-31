@@ -152,6 +152,8 @@ export default class Splide {
 		if ( this.State.is( STATES.IDLE ) || ( this.State.is( STATES.MOVING ) && ! wait ) ) {
 			this.Components.Controller.go( control, false );
 		}
+
+		return this;
 	}
 
 	/**
@@ -174,6 +176,7 @@ export default class Splide {
 	add( slide, index = -1 ) {
 		this.Components.Elements.add( slide, index );
 		this.refresh();
+		return this;
 	}
 
 	/**
@@ -184,6 +187,7 @@ export default class Splide {
 	remove( index ) {
 		this.Components.Elements.remove( index );
 		this.refresh();
+		return this;
 	}
 
 	/**
@@ -192,6 +196,7 @@ export default class Splide {
 	 */
 	refresh() {
 		this.emit( 'refresh' ).emit( 'updated', this.options );
+		return this;
 	}
 
 	/**

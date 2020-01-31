@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 1.4.0
+ * Version  : 1.4.1
  * License  : MIT
  * Copyright: 2019 Naotoshi Fujita
  */
@@ -1516,6 +1516,8 @@ function () {
     if (this.State.is(IDLE) || this.State.is(MOVING) && !wait) {
       this.Components.Controller.go(control, false);
     }
+
+    return this;
   }
   /**
    * Verify whether the slider type is the given one or not.
@@ -1544,6 +1546,7 @@ function () {
 
     this.Components.Elements.add(slide, index);
     this.refresh();
+    return this;
   }
   /**
    * Remove the slide designated by the index.
@@ -1555,6 +1558,7 @@ function () {
   _proto.remove = function remove(index) {
     this.Components.Elements.remove(index);
     this.refresh();
+    return this;
   }
   /**
    * Destroy all Slide objects and clones and recreate them again.
@@ -1564,6 +1568,7 @@ function () {
 
   _proto.refresh = function refresh() {
     this.emit('refresh').emit('updated', this.options);
+    return this;
   }
   /**
    * Destroy the Splide.
