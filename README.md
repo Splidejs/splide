@@ -5,12 +5,14 @@
 * [Documents](https://splidejs.com/category/users-guide/)
 
 ## News
+* Splide can be destroyed.
+* Add or remove slides dynamically.
 * [Video](https://splidejs.com/video/) extension is released.
 * [URL Hash Navigation](https://splidejs.com/url-hash-navigation/) extension is released.
 
 ## Features
 * Pure JavaScript without any dependencies
-* Small size, less than 27kB(10kB gzipped)
+* Small size, less than 28kB(11kB gzipped)
 * Flexible and extensible
 * Multiple slides
 * Slide or fade transition by CSS
@@ -24,6 +26,7 @@
 * Lazy loading
 * Thumbnail slider
 * Accessibility friendly, supporting keyboard control and ARIA attributes
+* Dynamically adding/removing slides
 * Internet Explorer 10
 
 ## Installation
