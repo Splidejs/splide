@@ -1,4 +1,4 @@
-![Splide](images/splide.png)
+[![Splide](images/splide.png)](https://splidejs.com/)
 
 **[Splide](https://splidejs.com/) is a lightweight, powerful and flexible slider and carousel, written in pure JavaScript without any dependencies.**
 
