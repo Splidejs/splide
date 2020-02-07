@@ -7,6 +7,7 @@
 ## News
 * [Auto Width](https://splidejs.com/auto-width/) is implemented. Each slide can have its own width.
 * [Breakpoints](https://splidejs.com/options/#breakpoints) accept 'destroy' option.
+* Merge Slides component to Elements.
 * Splide can be destroyed.
 * Add or remove slides dynamically.
 * [Video](https://splidejs.com/video/) extension is released.
