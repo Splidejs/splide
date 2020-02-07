@@ -1,4 +1,5 @@
-# Splide
+![Splide](images/splide.png)
+
 [Splide](https://splidejs.com/) is a lightweight, powerful and flexible slider and carousel, written in pure JavaScript without any dependencies.
 
 * [Demo](https://splidejs.com/)
