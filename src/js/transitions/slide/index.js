@@ -51,13 +51,14 @@ export default ( Splide, Components ) => {
 		 * @param {number}   destIndex - Destination slide index that might be clone's.
 		 * @param {number}   newIndex  - New index.
 		 * @param {Object}   coord     - Destination coordinates.
-		 * @param {function} onEnd     - Callback function must be invoked when transition is completed.
+		 * @param {function} done      - Callback function must be invoked when transition is completed.
 		 */
-		start( destIndex, newIndex, coord, onEnd ) {
-			endCallback = onEnd;
+		start( destIndex, newIndex, coord, done ) {
+			const options = Splide.options;
+			endCallback = done;
 
 			applyStyle( list, {
-				transition: `transform ${ Splide.options.speed }ms ${ Splide.options.easing }`,
+				transition: `transform ${ options.speed }ms ${ options.easing }`,
 				transform : `translate(${ coord.x }px,${ coord.y }px)`,
 			} );
 		},

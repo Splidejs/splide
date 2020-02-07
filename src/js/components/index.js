@@ -8,7 +8,6 @@
 import Options     from './options';
 import Elements    from './elements';
 import Controller  from './controller';
-import Slides      from './slides';
 import Track       from './track';
 import Clones      from './clones';
 import Layout      from './layout';
@@ -28,7 +27,6 @@ export const COMPLETE = {
 	Options,
 	Elements,
 	Controller,
-	Slides,
 	Track,
 	Clones,
 	Layout,
@@ -49,12 +47,10 @@ export const LIGHT = {
 	Options,
 	Elements,
 	Controller,
-	Slides,
 	Track,
 	Clones,
 	Layout,
 	Drag,
-	Autoplay,
 	Arrows,
 	Pagination,
 	A11y,

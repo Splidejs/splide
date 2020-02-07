@@ -10,6 +10,7 @@ import { error } from '../../utils/error';
 import { getAttribute } from "../../utils/dom";
 import { CREATED } from "../../constants/states";
 
+
 /**
  * The component for initializing options.
  *
@@ -19,17 +20,12 @@ import { CREATED } from "../../constants/states";
  */
 export default ( Splide ) => {
 	/**
-	 * Store the root element.
-	 */
-	const root = Splide.root;
-
-	/**
 	 * Retrieve options from the data attribute.
 	 * Note that IE10 doesn't support dataset property.
 	 *
 	 * @type {string}
 	 */
-	const options = getAttribute( root, 'data-splide' );
+	const options = getAttribute( Splide.root, 'data-splide' );
 
 	if ( options ) {
 		try {

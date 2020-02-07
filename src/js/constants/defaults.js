@@ -74,6 +74,15 @@ export const DEFAULTS = {
 	heightRatio: 0,
 
 	/**
+	 * If true, slide width will be determined by the element width itself.
+	 * - perPage/perMove should be 1.
+	 * - lazyLoad should be false.
+	 *
+	 * @type {boolean}
+	 */
+	autoWidth: false,
+
+	/**
 	 * Determine how many slides should be displayed per page.
 	 *
 	 * @type {number}

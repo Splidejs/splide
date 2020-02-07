@@ -14,7 +14,7 @@
  * @return {Function} - A debounced function.
  */
 export function throttle( func, wait ) {
-	let timeout = null;
+	let timeout;
 
 	// Declare function by the "function" keyword to prevent "this" from being inherited.
 	return function () {
@@ -41,28 +41,26 @@ export function createInterval( callback, interval, progress ) {
 	let start, elapse, rate, pause = true;
 
 	const step = timestamp => {
-		if ( pause ) {
-			return;
+		if ( ! pause ) {
+			if ( ! start ) {
+				start = timestamp;
+			}
+
+			elapse = timestamp - start;
+			rate   = elapse / interval;
+
+			if ( elapse >= interval ) {
+				start = 0;
+				rate  = 1;
+				callback();
+			}
+
+			if ( progress ) {
+				progress( rate );
+			}
+
+			requestAnimationFrame( step );
 		}
-
-		if ( ! start ) {
-			start = timestamp;
-		}
-
-		elapse = timestamp - start;
-		rate   = elapse / interval;
-
-		if ( elapse >= interval ) {
-			start = 0;
-			rate  = 1;
-			callback();
-		}
-
-		if ( progress ) {
-			progress( rate );
-		}
-
-		requestAnimationFrame( step );
 	};
 
 	return {

@@ -50,19 +50,37 @@ export function isObject( subject ) {
  * @return {Object} - A merged object.
  */
 export function merge( { ...to }, from ) {
-	if ( isObject( to ) && isObject( from ) ) {
-		each( from, ( value, key ) => {
-			if ( isObject( value ) ) {
-				if ( ! isObject( to[ key ] ) ) {
-					to[ key ] = {};
-				}
-
-				to[ key ] = merge( to[ key ], value );
-			} else {
-				to[ key ] = value;
+	each( from, ( value, key ) => {
+		if ( isObject( value ) ) {
+			if ( ! isObject( to[ key ] ) ) {
+				to[ key ] = {};
 			}
-		} );
-	}
+
+			to[ key ] = merge( to[ key ], value );
+		} else {
+			to[ key ] = value;
+		}
+	} );
+
+	return to;
+}
+
+/**
+ * Assign all properties "from" to "to" object.
+ *
+ * @param {Object} to   - An object where properties are assigned.
+ * @param {Object} from - An object whose properties are assigned to "to".
+ *
+ * @return {Object} - An assigned object.
+ */
+export function assign( to, from ) {
+	to._s = from;
+
+	Object.keys( from ).forEach( key => {
+		if ( ! to[ key ] ) {
+			Object.defineProperty( to, key, Object.getOwnPropertyDescriptor( from, key ) );
+		}
+	} );
 
 	return to;
 }

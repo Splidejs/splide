@@ -1,4 +1,8 @@
 .splide {
   position: relative;
   visibility: hidden;
+
+  &.is-active {
+    visibility: visible;
+  }
 }

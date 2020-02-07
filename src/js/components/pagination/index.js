@@ -43,11 +43,11 @@ export default ( Splide, Components, name ) => {
 	let data = {};
 
 	/**
-	 * Hold a parent element of pagination.
+	 * Hold the Elements component.
 	 *
-	 * @type {Element}
+	 * @type {Object}
 	 */
-	let parent;
+	const Elements = Components.Elements;
 
 	/**
 	 * Pagination component object.
@@ -68,8 +68,8 @@ export default ( Splide, Components, name ) => {
 		mount() {
 			data = createPagination();
 
-			const slider = Components.Elements.slider;
-			parent = Splide.options.pagination === 'slider' && slider ? slider : Splide.root;
+			const slider = Elements.slider;
+			const parent = Splide.options.pagination === 'slider' && slider ? slider : Splide.root;
 			append( parent, data.list );
 
 			bind();
@@ -107,7 +107,7 @@ export default ( Splide, Components, name ) => {
 		 * @return {Object|undefined} - An item object on success or undefined on failure.
 		 */
 		getItem( index ) {
-			return data.items[ Components.Controller.indexToPage( index ) ];
+			return data.items[ Components.Controller.toPage( index ) ];
 		},
 
 		/**
@@ -164,12 +164,11 @@ export default ( Splide, Components, name ) => {
 	 * @return {Object} - An object contains all data.
 	 */
 	function createPagination() {
-		const options = Splide.options;
-		const classes = Splide.classes;
-		const list    = create( 'ul', { class: classes.pagination } );
-		const Slides  = Components.Slides;
+		const options  = Splide.options;
+		const classes  = Splide.classes;
+		const list     = create( 'ul', { class: classes.pagination } );
 
-		const items = Slides.getSlides( false, true )
+		const items = Elements.getSlides( false )
 			.filter( Slide => options.focus !== false || Slide.index % options.perPage === 0 )
 			.map( ( Slide, page ) => {
 				const li     = create( 'li', {} );
@@ -180,7 +179,7 @@ export default ( Splide, Components, name ) => {
 
 				Splide.on( 'click', () => { Splide.go( `>${ page }` ) }, button );
 
-				return { li, button, page, Slides: Slides.getSlidesByPage( page ) };
+				return { li, button, page, Slides: Elements.getSlidesByPage( page ) };
 			} );
 
 		return { list, items };

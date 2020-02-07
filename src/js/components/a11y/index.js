@@ -27,6 +27,13 @@ export default ( Splide, Components ) => {
 	const i18n = Splide.i18n;
 
 	/**
+	 * Hold the Elements component.
+	 *
+	 * @type {Object}
+	 */
+	const Elements = Components.Elements;
+
+	/**
 	 * A11y component object.
 	 *
 	 * @type {Object}
@@ -65,14 +72,12 @@ export default ( Splide, Components ) => {
 		 * Destroy.
 		 */
 		destroy() {
-			const Elements = Components.Elements;
-			const arrows   = Components.Arrows.arrows;
+			const arrows = Components.Arrows.arrows;
 
-			Elements.slides
-				.concat( [ arrows.prev, arrows.next, Elements.play, Elements.pause ] )
-				.forEach( elm => {
-					removeAttribute( elm, [ ARIA_HIDDEN, TAB_INDEX, ARIA_CONTROLS, ARIA_LABEL, ARIA_CURRENRT, 'role' ] );
-				} );
+			removeAttribute(
+				Elements.slides.concat( [ arrows.prev, arrows.next, Elements.play, Elements.pause ] ),
+				[ ARIA_HIDDEN, TAB_INDEX, ARIA_CONTROLS, ARIA_LABEL, ARIA_CURRENRT, 'role' ]
+			);
 		},
 	};
 
@@ -95,7 +100,7 @@ export default ( Splide, Components ) => {
 	 * @param {Element} next - Next arrow element.
 	 */
 	function initArrows( prev, next ) {
-		const controls = Components.Elements.track.id;
+		const controls = Elements.track.id;
 
 		setAttribute( prev, ARIA_CONTROLS, controls );
 		setAttribute( next, ARIA_CONTROLS, controls );
@@ -110,7 +115,7 @@ export default ( Splide, Components ) => {
 	 * @param {number}  nextIndex - Next slide index or -1 when there is no next slide.
 	 */
 	function updateArrows( prev, next, prevIndex, nextIndex ) {
-		const index = Splide.index;
+		const index     = Splide.index;
 		const prevLabel = prevIndex > -1 && index < prevIndex ? i18n.last : i18n.prev;
 		const nextLabel = nextIndex > -1 && index > nextIndex ? i18n.first : i18n.next;
 
@@ -163,16 +168,16 @@ export default ( Splide, Components ) => {
 	 * Initialize autoplay buttons.
 	 */
 	function initAutoplay() {
-		const Elements = Components.Elements;
+		[ 'play', 'pause' ].forEach( name => {
+			const elm = Elements[ name ];
 
-		[ Elements.play, Elements.pause ].forEach( ( elm, index ) => {
 			if ( elm ) {
 				if ( ! isButton( elm ) ) {
 					setAttribute( elm, 'role', 'button' );
 				}
 
 				setAttribute( elm, ARIA_CONTROLS, Elements.track.id );
-				setAttribute( elm, ARIA_LABEL, i18n[ index === 0 ? 'play' : 'pause' ] );
+				setAttribute( elm, ARIA_LABEL, i18n[ name ] );
 			}
 		} );
 	}
@@ -184,18 +189,14 @@ export default ( Splide, Components ) => {
 	 * @param {Splide} main - A main Splide instance.
 	 */
 	function initNavigation( main ) {
-		const Slides = Components.Slides.getSlides( true, true );
-
-		Slides.forEach( Slide => {
-			const slide = Slide.slide;
-
+		Elements.each( ( { slide, realIndex, index } ) => {
 			if ( ! isButton( slide ) ) {
 				setAttribute( slide, 'role', 'button' );
 			}
 
-			const slideIndex = Slide.realIndex > -1 ? Slide.realIndex : Slide.index;
+			const slideIndex = realIndex > -1 ? realIndex : index;
 			const label      = sprintf( i18n.slideX, slideIndex + 1 );
-			const mainSlide  = main.Components.Slides.getSlide( slideIndex );
+			const mainSlide  = main.Components.Elements.getSlide( slideIndex );
 
 			setAttribute( slide, ARIA_LABEL, label );
 

@@ -15,7 +15,7 @@ describe( 'The "slide" type Splide', () => {
 	test( 'should init index and slide attributes correctly.', () => {
 		expect( splide.index ).toBe( 0 );
 
-		const Slide     = splide.Components.Slides.getSlide( splide.index );
+		const Slide     = splide.Components.Elements.getSlide( splide.index );
 		const classList = Slide.slide.classList;
 
 		expect( classList.contains( STATUS_CLASSES.active ) ).toBe( true );
@@ -31,8 +31,8 @@ describe( 'The "slide" type Splide', () => {
 		splide.on( 'moved', ( newIndex, prevIndex ) => {
 			expect( Track.position ).toBe( -800 );
 
-			const prevSlide   = splide.Components.Slides.getSlide( prevIndex );
-			const newSlide    = splide.Components.Slides.getSlide( newIndex );
+			const prevSlide   = splide.Components.Elements.getSlide( prevIndex );
+			const newSlide    = splide.Components.Elements.getSlide( newIndex );
 			const prevClasses = prevSlide.slide.classList;
 			const newClasses  = newSlide.slide.classList;
 

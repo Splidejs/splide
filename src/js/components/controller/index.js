@@ -78,8 +78,8 @@ export default ( Splide, Components ) => {
 			let index = Splide.index;
 
 			const matches   = String( control ).match( /([+\-<>])(\d+)?/ );
-			const indicator = matches ? matches[ 1 ] || '' : '';
-			const number    = matches ? parseInt( matches[ 2 ] ) : 0;
+			const indicator = matches ? matches[1] : '';
+			const number    = matches ? parseInt( matches[2] ) : 0;
 
 			switch ( indicator ) {
 				case '+':
@@ -91,11 +91,11 @@ export default ( Splide, Components ) => {
 					break;
 
 				case '>':
-					index = this.pageToIndex( number > -1 ? number : this.indexToPage( index ) + 1 );
+					index = this.toIndex( number > -1 ? number : this.toPage( index ) + 1 );
 					break;
 
 				case '<':
-					index = this.pageToIndex( number > -1 ? number : this.indexToPage( index ) - 1 );
+					index = this.toIndex( number > -1 ? number : this.toPage( index ) - 1 );
 					break;
 
 				default:
@@ -112,7 +112,7 @@ export default ( Splide, Components ) => {
 		 *
 		 * @return {number} - A computed page number.
 		 */
-		pageToIndex( page ) {
+		toIndex( page ) {
 			if ( hasFocus() ) {
 				return page;
 			}
@@ -138,7 +138,7 @@ export default ( Splide, Components ) => {
 		 *
 		 * @return {number} - A computed page number.
 		 */
-		indexToPage( index ) {
+		toPage( index ) {
 			if ( hasFocus() ) {
 				return index;
 			}
@@ -287,7 +287,7 @@ export default ( Splide, Components ) => {
 	 * @return {boolean} - True if a slider has the focus option.
 	 */
 	function hasFocus() {
-		return Splide.options.focus !== false;
+		return options.focus !== false;
 	}
 
 	return Controller;

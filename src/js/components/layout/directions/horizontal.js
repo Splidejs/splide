@@ -9,17 +9,23 @@ import { applyStyle } from "../../../utils/dom";
 import { unit, toPixel } from "../../../utils/utils";
 import { RTL } from '../../../constants/directions';
 
+/**
+ * Max width of a slide.
+ *
+ * @type {number}
+ */
+const SLIDE_MAX_WIDTH = 5000;
+
 
 /**
  * The resolver component for horizontal layout.
  *
  * @param {Splide} Splide     - A Splide instance.
  * @param {Object} Components - An object containing components.
- * @param {Object} options    - Current options.
  *
  * @return {Object} - The resolver object.
  */
-export default ( Splide, Components, options ) => {
+export default ( Splide, Components ) => {
 	/**
 	 * Keep the Elements component.
 	 *
@@ -39,7 +45,14 @@ export default ( Splide, Components, options ) => {
 	 *
 	 * @type {Element}
 	 */
-	const track = Elements.track;
+	let track;
+
+	/**
+	 * Keep the latest options.
+	 *
+	 * @type {Element}
+	 */
+	let options = Splide.options;
 
 	return {
 		/**
@@ -47,7 +60,7 @@ export default ( Splide, Components, options ) => {
 		 *
 		 * @type {string}
 		 */
-		marginProp: options.direction === RTL ? 'marginLeft' : 'marginRight',
+		margin: 'margin' + ( options.direction === RTL ? 'Left' : 'Right' ),
 
 		/**
 		 * Always 0 because the height will be determined by inner contents.
@@ -64,35 +77,68 @@ export default ( Splide, Components, options ) => {
 		listHeight: 0,
 
 		/**
-		 * Gap in px.
-		 *
-		 * @type {number}
-		 */
-		gap: toPixel( root, options.gap ),
-
-		/**
-		 * An object containing padding left and right in px.
-		 *
-		 * @type {Object}
-		 */
-		padding: ( () => {
-			const padding = options.padding;
-			const { left = padding, right = padding } = padding;
-
-			return {
-				left : toPixel( root, left ),
-				right: toPixel( root, right ),
-			};
-		} )(),
-
-		/**
 		 * Initialization.
 		 */
 		init() {
+			options = Splide.options;
+			track   = Elements.track;
+
+			this.gap = toPixel( root, options.gap );
+
+			const padding = options.padding;
+			const { left = padding, right = padding } = padding;
+
+			this.padding = {
+				left : toPixel( root, left ),
+				right: toPixel( root, right ),
+			};
+
 			applyStyle( track, {
-				paddingLeft : unit( this.padding.left ),
-				paddingRight: unit( this.padding.right ),
+				paddingLeft : unit( left ),
+				paddingRight: unit( right ),
 			} );
+		},
+
+		/**
+		 * Accumulate slide width including the gap to the designated index.
+		 *
+		 * @param {number|undefined} index - If undefined, width of all slides will be accumulated.
+		 *
+		 * @return {number} - Accumulated width.
+		 */
+		totalWidth( index ) {
+			return Elements.getSlides( true )
+				.filter( Slide => Slide.index <= index )
+				.reduce( ( accumulator, Slide ) => {
+					return accumulator + this.slideWidth( Slide.index ) + this.gap;
+				}, 0 );
+		},
+
+		/**
+		 * Return the slide width in px.
+		 *
+		 * @param {number} index - Slide index.
+		 *
+		 * @return {number} - The slide width.
+		 */
+		slideWidth( index ) {
+			if ( options.autoWidth ) {
+				const Slide = Elements.getSlide( index );
+				return Slide ? Slide.slide.clientWidth : 0;
+			}
+
+			const width = options.fixedWidth || ( ( this.width + this.gap ) / options.perPage ) - this.gap;
+			return toPixel( root, width );
+		},
+
+		/**
+		 * Return the slide height in px.
+		 *
+		 * @return {number} - The slide height.
+		 */
+		slideHeight() {
+			const height = options.height || options.fixedHeight || this.width * options.heightRatio;
+			return toPixel( root, height );
 		},
 
 		/**
@@ -110,40 +156,8 @@ export default ( Splide, Components, options ) => {
 		 * @return {number} - Current list width.
 		 */
 		get listWidth() {
-			return ( this.slideWidth + this.gap ) * Components.Slides.total;
-		},
-
-		/**
-		 * Return the slide width in px.
-		 *
-		 * @return {number} - The slide width.
-		 */
-		get slideWidth() {
-			const width = options.fixedWidth || ( ( this.width + this.gap ) / options.perPage ) - this.gap;
-			return toPixel( root, width );
-		},
-
-		/**
-		 * Return the slide height in px.
-		 *
-		 * @return {number} - The slide height.
-		 */
-		get slideHeight() {
-			const height = options.height || options.fixedHeight || this.width * options.heightRatio;
-			return toPixel( root, height );
-		},
-
-		/**
-		 * Return the number of slides in the current view.
-		 *
-		 * @return {number} - The number of slides in view.
-		 */
-		get numInView() {
-			if ( options.fixedWidth ) {
-				return Math.floor( ( this.width + this.gap ) / ( this.slideWidth + this.gap ) ) || 1;
-			}
-
-			return options.perPage;
+			const total = Elements.total;
+			return options.autoWidth ? total * SLIDE_MAX_WIDTH : this.totalWidth( total );
 		},
 	}
 }

@@ -5,7 +5,7 @@
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
-import { find, applyStyle } from '../../utils/dom';
+import { applyStyle, child } from '../../utils/dom';
 
 
 /**
@@ -42,7 +42,7 @@ export default ( Splide, Components ) => {
 		 */
 		mount() {
 			apply( false );
-			Splide.on( 'lazyload:loaded', img => { cover( img ) } );
+			Splide.on( 'lazyload:loaded', img => { cover( img, false ) } );
 			Splide.on( 'updated', () => apply( false ) );
 		},
 
@@ -56,10 +56,12 @@ export default ( Splide, Components ) => {
 
 	/**
 	 * Apply "cover" to all slides.
+	 *
+	 * @param {boolean} uncover - If true, "cover" will be clear.
 	 */
 	function apply( uncover ) {
-		Components.Slides.getSlides( true, false ).forEach( slide => {
-			const img = find( slide, 'img' );
+		Components.Elements.each( Slide => {
+			const img = child( Slide.slide, 'img' ) || child( Slide.container, 'img' );
 
 			if ( img && img.src ) {
 				cover( img, uncover );
@@ -71,9 +73,9 @@ export default ( Splide, Components ) => {
 	 * Set background image of the parent element, using source of the given image element.
 	 *
 	 * @param {Element} img     - An image element.
-	 * @param {boolean} uncover - Optional. Reset "cover".
+	 * @param {boolean} uncover - Reset "cover".
 	 */
-	function cover( img, uncover = false ) {
+	function cover( img, uncover ) {
 		applyStyle( img.parentElement, { background: uncover ? '' : `center/cover no-repeat url("${ img.src }")` } );
 		applyStyle( img, { display: uncover ? '' : 'none' } );
 	}

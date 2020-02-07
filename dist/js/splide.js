@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 1.4.1
+ * Version  : 2.0.0
  * License  : MIT
  * Copyright: 2019 Naotoshi Fujita
  */
@@ -112,6 +112,7 @@ __webpack_require__.d(states_namespaceObject, "CREATED", function() { return CRE
 __webpack_require__.d(states_namespaceObject, "MOUNTED", function() { return MOUNTED; });
 __webpack_require__.d(states_namespaceObject, "IDLE", function() { return IDLE; });
 __webpack_require__.d(states_namespaceObject, "MOVING", function() { return MOVING; });
+__webpack_require__.d(states_namespaceObject, "DESTROYED", function() { return DESTROYED; });
 
 // CONCATENATED MODULE: ./src/js/core/event.js
 /**
@@ -131,7 +132,7 @@ __webpack_require__.d(states_namespaceObject, "MOVING", function() { return MOVI
    * @type {Array}
    */
   var data = [];
-  return {
+  var Event = {
     /**
      * Subscribe the given event(s).
      *
@@ -180,10 +181,7 @@ __webpack_require__.d(states_namespaceObject, "MOVING", function() { return MOVI
           var item = data[i];
 
           if (item && item.event === event && item.elm === elm) {
-            if (elm) {
-              elm.removeEventListener(event, item.handler, item.options);
-            }
-
+            unsubscribe(item);
             delete data[i];
             break;
           }
@@ -214,14 +212,23 @@ __webpack_require__.d(states_namespaceObject, "MOVING", function() { return MOVI
      * Clear event data.
      */
     destroy: function destroy() {
-      data.forEach(function (item) {
-        if (item.elm) {
-          item.elm.removeEventListener(item.event, item.handler, item.options);
-        }
-      });
+      data.forEach(unsubscribe);
       data = [];
     }
   };
+  /**
+   * Remove the registered event listener.
+   *
+   * @param {Object} item - An object containing event data.
+   */
+
+  function unsubscribe(item) {
+    if (item.elm) {
+      item.elm.removeEventListener(item.event, item.handler, item.options);
+    }
+  }
+
+  return Event;
 });
 // CONCATENATED MODULE: ./src/js/core/state.js
 /**
@@ -414,6 +421,15 @@ var DEFAULTS = {
    * @type {number}
    */
   heightRatio: 0,
+
+  /**
+   * If true, slide width will be determined by the element width itself.
+   * - perPage/perMove should be 1.
+   * - lazyLoad should be false.
+   *
+   * @type {boolean}
+   */
+  autoWidth: false,
 
   /**
    * Determine how many slides should be displayed per page.
@@ -726,20 +742,35 @@ function isObject(subject) {
 function merge(_ref, from) {
   var to = _extends({}, _ref);
 
-  if (isObject(to) && isObject(from)) {
-    each(from, function (value, key) {
-      if (isObject(value)) {
-        if (!isObject(to[key])) {
-          to[key] = {};
-        }
-
-        to[key] = merge(to[key], value);
-      } else {
-        to[key] = value;
+  each(from, function (value, key) {
+    if (isObject(value)) {
+      if (!isObject(to[key])) {
+        to[key] = {};
       }
-    });
-  }
 
+      to[key] = merge(to[key], value);
+    } else {
+      to[key] = value;
+    }
+  });
+  return to;
+}
+/**
+ * Assign all properties "from" to "to" object.
+ *
+ * @param {Object} to   - An object where properties are assigned.
+ * @param {Object} from - An object whose properties are assigned to "to".
+ *
+ * @return {Object} - An assigned object.
+ */
+
+function object_assign(to, from) {
+  to._s = from;
+  Object.keys(from).forEach(function (key) {
+    if (!to[key]) {
+      Object.defineProperty(to, key, Object.getOwnPropertyDescriptor(from, key));
+    }
+  });
   return to;
 }
 // CONCATENATED MODULE: ./src/js/utils/utils.js
@@ -802,13 +833,22 @@ function sprintf(format, replacements) {
 function unit(value) {
   var type = typeof value;
 
-  if (type === 'string') {
-    return value;
-  } else if (type === 'number' && value > 0) {
+  if (type === 'number' && value > 0) {
     return parseFloat(value) + 'px';
   }
 
-  return '';
+  return type === 'string' ? value : '';
+}
+/**
+ * Pad start with 0.
+ *
+ * @param {number} number - A number to be filled with 0.
+ *
+ * @return {string|number} - Padded number.
+ */
+
+function pad(number) {
+  return number < 10 ? '0' + number : number;
 }
 /**
  * Convert the given value to pixel.
@@ -820,18 +860,17 @@ function unit(value) {
  */
 
 function toPixel(root, value) {
-  if (typeof value === 'number') {
-    return value;
+  if (typeof value === 'string') {
+    var div = create('div', {});
+    applyStyle(div, {
+      position: 'absolute',
+      width: value
+    });
+    append(root, div);
+    value = div.clientWidth;
+    dom_remove(div);
   }
 
-  var div = create('div', {});
-  applyStyle(div, {
-    position: 'absolute',
-    width: value
-  });
-  append(root, div);
-  value = div.clientWidth;
-  dom_remove(div);
   return value;
 }
 // CONCATENATED MODULE: ./src/js/utils/dom.js
@@ -854,21 +893,21 @@ function toPixel(root, value) {
  */
 
 function find(elm, selector) {
-  return elm && selector ? elm.querySelector(selector.split(' ')[0]) : null;
+  return elm ? elm.querySelector(selector.split(' ')[0]) : null;
 }
 /**
- * Find a first child having the given class.
+ * Find a first child having the given tag or class name.
  *
- * @param {Element} parent    - A parent element.
- * @param {string}  className - A class name.
+ * @param {Element} parent         - A parent element.
+ * @param {string}  tagOrClassName - A tag or class name.
  *
  * @return {Element|null} - A found element on success. Null on failure.
  */
 
-function child(parent, className) {
+function child(parent, tagOrClassName) {
   if (parent) {
     return values(parent.children).filter(function (child) {
-      return hasClass(child, className.split(' ')[0]);
+      return hasClass(child, tagOrClassName.split(' ')[0]) || child.tagName.toLowerCase() === tagOrClassName;
     })[0] || null;
   }
 
@@ -911,7 +950,9 @@ function domify(html) {
 
 function dom_remove(elms) {
   toArray(elms).forEach(function (elm) {
-    elm && elm.parentElement.removeChild(elm);
+    if (elm && elm.parentElement) {
+      elm.parentElement.removeChild(elm);
+    }
   });
 }
 /**
@@ -948,7 +989,9 @@ function before(elm, ref) {
 function applyStyle(elm, styles) {
   if (elm) {
     each(styles, function (value, prop) {
-      elm.style[prop] = value || '';
+      if (value !== null) {
+        elm.style[prop] = value;
+      }
     });
   }
 }
@@ -1022,24 +1065,49 @@ function setAttribute(elm, name, value) {
  * @param {Element} elm  - An element where an attribute is assigned.
  * @param {string}  name - Attribute name.
  *
- * @return {string|null} - The value of the given attribute if available. Null if not.
+ * @return {string} - The value of the given attribute if available. An empty string if not.
  */
 
 function getAttribute(elm, name) {
-  return elm ? elm.getAttribute(name) : null;
+  return elm ? elm.getAttribute(name) : '';
 }
 /**
  * Remove attribute from the given element.
  *
- * @param {Element}      elm   - An element where an attribute is removed.
- * @param {string|Array} names - Attribute name.
+ * @param {Element|Element[]} elms  - An element where an attribute is removed.
+ * @param {string|string[]}      names - Attribute name.
  */
 
-function removeAttribute(elm, names) {
-  if (elm) {
-    toArray(names).forEach(function (name) {
-      elm.removeAttribute(name);
+function removeAttribute(elms, names) {
+  toArray(names).forEach(function (name) {
+    toArray(elms).forEach(function (elm) {
+      return elm && elm.removeAttribute(name);
     });
+  });
+}
+/**
+ * Trigger the given callback after all images contained by the element are loaded.
+ *
+ * @param {Element}  elm      - Element that may contain images.
+ * @param {Function} callback - Callback function fired right after all images are loaded.
+ */
+
+function dom_loaded(elm, callback) {
+  var images = elm.querySelectorAll('img');
+  var length = images.length;
+
+  if (length) {
+    var count = 0;
+    each(images, function (img) {
+      img.onload = img.onerror = function () {
+        if (++count === length) {
+          callback();
+        }
+      };
+    });
+  } else {
+    // Trigger the callback immediately if there is no image.
+    callback();
   }
 }
 // CONCATENATED MODULE: ./src/js/transitions/slide/index.js
@@ -1092,12 +1160,13 @@ function removeAttribute(elm, names) {
      * @param {number}   destIndex - Destination slide index that might be clone's.
      * @param {number}   newIndex  - New index.
      * @param {Object}   coord     - Destination coordinates.
-     * @param {function} onEnd     - Callback function must be invoked when transition is completed.
+     * @param {function} done      - Callback function must be invoked when transition is completed.
      */
-    start: function start(destIndex, newIndex, coord, onEnd) {
-      endCallback = onEnd;
+    start: function start(destIndex, newIndex, coord, done) {
+      var options = Splide.options;
+      endCallback = done;
       applyStyle(list, {
-        transition: "transform " + Splide.options.speed + "ms " + Splide.options.easing,
+        transition: "transform " + options.speed + "ms " + options.easing,
         transform: "translate(" + coord.x + "px," + coord.y + "px)"
       });
     }
@@ -1121,12 +1190,6 @@ function removeAttribute(elm, names) {
  */
 
 /* harmony default export */ var fade = (function (Splide, Components) {
-  Components.Options.fix({
-    perPage: 1,
-    gap: 0,
-    padding: 0
-  });
-
   if (Components.Drag) {
     Components.Drag.required = false;
   }
@@ -1146,11 +1209,11 @@ function removeAttribute(elm, names) {
      * @param {number}    destIndex - Destination slide index that might be clone's.
      * @param {number}    newIndex  - New index.
      * @param {Object}    coord     - Destination coordinates.
-     * @param {function}  onEnd     - Callback function must be invoked when transition is completed.
+     * @param {function}  done      - Callback function must be invoked when transition is completed.
      */
-    start: function start(destIndex, newIndex, coord, onEnd) {
+    start: function start(destIndex, newIndex, coord, done) {
       apply(newIndex);
-      onEnd();
+      done();
     }
   };
   /**
@@ -1160,14 +1223,10 @@ function removeAttribute(elm, names) {
    */
 
   function apply(index) {
-    var Slide = Components.Slides.getSlide(index);
     var options = Splide.options;
-
-    if (Slide) {
-      applyStyle(Slide.slide, {
-        transition: "opacity " + options.speed + "ms " + options.easing
-      });
-    }
+    applyStyle(Components.Elements.slides[index], {
+      transition: "opacity " + options.speed + "ms " + options.easing
+    });
   }
 
   return Fade;
@@ -1310,6 +1369,13 @@ var IDLE = 3;
  */
 
 var MOVING = 4;
+/**
+ * Splide is moving.
+ *
+ * @type {number}
+ */
+
+var DESTROYED = 5;
 // CONCATENATED MODULE: ./src/js/splide.js
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
@@ -1321,7 +1387,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
 
 
 
@@ -1359,8 +1424,8 @@ function () {
     }
 
     this.root = root instanceof Element ? root : find(document, root);
-    exist(this.root, 'An invalid root element or selector was given.');
-    this.Components = {};
+    exist(this.root, 'An invalid element/selector was given.');
+    this.Components = null;
     this.Event = core_event();
     this.State = state(CREATED);
     this.STATES = states_namespaceObject;
@@ -1396,7 +1461,7 @@ function () {
       Transition = null;
     }
 
-    this.Components = compose(this, merge(this._c, Extensions), Transition);
+    this.Components = this.Components || compose(this, merge(this._c, Extensions), Transition);
 
     try {
       each(this.Components, function (component, key) {
@@ -1413,16 +1478,20 @@ function () {
       return null;
     }
 
+    this.State.set(MOUNTED);
     each(this.Components, function (component) {
       component.mounted && component.mounted();
-    });
-    this.State.set(MOUNTED);
-    this.emit('mounted');
-    this.State.set(IDLE);
+    }); // Breakpoints can destroy the Splide.
+
+    if (!this.State.is(DESTROYED)) {
+      this.emit('mounted');
+      this.State.set(IDLE);
+      this.emit('ready');
+    }
+
     applyStyle(this.root, {
       visibility: 'visible'
     });
-    this.emit('ready');
     return this;
   }
   /**
@@ -1544,8 +1613,7 @@ function () {
       index = -1;
     }
 
-    this.Components.Elements.add(slide, index);
-    this.refresh();
+    this.Components.Elements.add(slide, index, this.refresh.bind(this));
     return this;
   }
   /**
@@ -1567,23 +1635,29 @@ function () {
   ;
 
   _proto.refresh = function refresh() {
-    this.emit('refresh').emit('updated', this.options);
+    this.emit('refresh').emit('updated', this._o);
     return this;
   }
   /**
    * Destroy the Splide.
+   * "Completely" boolean is mainly for breakpoints.
+   *
+   * @param {boolean} completely - Destroy completely.
    */
   ;
 
-  _proto.destroy = function destroy() {
+  _proto.destroy = function destroy(completely) {
+    if (completely === void 0) {
+      completely = true;
+    }
+
     values(this.Components).reverse().forEach(function (component) {
-      component.destroy && component.destroy();
+      component.destroy && component.destroy(completely);
     });
-    this.emit('destroy'); // Destroy all event handlers, including ones for native events.
+    this.emit('destroy', completely); // Destroy all event handlers, including ones for native events.
 
     this.Event.destroy();
-    delete this.Components;
-    this.State.set(CREATED);
+    this.State.set(DESTROYED);
     return this;
   }
   /**
@@ -1609,7 +1683,7 @@ function () {
     }
     /**
      * Return length of slides.
-     * This is an alias of Slides.length.
+     * This is an alias of Elements.length.
      *
      * @return {number} - A number of slides.
      */
@@ -1617,7 +1691,7 @@ function () {
   }, {
     key: "length",
     get: function get() {
-      return this.Components.Slides.length;
+      return this.Components.Elements.length;
     }
     /**
      * Return options.
@@ -1637,9 +1711,15 @@ function () {
      */
     ,
     set: function set(options) {
+      var created = this.State.is(CREATED);
+
+      if (!created) {
+        this.emit('update');
+      }
+
       this._o = merge(this._o, options);
 
-      if (!this.State.is(CREATED)) {
+      if (!created) {
         this.emit('updated', this._o);
       }
     }
@@ -1694,17 +1774,12 @@ function () {
 
 /* harmony default export */ var components_options = (function (Splide) {
   /**
-   * Store the root element.
-   */
-  var root = Splide.root;
-  /**
    * Retrieve options from the data attribute.
    * Note that IE10 doesn't support dataset property.
    *
    * @type {string}
    */
-
-  var options = getAttribute(root, 'data-splide');
+  var options = getAttribute(Splide.root, 'data-splide');
 
   if (options) {
     try {
@@ -1743,165 +1818,6 @@ function () {
     }
   };
 });
-// CONCATENATED MODULE: ./src/js/components/elements/index.js
-/**
- * The component for main elements.
- *
- * @author    Naotoshi Fujita
- * @copyright Naotoshi Fujita. All rights reserved.
- */
-
-
-
-/**
- * The property name for UID stored in a window object.
- *
- * @type {string}
- */
-
-var UID_NAME = 'uid';
-/**
- * The component for main elements.
- *
- * @param {Splide} Splide - A Splide instance.
- *
- * @return {Object} - The component object.
- */
-
-/* harmony default export */ var components_elements = (function (Splide) {
-  /**
-   * Hold the root element.
-   *
-   * @type {Element}
-   */
-  var root = Splide.root;
-  /**
-   * Hold the class list.
-   *
-   * @type {Object}
-   */
-
-  var classes = Splide.classes;
-  /*
-   * Assign unique ID to the root element if it doesn't have the one.
-   * Note that IE doesn't support padStart() to fill the uid by 0.
-   */
-
-  if (!root.id) {
-    window.splide = window.splide || {};
-    var uid = window.splide[UID_NAME] || 0;
-    window.splide[UID_NAME] = ++uid;
-    root.id = "splide" + (uid < 10 ? '0' + uid : uid);
-  }
-  /**
-   * Elements component object.
-   *
-   * @type {Object}
-   */
-
-
-  var Elements = {
-    /**
-     * Called when the component is mounted.
-     * Collect main elements and store them as member properties.
-     */
-    mount: function mount() {
-      var message = 'was not found.';
-      this.slider = child(root, classes.slider);
-      this.track = find(root, "." + classes.track);
-      exist(this.track, "A track " + message);
-      this.list = child(this.track, classes.list);
-      exist(this.list, "A list " + message);
-      this.slides = values(this.list.children);
-      var arrows = findParts(classes.arrows);
-      this.arrows = {
-        prev: find(arrows, "." + classes.prev),
-        next: find(arrows, "." + classes.next)
-      };
-      var autoplay = findParts(classes.autoplay);
-      this.bar = find(findParts(classes.progress), "." + classes.bar);
-      this.play = find(autoplay, "." + classes.play);
-      this.pause = find(autoplay, "." + classes.pause);
-      init();
-    },
-
-    /**
-     * Destroy.
-     */
-    destroy: function destroy() {
-      removeClass(root, getClasses());
-    },
-
-    /**
-     * Insert a slide to a slider.
-     * Need to refresh Splide after adding a slide.
-     *
-     * @param {Node|string} slide - A slide element to be added.
-     * @param {number}      index - A slide will be added at the position.
-     */
-    add: function add(slide, index) {
-      if (typeof slide === 'string') {
-        slide = domify(slide);
-      }
-
-      if (slide instanceof Element) {
-        var ref = this.slides[index];
-
-        if (ref) {
-          before(slide, ref);
-          this.slides.splice(index, 0, slide);
-        } else {
-          append(this.list, slide);
-          this.slides.push(slide);
-        }
-      }
-    },
-
-    /**
-     * Remove a slide from a slider.
-     * Need to refresh Splide after removing a slide.
-     *
-     * @param index - Slide index.
-     */
-    remove: function remove(index) {
-      var slides = this.slides.splice(index, 1);
-
-      dom_remove(slides[0]);
-    }
-  };
-  /**
-   * Initialization.
-   * Assign ID to some elements if it's not available.
-   */
-
-  function init() {
-    Elements.track.id = Elements.track.id || root.id + "-track";
-    Elements.list.id = Elements.list.id || root.id + "-list";
-    addClass(root, getClasses());
-  }
-  /**
-   * Return class names for the root element.
-   */
-
-
-  function getClasses() {
-    var rootClass = classes.root;
-    var options = Splide.options;
-    return [rootClass + "--" + options.type, rootClass + "--" + options.direction, options.drag ? rootClass + "--draggable" : '', options.isNavigation ? rootClass + "--nav" : ''];
-  }
-  /**
-   * Find parts only from children of the root or track.
-   *
-   * @return {Element|null} - A found element or null.
-   */
-
-
-  function findParts(className) {
-    return child(root, className) || child(Elements.slider, className);
-  }
-
-  return Elements;
-});
 // CONCATENATED MODULE: ./src/js/constants/directions.js
 /**
  * Export layout modes.
@@ -1930,6 +1846,475 @@ var RTL = 'rtl';
  */
 
 var TTB = 'ttb';
+// CONCATENATED MODULE: ./src/js/components/elements/slide.js
+/**
+ * The sub component for handling each slide.
+ *
+ * @author    Naotoshi Fujita
+ * @copyright Naotoshi Fujita. All rights reserved.
+ */
+
+
+
+
+
+
+/**
+ * Events for restoring original styles.
+ *
+ * @type {string}
+ */
+
+var STYLE_RESTORE_EVENTS = 'update.slide';
+/**
+ * The sub component for handling each slide.
+ *
+ * @param {Splide}  Splide    - A Splide instance.
+ * @param {number}  index     - An unique slide index.
+ * @param {number}  realIndex - Clones should pass a real slide index.
+ * @param {Element} slide     - A slide element.
+ *
+ * @return {Object} - The sub component object.
+ */
+
+/* harmony default export */ var elements_slide = (function (Splide, index, realIndex, slide) {
+  /**
+   * Events when the slide status is updated.
+   * Append a namespace to remove listeners later.
+   *
+   * @type {string}
+   */
+  var STATUS_UPDATE_EVENTS = 'ready.slide updated.slide resize.slide ' + (Splide.options.updateOnMove ? 'move.slide' : 'moved.slide');
+  /**
+   * Slide sub component object.
+   *
+   * @type {Object}
+   */
+
+  var Slide = {
+    /**
+     * Slide element.
+     *
+     * @type {Element}
+     */
+    slide: slide,
+
+    /**
+     * Slide index.
+     *
+     * @type {number}
+     */
+    index: index,
+
+    /**
+     * Real index for clones.
+     *
+     * @type {number}
+     */
+    realIndex: realIndex,
+
+    /**
+     * Container element if available.
+     *
+     * @type {Element|null}
+     */
+    container: find(slide, "." + Splide.classes.container),
+
+    /**
+     * Whether this is a cloned slide or not.
+     *
+     * @type {boolean}
+     */
+    isClone: realIndex > -1,
+
+    /**
+     * Hold the original styles.
+     *
+     * @type {string}
+     */
+    styles: getAttribute(slide, 'style') || '',
+
+    /**
+     * Called when the component is mounted.
+     */
+    mount: function mount() {
+      var _this = this;
+
+      if (!this.isClone) {
+        slide.id = Splide.root.id + "-slide" + pad(index + 1);
+      }
+
+      Splide.on(STATUS_UPDATE_EVENTS, function () {
+        return _this.update();
+      }).on(STYLE_RESTORE_EVENTS, restoreStyles);
+    },
+
+    /**
+     * Destroy.
+     */
+    destroy: function destroy() {
+      Splide.off(STATUS_UPDATE_EVENTS).off(STYLE_RESTORE_EVENTS);
+      removeClass(slide, values(STATUS_CLASSES));
+      restoreStyles();
+    },
+
+    /**
+     * Update active and visible status.
+     */
+    update: function update() {
+      _update(this.isActive(), false);
+
+      _update(this.isVisible(), true);
+    },
+
+    /**
+     * Check whether this slide is active or not.
+     *
+     * @return {boolean} - True if the slide is active or false if not.
+     */
+    isActive: function isActive() {
+      return Splide.index === index;
+    },
+
+    /**
+     * Check whether this slide is visible in the viewport or not.
+     *
+     * @return {boolean} - True if the slide is visible or false if not.
+     */
+    isVisible: function isVisible() {
+      var floor = Math.floor;
+      var Components = Splide.Components;
+      var Track = Components.Track;
+      var prop = Splide.options.direction === TTB ? 'clientHeight' : 'clientWidth';
+      var position = floor((Track.toPosition(index) + Track.offset(index) - Track.position) * Track.sign);
+      var edge = floor(position + slide[prop]);
+      var size = Components.Elements.track[prop];
+      return 0 <= position && position <= size && 0 <= edge && edge <= size || this.isActive();
+    },
+
+    /**
+     * Calculate how far this slide is from another slide and
+     * return true if the distance is within the given number.
+     *
+     * @param {number} from   - Index of a target slide.
+     * @param {number} within - True if the slide is within this number.
+     *
+     * @return {boolean} - True if the slide is within the number or false otherwise.
+     */
+    isWithin: function isWithin(from, within) {
+      var diff = Math.abs(from - index);
+
+      if (!Splide.is(SLIDE) && !this.isClone) {
+        diff = Math.min(diff, Splide.length - diff);
+      }
+
+      return diff < within;
+    }
+  };
+  /**
+   * Update classes for activity or visibility.
+   *
+   * @param {boolean} active        - Is active/visible or not.
+   * @param {boolean} forVisibility - Toggle classes for activity or visibility.
+   */
+
+  function _update(active, forVisibility) {
+    var type = forVisibility ? 'visible' : 'active';
+    var className = STATUS_CLASSES[type];
+
+    if (active) {
+      addClass(slide, className);
+      Splide.emit("" + type, Slide);
+    } else {
+      if (hasClass(slide, className)) {
+        removeClass(slide, className);
+        Splide.emit("" + (forVisibility ? 'hidden' : 'inactive'), Slide);
+      }
+    }
+  }
+  /**
+   * Restore the original styles.
+   */
+
+
+  function restoreStyles() {
+    setAttribute(slide, 'style', Slide.styles);
+  }
+
+  return Slide;
+});
+// CONCATENATED MODULE: ./src/js/components/elements/index.js
+/**
+ * The component for main elements.
+ *
+ * @author    Naotoshi Fujita
+ * @copyright Naotoshi Fujita. All rights reserved.
+ */
+
+
+
+
+
+/**
+ * The property name for UID stored in a window object.
+ *
+ * @type {string}
+ */
+
+var UID_NAME = 'uid';
+/**
+ * The component for main elements.
+ *
+ * @param {Splide} Splide     - A Splide instance.
+ * @param {Object} Components - An object containing components.
+ *
+ * @return {Object} - The component object.
+ */
+
+/* harmony default export */ var components_elements = (function (Splide, Components) {
+  /**
+   * Hold the root element.
+   *
+   * @type {Element}
+   */
+  var root = Splide.root;
+  /**
+   * Hold the class list.
+   *
+   * @type {Object}
+   */
+
+  var classes = Splide.classes;
+  /**
+   * Store Slide objects.
+   *
+   * @type {Array}
+   */
+
+  var Slides = [];
+  /*
+   * Assign unique ID to the root element if it doesn't have the one.
+   * Note that IE doesn't support padStart() to fill the uid by 0.
+   */
+
+  if (!root.id) {
+    window.splide = window.splide || {};
+    var uid = window.splide[UID_NAME] || 0;
+    window.splide[UID_NAME] = ++uid;
+    root.id = "splide" + pad(uid);
+  }
+  /**
+   * Elements component object.
+   *
+   * @type {Object}
+   */
+
+
+  var Elements = {
+    /**
+     * Called when the component is mounted.
+     * Collect main elements and store them as member properties.
+     */
+    mount: function mount() {
+      var _this = this;
+
+      this.slider = child(root, classes.slider);
+      this.track = find(root, "." + classes.track);
+      this.list = child(this.track, classes.list);
+      exist(this.track && this.list, 'Track or list was not found.');
+      this.slides = values(this.list.children);
+      var arrows = findParts(classes.arrows);
+      this.arrows = {
+        prev: find(arrows, "." + classes.prev),
+        next: find(arrows, "." + classes.next)
+      };
+      var autoplay = findParts(classes.autoplay);
+      this.bar = find(findParts(classes.progress), "." + classes.bar);
+      this.play = find(autoplay, "." + classes.play);
+      this.pause = find(autoplay, "." + classes.pause);
+      this.track.id = this.track.id || root.id + "-track";
+      this.list.id = this.list.id || root.id + "-list";
+      init();
+      Splide.on('refresh', function () {
+        _this.destroy();
+
+        init();
+      });
+    },
+
+    /**
+     * Destroy.
+     */
+    destroy: function destroy() {
+      Slides.forEach(function (Slide) {
+        Slide.destroy();
+      });
+      Slides = [];
+      removeClass(root, getClasses());
+    },
+
+    /**
+     * Register a slide to create a Slide object and handle its behavior.
+     *
+     * @param {Element} slide     - A slide element.
+     * @param {number}  index     - A unique index. This can be negative.
+     * @param {number}  realIndex - A real index for clones. Set -1 for real slides.
+     */
+    register: function register(slide, index, realIndex) {
+      var SlideObject = elements_slide(Splide, index, realIndex, slide);
+      SlideObject.mount();
+      Slides.push(SlideObject);
+    },
+
+    /**
+     * Return the Slide object designated by the index.
+     * Note that "find" is not supported by IE.
+     *
+     * @return {Object|undefined} - A Slide object if available. Undefined if not.
+     */
+    getSlide: function getSlide(index) {
+      return Slides.filter(function (Slide) {
+        return Slide.index === index;
+      })[0];
+    },
+
+    /**
+     * Return all Slide objects.
+     *
+     * @param {boolean} includeClones - Whether to include cloned slides or not.
+     *
+     * @return {Object[]} - Slide objects.
+     */
+    getSlides: function getSlides(includeClones) {
+      return includeClones ? Slides : Slides.filter(function (Slide) {
+        return !Slide.isClone;
+      });
+    },
+
+    /**
+     * Return Slide objects belonging to the given page.
+     *
+     * @param {number} page - A page number.
+     *
+     * @return {Object[]} - An array containing Slide objects.
+     */
+    getSlidesByPage: function getSlidesByPage(page) {
+      var idx = Components.Controller.toIndex(page);
+      var options = Splide.options;
+      var max = options.focus !== false ? 1 : options.perPage;
+      return Slides.filter(function (_ref) {
+        var index = _ref.index;
+        return idx <= index && index < idx + max;
+      });
+    },
+
+    /**
+     * Insert a slide to a slider.
+     * Need to refresh Splide after adding a slide.
+     *
+     * @param {Node|string} slide    - A slide element to be added.
+     * @param {number}      index    - A slide will be added at the position.
+     * @param {Function}    callback - Called right after the slide is added to the DOM tree.
+     */
+    add: function add(slide, index, callback) {
+      if (typeof slide === 'string') {
+        slide = domify(slide);
+      }
+
+      if (slide instanceof Element) {
+        var ref = this.slides[index];
+        applyStyle(slide, {
+          display: 'none'
+        });
+
+        if (ref) {
+          before(slide, ref);
+          this.slides.splice(index, 0, slide);
+        } else {
+          append(this.list, slide);
+          this.slides.push(slide);
+        }
+
+        dom_loaded(slide, function () {
+          applyStyle(slide, {
+            display: ''
+          });
+          callback && callback(slide);
+        });
+      }
+    },
+
+    /**
+     * Remove a slide from a slider.
+     * Need to refresh Splide after removing a slide.
+     *
+     * @param index - Slide index.
+     */
+    remove: function remove(index) {
+      dom_remove(this.slides.splice(index, 1)[0]);
+    },
+
+    /**
+     * Trigger the provided callback for each Slide object.
+     *
+     * @param {Function} callback - A callback function. The first argument will be the Slide object.
+     */
+    each: function each(callback) {
+      Slides.forEach(callback);
+    },
+
+    /**
+     * Return slides length without clones.
+     *
+     * @return {number} - Slide length.
+     */
+    get length() {
+      return this.slides.length;
+    },
+
+    /**
+     * Return "SlideObjects" length including clones.
+     *
+     * @return {number} - Slide length including clones.
+     */
+    get total() {
+      return Slides.length;
+    }
+
+  };
+  /**
+   * Initialization.
+   */
+
+  function init() {
+    addClass(root, getClasses());
+    Elements.slides.forEach(function (slide, index) {
+      Elements.register(slide, index, -1);
+    });
+  }
+  /**
+   * Return class names for the root element.
+   */
+
+
+  function getClasses() {
+    var rootClass = classes.root;
+    var options = Splide.options;
+    return [rootClass + "--" + options.type, rootClass + "--" + options.direction, options.drag ? rootClass + "--draggable" : '', options.isNavigation ? rootClass + "--nav" : ''];
+  }
+  /**
+   * Find parts only from children of the root or track.
+   *
+   * @return {Element|null} - A found element or null.
+   */
+
+
+  function findParts(className) {
+    return child(root, className) || child(Elements.slider, className);
+  }
+
+  return Elements;
+});
 // CONCATENATED MODULE: ./src/js/components/controller/index.js
 /**
  * The component for controlling the track.
@@ -1940,7 +2325,7 @@ var TTB = 'ttb';
 
 
 
-var floor = Math.floor;
+var controller_floor = Math.floor;
 /**
  * The component for controlling the track.
  *
@@ -2007,7 +2392,7 @@ var floor = Math.floor;
     parse: function parse(control) {
       var index = Splide.index;
       var matches = String(control).match(/([+\-<>])(\d+)?/);
-      var indicator = matches ? matches[1] || '' : '';
+      var indicator = matches ? matches[1] : '';
       var number = matches ? parseInt(matches[2]) : 0;
 
       switch (indicator) {
@@ -2020,11 +2405,11 @@ var floor = Math.floor;
           break;
 
         case '>':
-          index = this.pageToIndex(number > -1 ? number : this.indexToPage(index) + 1);
+          index = this.toIndex(number > -1 ? number : this.toPage(index) + 1);
           break;
 
         case '<':
-          index = this.pageToIndex(number > -1 ? number : this.indexToPage(index) - 1);
+          index = this.toIndex(number > -1 ? number : this.toPage(index) - 1);
           break;
 
         default:
@@ -2041,7 +2426,7 @@ var floor = Math.floor;
      *
      * @return {number} - A computed page number.
      */
-    pageToIndex: function pageToIndex(page) {
+    toIndex: function toIndex(page) {
       if (hasFocus()) {
         return page;
       }
@@ -2049,7 +2434,7 @@ var floor = Math.floor;
       var length = Splide.length;
       var perPage = options.perPage;
       var index = page * perPage;
-      index = index - (this.pageLength * perPage - length) * floor(index / length); // Adjustment for the last page.
+      index = index - (this.pageLength * perPage - length) * controller_floor(index / length); // Adjustment for the last page.
 
       if (length - perPage <= index && index < length) {
         index = length - perPage;
@@ -2065,7 +2450,7 @@ var floor = Math.floor;
      *
      * @return {number} - A computed page number.
      */
-    indexToPage: function indexToPage(index) {
+    toPage: function toPage(index) {
       if (hasFocus()) {
         return index;
       }
@@ -2074,10 +2459,10 @@ var floor = Math.floor;
       var perPage = options.perPage; // Make the last "perPage" number of slides belong to the last page.
 
       if (length - perPage <= index && index < length) {
-        return floor((length - 1) / perPage);
+        return controller_floor((length - 1) / perPage);
       }
 
-      return floor(index / perPage);
+      return controller_floor(index / perPage);
     },
 
     /**
@@ -2215,368 +2600,18 @@ var floor = Math.floor;
 
 
   function hasFocus() {
-    return Splide.options.focus !== false;
+    return options.focus !== false;
   }
 
   return Controller;
 });
-// CONCATENATED MODULE: ./src/js/components/slides/slide.js
-/**
- * The sub component for handling each slide.
- *
- * @author    Naotoshi Fujita
- * @copyright Naotoshi Fujita. All rights reserved.
- */
-
-
-
-
-
-/**
- * The sub component for handling each slide.
- *
- * @param {number}  index     - An unique slide index.
- * @param {number}  realIndex - Clones should pass a real slide index.
- * @param {Element} slide     - A slide element.
- * @param {Splide}  Splide    - A Splide instance.
- *
- * @return {Object} - The sub component object.
- */
-
-/* harmony default export */ var slides_slide = (function (index, realIndex, slide, Splide) {
-  /**
-   * Events when the slide status is updated.
-   * Append a namespace to remove listeners later.
-   *
-   * @type {string}
-   */
-  var statusUpdateEvents = ['mounted', 'updated', 'resize', Splide.options.updateOnMove ? 'move' : 'moved'].reduce(function (acc, cur) {
-    return acc + cur + '.slide ';
-  }, '').trim();
-  /**
-   * Slide sub component object.
-   *
-   * @type {Object}
-   */
-
-  var Slide = {
-    /**
-     * Slide element.
-     *
-     * @type {Element}
-     */
-    slide: slide,
-
-    /**
-     * Slide index.
-     *
-     * @type {number}
-     */
-    index: index,
-
-    /**
-     * Real index for clones.
-     *
-     * @type {number}
-     */
-    realIndex: realIndex,
-
-    /**
-     * Container element if available.
-     *
-     * @type {Element|null}
-     */
-    container: find(slide, "." + Splide.classes.container),
-
-    /**
-     * Whether this is clone or not.
-     *
-     * @type {boolean}
-     */
-    isClone: realIndex > -1,
-
-    /**
-     * Called when the component is mounted.
-     */
-    mount: function mount() {
-      var _this = this;
-
-      if (!this.isClone) {
-        var number = index + 1;
-        slide.id = Splide.root.id + "-slide" + (number < 10 ? '0' + number : number);
-      }
-
-      Splide.on(statusUpdateEvents, function () {
-        return _this.update();
-      }); // Update status immediately on refresh.
-
-      if (!Splide.State.is(CREATED)) {
-        this.update();
-      }
-    },
-
-    /**
-     * Destroy.
-     */
-    destroy: function destroy() {
-      Splide.off(statusUpdateEvents);
-      each(STATUS_CLASSES, function (className) {
-        removeClass(slide, className);
-      });
-    },
-
-    /**
-     * Update active and visible status.
-     */
-    update: function update() {
-      _update(this.isActive(), false);
-
-      _update(this.isVisible(), true);
-    },
-
-    /**
-     * Check whether this slide is active or not.
-     *
-     * @return {boolean} - True if the slide is active or false if not.
-     */
-    isActive: function isActive() {
-      return Splide.index === index;
-    },
-
-    /**
-     * Check whether this slide is visible or not.
-     *
-     * @return {boolean} - True if the slide is visible or false if not.
-     */
-    isVisible: function isVisible() {
-      var _Splide$options = Splide.options,
-          focus = _Splide$options.focus,
-          trimSpace = _Splide$options.trimSpace;
-      var activeIndex = Splide.index,
-          length = Splide.length;
-      var isCenter = 'center' === focus;
-      var numInView = Splide.Components.Layout.numInView;
-      var offset = isCenter ? numInView / 2 : parseInt(focus) || 0;
-
-      if (trimSpace) {
-        if (activeIndex < offset) {
-          return index < numInView;
-        } else if (activeIndex >= length - (numInView - offset)) {
-          return index >= length - numInView;
-        }
-      }
-
-      var min = activeIndex - offset + (isCenter && numInView % 2 === 0 ? 1 : 0);
-      return min <= index && index < activeIndex + numInView - offset;
-    },
-
-    /**
-     * Calculate how far this slide is from another slide and
-     * return true if the distance is within the given number.
-     *
-     * @param {number} from   - Index of a target slide.
-     * @param {number} within - True if the slide is within this number.
-     *
-     * @return {boolean} - True if the slide is within this number or false otherwise.
-     */
-    isWithin: function isWithin(from, within) {
-      var diff = Math.abs(from - index);
-
-      if (!Splide.is(SLIDE) && !this.isClone) {
-        diff = Math.min(diff, Splide.length - diff);
-      }
-
-      return diff < within;
-    }
-  };
-  /**
-   * Update classes for activity or visibility.
-   *
-   * @param {boolean} active        - Is active/visible or not.
-   * @param {boolean} forVisibility - Toggle classes for activity or visibility.
-   */
-
-  function _update(active, forVisibility) {
-    var type = forVisibility ? 'visible' : 'active';
-    var className = STATUS_CLASSES[type];
-
-    if (active) {
-      addClass(slide, className);
-      Splide.emit("" + type, Slide);
-    } else {
-      if (hasClass(slide, className)) {
-        removeClass(slide, className);
-        Splide.emit("" + (forVisibility ? 'hidden' : 'inactive'), Slide);
-      }
-    }
-  }
-
-  return Slide;
-});
-// CONCATENATED MODULE: ./src/js/components/slides/index.js
-/**
- * The component for handling all slides including clones.
- *
- * @author    Naotoshi Fujita
- * @copyright Naotoshi Fujita. All rights reserved.
- */
-
-/**
- * The component for handling all slides including clones.
- *
- * @param {Splide} Splide     - A Splide instance.
- * @param {Object} Components - An object containing components.
- *
- * @return {Object} - The component object.
- */
-
-/* harmony default export */ var components_slides = (function (Splide, Components) {
-  /**
-   * Store slide elements.
-   *
-   * @type {Array}
-   */
-  var slides = [];
-  /**
-   * Store Slide objects.
-   *
-   * @type {Array}
-   */
-
-  var SlideObjects = [];
-  /**
-   * Slides component object.
-   *
-   * @type {Object}
-   */
-
-  var Slides = {
-    /**
-     * Called when the component is mounted.
-     */
-    mount: function mount() {
-      var _this = this;
-
-      init();
-      Splide.on('refresh', function () {
-        _this.destroy();
-
-        init();
-      });
-    },
-
-    /**
-     * Destroy.
-     */
-    destroy: function destroy() {
-      SlideObjects.forEach(function (Slide) {
-        Slide.destroy();
-      });
-      SlideObjects = [];
-    },
-
-    /**
-     * Register a slide to create a Slide object and handle its behavior.
-     *
-     * @param {number}  index     - A unique index.
-     * @param {number}  realIndex - A real index for clones. Set -1 for real slides.
-     * @param {Element} slide     - A slide element.
-     */
-    register: function register(index, realIndex, slide) {
-      var SlideObject = slides_slide(index, realIndex, slide, Splide);
-      SlideObject.mount();
-      SlideObjects.push(SlideObject);
-    },
-
-    /**
-     * Return the Slide object designated by the index.
-     * Note that "find" is not supported by IE.
-     *
-     * @return {Object|undefined} - A Slide object if available. Undefined if not.
-     */
-    getSlide: function getSlide(index) {
-      return SlideObjects.filter(function (Slide) {
-        return Slide.index === index;
-      })[0];
-    },
-
-    /**
-     * Return slide elements.
-     *
-     * @param {boolean} includeClones - Whether to include cloned slides or not.
-     * @param {boolean} objects       - Whether to return elements or Slide objects
-     *
-     * @return {Object[]|Element[]} - Slide objects or elements.
-     */
-    getSlides: function getSlides(includeClones, objects) {
-      if (objects) {
-        return includeClones ? SlideObjects : SlideObjects.filter(function (Slide) {
-          return !Slide.isClone;
-        });
-      }
-
-      return includeClones ? SlideObjects.map(function (Slide) {
-        return Slide.slide;
-      }) : slides;
-    },
-
-    /**
-     * Return Slide objects belonging to the given page.
-     *
-     * @param {number} page - A page number.
-     *
-     * @return {Object[]} - An array containing Slide objects.
-     */
-    getSlidesByPage: function getSlidesByPage(page) {
-      var idx = Components.Controller.pageToIndex(page);
-      var options = Splide.options;
-      var max = options.focus !== false ? 1 : options.perPage;
-      return SlideObjects.filter(function (_ref) {
-        var index = _ref.index;
-        return idx <= index && index < idx + max;
-      });
-    },
-
-    /**
-     * Return slides length without clones.
-     *
-     * @return {number} - Slide length.
-     */
-    get length() {
-      return slides.length;
-    },
-
-    /**
-     * Return "SlideObjects" length including clones.
-     *
-     * @return {number} - Slide length including clones.
-     */
-    get total() {
-      return SlideObjects.length;
-    }
-
-  };
-  /**
-   * Initialization.
-   */
-
-  function init() {
-    slides = Components.Elements.slides;
-    slides.forEach(function (slide, index) {
-      Slides.register(index, -1, slide);
-    });
-  }
-
-  return Slides;
-});
-// CONCATENATED MODULE: ./src/js/components/track/resolvers/vertical.js
+// CONCATENATED MODULE: ./src/js/components/track/directions/vertical.js
 /**
  * The resolver component for vertical move.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
 
 /**
  * The resolver component for vertical move.
@@ -2593,18 +2628,27 @@ var floor = Math.floor;
    *
    * @type {Object}
    */
-  var Layout = Components.Layout;
+  var Layout;
   return {
     /**
-     * Set position with CSS transform.
+     * Axis of translate.
      *
-     * @param {Element} list    - A list element.
-     * @param {number} position - A new position value.
+     * @type {string}
      */
-    translate: function translate(list, position) {
-      applyStyle(list, {
-        transform: "translateY(" + position + "px)"
-      });
+    axis: 'Y',
+
+    /**
+     * Sign for the direction.
+     *
+     * @return {number}
+     */
+    sign: -1,
+
+    /**
+     * Initialization.
+     */
+    init: function init() {
+      Layout = Components.Layout;
     },
 
     /**
@@ -2615,7 +2659,7 @@ var floor = Math.floor;
      * @return {Object} - Calculated position.
      */
     toPosition: function toPosition(index) {
-      return -(index * (Layout.slideHeight + Layout.gap) + this.offset);
+      return -((index + Components.Clones.length / 2) * (Layout.slideHeight() + Layout.gap) + this.offset());
     },
 
     /**
@@ -2624,7 +2668,9 @@ var floor = Math.floor;
      * @return {number} - The closest slide index.
      */
     toIndex: function toIndex(position) {
-      return Math.round(-(position + this.offset) / (Layout.slideHeight + Layout.gap));
+      var slideHeight = Layout.slideHeight();
+      var cloneOffset = (slideHeight + Layout.gap) * Components.Clones.length / 2;
+      return Math.round(-(position + cloneOffset + this.offset()) / (slideHeight + Layout.gap));
     },
 
     /**
@@ -2640,35 +2686,30 @@ var floor = Math.floor;
     },
 
     /**
-     * Return current offset value, considering direction and a number of clones.
+     * Return current offset value, considering direction.
      *
      * @return {number} - Offset amount.
      */
-    get offset() {
-      var height = Layout.height,
-          slideHeight = Layout.slideHeight,
-          gap = Layout.gap;
+    offset: function offset() {
       var focus = Splide.options.focus;
-      var focusOffset;
+      var slideHeight = Layout.slideHeight();
 
       if (focus === 'center') {
-        focusOffset = (height - slideHeight) / 2;
-      } else {
-        focusOffset = (parseInt(focus) || 0) * (slideHeight + gap);
+        return -(Layout.height - slideHeight) / 2;
       }
 
-      return (slideHeight + gap) * Components.Clones.length / 2 - focusOffset;
+      return -(parseInt(focus) || 0) * (slideHeight + Layout.gap);
     }
-
   };
 });
-// CONCATENATED MODULE: ./src/js/components/track/resolvers/horizontal.js
+// CONCATENATED MODULE: ./src/js/components/track/directions/horizontal.js
 /**
  * The resolver component for horizontal move.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
+
 
 
 /**
@@ -2682,22 +2723,39 @@ var floor = Math.floor;
 
 /* harmony default export */ var horizontal = (function (Splide, Components) {
   /**
-   * Hold the Layout object.
+   * Hold the Layout component.
    *
    * @type {Object}
    */
-  var Layout = Components.Layout;
+  var Layout;
+  /**
+   * Hold the Elements component.
+   *
+   * @type {Object}
+   */
+
+  var Elements;
   return {
     /**
-     * Set position with CSS transform.
+     * Axis of translate.
      *
-     * @param {Element} list     - A list element.
-     * @param {number}  position - A new position value.
+     * @type {string}
      */
-    translate: function translate(list, position) {
-      applyStyle(list, {
-        transform: "translateX(" + position + "px)"
-      });
+    axis: 'X',
+
+    /**
+     * Sign for the direction.
+     *
+     * @type {number}
+     */
+    sign: Splide.options.direction === RTL ? 1 : -1,
+
+    /**
+     * Initialization.
+     */
+    init: function init() {
+      Layout = Components.Layout;
+      Elements = Components.Elements;
     },
 
     /**
@@ -2708,7 +2766,7 @@ var floor = Math.floor;
      * @return {Object} - Calculated position.
      */
     toPosition: function toPosition(index) {
-      return this.sign * (index * (Layout.slideWidth + Layout.gap) + this.offset);
+      return this.sign * (Layout.totalWidth(index - 1) + this.offset(index));
     },
 
     /**
@@ -2717,7 +2775,25 @@ var floor = Math.floor;
      * @return {number} - The closest slide position.
      */
     toIndex: function toIndex(position) {
-      return Math.round((this.sign * position - this.offset) / (Layout.slideWidth + Layout.gap));
+      position *= this.sign;
+
+      if (Splide.is(SLIDE)) {
+        position = between(position, Layout.totalWidth(Elements.total), 0);
+      }
+
+      var Slides = Elements.getSlides(true);
+
+      for (var i in Slides) {
+        var Slide = Slides[i];
+        var slideIndex = Slide.index;
+        var slidePosition = this.sign * this.toPosition(slideIndex);
+
+        if (slidePosition < position && position <= slidePosition + Layout.slideWidth(slideIndex) + Layout.gap) {
+          return slideIndex;
+        }
+      }
+
+      return 0;
     },
 
     /**
@@ -2728,40 +2804,25 @@ var floor = Math.floor;
      * @return {number} - Trimmed position.
      */
     trim: function trim(position) {
-      var edge = this.sign * (Layout.listWidth - (Layout.width + Layout.gap));
+      var edge = this.sign * (Layout.totalWidth(Elements.total) - (Layout.width + Layout.gap));
       return between(position, edge, 0);
     },
 
     /**
-     * Return sign according to the direction.
-     *
-     * @return {number} - -1 for LTR or 1 or RTL.
-     */
-    get sign() {
-      return Components.Controller.isRtl() ? 1 : -1;
-    },
-
-    /**
-     * Return current offset value, considering direction and a number of clones.
+     * Return current offset value, considering direction.
      *
      * @return {number} - Offset amount.
      */
-    get offset() {
-      var width = Layout.width,
-          slideWidth = Layout.slideWidth,
-          gap = Layout.gap;
+    offset: function offset(index) {
       var focus = Splide.options.focus;
-      var focusOffset;
+      var slideWidth = Layout.slideWidth(index);
 
       if (focus === 'center') {
-        focusOffset = (width - slideWidth) / 2;
-      } else {
-        focusOffset = (parseInt(focus) || 0) * (slideWidth + gap);
+        return -(Layout.width - slideWidth) / 2;
       }
 
-      return (slideWidth + gap) * Components.Clones.length / 2 - focusOffset;
+      return -(parseInt(focus) || 0) * (slideWidth + Layout.gap);
     }
-
   };
 });
 // CONCATENATED MODULE: ./src/js/components/track/index.js
@@ -2771,6 +2832,7 @@ var floor = Math.floor;
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
+
 
 
 
@@ -2793,13 +2855,6 @@ var floor = Math.floor;
    */
   var list;
   /**
-   * Store the Resolver for direction.
-   *
-   * @type {Object}
-   */
-
-  var Resolver;
-  /**
    * Store the current position.
    *
    * @type {number}
@@ -2820,13 +2875,19 @@ var floor = Math.floor;
    */
 
   var isFade = Splide.is(FADE);
-  return {
+  /**
+   * Track component object.
+   *
+   * @type {Object}
+   */
+
+  var Track = object_assign({
     /**
      * Called when the component is mounted.
      */
     mount: function mount() {
       list = Components.Elements.list;
-      Resolver = isVertical ? vertical(Splide, Components) : horizontal(Splide, Components);
+      this.init();
     },
 
     /**
@@ -2855,7 +2916,7 @@ var floor = Math.floor;
     go: function go(destIndex, newIndex, silently) {
       var _this2 = this;
 
-      var newPosition = this.trim(this.toPosition(destIndex));
+      var newPosition = getTrimmedPosition(destIndex);
       var prevIndex = Splide.index;
 
       if (!silently) {
@@ -2867,7 +2928,11 @@ var floor = Math.floor;
           _this2.end(destIndex, newIndex, prevIndex, silently);
         });
       } else {
-        this.end(destIndex, newIndex, prevIndex, silently);
+        if (destIndex !== prevIndex && Splide.options.trimSpace === 'rewind') {
+          Components.Controller.go(destIndex + destIndex - prevIndex, silently);
+        } else {
+          this.end(destIndex, newIndex, prevIndex, silently);
+        }
       }
     },
 
@@ -2899,8 +2964,7 @@ var floor = Math.floor;
      * @param {number} index - A destination index where the track jumps.
      */
     jump: function jump(index) {
-      var position = this.trim(this.toPosition(index));
-      this.translate(position);
+      this.translate(getTrimmedPosition(index));
     },
 
     /**
@@ -2910,27 +2974,9 @@ var floor = Math.floor;
      */
     translate: function translate(position) {
       currPosition = position;
-      Resolver.translate(list, position);
-    },
-
-    /**
-     * Calculate position by index.
-     *
-     * @param {number} index - Slide index.
-     *
-     * @return {Object} - Calculated position.
-     */
-    toPosition: function toPosition(index) {
-      return Resolver.toPosition(index);
-    },
-
-    /**
-     * Calculate the closest slide index by the given position.
-     *
-     * @return {number} - The closest slide index.
-     */
-    toIndex: function toIndex(position) {
-      return Resolver.toIndex(position);
+      applyStyle(list, {
+        transform: "translate" + this.axis + "(" + position + "px)"
+      });
     },
 
     /**
@@ -2945,7 +2991,7 @@ var floor = Math.floor;
         return position;
       }
 
-      return Resolver.trim(position);
+      return this._s.trim(position);
     },
 
     /**
@@ -2969,18 +3015,20 @@ var floor = Math.floor;
      */
     get position() {
       return currPosition;
-    },
-
-    /**
-     * Return current offset value including focus offset.
-     *
-     * @return {number} - Offset amount.
-     */
-    get offset() {
-      return Resolver.offset;
     }
 
-  };
+  }, isVertical ? vertical(Splide, Components) : horizontal(Splide, Components));
+  /**
+   * Convert index to the trimmed position.
+   *
+   * @return {number} - Trimmed position.
+   */
+
+  function getTrimmedPosition(index) {
+    return Track.trim(Track.toPosition(index));
+  }
+
+  return Track;
 });
 // CONCATENATED MODULE: ./src/js/components/clones/index.js
 /**
@@ -3007,6 +3055,13 @@ var floor = Math.floor;
    * @type {Array}
    */
   var clones = [];
+  /**
+   * Keep Elements component.
+   *
+   * @type {Object}
+   */
+
+  var Elements = Components.Elements;
   /**
    * Clones component object.
    *
@@ -3059,40 +3114,53 @@ var floor = Math.floor;
   };
   /**
    * Generate and append clones.
-   * Clone count is determined by:
-   * - Max pages a flick action can move.
-   * - Whether the slide length is enough for perPage.
    */
 
   function generateClones() {
-    var Slides = Components.Slides;
-    var _Splide$options = Splide.options,
-        perPage = _Splide$options.perPage,
-        drag = _Splide$options.drag,
-        flickMaxPages = _Splide$options.flickMaxPages;
-    var length = Slides.length;
-    var count = perPage * (drag ? flickMaxPages + 1 : 1) + (length < perPage ? perPage : 0);
+    var length = Elements.length;
 
-    if (length) {
-      var slides = Slides.getSlides(false, false);
-
-      while (slides.length < count) {
-        slides = slides.concat(slides);
-      }
-
-      slides.slice(0, count).forEach(function (elm, index) {
-        var clone = cloneDeeply(elm);
-        append(Components.Elements.list, clone);
-        clones.push(clone);
-        Slides.register(index + length, index, clone);
-      });
-      slides.slice(-count).forEach(function (elm, index) {
-        var clone = cloneDeeply(elm);
-        before(clone, slides[0]);
-        clones.push(clone);
-        Slides.register(index - count, index, clone);
-      });
+    if (!length) {
+      return;
     }
+
+    var count = getCloneCount();
+    var slides = Elements.slides;
+
+    while (slides.length < count) {
+      slides = slides.concat(slides);
+    }
+
+    slides.slice(0, count).forEach(function (elm, index) {
+      var clone = cloneDeeply(elm);
+      append(Elements.list, clone);
+      clones.push(clone);
+      Elements.register(clone, index + length, index);
+    });
+    slides.slice(-count).forEach(function (elm, index) {
+      var clone = cloneDeeply(elm);
+      before(clone, slides[0]);
+      clones.push(clone);
+      Elements.register(clone, index - count, index);
+    });
+  }
+  /**
+   * Return half count of clones to be generated.
+   * Clone count is determined by:
+   * - Max pages a flick action can move.
+   * - Whether the slide length is enough for perPage.
+   *
+   * @return {number} - Count for clones.
+   */
+
+
+  function getCloneCount() {
+    var options = Splide.options;
+
+    if (options.autoWidth) {
+      return Elements.length;
+    }
+
+    return options.perPage * (options.drag ? options.flickMaxPages + 1 : 1);
   }
   /**
    * Clone deeply the given element.
@@ -3113,7 +3181,7 @@ var floor = Math.floor;
 
   return Clones;
 });
-// CONCATENATED MODULE: ./src/js/components/layout/resolvers/horizontal.js
+// CONCATENATED MODULE: ./src/js/components/layout/directions/horizontal.js
 /**
  * The resolver component for horizontal layout.
  *
@@ -3124,16 +3192,22 @@ var floor = Math.floor;
 
 
 /**
+ * Max width of a slide.
+ *
+ * @type {number}
+ */
+
+var SLIDE_MAX_WIDTH = 5000;
+/**
  * The resolver component for horizontal layout.
  *
  * @param {Splide} Splide     - A Splide instance.
  * @param {Object} Components - An object containing components.
- * @param {Object} options    - Current options.
  *
  * @return {Object} - The resolver object.
  */
 
-/* harmony default export */ var resolvers_horizontal = (function (Splide, Components, options) {
+/* harmony default export */ var directions_horizontal = (function (Splide, Components) {
   /**
    * Keep the Elements component.
    *
@@ -3153,14 +3227,21 @@ var floor = Math.floor;
    * @type {Element}
    */
 
-  var track = Elements.track;
+  var track;
+  /**
+   * Keep the latest options.
+   *
+   * @type {Element}
+   */
+
+  var options = Splide.options;
   return {
     /**
      * Margin property name.
      *
      * @type {string}
      */
-    marginProp: options.direction === RTL ? 'marginLeft' : 'marginRight',
+    margin: 'margin' + (options.direction === RTL ? 'Left' : 'Right'),
 
     /**
      * Always 0 because the height will be determined by inner contents.
@@ -3177,37 +3258,69 @@ var floor = Math.floor;
     listHeight: 0,
 
     /**
-     * Gap in px.
-     *
-     * @type {number}
+     * Initialization.
      */
-    gap: toPixel(root, options.gap),
-
-    /**
-     * An object containing padding left and right in px.
-     *
-     * @type {Object}
-     */
-    padding: function () {
+    init: function init() {
+      options = Splide.options;
+      track = Elements.track;
+      this.gap = toPixel(root, options.gap);
       var padding = options.padding;
       var _padding$left = padding.left,
           left = _padding$left === void 0 ? padding : _padding$left,
           _padding$right = padding.right,
           right = _padding$right === void 0 ? padding : _padding$right;
-      return {
+      this.padding = {
         left: toPixel(root, left),
         right: toPixel(root, right)
       };
-    }(),
+      applyStyle(track, {
+        paddingLeft: unit(left),
+        paddingRight: unit(right)
+      });
+    },
 
     /**
-     * Initialization.
+     * Accumulate slide width including the gap to the designated index.
+     *
+     * @param {number|undefined} index - If undefined, width of all slides will be accumulated.
+     *
+     * @return {number} - Accumulated width.
      */
-    init: function init() {
-      applyStyle(track, {
-        paddingLeft: unit(this.padding.left),
-        paddingRight: unit(this.padding.right)
-      });
+    totalWidth: function totalWidth(index) {
+      var _this = this;
+
+      return Elements.getSlides(true).filter(function (Slide) {
+        return Slide.index <= index;
+      }).reduce(function (accumulator, Slide) {
+        return accumulator + _this.slideWidth(Slide.index) + _this.gap;
+      }, 0);
+    },
+
+    /**
+     * Return the slide width in px.
+     *
+     * @param {number} index - Slide index.
+     *
+     * @return {number} - The slide width.
+     */
+    slideWidth: function slideWidth(index) {
+      if (options.autoWidth) {
+        var Slide = Elements.getSlide(index);
+        return Slide ? Slide.slide.clientWidth : 0;
+      }
+
+      var width = options.fixedWidth || (this.width + this.gap) / options.perPage - this.gap;
+      return toPixel(root, width);
+    },
+
+    /**
+     * Return the slide height in px.
+     *
+     * @return {number} - The slide height.
+     */
+    slideHeight: function slideHeight() {
+      var height = options.height || options.fixedHeight || this.width * options.heightRatio;
+      return toPixel(root, height);
     },
 
     /**
@@ -3225,45 +3338,13 @@ var floor = Math.floor;
      * @return {number} - Current list width.
      */
     get listWidth() {
-      return (this.slideWidth + this.gap) * Components.Slides.total;
-    },
-
-    /**
-     * Return the slide width in px.
-     *
-     * @return {number} - The slide width.
-     */
-    get slideWidth() {
-      var width = options.fixedWidth || (this.width + this.gap) / options.perPage - this.gap;
-      return toPixel(root, width);
-    },
-
-    /**
-     * Return the slide height in px.
-     *
-     * @return {number} - The slide height.
-     */
-    get slideHeight() {
-      var height = options.height || options.fixedHeight || this.width * options.heightRatio;
-      return toPixel(root, height);
-    },
-
-    /**
-     * Return the number of slides in the current view.
-     *
-     * @return {number} - The number of slides in view.
-     */
-    get numInView() {
-      if (options.fixedWidth) {
-        return Math.floor((this.width + this.gap) / (this.slideWidth + this.gap)) || 1;
-      }
-
-      return options.perPage;
+      var total = Elements.total;
+      return options.autoWidth ? total * SLIDE_MAX_WIDTH : this.totalWidth(total);
     }
 
   };
 });
-// CONCATENATED MODULE: ./src/js/components/layout/resolvers/vertical.js
+// CONCATENATED MODULE: ./src/js/components/layout/directions/vertical.js
 /**
  * The resolver component for vertical layout.
  *
@@ -3278,12 +3359,11 @@ var floor = Math.floor;
  *
  * @param {Splide} Splide     - A Splide instance.
  * @param {Object} Components - An object containing components.
- * @param {Object} options    - Current options.
  *
  * @return {Object} - The resolver object.
  */
 
-/* harmony default export */ var resolvers_vertical = (function (Splide, Components, options) {
+/* harmony default export */ var directions_vertical = (function (Splide, Components) {
   /**
    * Keep the Elements component.
    *
@@ -3303,47 +3383,61 @@ var floor = Math.floor;
    * @type {Element}
    */
 
-  var track = Elements.track;
+  var track;
+  /**
+   * Keep the latest options.
+   *
+   * @type {Element}
+   */
+
+  var options;
   return {
     /**
      * Margin property name.
      *
      * @type {string}
      */
-    marginProp: 'marginBottom',
-
-    /**
-     * Gap in px.
-     *
-     * @type {number}
-     */
-    gap: toPixel(root, options.gap),
-
-    /**
-     * An object containing padding left and right in px.
-     *
-     * @type {Object}
-     */
-    padding: function () {
-      var padding = options.padding;
-      var _padding$top = padding.top,
-          top = _padding$top === void 0 ? padding : _padding$top,
-          _padding$bottom = padding.bottom,
-          bottom = _padding$bottom === void 0 ? padding : _padding$bottom;
-      return {
-        top: toPixel(root, top),
-        bottom: toPixel(root, bottom)
-      };
-    }(),
+    margin: 'marginBottom',
 
     /**
      * Init slider styles according to options.
      */
     init: function init() {
+      options = Splide.options;
+      track = Elements.track;
+      this.gap = toPixel(root, options.gap);
+      var padding = options.padding;
+      var _padding$top = padding.top,
+          top = _padding$top === void 0 ? padding : _padding$top,
+          _padding$bottom = padding.bottom,
+          bottom = _padding$bottom === void 0 ? padding : _padding$bottom;
+      this.padding = {
+        top: toPixel(root, top),
+        bottom: toPixel(root, bottom)
+      };
       applyStyle(track, {
-        paddingTop: unit(this.padding.top),
-        paddingBottom: unit(this.padding.bottom)
+        paddingTop: unit(top),
+        paddingBottom: unit(bottom)
       });
+    },
+
+    /**
+     * Return the slide width in px.
+     *
+     * @return {number} - The slide width.
+     */
+    slideWidth: function slideWidth() {
+      return toPixel(root, options.fixedWidth || this.width);
+    },
+
+    /**
+     * Return the slide height in px.
+     *
+     * @return {number} - The slide height.
+     */
+    slideHeight: function slideHeight() {
+      var height = options.fixedHeight || (this.height + this.gap) / options.perPage - this.gap;
+      return toPixel(root, height);
     },
 
     /**
@@ -3363,7 +3457,7 @@ var floor = Math.floor;
     get height() {
       var height = options.height || this.width * options.heightRatio;
       exist(height, '"height" or "heightRatio" is missing.');
-      return toPixel(Splide.root, height) - this.padding.top - this.padding.bottom;
+      return toPixel(root, height) - this.padding.top - this.padding.bottom;
     },
 
     /**
@@ -3381,39 +3475,7 @@ var floor = Math.floor;
      * @return {number} - Current list height.
      */
     get listHeight() {
-      return (this.slideHeight + this.gap) * Components.Slides.total;
-    },
-
-    /**
-     * Return the slide width in px.
-     *
-     * @return {number} - The slide width.
-     */
-    get slideWidth() {
-      return toPixel(Splide.root, options.fixedWidth || this.width);
-    },
-
-    /**
-     * Return the slide height in px.
-     *
-     * @return {number} - The slide height.
-     */
-    get slideHeight() {
-      var height = options.fixedHeight || (this.height + this.gap) / options.perPage - this.gap;
-      return toPixel(Splide.root, height);
-    },
-
-    /**
-     * Return the number of slides in the current view.
-     *
-     * @return {number} - The number of slides in view.
-     */
-    get numInView() {
-      if (options.fixedHeight) {
-        return Math.floor((this.height + this.gap) / (this.slideHeight + this.gap)) || 1;
-      }
-
-      return options.perPage;
+      return (this.slideHeight() + this.gap) * Elements.total;
     }
 
   };
@@ -3435,7 +3497,7 @@ var floor = Math.floor;
  * @return {Function} - A debounced function.
  */
 function throttle(func, wait) {
-  var timeout = null; // Declare function by the "function" keyword to prevent "this" from being inherited.
+  var timeout; // Declare function by the "function" keyword to prevent "this" from being inherited.
 
   return function () {
     if (!timeout) {
@@ -3465,28 +3527,26 @@ function createInterval(callback, interval, progress) {
       _pause = true;
 
   var step = function step(timestamp) {
-    if (_pause) {
-      return;
+    if (!_pause) {
+      if (!start) {
+        start = timestamp;
+      }
+
+      elapse = timestamp - start;
+      rate = elapse / interval;
+
+      if (elapse >= interval) {
+        start = 0;
+        rate = 1;
+        callback();
+      }
+
+      if (progress) {
+        progress(rate);
+      }
+
+      requestAnimationFrame(step);
     }
-
-    if (!start) {
-      start = timestamp;
-    }
-
-    elapse = timestamp - start;
-    rate = elapse / interval;
-
-    if (elapse >= interval) {
-      start = 0;
-      rate = 1;
-      callback();
-    }
-
-    if (progress) {
-      progress(rate);
-    }
-
-    requestAnimationFrame(step);
   };
 
   return {
@@ -3516,13 +3576,15 @@ function createInterval(callback, interval, progress) {
 
 
 
+
+
 /**
  * Interval time for throttle.
  *
  * @type {number}
  */
 
-var THROTTLE = 50;
+var THROTTLE = 100;
 /**
  * The component for handing slide layouts and their sizes.
  *
@@ -3534,51 +3596,10 @@ var THROTTLE = 50;
 
 /* harmony default export */ var layout = (function (Splide, Components) {
   /**
-   * Store the root element.
-   *
-   * @type {Element}
-   */
-  var root = Splide.root;
-  /**
-   * Store the list element.
-   *
-   * @type {Element}
-   */
-
-  var list;
-  /**
-   * Store the track element.
-   *
-   * @type {Element}
-   */
-
-  var track;
-  /**
-   * Store all Slide objects.
-   *
-   * @type {Object}
-   */
-
-  var Slides;
-  /**
-   * Hold a resolver object.
-   *
-   * @type {Object}
-   */
-
-  var Resolver;
-  /**
-   * Whether the slider is vertical or not.
-   * @type {boolean}
-   */
-
-  var isVertical = Splide.options.direction === 'ttb';
-  /**
    * Keep the Elements component.
    *
    * @type {string}
    */
-
   var Elements = Components.Elements;
   /**
    * Layout component object.
@@ -3586,13 +3607,11 @@ var THROTTLE = 50;
    * @type {Object}
    */
 
-  var Layout = {
+  var Layout = object_assign({
     /**
      * Called when the component is mounted.
      */
     mount: function mount() {
-      list = Elements.list;
-      track = Elements.track;
       bind();
       init();
     },
@@ -3601,117 +3620,20 @@ var THROTTLE = 50;
      * Destroy.
      */
     destroy: function destroy() {
-      Elements.slides.concat([list, track]).forEach(function (elm) {
-        removeAttribute(elm, 'style');
-      });
-    },
-
-    /**
-     * Return slider width without padding.
-     *
-     * @return {number} - Current slide width.
-     */
-    get width() {
-      return Resolver.width;
-    },
-
-    /**
-     * Return slider height without padding.
-     *
-     * @return {number}
-     */
-    get height() {
-      return Resolver.height;
-    },
-
-    /**
-     * Return list width.
-     *
-     * @return {number} - Current list width.
-     */
-    get listWidth() {
-      return Resolver.listWidth;
-    },
-
-    /**
-     * Return list height.
-     *
-     * @return {number} - Current list height.
-     */
-    get listHeight() {
-      return Resolver.listHeight;
-    },
-
-    /**
-     * Return slide width including gap size.
-     * Note that slideWidth * perPage is NOT equal to slider width.
-     *
-     * @return {number} - Current slide width including gap size.
-     */
-    get slideWidth() {
-      return Resolver.slideWidth;
-    },
-
-    /**
-     * Return slide height.
-     *
-     * @return {number} - Computed slide height.
-     */
-    get slideHeight() {
-      return Resolver.slideHeight;
-    },
-
-    /**
-     * Return gap in px.
-     *
-     * @return {Object} - Gap amount in px.
-     */
-    get gap() {
-      return Resolver.gap;
-    },
-
-    /**
-     * Return padding object.
-     *
-     * @return {Object} - An object containing padding left and right in horizontal mode
-     *                    or top and bottom in vertical one.
-     */
-    get padding() {
-      return Resolver.padding;
-    },
-
-    /**
-     * Return the number of slides in the current view.
-     *
-     * @return {number} - The number of slides in view.
-     */
-    get numInView() {
-      return Resolver.numInView;
+      removeAttribute([Elements.list, Elements.track], 'style');
     }
-
-  };
+  }, Splide.options.direction === TTB ? directions_vertical(Splide, Components) : directions_horizontal(Splide, Components));
   /**
    * Init slider styles according to options.
    */
 
   function init() {
-    var options = Splide.options;
-    Slides = Components.Slides.getSlides(true, true);
-
-    if (isVertical) {
-      Resolver = resolvers_vertical(Splide, Components, options);
-    } else {
-      Resolver = resolvers_horizontal(Splide, Components, options);
-    }
-
-    Resolver.init();
-    applyStyle(root, {
-      maxWidth: unit(options.width)
+    Layout.init();
+    applyStyle(Splide.root, {
+      maxWidth: unit(Splide.options.width)
     });
-    Slides.forEach(function (Slide) {
-      var _applyStyle;
-
-      applyStyle(Slide.slide, (_applyStyle = {}, _applyStyle[Resolver.marginProp] = unit(Resolver.gap), _applyStyle));
+    Elements.each(function (Slide) {
+      Slide.slide.style[Layout.margin] = unit(Layout.gap);
     });
     resize();
   }
@@ -3722,9 +3644,9 @@ var THROTTLE = 50;
 
 
   function bind() {
-    Splide.on('resize', throttle(function () {
+    Splide.on('resize load', throttle(function () {
       Splide.emit('resize');
-    }, THROTTLE), window).on('mounted resize', resize).on('updated', init);
+    }, THROTTLE), window).on('resize', resize).on('updated', init);
   }
   /**
    * Resize the list and slides including clones.
@@ -3732,22 +3654,21 @@ var THROTTLE = 50;
 
 
   function resize() {
-    applyStyle(list, {
+    applyStyle(Elements.list, {
       width: unit(Layout.listWidth),
       height: unit(Layout.listHeight)
     });
-    applyStyle(track, {
+    applyStyle(Elements.track, {
       height: unit(Layout.height)
     });
-    var slideWidth = unit(Resolver.slideWidth);
-    var slideHeight = unit(Resolver.slideHeight);
-    Slides.forEach(function (Slide) {
+    var slideHeight = unit(Layout.slideHeight());
+    Elements.each(function (Slide) {
       applyStyle(Slide.container, {
         height: slideHeight
       });
       applyStyle(Slide.slide, {
-        width: slideWidth,
-        height: !Slide.container ? slideHeight : ''
+        width: Splide.options.autoWidth ? null : unit(Layout.slideWidth(Slide.index)),
+        height: Slide.container ? null : slideHeight
       });
     });
   }
@@ -3766,15 +3687,17 @@ var THROTTLE = 50;
 
 
 
+var abs = Math.abs,
+    log = Math.log;
 /**
  * Adjust how much the track can be pulled on the first or last page.
  * The larger number this is, the farther the track moves.
- * This should be around 5.
+ * This should be around 5 - 9.
  *
  * @type {number}
  */
 
-var FRICTION_REDUCER = 5;
+var FRICTION_REDUCER = 7;
 /**
  * To start dragging the track, the drag angle must be less than this threshold.
  *
@@ -3798,7 +3721,7 @@ var SWIPE_THRESHOLD = 150;
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ var components_drag = (function (Splide, Components) {
+/* harmony default export */ var drag = (function (Splide, Components) {
   /**
    * Store the Move component.
    *
@@ -3839,7 +3762,7 @@ var SWIPE_THRESHOLD = 150;
    * @type {boolean}
    */
 
-  var isDragging = false;
+  var isDragging;
   /**
    * Whether the slider direction is vertical or not.
    *
@@ -3882,13 +3805,14 @@ var SWIPE_THRESHOLD = 150;
       var list = Components.Elements.list;
       Splide.on('touchstart mousedown', start, list).on('touchmove mousemove', move, list, {
         passive: false
-      }).on('touchend touchcancel mouseleave mouseup dragend', end, list); // Prevent dragging an image or anchor itself.
-
-      each(list.querySelectorAll('img, a'), function (elm) {
-        Splide.on('dragstart', function (e) {
-          e.preventDefault();
-        }, elm, {
-          passive: false
+      }).on('touchend touchcancel mouseleave mouseup dragend', end, list).on('mounted refresh', function () {
+        // Prevent dragging an image or anchor itself.
+        each(list.querySelectorAll('img, a'), function (elm) {
+          Splide.off('dragstart', elm).on('dragstart', function (e) {
+            e.preventDefault();
+          }, elm, {
+            passive: false
+          });
         });
       });
     }
@@ -3945,7 +3869,7 @@ var SWIPE_THRESHOLD = 150;
     var offset = _ref.offset;
 
     if (Splide.State.is(IDLE)) {
-      var angle = Math.atan(Math.abs(offset.y) / Math.abs(offset.x)) * 180 / Math.PI;
+      var angle = Math.atan(abs(offset.y) / abs(offset.x)) * 180 / Math.PI;
 
       if (isVertical) {
         angle = 90 - angle;
@@ -3967,20 +3891,18 @@ var SWIPE_THRESHOLD = 150;
 
   function resist(position) {
     if (!Splide.is(LOOP)) {
-      var trim = Track.trim,
-          toPosition = Track.toPosition;
-      var sign = Controller.isRtl() ? -1 : 1;
+      var sign = Track.sign;
 
-      var _start = sign * trim(toPosition(0));
+      var _start = sign * Track.trim(Track.toPosition(0));
 
-      var _end = sign * trim(toPosition(Controller.edgeIndex));
+      var _end = sign * Track.trim(Track.toPosition(Controller.edgeIndex));
 
       position *= sign;
 
-      if (position > _start) {
-        position = FRICTION_REDUCER * Math.log(position - _start) + _start;
-      } else if (position < _end) {
-        position = -FRICTION_REDUCER * Math.log(_end - position) + _end;
+      if (position < _start) {
+        position = _start - FRICTION_REDUCER * Math.log(_start - position);
+      } else if (position > _end) {
+        position = _end + FRICTION_REDUCER * Math.log(position - _end);
       }
 
       position *= sign;
@@ -4011,7 +3933,7 @@ var SWIPE_THRESHOLD = 150;
 
   function go(info) {
     var velocity = info.velocity[axis];
-    var absV = Math.abs(velocity);
+    var absV = abs(velocity);
 
     if (absV > 0) {
       var Layout = Components.Layout;
@@ -4019,14 +3941,14 @@ var SWIPE_THRESHOLD = 150;
       var sign = velocity < 0 ? -1 : 1;
       var destination = Track.position;
 
-      if (absV > options.flickThreshold && Math.abs(info.offset[axis]) < SWIPE_THRESHOLD) {
+      if (absV > options.flickThreshold && abs(info.offset[axis]) < SWIPE_THRESHOLD) {
         destination += sign * Math.min(absV * options.flickPower, Layout.width * (options.flickMaxPages || 1));
       }
 
       var index = Track.toIndex(destination); // Do not allow the track to go to a previous position.
 
       if (index === Splide.index) {
-        index += Controller.isRtl() ? sign : -sign;
+        index += sign * Track.sign;
       }
 
       if (!Splide.is(LOOP)) {
@@ -4060,7 +3982,7 @@ var SWIPE_THRESHOLD = 150;
         _ref3$y = _ref3.y,
         fromY = _ref3$y === void 0 ? clientY : _ref3$y;
 
-    var startTime = startInfo.timeStamp || 0;
+    var startTime = startInfo.time || 0;
     var offset = {
       x: clientX - fromX,
       y: clientY - fromY
@@ -4071,16 +3993,12 @@ var SWIPE_THRESHOLD = 150;
       y: offset.y / duration
     };
     return {
-      from: {
-        x: fromX,
-        y: fromY
-      },
       to: {
         x: clientX,
         y: clientY
       },
       offset: offset,
-      timeStamp: timeStamp,
+      time: timeStamp,
       velocity: velocity
     };
   }
@@ -4198,6 +4116,13 @@ var PAUSE_FLAGS = {
 
   var interval;
   /**
+   * Keep the Elements component.
+   *
+   * @type {string}
+   */
+
+  var Elements = Components.Elements;
+  /**
    * Autoplay component object.
    *
    * @type {Object}
@@ -4217,18 +4142,15 @@ var PAUSE_FLAGS = {
      */
     mount: function mount() {
       var options = Splide.options;
-      var _Components$Elements = Components.Elements,
-          slides = _Components$Elements.slides,
-          bar = _Components$Elements.bar;
 
-      if (slides.length > options.perPage) {
+      if (Elements.slides.length > options.perPage) {
         interval = createInterval(function () {
           Splide.go('>');
         }, options.interval, function (rate) {
           Splide.emit(name + ":playing", rate);
 
-          if (bar) {
-            applyStyle(bar, {
+          if (Elements.bar) {
+            applyStyle(Elements.bar, {
               width: rate * 100 + "%"
             });
           }
@@ -4286,7 +4208,6 @@ var PAUSE_FLAGS = {
 
   function bind() {
     var options = Splide.options;
-    var Elements = Components.Elements;
     var sibling = Splide.sibling;
     var elms = [Splide.root, sibling ? sibling.root : null];
 
@@ -4304,10 +4225,10 @@ var PAUSE_FLAGS = {
       // Need to be removed a focus flag at first.
       Autoplay.play(PAUSE_FLAGS.FOCUS);
       Autoplay.play(PAUSE_FLAGS.MANUAL);
-    }, Elements.play).on('move', function () {
-      // Rewind the timer when others move the slide.
+    }, Elements.play).on('move refresh', function () {
       Autoplay.play();
-    }).on('destroy', function () {
+    }) // Rewind the timer.
+    .on('destroy', function () {
       Autoplay.pause();
     });
     switchOn([Elements.pause], 'click', PAUSE_FLAGS.MANUAL, false);
@@ -4376,7 +4297,7 @@ var PAUSE_FLAGS = {
     mount: function mount() {
       apply(false);
       Splide.on('lazyload:loaded', function (img) {
-        cover(img);
+        cover(img, false);
       });
       Splide.on('updated', function () {
         return apply(false);
@@ -4392,11 +4313,13 @@ var PAUSE_FLAGS = {
   };
   /**
    * Apply "cover" to all slides.
+   *
+   * @param {boolean} uncover - If true, "cover" will be clear.
    */
 
   function apply(uncover) {
-    Components.Slides.getSlides(true, false).forEach(function (slide) {
-      var img = find(slide, 'img');
+    Components.Elements.each(function (Slide) {
+      var img = child(Slide.slide, 'img') || child(Slide.container, 'img');
 
       if (img && img.src) {
         cover(img, uncover);
@@ -4407,15 +4330,11 @@ var PAUSE_FLAGS = {
    * Set background image of the parent element, using source of the given image element.
    *
    * @param {Element} img     - An image element.
-   * @param {boolean} uncover - Optional. Reset "cover".
+   * @param {boolean} uncover - Reset "cover".
    */
 
 
   function cover(img, uncover) {
-    if (uncover === void 0) {
-      uncover = false;
-    }
-
     applyStyle(img.parentElement, {
       background: uncover ? '' : "center/cover no-repeat url(\"" + img.src + "\")"
     });
@@ -4461,6 +4380,7 @@ var SIZE = 40;
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
+
 
 
 /**
@@ -4509,6 +4429,13 @@ var SIZE = 40;
 
   var created;
   /**
+   * Hold the Elements component.
+   *
+   * @type {Object}
+   */
+
+  var Elements = Components.Elements;
+  /**
    * Arrows component object.
    *
    * @type {Object}
@@ -4526,8 +4453,7 @@ var SIZE = 40;
      * Called when the component is mounted.
      */
     mount: function mount() {
-      var Elements = Components.Elements; // Attempt to get arrows from HTML source.
-
+      // Attempt to get arrows from HTML source.
       prev = Elements.arrows.prev;
       next = Elements.arrows.next; // If arrows were not found in HTML, let's generate them.
 
@@ -4559,9 +4485,7 @@ var SIZE = 40;
      * Destroy.
      */
     destroy: function destroy() {
-      [prev, next].forEach(function (elm) {
-        removeAttribute(elm, 'disabled');
-      });
+      removeAttribute([prev, next], 'disabled');
 
       if (created) {
         dom_remove(prev.parentElement);
@@ -4599,7 +4523,7 @@ var SIZE = 40;
     var _Components$Controlle = Components.Controller,
         prevIndex = _Components$Controlle.prevIndex,
         nextIndex = _Components$Controlle.nextIndex;
-    var isEnough = Splide.length > Splide.options.perPage;
+    var isEnough = Splide.length > Splide.options.perPage || Splide.is(LOOP);
     prev.disabled = prevIndex < 0 || !isEnough;
     next.disabled = nextIndex < 0 || !isEnough;
     Splide.emit(name + ":updated", prev, next, prevIndex, nextIndex);
@@ -4615,7 +4539,7 @@ var SIZE = 40;
     });
     append(wrapper, prev);
     append(wrapper, next);
-    var slider = Components.Elements.slider;
+    var slider = Elements.slider;
     var parent = Splide.options.arrows === 'slider' && slider ? slider : root;
     before(wrapper, parent.firstElementChild);
   }
@@ -4678,12 +4602,12 @@ var UPDATE_EVENT = 'updated.page';
    */
   var data = {};
   /**
-   * Hold a parent element of pagination.
+   * Hold the Elements component.
    *
-   * @type {Element}
+   * @type {Object}
    */
 
-  var parent;
+  var Elements = Components.Elements;
   /**
    * Pagination component object.
    *
@@ -4703,8 +4627,8 @@ var UPDATE_EVENT = 'updated.page';
      */
     mount: function mount() {
       data = createPagination();
-      var slider = Components.Elements.slider;
-      parent = Splide.options.pagination === 'slider' && slider ? slider : Splide.root;
+      var slider = Elements.slider;
+      var parent = Splide.options.pagination === 'slider' && slider ? slider : Splide.root;
       append(parent, data.list);
       bind();
     },
@@ -4743,7 +4667,7 @@ var UPDATE_EVENT = 'updated.page';
      * @return {Object|undefined} - An item object on success or undefined on failure.
      */
     getItem: function getItem(index) {
-      return data.items[Components.Controller.indexToPage(index)];
+      return data.items[Components.Controller.toPage(index)];
     },
 
     /**
@@ -4806,8 +4730,7 @@ var UPDATE_EVENT = 'updated.page';
     var list = create('ul', {
       "class": classes.pagination
     });
-    var Slides = Components.Slides;
-    var items = Slides.getSlides(false, true).filter(function (Slide) {
+    var items = Elements.getSlides(false).filter(function (Slide) {
       return options.focus !== false || Slide.index % options.perPage === 0;
     }).map(function (Slide, page) {
       var li = create('li', {});
@@ -4823,7 +4746,7 @@ var UPDATE_EVENT = 'updated.page';
         li: li,
         button: button,
         page: page,
-        Slides: Slides.getSlidesByPage(page)
+        Slides: Elements.getSlidesByPage(page)
       };
     });
     return {
@@ -4891,10 +4814,10 @@ var SRC_DATA_NAME = 'data-splide-lazy';
   /**
    * Whether to stop sequential load.
    *
-   * @type {boolean}
+   * @type {boolean|undefined}
    */
 
-  var stop = false;
+  var interrupted;
   /**
    * Lazyload component object.
    *
@@ -4913,7 +4836,7 @@ var SRC_DATA_NAME = 'data-splide-lazy';
      * Called when the component is mounted.
      */
     mount: function mount() {
-      Components.Slides.getSlides(true, true).forEach(function (Slide) {
+      Components.Elements.each(function (Slide) {
         var img = find(Slide.slide, "[" + SRC_DATA_NAME + "]");
 
         if (img) {
@@ -4922,7 +4845,7 @@ var SRC_DATA_NAME = 'data-splide-lazy';
             Slide: Slide
           });
           applyStyle(img, {
-            visibility: 'hidden'
+            display: 'none'
           });
         }
       });
@@ -4942,7 +4865,7 @@ var SRC_DATA_NAME = 'data-splide-lazy';
      * Destroy.
      */
     destroy: function destroy() {
-      stop = true;
+      interrupted = true;
     }
   };
   /**
@@ -5023,12 +4946,12 @@ var SRC_DATA_NAME = 'data-splide-lazy';
     if (!error) {
       dom_remove(spinner);
       applyStyle(img, {
-        visibility: 'visible'
+        display: ''
       });
-      Splide.emit(name + ":loaded", img);
+      Splide.emit(name + ":loaded", img).emit('resize');
     }
 
-    if (isSequential && !stop) {
+    if (isSequential && !interrupted) {
       loadNext();
     }
   }
@@ -5049,14 +4972,21 @@ var SRC_DATA_NAME = 'data-splide-lazy';
  * @type {Object}
  */
 var KEY_MAP = {
-  horizontal: {
+  ltr: {
     ArrowLeft: '<',
     ArrowRight: '>',
     // For IE.
     Left: '<',
     Right: '>'
   },
-  vertical: {
+  rtl: {
+    ArrowLeft: '>',
+    ArrowRight: '<',
+    // For IE.
+    Left: '>',
+    Right: '<'
+  },
+  ttb: {
     ArrowUp: '<',
     ArrowDown: '>',
     // For IE.
@@ -5073,21 +5003,27 @@ var KEY_MAP = {
  */
 
 /* harmony default export */ var keyboard = (function (Splide) {
+  /**
+   * Hold the root element.
+   *
+   * @type {Element}
+   */
+  var root = Splide.root;
   return {
     /**
      * Called when the component is mounted.
      */
     mount: function mount() {
-      var map = KEY_MAP[Splide.options.direction === 'ttb' ? 'vertical' : 'horizontal'];
+      var map = KEY_MAP[Splide.options.direction];
       Splide.on('mounted updated', function () {
-        Splide.off('keydown', Splide.root);
+        Splide.off('keydown', root);
 
         if (Splide.options.keyboard) {
           Splide.on('keydown', function (e) {
             if (map[e.key]) {
               Splide.go(map[e.key]);
             }
-          }, Splide.root);
+          }, root);
         }
       });
     }
@@ -5169,6 +5105,13 @@ var TAB_INDEX = 'tabindex';
    */
   var i18n = Splide.i18n;
   /**
+   * Hold the Elements component.
+   *
+   * @type {Object}
+   */
+
+  var Elements = Components.Elements;
+  /**
    * A11y component object.
    *
    * @type {Object}
@@ -5207,11 +5150,8 @@ var TAB_INDEX = 'tabindex';
      * Destroy.
      */
     destroy: function destroy() {
-      var Elements = Components.Elements;
       var arrows = Components.Arrows.arrows;
-      Elements.slides.concat([arrows.prev, arrows.next, Elements.play, Elements.pause]).forEach(function (elm) {
-        removeAttribute(elm, [ARIA_HIDDEN, TAB_INDEX, ARIA_CONTROLS, ARIA_LABEL, ARIA_CURRENRT, 'role']);
-      });
+      removeAttribute(Elements.slides.concat([arrows.prev, arrows.next, Elements.play, Elements.pause]), [ARIA_HIDDEN, TAB_INDEX, ARIA_CONTROLS, ARIA_LABEL, ARIA_CURRENRT, 'role']);
     }
   };
   /**
@@ -5235,7 +5175,7 @@ var TAB_INDEX = 'tabindex';
 
 
   function initArrows(prev, next) {
-    var controls = Components.Elements.track.id;
+    var controls = Elements.track.id;
     setAttribute(prev, ARIA_CONTROLS, controls);
     setAttribute(next, ARIA_CONTROLS, controls);
   }
@@ -5306,15 +5246,16 @@ var TAB_INDEX = 'tabindex';
 
 
   function initAutoplay() {
-    var Elements = Components.Elements;
-    [Elements.play, Elements.pause].forEach(function (elm, index) {
+    ['play', 'pause'].forEach(function (name) {
+      var elm = Elements[name];
+
       if (elm) {
         if (!isButton(elm)) {
           setAttribute(elm, 'role', 'button');
         }
 
         setAttribute(elm, ARIA_CONTROLS, Elements.track.id);
-        setAttribute(elm, ARIA_LABEL, i18n[index === 0 ? 'play' : 'pause']);
+        setAttribute(elm, ARIA_LABEL, i18n[name]);
       }
     });
   }
@@ -5327,17 +5268,18 @@ var TAB_INDEX = 'tabindex';
 
 
   function initNavigation(main) {
-    var Slides = Components.Slides.getSlides(true, true);
-    Slides.forEach(function (Slide) {
-      var slide = Slide.slide;
+    Elements.each(function (_ref) {
+      var slide = _ref.slide,
+          realIndex = _ref.realIndex,
+          index = _ref.index;
 
       if (!isButton(slide)) {
         setAttribute(slide, 'role', 'button');
       }
 
-      var slideIndex = Slide.realIndex > -1 ? Slide.realIndex : Slide.index;
+      var slideIndex = realIndex > -1 ? realIndex : index;
       var label = sprintf(i18n.slideX, slideIndex + 1);
-      var mainSlide = main.Components.Slides.getSlide(slideIndex);
+      var mainSlide = main.Components.Elements.getSlide(slideIndex);
       setAttribute(slide, ARIA_LABEL, label);
 
       if (mainSlide) {
@@ -5353,8 +5295,8 @@ var TAB_INDEX = 'tabindex';
    */
 
 
-  function updateNavigation(_ref, active) {
-    var slide = _ref.slide;
+  function updateNavigation(_ref2, active) {
+    var slide = _ref2.slide;
 
     if (active) {
       setAttribute(slide, ARIA_CURRENRT, true);
@@ -5486,8 +5428,7 @@ var TRIGGER_KEYS = [' ', 'Enter', 'Spacebar'];
 
 
   function bind() {
-    var Slides = sibling.Components.Slides.getSlides(true, true);
-    Slides.forEach(function (_ref) {
+    sibling.Components.Elements.each(function (_ref) {
       var slide = _ref.slide,
           index = _ref.index;
 
@@ -5539,6 +5480,14 @@ var TRIGGER_KEYS = [' ', 'Enter', 'Spacebar'];
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
+
+/**
+ * Interval time for throttle.
+ *
+ * @type {number}
+ */
+
+var breakpoints_THROTTLE = 50;
 /**
  * The component for updating options according to a current window width.
  *
@@ -5546,6 +5495,7 @@ var TRIGGER_KEYS = [' ', 'Enter', 'Spacebar'];
  *
  * @return {Object} - The component object.
  */
+
 /* harmony default export */ var components_breakpoints = (function (Splide) {
   /**
    * Store breakpoints.
@@ -5553,6 +5503,13 @@ var TRIGGER_KEYS = [' ', 'Enter', 'Spacebar'];
    * @type {Object|boolean}
    */
   var breakpoints = Splide.options.breakpoints;
+  /**
+   * The check function whose frequency of call is reduced.
+   *
+   * @type {Function}
+   */
+
+  var throttledCheck = throttle(check, breakpoints_THROTTLE);
   /**
    * Keep initial options.
    *
@@ -5600,7 +5557,13 @@ var TRIGGER_KEYS = [' ', 'Enter', 'Spacebar'];
           mql: matchMedia("(max-width:" + point + "px)")
         };
       });
-      bind();
+      /*
+       * To keep monitoring resize event after destruction without "completely",
+       * use native addEventListener instead of Splide.on.
+       */
+
+      this.destroy(true);
+      addEventListener('resize', throttledCheck);
     },
 
     /**
@@ -5609,21 +5572,44 @@ var TRIGGER_KEYS = [' ', 'Enter', 'Spacebar'];
      */
     mounted: function mounted() {
       initialOptions = Splide.options;
+      check();
+    },
+
+    /**
+     * Destroy.
+     *
+     * @param {boolean} completely - Whether to destroy Splide completely.
+     */
+    destroy: function destroy(completely) {
+      if (completely) {
+        removeEventListener('resize', throttledCheck);
+      }
     }
   };
   /**
-   * Listen some events to update options when media query is changed.
+   * Check the breakpoint.
    */
 
-  function bind() {
-    Splide.on('mounted resize', function () {
-      var point = getPoint();
+  function check() {
+    var point = getPoint();
 
-      if (point !== prevPoint) {
-        Splide.options = breakpoints[point] || initialOptions;
-        prevPoint = point;
+    if (point !== prevPoint) {
+      var options = breakpoints[point] || initialOptions;
+      var destroy = options.destroy;
+
+      if (destroy) {
+        Splide.options = initialOptions;
+        Splide.destroy(destroy === 'completely');
+      } else {
+        if (Splide.State.is(DESTROYED)) {
+          Splide.mount();
+        } else {
+          Splide.options = options;
+        }
       }
-    });
+
+      prevPoint = point;
+    }
   }
   /**
    * Return the breakpoint matching current window width.
@@ -5666,16 +5652,14 @@ var TRIGGER_KEYS = [' ', 'Enter', 'Spacebar'];
 
 
 
-
 var COMPLETE = {
   Options: components_options,
   Elements: components_elements,
   Controller: controller,
-  Slides: components_slides,
   Track: components_track,
   Clones: components_clones,
   Layout: layout,
-  Drag: components_drag,
+  Drag: drag,
   Click: click,
   Autoplay: components_autoplay,
   Cover: components_cover,
@@ -5691,11 +5675,10 @@ var LIGHT = {
   Options: components_options,
   Elements: components_elements,
   Controller: controller,
-  Slides: components_slides,
   Track: components_track,
   Clones: components_clones,
   Layout: layout,
-  Drag: components_drag,
+  Drag: drag,
   Autoplay: components_autoplay,
   Arrows: components_arrows,
   Pagination: pagination,

@@ -10,9 +10,8 @@ import State from './core/state';
 import { DEFAULTS } from './constants/defaults';
 
 import compose from './core/composer';
-import { applyStyle } from './utils/dom';
 import { error, exist } from './utils/error';
-import { find } from './utils/dom';
+import { applyStyle, find } from './utils/dom';
 import { merge, each, values } from './utils/object';
 import * as STATES from './constants/states';
 
@@ -33,9 +32,9 @@ export default class Splide {
 	 */
 	constructor( root, options = {}, Components = {} ) {
 		this.root = root instanceof Element ? root : find( document, root );
-		exist( this.root, 'An invalid root element or selector was given.' );
+		exist( this.root, 'An invalid element/selector was given.' );
 
-		this.Components = {};
+		this.Components = null;
 		this.Event      = Event();
 		this.State      = State( STATES.CREATED );
 		this.STATES     = STATES;
@@ -58,7 +57,7 @@ export default class Splide {
 	 * @return {Splide|null} - This instance or null if an exception occurred.
 	 */
 	mount( Extensions = {}, Transition = null ) {
-		this.Components = compose( this, merge( this._c, Extensions ), Transition );
+		this.Components = this.Components || compose( this, merge( this._c, Extensions ), Transition );
 
 		try {
 			each( this.Components, ( component, key ) => {
@@ -75,17 +74,20 @@ export default class Splide {
 			return null;
 		}
 
+		this.State.set( STATES.MOUNTED );
+
 		each( this.Components, component => {
 			component.mounted && component.mounted();
 		} );
 
-		this.State.set( STATES.MOUNTED );
-		this.emit( 'mounted' );
+		// Breakpoints can destroy the Splide.
+		if ( ! this.State.is( STATES.DESTROYED ) ) {
+			this.emit( 'mounted' );
+			this.State.set( STATES.IDLE );
+			this.emit( 'ready' );
+		}
 
-		this.State.set( STATES.IDLE );
 		applyStyle( this.root, { visibility: 'visible' } );
-
-		this.emit( 'ready' );
 
 		return this;
 	}
@@ -174,8 +176,7 @@ export default class Splide {
 	 * @param {number}         index - A slide will be added at the position.
 	 */
 	add( slide, index = -1 ) {
-		this.Components.Elements.add( slide, index );
-		this.refresh();
+		this.Components.Elements.add( slide, index, this.refresh.bind( this ) );
 		return this;
 	}
 
@@ -195,25 +196,26 @@ export default class Splide {
 	 * And then call "updated" event.
 	 */
 	refresh() {
-		this.emit( 'refresh' ).emit( 'updated', this.options );
+		this.emit( 'refresh' ).emit( 'updated', this._o );
 		return this;
 	}
 
 	/**
 	 * Destroy the Splide.
+	 * "Completely" boolean is mainly for breakpoints.
+	 *
+	 * @param {boolean} completely - Destroy completely.
 	 */
-	destroy() {
+	destroy( completely = true ) {
 		values( this.Components ).reverse().forEach( component => {
-			component.destroy && component.destroy();
+			component.destroy && component.destroy( completely );
 		} );
 
-		this.emit( 'destroy' );
+		this.emit( 'destroy', completely );
 
 		// Destroy all event handlers, including ones for native events.
 		this.Event.destroy();
-
-		delete this.Components;
-		this.State.set( STATES.CREATED );
+		this.State.set( STATES.DESTROYED );
 
 		return this;
 	}
@@ -238,12 +240,12 @@ export default class Splide {
 
 	/**
 	 * Return length of slides.
-	 * This is an alias of Slides.length.
+	 * This is an alias of Elements.length.
 	 *
 	 * @return {number} - A number of slides.
 	 */
 	get length() {
-		return this.Components.Slides.length;
+		return this.Components.Elements.length;
 	}
 
 	/**
@@ -261,9 +263,15 @@ export default class Splide {
 	 * @param {Object} options - New options.
 	 */
 	set options( options ) {
+		const created = this.State.is( STATES.CREATED );
+
+		if ( ! created ) {
+			this.emit( 'update' );
+		}
+
 		this._o = merge( this._o, options );
 
-		if ( ! this.State.is( STATES.CREATED ) ) {
+		if ( ! created ) {
 			this.emit( 'updated', this._o );
 		}
 	}

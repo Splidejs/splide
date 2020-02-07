@@ -56,13 +56,22 @@ export function sprintf( format, replacements ) {
 export function unit( value ) {
 	const type = typeof value;
 
-	if ( type === 'string' ) {
-		return value;
-	} else if ( type === 'number' && value > 0 ) {
+	if ( type === 'number' && value > 0 ) {
 		return parseFloat( value ) + 'px';
 	}
 
-	return '';
+	return type === 'string' ? value : '';
+}
+
+/**
+ * Pad start with 0.
+ *
+ * @param {number} number - A number to be filled with 0.
+ *
+ * @return {string|number} - Padded number.
+ */
+export function pad( number ) {
+	return number < 10 ? '0' + number : number
 }
 
 /**
@@ -74,22 +83,20 @@ export function unit( value ) {
  * @return {number} - Pixel.
  */
 export function toPixel( root, value ) {
-	if ( typeof value === 'number' ) {
-		return value;
+	if ( typeof value === 'string' ) {
+		const div = create( 'div', {} );
+
+		applyStyle( div, {
+			position: 'absolute',
+			width: value,
+		} );
+
+		append( root, div );
+
+		value = div.clientWidth;
+
+		remove( div );
 	}
-
-	const div = create( 'div', {} );
-
-	applyStyle( div, {
-		position: 'absolute',
-		width: value,
-	} );
-
-	append( root, div );
-
-	value = div.clientWidth;
-
-	remove( div );
 
 	return value;
 }

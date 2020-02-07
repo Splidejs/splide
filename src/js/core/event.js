@@ -17,7 +17,7 @@ export default () => {
 	 */
 	let data = [];
 
-	return {
+	const Event = {
 		/**
 		 * Subscribe the given event(s).
 		 *
@@ -49,10 +49,7 @@ export default () => {
 					const item = data[ i ];
 
 					if ( item && item.event === event && item.elm === elm ) {
-						if ( elm ) {
-							elm.removeEventListener( event, item.handler, item.options );
-						}
-
+						unsubscribe( item );
 						delete data[ i ];
 						break;
 					}
@@ -79,13 +76,21 @@ export default () => {
 		 * Clear event data.
 		 */
 		destroy() {
-			data.forEach( item => {
-				if ( item.elm ) {
-					item.elm.removeEventListener( item.event, item.handler, item.options );
-				}
-			} );
-
+			data.forEach( unsubscribe );
 			data = [];
 		},
 	};
+
+	/**
+	 * Remove the registered event listener.
+	 *
+	 * @param {Object} item - An object containing event data.
+	 */
+	function unsubscribe( item ) {
+		if ( item.elm ) {
+			item.elm.removeEventListener( item.event, item.handler, item.options );
+		}
+	}
+
+	return Event;
 }

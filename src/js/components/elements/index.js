@@ -5,9 +5,23 @@
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
-import { find, addClass, removeClass, child, remove, append, before, domify } from '../../utils/dom';
+import Slide from './slide';
+import {
+	find,
+	addClass,
+	removeClass,
+	child,
+	remove,
+	append,
+	before,
+	domify,
+	applyStyle,
+	loaded,
+} from '../../utils/dom';
 import { exist } from '../../utils/error';
 import { values } from '../../utils/object';
+import { pad } from "../../utils/utils";
+
 
 /**
  * The property name for UID stored in a window object.
@@ -20,11 +34,12 @@ const UID_NAME = 'uid';
 /**
  * The component for main elements.
  *
- * @param {Splide} Splide - A Splide instance.
+ * @param {Splide} Splide     - A Splide instance.
+ * @param {Object} Components - An object containing components.
  *
  * @return {Object} - The component object.
  */
-export default ( Splide ) => {
+export default ( Splide, Components ) => {
 	/**
 	 * Hold the root element.
 	 *
@@ -39,6 +54,13 @@ export default ( Splide ) => {
 	 */
 	const classes = Splide.classes;
 
+	/**
+	 * Store Slide objects.
+	 *
+	 * @type {Array}
+	 */
+	let Slides = [];
+
 	/*
 	 * Assign unique ID to the root element if it doesn't have the one.
 	 * Note that IE doesn't support padStart() to fill the uid by 0.
@@ -47,7 +69,7 @@ export default ( Splide ) => {
 		window.splide = window.splide || {};
 		let uid = window.splide[ UID_NAME ] || 0;
 		window.splide[ UID_NAME ] = ++uid;
-		root.id = `splide${ uid < 10 ? '0' + uid : uid }`;
+		root.id = `splide${ pad( uid ) }`;
 	}
 
 	/**
@@ -61,15 +83,11 @@ export default ( Splide ) => {
 		 * Collect main elements and store them as member properties.
 		 */
 		mount() {
-			const message = 'was not found.';
-
 			this.slider = child( root, classes.slider );
+			this.track  = find( root, `.${classes.track}` );
+			this.list   = child( this.track, classes.list );
 
-			this.track = find( root, `.${ classes.track }` );
-			exist( this.track, `A track ${ message }` );
-
-			this.list = child( this.track, classes.list );
-			exist( this.list, `A list ${ message }` );
+			exist( this.track && this.list, 'Track or list was not found.' );
 
 			this.slides = values( this.list.children );
 
@@ -84,30 +102,91 @@ export default ( Splide ) => {
 			this.play  = find( autoplay, `.${ classes.play }` );
 			this.pause = find( autoplay, `.${ classes.pause }` );
 
+			this.track.id = this.track.id || `${ root.id }-track`;
+			this.list.id  = this.list.id || `${ root.id }-list`;
+
 			init();
+
+			Splide.on( 'refresh', () => {
+				this.destroy();
+				init();
+			} );
 		},
 
 		/**
 		 * Destroy.
 		 */
 		destroy() {
+			Slides.forEach( Slide => { Slide.destroy() } );
+			Slides = [];
 			removeClass( root, getClasses() );
+		},
+
+		/**
+		 * Register a slide to create a Slide object and handle its behavior.
+		 *
+		 * @param {Element} slide     - A slide element.
+		 * @param {number}  index     - A unique index. This can be negative.
+		 * @param {number}  realIndex - A real index for clones. Set -1 for real slides.
+		 */
+		register( slide, index, realIndex ) {
+			const SlideObject = Slide( Splide, index, realIndex, slide );
+			SlideObject.mount();
+			Slides.push( SlideObject );
+		},
+
+		/**
+		 * Return the Slide object designated by the index.
+		 * Note that "find" is not supported by IE.
+		 *
+		 * @return {Object|undefined} - A Slide object if available. Undefined if not.
+		 */
+		getSlide( index ) {
+			return Slides.filter( Slide => Slide.index === index )[0];
+		},
+
+		/**
+		 * Return all Slide objects.
+		 *
+		 * @param {boolean} includeClones - Whether to include cloned slides or not.
+		 *
+		 * @return {Object[]} - Slide objects.
+		 */
+		getSlides( includeClones ) {
+			return includeClones ? Slides : Slides.filter( Slide => ! Slide.isClone );
+		},
+
+		/**
+		 * Return Slide objects belonging to the given page.
+		 *
+		 * @param {number} page - A page number.
+		 *
+		 * @return {Object[]} - An array containing Slide objects.
+		 */
+		getSlidesByPage( page ) {
+			const idx     = Components.Controller.toIndex( page );
+			const options = Splide.options;
+			const max     = options.focus !== false ? 1 : options.perPage;
+
+			return Slides.filter( ( { index } ) => idx <= index && index < idx + max );
 		},
 
 		/**
 		 * Insert a slide to a slider.
 		 * Need to refresh Splide after adding a slide.
 		 *
-		 * @param {Node|string} slide - A slide element to be added.
-		 * @param {number}      index - A slide will be added at the position.
+		 * @param {Node|string} slide    - A slide element to be added.
+		 * @param {number}      index    - A slide will be added at the position.
+		 * @param {Function}    callback - Called right after the slide is added to the DOM tree.
 		 */
-		add( slide, index ) {
+		add( slide, index, callback ) {
 			if ( typeof slide === 'string' ) {
 				slide = domify( slide );
 			}
 
 			if ( slide instanceof Element ) {
 				const ref = this.slides[ index ];
+				applyStyle( slide, { display: 'none' } );
 
 				if ( ref ) {
 					before( slide, ref );
@@ -116,6 +195,11 @@ export default ( Splide ) => {
 					append( this.list, slide );
 					this.slides.push( slide );
 				}
+
+				loaded( slide, () => {
+					applyStyle( slide, { display: '' } );
+					callback && callback( slide );
+				} );
 			}
 		},
 
@@ -126,20 +210,46 @@ export default ( Splide ) => {
 		 * @param index - Slide index.
 		 */
 		remove( index ) {
-			const slides = this.slides.splice( index, 1 );
-			remove( slides[0] );
+			remove( this.slides.splice( index, 1 )[0] );
+		},
+
+		/**
+		 * Trigger the provided callback for each Slide object.
+		 *
+		 * @param {Function} callback - A callback function. The first argument will be the Slide object.
+		 */
+		each( callback ) {
+			Slides.forEach( callback );
+		},
+
+		/**
+		 * Return slides length without clones.
+		 *
+		 * @return {number} - Slide length.
+		 */
+		get length() {
+			return this.slides.length;
+		},
+
+		/**
+		 * Return "SlideObjects" length including clones.
+		 *
+		 * @return {number} - Slide length including clones.
+		 */
+		get total() {
+			return Slides.length;
 		},
 	};
 
 	/**
 	 * Initialization.
-	 * Assign ID to some elements if it's not available.
 	 */
 	function init() {
-		Elements.track.id = Elements.track.id || `${ root.id }-track`;
-		Elements.list.id  = Elements.list.id || `${ root.id }-list`;
-
 		addClass( root, getClasses() );
+
+		Elements.slides.forEach( ( slide, index ) => {
+			Elements.register( slide, index, -1 );
+		} );
 	}
 
 	/**

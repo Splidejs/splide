@@ -19,21 +19,21 @@ import { toArray } from "./utils";
  * @return {Element|null} - A found element or null.
  */
 export function find( elm, selector ) {
-	return elm && selector ? elm.querySelector( selector.split( ' ' )[0] ) : null;
+	return elm ? elm.querySelector( selector.split( ' ' )[0] ) : null;
 }
 
 /**
- * Find a first child having the given class.
+ * Find a first child having the given tag or class name.
  *
- * @param {Element} parent    - A parent element.
- * @param {string}  className - A class name.
+ * @param {Element} parent         - A parent element.
+ * @param {string}  tagOrClassName - A tag or class name.
  *
  * @return {Element|null} - A found element on success. Null on failure.
  */
-export function child( parent, className ) {
+export function child( parent, tagOrClassName ) {
 	if ( parent ) {
 		return values( parent.children ).filter( child => {
-			return hasClass( child, className.split( ' ' )[0] );
+			return hasClass( child, tagOrClassName.split( ' ' )[0] ) || child.tagName.toLowerCase() === tagOrClassName;
 		} )[0] || null;
 	}
 
@@ -75,7 +75,11 @@ export function domify( html ) {
  * @param {Element|Element[]} elms - Element(s) to be removed.
  */
 export function remove( elms ) {
-	toArray( elms ).forEach( elm => { elm && elm.parentElement.removeChild( elm ) } );
+	toArray( elms ).forEach( elm => {
+		if ( elm && elm.parentElement ) {
+			elm.parentElement.removeChild( elm );
+		}
+	} );
 }
 
 /**
@@ -111,7 +115,9 @@ export function before( elm, ref ) {
 export function applyStyle( elm, styles ) {
 	if ( elm ) {
 		each( styles, ( value, prop ) => {
-			elm.style[ prop ] = value || '';
+			if ( value !== null ) {
+				elm.style[ prop ] = value;
+			}
 		} );
 	}
 }
@@ -185,20 +191,46 @@ export function setAttribute( elm, name, value ) {
  * @param {Element} elm  - An element where an attribute is assigned.
  * @param {string}  name - Attribute name.
  *
- * @return {string|null} - The value of the given attribute if available. Null if not.
+ * @return {string} - The value of the given attribute if available. An empty string if not.
  */
 export function getAttribute( elm, name ) {
-	return elm ? elm.getAttribute( name ) : null;
+	return elm ? elm.getAttribute( name ) : '';
 }
 
 /**
  * Remove attribute from the given element.
  *
- * @param {Element}      elm   - An element where an attribute is removed.
- * @param {string|Array} names - Attribute name.
+ * @param {Element|Element[]} elms  - An element where an attribute is removed.
+ * @param {string|string[]}      names - Attribute name.
  */
-export function removeAttribute( elm, names ) {
-	if ( elm ) {
-		toArray( names ).forEach( name => { elm.removeAttribute( name ) } );
+export function removeAttribute( elms, names ) {
+	toArray( names ).forEach( name => {
+		toArray( elms ).forEach( elm => elm && elm.removeAttribute( name ) );
+	} );
+}
+
+/**
+ * Trigger the given callback after all images contained by the element are loaded.
+ *
+ * @param {Element}  elm      - Element that may contain images.
+ * @param {Function} callback - Callback function fired right after all images are loaded.
+ */
+export function loaded( elm, callback ) {
+	const images = elm.querySelectorAll( 'img' );
+	const length = images.length;
+
+	if ( length ) {
+		let count = 0;
+
+		each( images, img => {
+			img.onload = img.onerror = () => {
+				if ( ++count === length ) {
+					callback();
+				}
+			};
+		} );
+	} else {
+		// Trigger the callback immediately if there is no image.
+		callback();
 	}
 }

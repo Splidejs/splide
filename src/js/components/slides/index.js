@@ -104,7 +104,7 @@ export default ( Splide, Components ) => {
 		 * @return {Object[]} - An array containing Slide objects.
 		 */
 		getSlidesByPage( page ) {
-			const idx     = Components.Controller.pageToIndex( page );
+			const idx     = Components.Controller.toIndex( page );
 			const options = Splide.options;
 			const max     = options.focus !== false ? 1 : options.perPage;
 

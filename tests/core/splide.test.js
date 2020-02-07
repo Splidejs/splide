@@ -43,8 +43,8 @@ describe( 'Splide ', () => {
 	} );
 
 	test( 'should add a slide dynamically.', () => {
-		const splide = new Splide( '#splide', {}, COMPLETE ).mount();
-		const slide = document.createElement( 'li' );
+		const splide = new Splide( '#splide', { perMove: 1 }, COMPLETE ).mount();
+		const slide  = document.createElement( 'li' );
 		const length = splide.length;
 
 		slide.classList.add( 'splide__slide' );
@@ -53,10 +53,7 @@ describe( 'Splide ', () => {
 		splide.add( slide );
 
 		expect( splide.length ).toBe( length + 1 );
-
-		splide.go( splide.length - 1 );
-
-		expect( slide.classList.contains( 'is-active' ) ).toBeTruthy();
+		expect( parseInt( splide.Components.Elements.slides[ splide.length - 1 ].textContent ) ).toBe( length );
 	} );
 
 	test( 'should remove a slide dynamically.', () => {

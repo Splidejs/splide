@@ -23,7 +23,7 @@ describe( 'The "loop" type Splide', () => {
 
 		global.dispatchEvent( new Event( 'resize' ) );
 
-		expect( Track.offset ).toBe( width * Clones.length / 2 );
+		expect( Math.abs( Track.toPosition( 0 ) ) ).toBe( width * Clones.length / 2 );
 	} );
 
 	test( 'should move to clones before the first slide or after the last one then jump to actual slide.', done => {

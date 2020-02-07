@@ -11,15 +11,17 @@ import { between } from '../../utils/utils';
 import { IDLE } from '../../constants/states';
 import { each } from "../../utils/object";
 
+const { abs } = Math;
+
 
 /**
  * Adjust how much the track can be pulled on the first or last page.
  * The larger number this is, the farther the track moves.
- * This should be around 5.
+ * This should be around 5 - 9.
  *
  * @type {number}
  */
-const FRICTION_REDUCER = 5;
+const FRICTION_REDUCER = 7;
 
 /**
  * To start dragging the track, the drag angle must be less than this threshold.
@@ -85,7 +87,7 @@ export default ( Splide, Components ) => {
 	 *
 	 * @type {boolean}
 	 */
-	let isDragging = false;
+	let isDragging;
 
 	/**
 	 * Whether the slider direction is vertical or not.
@@ -130,12 +132,15 @@ export default ( Splide, Components ) => {
 			Splide
 				.on( 'touchstart mousedown', start, list )
 				.on( 'touchmove mousemove', move, list, { passive: false } )
-				.on( 'touchend touchcancel mouseleave mouseup dragend', end, list );
-
-			// Prevent dragging an image or anchor itself.
-			each( list.querySelectorAll( 'img, a' ), elm => {
-				Splide.on( 'dragstart', e => { e.preventDefault() }, elm, { passive: false } );
-			} );
+				.on( 'touchend touchcancel mouseleave mouseup dragend', end, list )
+				.on( 'mounted refresh', () => {
+					// Prevent dragging an image or anchor itself.
+					each( list.querySelectorAll( 'img, a' ), elm => {
+						Splide
+							.off( 'dragstart', elm )
+							.on( 'dragstart', e => { e.preventDefault() }, elm, { passive: false } );
+					} );
+				} );
 		},
 	};
 
@@ -186,7 +191,7 @@ export default ( Splide, Components ) => {
 	 */
 	function shouldMove( { offset } ) {
 		if ( Splide.State.is( IDLE ) ) {
-			let angle = Math.atan( Math.abs( offset.y ) / Math.abs( offset.x ) ) * 180 / Math.PI;
+			let angle = Math.atan( abs( offset.y ) / abs( offset.x ) ) * 180 / Math.PI;
 
 			if ( isVertical ) {
 				angle = 90 - angle;
@@ -207,17 +212,16 @@ export default ( Splide, Components ) => {
 	 */
 	function resist( position ) {
 		if ( ! Splide.is( LOOP ) ) {
-			const { trim, toPosition } = Track;
-			const sign  = Controller.isRtl() ? -1 : 1;
-			const start = sign * trim( toPosition( 0 ) );
-			const end   = sign * trim( toPosition( Controller.edgeIndex ) );
+			const sign  = Track.sign;
+			const start = sign * Track.trim( Track.toPosition( 0 ) );
+			const end   = sign * Track.trim( Track.toPosition( Controller.edgeIndex ) );
 
 			position *= sign;
 
-			if ( position > start ) {
-				position = FRICTION_REDUCER * Math.log( position - start ) + start;
-			}	else if ( position < end ) {
-				position = -FRICTION_REDUCER * Math.log( end - position ) + end;
+			if ( position < start ) {
+				position = start - FRICTION_REDUCER * Math.log( start - position );
+			}	else if ( position > end ) {
+				position = end + FRICTION_REDUCER * Math.log( position - end );
 			}
 
 			position *= sign;
@@ -246,7 +250,7 @@ export default ( Splide, Components ) => {
 	 */
 	function go( info ) {
 		const velocity = info.velocity[ axis ];
-		const absV     = Math.abs( velocity );
+		const absV     = abs( velocity );
 
 		if ( absV > 0 ) {
 			const Layout  = Components.Layout;
@@ -255,7 +259,7 @@ export default ( Splide, Components ) => {
 
 			let destination = Track.position;
 
-			if ( absV > options.flickThreshold && Math.abs( info.offset[ axis ] ) < SWIPE_THRESHOLD ) {
+			if ( absV > options.flickThreshold && abs( info.offset[ axis ] ) < SWIPE_THRESHOLD ) {
 				destination += sign * Math.min( absV * options.flickPower, Layout.width * ( options.flickMaxPages || 1 ) );
 			}
 
@@ -263,7 +267,7 @@ export default ( Splide, Components ) => {
 
 			// Do not allow the track to go to a previous position.
 			if ( index === Splide.index ) {
-				index += Controller.isRtl() ? sign : -sign;
+				index += sign * Track.sign;
 			}
 
 			if ( ! Splide.is( LOOP ) ) {
@@ -284,19 +288,18 @@ export default ( Splide, Components ) => {
 	 */
 	function analyze( e, startInfo ) {
 		const { timeStamp, touches } = e;
-		const { clientX, clientY } = touches ? touches[ 0 ] : e;
+		const { clientX, clientY } = touches ? touches[0] : e;
 		const { x: fromX = clientX, y: fromY = clientY } = startInfo.to || {};
 
-		const startTime = startInfo.timeStamp || 0;
+		const startTime = startInfo.time || 0;
 		const offset    = { x: clientX - fromX, y: clientY - fromY };
 		const duration  = timeStamp - startTime;
 		const velocity  = { x: offset.x / duration, y: offset.y / duration };
 
 		return {
-			from: { x: fromX, y: fromY },
-			to  : { x: clientX, y: clientY },
+			to: { x: clientX, y: clientY },
 			offset,
-			timeStamp,
+			time: timeStamp,
 			velocity,
 		};
 	}

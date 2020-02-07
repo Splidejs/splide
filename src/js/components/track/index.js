@@ -5,11 +5,12 @@
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
-import Vertical from './resolvers/vertical';
-import Horizontal from './resolvers/horizontal';
+import Vertical from './directions/vertical';
+import Horizontal from './directions/horizontal';
 import { applyStyle } from '../../utils/dom';
 import { LOOP, FADE } from '../../constants/types';
 import { TTB } from '../../constants/directions';
+import { assign } from "../../utils/object";
 
 
 /**
@@ -27,13 +28,6 @@ export default ( Splide, Components ) => {
 	 * @type {Element}
 	 */
 	let list;
-
-	/**
-	 * Store the Resolver for direction.
-	 *
-	 * @type {Object}
-	 */
-	let Resolver;
 
 	/**
 	 * Store the current position.
@@ -56,13 +50,18 @@ export default ( Splide, Components ) => {
 	 */
 	const isFade = Splide.is( FADE );
 
-	return {
+	/**
+	 * Track component object.
+	 *
+	 * @type {Object}
+	 */
+	const Track = assign( {
 		/**
 		 * Called when the component is mounted.
 		 */
 		mount() {
-			list     = Components.Elements.list;
-			Resolver = isVertical ? Vertical( Splide, Components ) : Horizontal( Splide, Components );
+			list = Components.Elements.list;
+			this.init();
 		},
 
 		/**
@@ -85,7 +84,7 @@ export default ( Splide, Components ) => {
 		 * @param {boolean} silently  - If true, suppress emitting events.
 		 */
 		go( destIndex, newIndex, silently ) {
-			const newPosition = this.trim( this.toPosition( destIndex ) );
+			const newPosition = getTrimmedPosition( destIndex );
 			const prevIndex   = Splide.index;
 
 			if ( ! silently ) {
@@ -97,7 +96,11 @@ export default ( Splide, Components ) => {
 					this.end( destIndex, newIndex, prevIndex, silently );
 				} );
 			} else {
-				this.end( destIndex, newIndex, prevIndex, silently );
+				if ( destIndex !== prevIndex && Splide.options.trimSpace === 'rewind' ) {
+					Components.Controller.go( destIndex + destIndex - prevIndex, silently );
+				} else {
+					this.end( destIndex, newIndex, prevIndex, silently );
+				}
 			}
 		},
 
@@ -127,8 +130,7 @@ export default ( Splide, Components ) => {
 		 * @param {number} index - A destination index where the track jumps.
 		 */
 		jump( index ) {
-			const position = this.trim( this.toPosition( index ) );
-			this.translate( position );
+			this.translate( getTrimmedPosition( index ) );
 		},
 
 		/**
@@ -138,27 +140,7 @@ export default ( Splide, Components ) => {
 		 */
 		translate( position ) {
 			currPosition = position;
-			Resolver.translate( list, position );
-		},
-
-		/**
-		 * Calculate position by index.
-		 *
-		 * @param {number} index - Slide index.
-		 *
-		 * @return {Object} - Calculated position.
-		 */
-		toPosition( index ) {
-			return Resolver.toPosition( index );
-		},
-
-		/**
-		 * Calculate the closest slide index by the given position.
-		 *
-		 * @return {number} - The closest slide index.
-		 */
-		toIndex( position ) {
-			return Resolver.toIndex( position );
+			applyStyle( list, { transform: `translate${ this.axis }(${ position }px)` } );
 		},
 
 		/**
@@ -173,7 +155,7 @@ export default ( Splide, Components ) => {
 				return position;
 			}
 
-			return Resolver.trim( position );
+			return this._s.trim( position );
 		},
 
 		/**
@@ -198,14 +180,16 @@ export default ( Splide, Components ) => {
 		get position() {
 			return currPosition;
 		},
+	}, isVertical ? Vertical( Splide, Components ) : Horizontal( Splide, Components ) );
 
-		/**
-		 * Return current offset value including focus offset.
-		 *
-		 * @return {number} - Offset amount.
-		 */
-		get offset() {
-			return Resolver.offset;
-		},
-	};
+	/**
+	 * Convert index to the trimmed position.
+	 *
+	 * @return {number} - Trimmed position.
+	 */
+	function getTrimmedPosition( index ) {
+		return Track.trim( Track.toPosition( index ) );
+	}
+
+	return Track;
 }

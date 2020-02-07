@@ -32,3 +32,10 @@ export const IDLE = 3;
  * @type {number}
  */
 export const MOVING = 4;
+
+/**
+ * Splide is moving.
+ *
+ * @type {number}
+ */
+export const DESTROYED = 5;

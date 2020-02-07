@@ -17,8 +17,6 @@ import { applyStyle } from '../../utils/dom';
  * @return {Object} - The component object.
  */
 export default ( Splide, Components ) => {
-	Components.Options.fix( { perPage: 1, gap: 0, padding: 0 } );
-
 	if ( Components.Drag ) {
 		Components.Drag.required = false;
 	}
@@ -38,11 +36,11 @@ export default ( Splide, Components ) => {
 		 * @param {number}    destIndex - Destination slide index that might be clone's.
 		 * @param {number}    newIndex  - New index.
 		 * @param {Object}    coord     - Destination coordinates.
-		 * @param {function}  onEnd     - Callback function must be invoked when transition is completed.
+		 * @param {function}  done      - Callback function must be invoked when transition is completed.
 		 */
-		start( destIndex, newIndex, coord, onEnd ) {
+		start( destIndex, newIndex, coord, done ) {
 			apply( newIndex );
-			onEnd();
+			done();
 		},
 	};
 
@@ -52,14 +50,11 @@ export default ( Splide, Components ) => {
 	 * @param {number} index - A slide index.
 	 */
 	function apply( index ) {
-		const Slide   = Components.Slides.getSlide( index );
 		const options = Splide.options;
 
-		if ( Slide ) {
-			applyStyle( Slide.slide, {
-				transition: `opacity ${ options.speed }ms ${ options.easing }`,
-			} );
-		}
+		applyStyle( Components.Elements.slides[ index ], {
+			transition: `opacity ${ options.speed }ms ${ options.easing }`,
+		} );
 	}
 
 	return Fade;

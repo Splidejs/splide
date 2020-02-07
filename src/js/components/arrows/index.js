@@ -7,6 +7,7 @@
 
 import { create, append, before, domify, remove, removeAttribute } from '../../utils/dom';
 import { XML_NAME_SPACE, PATH, SIZE } from './path';
+import { LOOP } from "../../constants/types";
 
 
 /**
@@ -55,6 +56,13 @@ export default ( Splide, Components, name ) => {
 	let created;
 
 	/**
+	 * Hold the Elements component.
+	 *
+	 * @type {Object}
+	 */
+	const Elements = Components.Elements;
+
+	/**
 	 * Arrows component object.
 	 *
 	 * @type {Object}
@@ -71,8 +79,6 @@ export default ( Splide, Components, name ) => {
 		 * Called when the component is mounted.
 		 */
 		mount() {
-			const Elements = Components.Elements;
-
 			// Attempt to get arrows from HTML source.
 			prev = Elements.arrows.prev;
 			next = Elements.arrows.next;
@@ -104,7 +110,7 @@ export default ( Splide, Components, name ) => {
 		 * Destroy.
 		 */
 		destroy() {
-			[ prev, next ].forEach( elm => { removeAttribute( elm, 'disabled' ) } );
+			removeAttribute( [ prev, next ], 'disabled' );
 
 			if ( created ) {
 				remove( prev.parentElement );
@@ -137,7 +143,7 @@ export default ( Splide, Components, name ) => {
 	 */
 	function updateDisabled() {
 		const { prevIndex, nextIndex } = Components.Controller;
-		const isEnough = Splide.length > Splide.options.perPage;
+		const isEnough = Splide.length > Splide.options.perPage || Splide.is( LOOP );
 
 		prev.disabled = prevIndex < 0 || ! isEnough;
 		next.disabled = nextIndex < 0 || ! isEnough;
@@ -154,7 +160,7 @@ export default ( Splide, Components, name ) => {
 		append( wrapper, prev );
 		append( wrapper, next );
 
-		const slider = Components.Elements.slider;
+		const slider = Elements.slider;
 		const parent = Splide.options.arrows === 'slider' && slider ? slider : root;
 
 		before( wrapper, parent.firstElementChild );

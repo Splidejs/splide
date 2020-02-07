@@ -6,7 +6,17 @@
  */
 
 import { STATUS_CLASSES } from '../../constants/classes';
-import { create, remove, append, find, addClass, removeClass, setAttribute, getAttribute, applyStyle } from '../../utils/dom';
+import {
+	create,
+	remove,
+	append,
+	find,
+	addClass,
+	removeClass,
+	setAttribute,
+	getAttribute,
+	applyStyle,
+} from '../../utils/dom';
 
 /**
  * The name for a data attribute.
@@ -57,9 +67,9 @@ export default ( Splide, Components, name ) => {
 	/**
 	 * Whether to stop sequential load.
 	 *
-	 * @type {boolean}
+	 * @type {boolean|undefined}
 	 */
-	let stop = false;
+	let interrupted;
 
 	/**
 	 * Lazyload component object.
@@ -78,12 +88,12 @@ export default ( Splide, Components, name ) => {
 		 * Called when the component is mounted.
 		 */
 		mount() {
-			Components.Slides.getSlides( true, true ).forEach( Slide => {
+			Components.Elements.each( Slide => {
 				const img = find( Slide.slide, `[${ SRC_DATA_NAME }]` );
 
 				if ( img ) {
 					images.push( { img, Slide } );
-					applyStyle( img, { visibility: 'hidden' } );
+					applyStyle( img, { display: 'none' } );
 				}
 			} );
 
@@ -100,7 +110,7 @@ export default ( Splide, Components, name ) => {
 		 * Destroy.
 		 */
 		destroy() {
-			stop = true;
+			interrupted = true;
 		},
 	};
 
@@ -172,11 +182,11 @@ export default ( Splide, Components, name ) => {
 
 		if ( ! error ) {
 			remove( spinner );
-			applyStyle( img, { visibility: 'visible' } );
-			Splide.emit( `${ name }:loaded`, img );
+			applyStyle( img, { display: '' } );
+			Splide.emit( `${ name }:loaded`, img ).emit( 'resize' );
 		}
 
-		if ( isSequential && ! stop ) {
+		if ( isSequential && ! interrupted ) {
 			loadNext();
 		}
 	}

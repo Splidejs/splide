@@ -20,7 +20,7 @@ describe( 'Splide with "focus" option', () => {
 		Object.defineProperty( track, 'clientWidth', { value: width } );
 		splide.options = { focus: 'center', perPage };
 
-		expect( Track.offset ).toBe( - ( width / 2 - slideWidth / 2 ) );
+		expect( Track.offset( 0 ) ).toBe( - ( width / 2 - slideWidth / 2 ) );
 	} );
 
 	test( 'should locate the active slide according to the focus index.', () => {
@@ -33,6 +33,6 @@ describe( 'Splide with "focus" option', () => {
 		Object.defineProperty( track, 'clientWidth', { value: width } );
 		splide.options = { focus, perPage };
 
-		expect( Track.offset ).toBe( - slideWidth * focus );
+		expect( Track.offset( 0 ) ).toBe( - slideWidth * focus );
 	} );
 } );

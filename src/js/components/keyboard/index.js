@@ -11,14 +11,21 @@
  * @type {Object}
  */
 const KEY_MAP = {
-	horizontal: {
+	ltr: {
 		ArrowLeft : '<',
 		ArrowRight: '>',
 		// For IE.
 		Left : '<',
 		Right: '>',
 	},
-	vertical: {
+	rtl: {
+		ArrowLeft : '>',
+		ArrowRight: '<',
+		// For IE.
+		Left : '>',
+		Right: '<',
+	},
+	ttb: {
 		ArrowUp  : '<',
 		ArrowDown: '>',
 		// For IE.
@@ -36,24 +43,31 @@ const KEY_MAP = {
  * @return {Object} - The component object.
  */
 export default ( Splide ) => {
+	/**
+	 * Hold the root element.
+	 *
+	 * @type {Element}
+	 */
+	const root = Splide.root;
+
 	return {
 		/**
 		 * Called when the component is mounted.
 		 */
 		mount() {
-			const map = KEY_MAP[ Splide.options.direction === 'ttb' ? 'vertical' : 'horizontal' ];
+			const map = KEY_MAP[ Splide.options.direction ];
 
 			Splide.on( 'mounted updated', () => {
-				Splide.off( 'keydown', Splide.root );
+				Splide.off( 'keydown', root );
 
 				if ( Splide.options.keyboard ) {
 					Splide.on( 'keydown', e => {
 						if ( map[ e.key ] ) {
 							Splide.go( map[ e.key ] );
 						}
-					}, Splide.root );
+					}, root );
 				}
 			} );
 		},
-	}
+	};
 }

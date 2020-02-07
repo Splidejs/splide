@@ -43,6 +43,13 @@ export default ( Splide, Components, name ) => {
 	let interval;
 
 	/**
+	 * Keep the Elements component.
+	 *
+	 * @type {string}
+	 */
+	const Elements = Components.Elements;
+
+	/**
 	 * Autoplay component object.
 	 *
 	 * @type {Object}
@@ -61,14 +68,13 @@ export default ( Splide, Components, name ) => {
 		 */
 		mount() {
 			const options = Splide.options;
-			const { slides, bar } = Components.Elements;
 
-			if ( slides.length > options.perPage ) {
+			if ( Elements.slides.length > options.perPage ) {
 				interval = createInterval( () => { Splide.go( '>' ) }, options.interval, rate => {
 					Splide.emit( `${ name }:playing`, rate );
 
-					if ( bar ) {
-						applyStyle( bar, { width: `${ rate * 100 }%` } );
+					if ( Elements.bar ) {
+						applyStyle( Elements.bar, { width: `${ rate * 100 }%` } );
 					}
 				} );
 
@@ -115,7 +121,6 @@ export default ( Splide, Components, name ) => {
 	 */
 	function bind() {
 		const options  = Splide.options;
-		const Elements = Components.Elements;
 		const sibling  = Splide.sibling;
 		const elms     = [ Splide.root, sibling ? sibling.root : null ];
 
@@ -135,13 +140,8 @@ export default ( Splide, Components, name ) => {
 				Autoplay.play( PAUSE_FLAGS.FOCUS );
 				Autoplay.play( PAUSE_FLAGS.MANUAL );
 			}, Elements.play )
-			.on( 'move', () => {
-				// Rewind the timer when others move the slide.
-				Autoplay.play();
-			} )
-			.on( 'destroy', () => {
-				Autoplay.pause();
-			} );
+			.on( 'move refresh', () => { Autoplay.play() } ) // Rewind the timer.
+			.on( 'destroy', () => {	Autoplay.pause() } );
 
 		switchOn( [ Elements.pause ], 'click', PAUSE_FLAGS.MANUAL, false );
 	}

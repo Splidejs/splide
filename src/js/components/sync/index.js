@@ -112,9 +112,7 @@ export default ( Splide ) => {
 	 * Listen some events on each slide.
 	 */
 	function bind() {
-		const Slides = sibling.Components.Slides.getSlides( true, true );
-
-		Slides.forEach( ( { slide, index } ) => {
+		sibling.Components.Elements.each( ( { slide, index } ) => {
 			/*
 			 * Listen mouseup and touchend events to handle click.
 			 */

@@ -5,6 +5,16 @@
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
+import { throttle } from "../../utils/time";
+import { DESTROYED } from "../../constants/states";
+
+/**
+ * Interval time for throttle.
+ *
+ * @type {number}
+ */
+const THROTTLE = 50;
+
 /**
  * The component for updating options according to a current window width.
  *
@@ -19,6 +29,13 @@ export default ( Splide ) => {
 	 * @type {Object|boolean}
 	 */
 	const breakpoints = Splide.options.breakpoints;
+
+	/**
+	 * The check function whose frequency of call is reduced.
+	 *
+	 * @type {Function}
+	 */
+	const throttledCheck = throttle( check, THROTTLE );
 
 	/**
 	 * Keep initial options.
@@ -62,7 +79,12 @@ export default ( Splide ) => {
 				.sort( ( n, m ) => parseInt( n ) - parseInt( m ) )
 				.map( point => ( { point, mql: matchMedia( `(max-width:${ point }px)` ) } ) );
 
-			bind();
+			/*
+			 * To keep monitoring resize event after destruction without "completely",
+			 * use native addEventListener instead of Splide.on.
+			 */
+			this.destroy( true );
+			addEventListener( 'resize', throttledCheck );
 		},
 
 		/**
@@ -71,21 +93,44 @@ export default ( Splide ) => {
 		 */
 		mounted() {
 			initialOptions = Splide.options;
+			check();
+		},
+
+		/**
+		 * Destroy.
+		 *
+		 * @param {boolean} completely - Whether to destroy Splide completely.
+		 */
+		destroy( completely ) {
+			if ( completely ) {
+				removeEventListener( 'resize', throttledCheck );
+			}
 		},
 	};
 
 	/**
-	 * Listen some events to update options when media query is changed.
+	 * Check the breakpoint.
 	 */
-	function bind() {
-		Splide.on( 'mounted resize', () => {
-			const point = getPoint();
+	function check() {
+		const point = getPoint();
 
-			if ( point !== prevPoint ) {
-				Splide.options = breakpoints[ point ] || initialOptions;
-				prevPoint = point;
+		if ( point !== prevPoint ) {
+			const options = breakpoints[ point ] || initialOptions;
+			const destroy = options.destroy;
+
+			if ( destroy ) {
+				Splide.options = initialOptions;
+				Splide.destroy( destroy === 'completely' );
+			} else {
+				if ( Splide.State.is( DESTROYED ) ) {
+					Splide.mount();
+				} else {
+					Splide.options = options;
+				}
 			}
-		} );
+
+			prevPoint = point;
+		}
 	}
 
 	/**
