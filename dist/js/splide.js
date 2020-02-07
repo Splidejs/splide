@@ -3306,7 +3306,7 @@ var SLIDE_MAX_WIDTH = 5000;
     slideWidth: function slideWidth(index) {
       if (options.autoWidth) {
         var Slide = Elements.getSlide(index);
-        return Slide ? Slide.slide.clientWidth : 0;
+        return Slide ? Slide.slide.offsetWidth : 0;
       }
 
       var width = options.fixedWidth || (this.width + this.gap) / options.perPage - this.gap;
@@ -3687,8 +3687,7 @@ var THROTTLE = 100;
 
 
 
-var abs = Math.abs,
-    log = Math.log;
+var abs = Math.abs;
 /**
  * Adjust how much the track can be pulled on the first or last page.
  * The larger number this is, the farther the track moves.
@@ -5679,7 +5678,6 @@ var LIGHT = {
   Clones: components_clones,
   Layout: layout,
   Drag: drag,
-  Autoplay: components_autoplay,
   Arrows: components_arrows,
   Pagination: pagination,
   A11y: a11y

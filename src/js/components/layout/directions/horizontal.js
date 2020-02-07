@@ -124,7 +124,7 @@ export default ( Splide, Components ) => {
 		slideWidth( index ) {
 			if ( options.autoWidth ) {
 				const Slide = Elements.getSlide( index );
-				return Slide ? Slide.slide.clientWidth : 0;
+				return Slide ? Slide.slide.offsetWidth : 0;
 			}
 
 			const width = options.fixedWidth || ( ( this.width + this.gap ) / options.perPage ) - this.gap;
