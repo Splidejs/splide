@@ -96,7 +96,7 @@ export default ( Splide, Components ) => {
 					this.end( destIndex, newIndex, prevIndex, silently );
 				} );
 			} else {
-				if ( destIndex !== prevIndex && Splide.options.trimSpace === 'rewind' ) {
+				if ( destIndex !== prevIndex && Splide.options.trimSpace === 'move' ) {
 					Components.Controller.go( destIndex + destIndex - prevIndex, silently );
 				} else {
 					this.end( destIndex, newIndex, prevIndex, silently );
