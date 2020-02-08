@@ -12,6 +12,7 @@ describe( 'When the autoWidth option is true, ', () => {
 
 		Object.defineProperty( splide.root.querySelector( '.splide__track' ), 'clientWidth', { value: 800 } );
 		splide.root.querySelectorAll( '.splide__slide' ).forEach( slide => {
+			Object.defineProperty( slide, 'offsetWidth', { value: parseInt( slide.style.width ) } );
 			Object.defineProperty( slide, 'clientWidth', { value: parseInt( slide.style.width ) } );
 		} );
 
@@ -21,7 +22,7 @@ describe( 'When the autoWidth option is true, ', () => {
 	test( 'Splide should move slides according to their width.', done => {
 		splide.on( 'moved', () => {
 			const slide = splide.Components.Elements.slides[0];
-			expect( Math.abs( splide.Components.Track.position ) ).toBe( slide.clientWidth );
+			expect( Math.abs( splide.Components.Track.position ) ).toBe( slide.offsetWidth );
 			done();
 		} );
 
