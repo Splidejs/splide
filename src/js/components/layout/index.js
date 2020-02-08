@@ -80,7 +80,7 @@ export default ( Splide, Components ) => {
 		Splide
 			.on( 'resize load', throttle( () => { Splide.emit( 'resize' ) }, THROTTLE ), window )
 			.on( 'resize', resize )
-			.on( 'updated', init );
+			.on( 'updated refresh', init );
 	}
 
 	/**

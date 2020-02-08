@@ -1630,12 +1630,11 @@ function () {
   }
   /**
    * Destroy all Slide objects and clones and recreate them again.
-   * And then call "updated" event.
    */
   ;
 
   _proto.refresh = function refresh() {
-    this.emit('refresh').emit('updated', this._o);
+    this.emit('refresh').emit('resize');
     return this;
   }
   /**
@@ -3646,7 +3645,7 @@ var THROTTLE = 100;
   function bind() {
     Splide.on('resize load', throttle(function () {
       Splide.emit('resize');
-    }, THROTTLE), window).on('resize', resize).on('updated', init);
+    }, THROTTLE), window).on('resize', resize).on('updated refresh', init);
   }
   /**
    * Resize the list and slides including clones.
@@ -4294,11 +4293,10 @@ var PAUSE_FLAGS = {
      * Called when the component is mounted.
      */
     mount: function mount() {
-      apply(false);
       Splide.on('lazyload:loaded', function (img) {
         cover(img, false);
       });
-      Splide.on('updated', function () {
+      Splide.on('mounted updated refresh', function () {
         return apply(false);
       });
     },
@@ -4500,7 +4498,7 @@ var SIZE = 40;
       return onClick(true);
     }, prev).on('click', function () {
       return onClick(false);
-    }, next).on('mounted move updated', updateDisabled);
+    }, next).on('mounted move updated refresh', updateDisabled);
   }
   /**
    * Called when an arrow is clicked.

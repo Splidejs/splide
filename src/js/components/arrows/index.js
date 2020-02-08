@@ -125,7 +125,7 @@ export default ( Splide, Components, name ) => {
 		Splide
 			.on( 'click', () => onClick( true ), prev )
 			.on( 'click', () => onClick( false ), next )
-			.on( 'mounted move updated', updateDisabled );
+			.on( 'mounted move updated refresh', updateDisabled );
 	}
 
 	/**

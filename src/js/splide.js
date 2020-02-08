@@ -193,10 +193,9 @@ export default class Splide {
 
 	/**
 	 * Destroy all Slide objects and clones and recreate them again.
-	 * And then call "updated" event.
 	 */
 	refresh() {
-		this.emit( 'refresh' ).emit( 'updated', this._o );
+		this.emit( 'refresh' ).emit( 'resize' );
 		return this;
 	}
 
