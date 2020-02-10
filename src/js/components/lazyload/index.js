@@ -65,13 +65,6 @@ export default ( Splide, Components, name ) => {
 	const isSequential = lazyload === 'sequential';
 
 	/**
-	 * Whether to stop sequential load.
-	 *
-	 * @type {boolean|undefined}
-	 */
-	let interrupted;
-
-	/**
 	 * Lazyload component object.
 	 *
 	 * @type {Object}
@@ -110,7 +103,7 @@ export default ( Splide, Components, name ) => {
 		 * Destroy.
 		 */
 		destroy() {
-			interrupted = true;
+			images = [];
 		},
 	};
 
@@ -186,7 +179,7 @@ export default ( Splide, Components, name ) => {
 			Splide.emit( `${ name }:loaded`, img ).emit( 'resize' );
 		}
 
-		if ( isSequential && ! interrupted ) {
+		if ( isSequential ) {
 			loadNext();
 		}
 	}
