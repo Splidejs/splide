@@ -1481,13 +1481,10 @@ function () {
     this.State.set(MOUNTED);
     each(this.Components, function (component) {
       component.mounted && component.mounted();
-    }); // Breakpoints can destroy the Splide.
-    // if ( ! this.State.is( STATES.DESTROYED ) ) {
-
+    });
     this.emit('mounted');
     this.State.set(IDLE);
-    this.emit('ready'); // }
-
+    this.emit('ready');
     applyStyle(this.root, {
       visibility: 'visible'
     });
@@ -4831,7 +4828,11 @@ var SRC_DATA_NAME = 'data-splide-lazy';
      * Called when the component is mounted.
      */
     mount: function mount() {
+      var _this = this;
+
       Splide.on('mounted refresh', function () {
+        _this.destroy();
+
         Components.Elements.each(function (Slide) {
           each(Slide.slide.querySelectorAll("[" + SRC_DATA_NAME + "]"), function (img) {
             if (img && !img.src) {
@@ -4861,6 +4862,7 @@ var SRC_DATA_NAME = 'data-splide-lazy';
      */
     destroy: function destroy() {
       images = [];
+      nextIndex = 0;
     }
   };
   /**

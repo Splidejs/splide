@@ -89,6 +89,8 @@ export default ( Splide, Components, name ) => {
 		 */
 		mount() {
 			Splide.on( 'mounted refresh', () => {
+				this.destroy();
+
 				Components.Elements.each( Slide => {
 					each( Slide.slide.querySelectorAll( `[${ SRC_DATA_NAME }]` ), img => {
 						if ( img && ! img.src ) {
@@ -112,7 +114,8 @@ export default ( Splide, Components, name ) => {
 		 * Destroy.
 		 */
 		destroy() {
-			images = [];
+			images    = [];
+			nextIndex = 0;
 		},
 	};
 
