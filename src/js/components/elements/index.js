@@ -236,7 +236,7 @@ export default ( Splide, Components ) => {
 	 */
 	function collect() {
 		Elements.slider = child( root, classes.slider );
-		Elements.track  = find( root, `.${classes.track}` );
+		Elements.track  = find( root, `.${ classes.track }` );
 		Elements.list   = child( Elements.track, classes.list );
 
 		exist( Elements.track && Elements.list, 'Track or list was not found.' );

@@ -10,13 +10,13 @@ import {
 	create,
 	remove,
 	append,
-	find,
 	addClass,
 	removeClass,
 	setAttribute,
 	getAttribute,
 	applyStyle,
 } from '../../utils/dom';
+import { each } from "../../utils/object";
 
 /**
  * The name for a data attribute.
@@ -36,6 +36,13 @@ const SRC_DATA_NAME = 'data-splide-lazy';
  * @return {Object} - The component object.
  */
 export default ( Splide, Components, name ) => {
+	/**
+	 * Event names for "nearby".
+	 *
+	 * @type {string}
+	 */
+	const NEARBY_CHECK_EVENTS = `mounted moved.${ name }`;
+
 	/**
 	 * Next index for sequential loading.
 	 *
@@ -81,21 +88,23 @@ export default ( Splide, Components, name ) => {
 		 * Called when the component is mounted.
 		 */
 		mount() {
-			Components.Elements.each( Slide => {
-				const img = find( Slide.slide, `[${ SRC_DATA_NAME }]` );
+			Splide.on( 'mounted refresh', () => {
+				Components.Elements.each( Slide => {
+					each( Slide.slide.querySelectorAll( `[${ SRC_DATA_NAME }]` ), img => {
+						if ( img && ! img.src ) {
+							images.push( { img, Slide } );
+							applyStyle( img, { display: 'none' } );
+						}
+					} );
+				} );
 
-				if ( img ) {
-					images.push( { img, Slide } );
-					applyStyle( img, { display: 'none' } );
+				if ( isSequential ) {
+					loadNext();
 				}
 			} );
 
-			if ( images.length ) {
-				if ( isSequential ) {
-					loadNext();
-				} else {
-					Splide.on( `mounted moved.${ name }`, index => { check( index || Splide.index ) } );
-				}
+			if ( ! isSequential ) {
+				Splide.on( NEARBY_CHECK_EVENTS, check );
 			}
 		},
 
@@ -116,6 +125,8 @@ export default ( Splide, Components, name ) => {
 	function check( index ) {
 		const options = Splide.options;
 
+		index = index === undefined ? Splide.index : index;
+
 		images = images.filter( image => {
 			if ( image.Slide.isWithin( index, options.perPage * ( options.preloadPages + 1 ) ) ) {
 				load( image.img, image.Slide );
@@ -126,7 +137,7 @@ export default ( Splide, Components, name ) => {
 
 		// Unbind if all images are loaded.
 		if ( ! images.length ) {
-			Splide.off( `moved.${ name }` );
+			Splide.off( NEARBY_CHECK_EVENTS );
 		}
 	}
 

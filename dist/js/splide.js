@@ -1482,12 +1482,11 @@ function () {
     each(this.Components, function (component) {
       component.mounted && component.mounted();
     }); // Breakpoints can destroy the Splide.
+    // if ( ! this.State.is( STATES.DESTROYED ) ) {
 
-    if (!this.State.is(DESTROYED)) {
-      this.emit('mounted');
-      this.State.set(IDLE);
-      this.emit('ready');
-    }
+    this.emit('mounted');
+    this.State.set(IDLE);
+    this.emit('ready'); // }
 
     applyStyle(this.root, {
       visibility: 'visible'
@@ -1646,8 +1645,18 @@ function () {
   ;
 
   _proto.destroy = function destroy(completely) {
+    var _this3 = this;
+
     if (completely === void 0) {
       completely = true;
+    }
+
+    // Postpone destroy because it should be done after mount.
+    if (this.State.is(CREATED)) {
+      this.on('ready', function () {
+        return _this3.destroy(completely);
+      });
+      return;
     }
 
     values(this.Components).reverse().forEach(function (component) {
@@ -1762,7 +1771,6 @@ function () {
 
 
 
-
 /**
  * The component for initializing options.
  *
@@ -1796,24 +1804,6 @@ function () {
       if (Splide.State.is(CREATED)) {
         Splide.index = Splide.options.start;
       }
-    },
-
-    /**
-     * Fix some options that must be never changed by breakpoints.
-     *
-     * @param {Object} fixedOptions - Options to be fixed.
-     */
-    fix: function fix(fixedOptions) {
-      var options = merge(Splide.options, fixedOptions);
-      var breakpoints = options.breakpoints;
-
-      if (breakpoints) {
-        each(breakpoints, function (value, key) {
-          options.breakpoints[key] = merge(breakpoints[key], fixedOptions);
-        });
-      }
-
-      Splide.options = options;
     }
   };
 });
@@ -4580,12 +4570,12 @@ var SIZE = 40;
 
 var ATTRIBUTES_UPDATE_EVENT = 'move.page';
 /**
- * The event name for "update".
+ * The event name for recreating pagination.
  *
  * @type {string}
  */
 
-var UPDATE_EVENT = 'updated.page';
+var UPDATE_EVENT = 'updated.page refresh.page';
 /**
  * The component for handling pagination
  *
@@ -4770,6 +4760,7 @@ var UPDATE_EVENT = 'updated.page';
  */
 
 
+
 /**
  * The name for a data attribute.
  *
@@ -4789,10 +4780,17 @@ var SRC_DATA_NAME = 'data-splide-lazy';
 
 /* harmony default export */ var components_lazyload = (function (Splide, Components, name) {
   /**
+   * Event names for "nearby".
+   *
+   * @type {string}
+   */
+  var NEARBY_CHECK_EVENTS = "mounted moved." + name;
+  /**
    * Next index for sequential loading.
    *
    * @type {number}
    */
+
   var nextIndex = 0;
   /**
    * Store objects containing an img element and a Slide object.
@@ -4833,28 +4831,28 @@ var SRC_DATA_NAME = 'data-splide-lazy';
      * Called when the component is mounted.
      */
     mount: function mount() {
-      Components.Elements.each(function (Slide) {
-        var img = find(Slide.slide, "[" + SRC_DATA_NAME + "]");
+      Splide.on('mounted refresh', function () {
+        Components.Elements.each(function (Slide) {
+          each(Slide.slide.querySelectorAll("[" + SRC_DATA_NAME + "]"), function (img) {
+            if (img && !img.src) {
+              images.push({
+                img: img,
+                Slide: Slide
+              });
+              applyStyle(img, {
+                display: 'none'
+              });
+            }
+          });
+        });
 
-        if (img) {
-          images.push({
-            img: img,
-            Slide: Slide
-          });
-          applyStyle(img, {
-            display: 'none'
-          });
+        if (isSequential) {
+          loadNext();
         }
       });
 
-      if (images.length) {
-        if (isSequential) {
-          loadNext();
-        } else {
-          Splide.on("mounted moved." + name, function (index) {
-            check(index || Splide.index);
-          });
-        }
+      if (!isSequential) {
+        Splide.on(NEARBY_CHECK_EVENTS, check);
       }
     },
 
@@ -4874,6 +4872,7 @@ var SRC_DATA_NAME = 'data-splide-lazy';
 
   function check(index) {
     var options = Splide.options;
+    index = index === undefined ? Splide.index : index;
     images = images.filter(function (image) {
       if (image.Slide.isWithin(index, options.perPage * (options.preloadPages + 1))) {
         load(image.img, image.Slide);
@@ -4884,7 +4883,7 @@ var SRC_DATA_NAME = 'data-splide-lazy';
     }); // Unbind if all images are loaded.
 
     if (!images.length) {
-      Splide.off("moved." + name);
+      Splide.off(NEARBY_CHECK_EVENTS);
     }
   }
   /**
@@ -5560,14 +5559,8 @@ var breakpoints_THROTTLE = 50;
        */
 
       this.destroy(true);
-      addEventListener('resize', throttledCheck);
-    },
+      addEventListener('resize', throttledCheck); // Keep initial options to apply them when no breakpoint matches.
 
-    /**
-     * Called after all components are mounted.
-     * Keep initial options to apply them when no breakpoint matches.
-     */
-    mounted: function mounted() {
       initialOptions = Splide.options;
       check();
     },
@@ -5581,6 +5574,8 @@ var breakpoints_THROTTLE = 50;
       if (completely) {
         removeEventListener('resize', throttledCheck);
       }
+
+      prevPoint = -1;
     }
   };
   /**
@@ -5591,6 +5586,8 @@ var breakpoints_THROTTLE = 50;
     var point = getPoint();
 
     if (point !== prevPoint) {
+      prevPoint = point;
+      var State = Splide.State;
       var options = breakpoints[point] || initialOptions;
       var destroy = options.destroy;
 
@@ -5598,14 +5595,13 @@ var breakpoints_THROTTLE = 50;
         Splide.options = initialOptions;
         Splide.destroy(destroy === 'completely');
       } else {
-        if (Splide.State.is(DESTROYED)) {
+        if (State.is(DESTROYED)) {
+          State.set(CREATED);
           Splide.mount();
         } else {
           Splide.options = options;
         }
       }
-
-      prevPoint = point;
     }
   }
   /**
@@ -5651,6 +5647,7 @@ var breakpoints_THROTTLE = 50;
 
 var COMPLETE = {
   Options: components_options,
+  Breakpoints: components_breakpoints,
   Elements: components_elements,
   Controller: controller,
   Track: components_track,
@@ -5665,8 +5662,7 @@ var COMPLETE = {
   LazyLoad: components_lazyload,
   Keyboard: keyboard,
   Sync: sync,
-  A11y: a11y,
-  Breakpoints: components_breakpoints
+  A11y: a11y
 };
 var LIGHT = {
   Options: components_options,

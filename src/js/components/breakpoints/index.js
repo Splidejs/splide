@@ -6,7 +6,7 @@
  */
 
 import { throttle } from "../../utils/time";
-import { DESTROYED } from "../../constants/states";
+import { CREATED, DESTROYED } from "../../constants/states";
 
 /**
  * Interval time for throttle.
@@ -85,14 +85,10 @@ export default ( Splide ) => {
 			 */
 			this.destroy( true );
 			addEventListener( 'resize', throttledCheck );
-		},
 
-		/**
-		 * Called after all components are mounted.
-		 * Keep initial options to apply them when no breakpoint matches.
-		 */
-		mounted() {
+			// Keep initial options to apply them when no breakpoint matches.
 			initialOptions = Splide.options;
+
 			check();
 		},
 
@@ -105,6 +101,8 @@ export default ( Splide ) => {
 			if ( completely ) {
 				removeEventListener( 'resize', throttledCheck );
 			}
+
+			prevPoint = -1;
 		},
 	};
 
@@ -115,6 +113,9 @@ export default ( Splide ) => {
 		const point = getPoint();
 
 		if ( point !== prevPoint ) {
+			prevPoint = point;
+
+			const State   = Splide.State;
 			const options = breakpoints[ point ] || initialOptions;
 			const destroy = options.destroy;
 
@@ -122,14 +123,13 @@ export default ( Splide ) => {
 				Splide.options = initialOptions;
 				Splide.destroy( destroy === 'completely' );
 			} else {
-				if ( Splide.State.is( DESTROYED ) ) {
+				if ( State.is( DESTROYED ) ) {
+					State.set( CREATED );
 					Splide.mount();
 				} else {
 					Splide.options = options;
 				}
 			}
-
-			prevPoint = point;
 		}
 	}
 

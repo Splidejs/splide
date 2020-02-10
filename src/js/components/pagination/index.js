@@ -16,11 +16,11 @@ import { STATUS_CLASSES } from '../../constants/classes';
 const ATTRIBUTES_UPDATE_EVENT = 'move.page';
 
 /**
- * The event name for "update".
+ * The event name for recreating pagination.
  *
  * @type {string}
  */
-const UPDATE_EVENT = 'updated.page';
+const UPDATE_EVENT = 'updated.page refresh.page';
 
 
 /**

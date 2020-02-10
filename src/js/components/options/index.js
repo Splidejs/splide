@@ -5,7 +5,6 @@
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
-import { each, merge } from '../../utils/object';
 import { error } from '../../utils/error';
 import { getAttribute } from "../../utils/dom";
 import { CREATED } from "../../constants/states";
@@ -43,24 +42,6 @@ export default ( Splide ) => {
 			if ( Splide.State.is( CREATED ) ) {
 				Splide.index = Splide.options.start;
 			}
-		},
-
-		/**
-		 * Fix some options that must be never changed by breakpoints.
-		 *
-		 * @param {Object} fixedOptions - Options to be fixed.
-		 */
-		fix( fixedOptions ) {
-			const options     = merge( Splide.options, fixedOptions );
-			const breakpoints = options.breakpoints;
-
-			if ( breakpoints ) {
-				each( breakpoints, ( value, key ) => {
-					options.breakpoints[ key ] = merge( breakpoints[ key ], fixedOptions );
-				} );
-			}
-
-			Splide.options = options;
 		},
 	};
 }

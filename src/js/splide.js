@@ -80,12 +80,9 @@ export default class Splide {
 			component.mounted && component.mounted();
 		} );
 
-		// Breakpoints can destroy the Splide.
-		if ( ! this.State.is( STATES.DESTROYED ) ) {
-			this.emit( 'mounted' );
-			this.State.set( STATES.IDLE );
-			this.emit( 'ready' );
-		}
+		this.emit( 'mounted' );
+		this.State.set( STATES.IDLE );
+		this.emit( 'ready' );
 
 		applyStyle( this.root, { visibility: 'visible' } );
 
@@ -206,6 +203,12 @@ export default class Splide {
 	 * @param {boolean} completely - Destroy completely.
 	 */
 	destroy( completely = true ) {
+		// Postpone destroy because it should be done after mount.
+		if ( this.State.is( STATES.CREATED ) ) {
+			this.on( 'ready', () => this.destroy( completely ) );
+			return;
+		}
+
 		values( this.Components ).reverse().forEach( component => {
 			component.destroy && component.destroy( completely );
 		} );

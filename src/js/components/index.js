@@ -25,6 +25,7 @@ import Breakpoints from './breakpoints';
 
 export const COMPLETE = {
 	Options,
+	Breakpoints,
 	Elements,
 	Controller,
 	Track,
@@ -40,7 +41,6 @@ export const COMPLETE = {
 	Keyboard,
 	Sync,
 	A11y,
-	Breakpoints,
 };
 
 export const LIGHT = {
