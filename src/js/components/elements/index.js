@@ -83,33 +83,12 @@ export default ( Splide, Components ) => {
 		 * Collect main elements and store them as member properties.
 		 */
 		mount() {
-			this.slider = child( root, classes.slider );
-			this.track  = find( root, `.${classes.track}` );
-			this.list   = child( this.track, classes.list );
-
-			exist( this.track && this.list, 'Track or list was not found.' );
-
-			this.slides = values( this.list.children );
-
-			const arrows = findParts( classes.arrows );
-			this.arrows = {
-				prev: find( arrows, `.${ classes.prev }` ),
-				next: find( arrows, `.${ classes.next }` ),
-			};
-
-			const autoplay = findParts( classes.autoplay );
-			this.bar   = find( findParts( classes.progress ), `.${ classes.bar }` );
-			this.play  = find( autoplay, `.${ classes.play }` );
-			this.pause = find( autoplay, `.${ classes.pause }` );
-
-			this.track.id = this.track.id || `${ root.id }-track`;
-			this.list.id  = this.list.id || `${ root.id }-list`;
-
-			init();
+			collect();
+			this.init();
 
 			Splide.on( 'refresh', () => {
 				this.destroy();
-				init();
+				this.init();
 			} );
 		},
 
@@ -120,6 +99,17 @@ export default ( Splide, Components ) => {
 			Slides.forEach( Slide => { Slide.destroy() } );
 			Slides = [];
 			removeClass( root, getClasses() );
+		},
+
+		/**
+		 * Initialization.
+		 */
+		init() {
+			addClass( root, getClasses() );
+
+			Elements.slides.forEach( ( slide, index ) => {
+				Elements.register( slide, index, -1 );
+			} );
 		},
 
 		/**
@@ -242,14 +232,30 @@ export default ( Splide, Components ) => {
 	};
 
 	/**
-	 * Initialization.
+	 * Collect elements.
 	 */
-	function init() {
-		addClass( root, getClasses() );
+	function collect() {
+		Elements.slider = child( root, classes.slider );
+		Elements.track  = find( root, `.${classes.track}` );
+		Elements.list   = child( Elements.track, classes.list );
 
-		Elements.slides.forEach( ( slide, index ) => {
-			Elements.register( slide, index, -1 );
-		} );
+		exist( Elements.track && Elements.list, 'Track or list was not found.' );
+
+		Elements.slides = values( Elements.list.children );
+
+		const arrows = findParts( classes.arrows );
+		Elements.arrows = {
+			prev: find( arrows, `.${ classes.prev }` ),
+			next: find( arrows, `.${ classes.next }` ),
+		};
+
+		const autoplay = findParts( classes.autoplay );
+		Elements.bar   = find( findParts( classes.progress ), `.${ classes.bar }` );
+		Elements.play  = find( autoplay, `.${ classes.play }` );
+		Elements.pause = find( autoplay, `.${ classes.pause }` );
+
+		Elements.track.id = Elements.track.id || `${ root.id }-track`;
+		Elements.list.id  = Elements.list.id || `${ root.id }-list`;
 	}
 
 	/**

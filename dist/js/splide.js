@@ -2117,27 +2117,12 @@ var UID_NAME = 'uid';
     mount: function mount() {
       var _this = this;
 
-      this.slider = child(root, classes.slider);
-      this.track = find(root, "." + classes.track);
-      this.list = child(this.track, classes.list);
-      exist(this.track && this.list, 'Track or list was not found.');
-      this.slides = values(this.list.children);
-      var arrows = findParts(classes.arrows);
-      this.arrows = {
-        prev: find(arrows, "." + classes.prev),
-        next: find(arrows, "." + classes.next)
-      };
-      var autoplay = findParts(classes.autoplay);
-      this.bar = find(findParts(classes.progress), "." + classes.bar);
-      this.play = find(autoplay, "." + classes.play);
-      this.pause = find(autoplay, "." + classes.pause);
-      this.track.id = this.track.id || root.id + "-track";
-      this.list.id = this.list.id || root.id + "-list";
-      init();
+      collect();
+      this.init();
       Splide.on('refresh', function () {
         _this.destroy();
 
-        init();
+        _this.init();
       });
     },
 
@@ -2150,6 +2135,16 @@ var UID_NAME = 'uid';
       });
       Slides = [];
       removeClass(root, getClasses());
+    },
+
+    /**
+     * Initialization.
+     */
+    init: function init() {
+      addClass(root, getClasses());
+      Elements.slides.forEach(function (slide, index) {
+        Elements.register(slide, index, -1);
+      });
     },
 
     /**
@@ -2282,14 +2277,26 @@ var UID_NAME = 'uid';
 
   };
   /**
-   * Initialization.
+   * Collect elements.
    */
 
-  function init() {
-    addClass(root, getClasses());
-    Elements.slides.forEach(function (slide, index) {
-      Elements.register(slide, index, -1);
-    });
+  function collect() {
+    Elements.slider = child(root, classes.slider);
+    Elements.track = find(root, "." + classes.track);
+    Elements.list = child(Elements.track, classes.list);
+    exist(Elements.track && Elements.list, 'Track or list was not found.');
+    Elements.slides = values(Elements.list.children);
+    var arrows = findParts(classes.arrows);
+    Elements.arrows = {
+      prev: find(arrows, "." + classes.prev),
+      next: find(arrows, "." + classes.next)
+    };
+    var autoplay = findParts(classes.autoplay);
+    Elements.bar = find(findParts(classes.progress), "." + classes.bar);
+    Elements.play = find(autoplay, "." + classes.play);
+    Elements.pause = find(autoplay, "." + classes.pause);
+    Elements.track.id = Elements.track.id || root.id + "-track";
+    Elements.list.id = Elements.list.id || root.id + "-list";
   }
   /**
    * Return class names for the root element.
@@ -4809,13 +4816,6 @@ var SRC_DATA_NAME = 'data-splide-lazy';
 
   var isSequential = lazyload === 'sequential';
   /**
-   * Whether to stop sequential load.
-   *
-   * @type {boolean|undefined}
-   */
-
-  var interrupted;
-  /**
    * Lazyload component object.
    *
    * @type {Object}
@@ -4862,7 +4862,7 @@ var SRC_DATA_NAME = 'data-splide-lazy';
      * Destroy.
      */
     destroy: function destroy() {
-      interrupted = true;
+      images = [];
     }
   };
   /**
@@ -4948,7 +4948,7 @@ var SRC_DATA_NAME = 'data-splide-lazy';
       Splide.emit(name + ":loaded", img).emit('resize');
     }
 
-    if (isSequential && !interrupted) {
+    if (isSequential) {
       loadNext();
     }
   }
