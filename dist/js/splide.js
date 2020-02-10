@@ -4775,41 +4775,41 @@ var SRC_DATA_NAME = 'data-splide-lazy';
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ var components_lazyload = (function (Splide, Components, name) {
+/* harmony default export */ var lazyload = (function (Splide, Components, name) {
   /**
    * Event names for "nearby".
    *
    * @type {string}
    */
-  var NEARBY_CHECK_EVENTS = "mounted moved." + name;
+  var NEARBY_CHECK_EVENTS = "mounted refresh moved." + name;
   /**
    * Next index for sequential loading.
    *
    * @type {number}
    */
 
-  var nextIndex = 0;
+  var nextIndex;
   /**
    * Store objects containing an img element and a Slide object.
    *
    * @type {Object[]}
    */
 
-  var images = [];
+  var images;
   /**
-   * Store a lazyload option value.
+   * Store the options.
    *
-   * @type {string|boolean}
+   * @type {Object}
    */
 
-  var lazyload = Splide.options.lazyLoad;
+  var options = Splide.options;
   /**
    * Whether to load images sequentially or not.
    *
    * @type {boolean}
    */
 
-  var isSequential = lazyload === 'sequential';
+  var isSequential = options.lazyLoad === 'sequential';
   /**
    * Lazyload component object.
    *
@@ -4822,26 +4822,20 @@ var SRC_DATA_NAME = 'data-splide-lazy';
      *
      * @type {boolean}
      */
-    required: lazyload,
+    required: options.lazyLoad,
 
     /**
      * Called when the component is mounted.
      */
     mount: function mount() {
-      var _this = this;
-
       Splide.on('mounted refresh', function () {
-        _this.destroy();
-
+        init();
         Components.Elements.each(function (Slide) {
           each(Slide.slide.querySelectorAll("[" + SRC_DATA_NAME + "]"), function (img) {
             if (img && !img.src) {
               images.push({
                 img: img,
                 Slide: Slide
-              });
-              applyStyle(img, {
-                display: 'none'
               });
             }
           });
@@ -4860,11 +4854,16 @@ var SRC_DATA_NAME = 'data-splide-lazy';
     /**
      * Destroy.
      */
-    destroy: function destroy() {
-      images = [];
-      nextIndex = 0;
-    }
+    destroy: init
   };
+  /**
+   * Initialize parameters.
+   */
+
+  function init() {
+    images = [];
+    nextIndex = 0;
+  }
   /**
    * Check how close each image is from the active slide and
    * determine whether to start loading or not, according to the distance.
@@ -4872,8 +4871,8 @@ var SRC_DATA_NAME = 'data-splide-lazy';
    * @param {number} index - Current index.
    */
 
+
   function check(index) {
-    var options = Splide.options;
     index = index === undefined ? Splide.index : index;
     images = images.filter(function (image) {
       if (image.Slide.isWithin(index, options.perPage * (options.preloadPages + 1))) {
@@ -4913,6 +4912,9 @@ var SRC_DATA_NAME = 'data-splide-lazy';
       loaded(img, spinner, Slide, true);
     };
 
+    applyStyle(img, {
+      display: 'none'
+    });
     setAttribute(img, 'src', getAttribute(img, SRC_DATA_NAME));
   }
   /**
@@ -5661,7 +5663,7 @@ var COMPLETE = {
   Cover: components_cover,
   Arrows: components_arrows,
   Pagination: pagination,
-  LazyLoad: components_lazyload,
+  LazyLoad: lazyload,
   Keyboard: keyboard,
   Sync: sync,
   A11y: a11y

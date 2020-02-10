@@ -41,35 +41,35 @@ export default ( Splide, Components, name ) => {
 	 *
 	 * @type {string}
 	 */
-	const NEARBY_CHECK_EVENTS = `mounted moved.${ name }`;
+	const NEARBY_CHECK_EVENTS = `mounted refresh moved.${ name }`;
 
 	/**
 	 * Next index for sequential loading.
 	 *
 	 * @type {number}
 	 */
-	let nextIndex = 0;
+	let nextIndex;
 
 	/**
 	 * Store objects containing an img element and a Slide object.
 	 *
 	 * @type {Object[]}
 	 */
-	let images = [];
+	let images;
 
 	/**
-	 * Store a lazyload option value.
+	 * Store the options.
 	 *
-	 * @type {string|boolean}
+	 * @type {Object}
 	 */
-	const lazyload = Splide.options.lazyLoad;
+	const options = Splide.options;
 
 	/**
 	 * Whether to load images sequentially or not.
 	 *
 	 * @type {boolean}
 	 */
-	const isSequential = lazyload === 'sequential';
+	const isSequential = options.lazyLoad === 'sequential';
 
 	/**
 	 * Lazyload component object.
@@ -82,20 +82,19 @@ export default ( Splide, Components, name ) => {
 		 *
 		 * @type {boolean}
 		 */
-		required: lazyload,
+		required: options.lazyLoad,
 
 		/**
 		 * Called when the component is mounted.
 		 */
 		mount() {
 			Splide.on( 'mounted refresh', () => {
-				this.destroy();
+				init();
 
 				Components.Elements.each( Slide => {
 					each( Slide.slide.querySelectorAll( `[${ SRC_DATA_NAME }]` ), img => {
 						if ( img && ! img.src ) {
 							images.push( { img, Slide } );
-							applyStyle( img, { display: 'none' } );
 						}
 					} );
 				} );
@@ -113,11 +112,16 @@ export default ( Splide, Components, name ) => {
 		/**
 		 * Destroy.
 		 */
-		destroy() {
-			images    = [];
-			nextIndex = 0;
-		},
+		destroy: init,
 	};
+
+	/**
+	 * Initialize parameters.
+	 */
+	function init() {
+		images    = [];
+		nextIndex = 0;
+	}
 
 	/**
 	 * Check how close each image is from the active slide and
@@ -126,8 +130,6 @@ export default ( Splide, Components, name ) => {
 	 * @param {number} index - Current index.
 	 */
 	function check( index ) {
-		const options = Splide.options;
-
 		index = index === undefined ? Splide.index : index;
 
 		images = images.filter( image => {
@@ -161,6 +163,7 @@ export default ( Splide, Components, name ) => {
 		img.onload  = () => { loaded( img, spinner, Slide, false ) };
 		img.onerror = () => { loaded( img, spinner, Slide, true ) };
 
+		applyStyle( img, { display: 'none' } );
 		setAttribute( img, 'src', getAttribute( img, SRC_DATA_NAME ) );
 	}
 
