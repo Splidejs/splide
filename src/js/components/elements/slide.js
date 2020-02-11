@@ -6,7 +6,7 @@
  */
 
 import { find, addClass, removeClass, hasClass, getAttribute, setAttribute } from '../../utils/dom';
-import { SLIDE } from '../../constants/types';
+import { FADE, SLIDE } from '../../constants/types';
 import { STATUS_CLASSES } from '../../constants/classes';
 import { values } from "../../utils/object";
 import { pad } from "../../utils/utils";
@@ -133,6 +133,12 @@ export default ( Splide, index, realIndex, slide ) => {
 		 * @return {boolean} - True if the slide is visible or false if not.
 		 */
 		isVisible() {
+			const active = this.isActive();
+
+			if ( Splide.is( FADE ) || active ) {
+				return active;
+			}
+
 			const { floor }  = Math;
 			const Components = Splide.Components;
 			const Track      = Components.Track;
@@ -141,7 +147,7 @@ export default ( Splide, index, realIndex, slide ) => {
 			const edge       = floor( position + slide[ prop ] );
 			const size       = Components.Elements.track[ prop ];
 
-			return ( 0 <= position && position <= size && 0 <= edge && edge <= size ) || this.isActive();
+			return ( 0 <= position && position <= size && 0 <= edge && edge <= size );
 		},
 
 		/**

@@ -1968,6 +1968,12 @@ var STYLE_RESTORE_EVENTS = 'update.slide';
      * @return {boolean} - True if the slide is visible or false if not.
      */
     isVisible: function isVisible() {
+      var active = this.isActive();
+
+      if (Splide.is(FADE) || active) {
+        return active;
+      }
+
       var floor = Math.floor;
       var Components = Splide.Components;
       var Track = Components.Track;
@@ -1975,7 +1981,7 @@ var STYLE_RESTORE_EVENTS = 'update.slide';
       var position = floor((Track.toPosition(index) + Track.offset(index) - Track.position) * Track.sign);
       var edge = floor(position + slide[prop]);
       var size = Components.Elements.track[prop];
-      return 0 <= position && position <= size && 0 <= edge && edge <= size || this.isActive();
+      return 0 <= position && position <= size && 0 <= edge && edge <= size;
     },
 
     /**
@@ -4832,7 +4838,7 @@ var SRC_DATA_NAME = 'data-splide-lazy';
         init();
         Components.Elements.each(function (Slide) {
           each(Slide.slide.querySelectorAll("[" + SRC_DATA_NAME + "]"), function (img) {
-            if (img && !img.src) {
+            if (!img.src) {
               images.push({
                 img: img,
                 Slide: Slide
@@ -4873,7 +4879,7 @@ var SRC_DATA_NAME = 'data-splide-lazy';
 
 
   function check(index) {
-    index = index === undefined ? Splide.index : index;
+    index = isNaN(index) ? Splide.index : index;
     images = images.filter(function (image) {
       if (image.Slide.isWithin(index, options.perPage * (options.preloadPages + 1))) {
         load(image.img, image.Slide);
@@ -4883,7 +4889,7 @@ var SRC_DATA_NAME = 'data-splide-lazy';
       return true;
     }); // Unbind if all images are loaded.
 
-    if (!images.length) {
+    if (!images[0]) {
       Splide.off(NEARBY_CHECK_EVENTS);
     }
   }

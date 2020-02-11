@@ -93,7 +93,7 @@ export default ( Splide, Components, name ) => {
 
 				Components.Elements.each( Slide => {
 					each( Slide.slide.querySelectorAll( `[${ SRC_DATA_NAME }]` ), img => {
-						if ( img && ! img.src ) {
+						if ( ! img.src ) {
 							images.push( { img, Slide } );
 						}
 					} );
@@ -130,7 +130,7 @@ export default ( Splide, Components, name ) => {
 	 * @param {number} index - Current index.
 	 */
 	function check( index ) {
-		index = index === undefined ? Splide.index : index;
+		index = isNaN( index ) ? Splide.index : index;
 
 		images = images.filter( image => {
 			if ( image.Slide.isWithin( index, options.perPage * ( options.preloadPages + 1 ) ) ) {
@@ -141,7 +141,7 @@ export default ( Splide, Components, name ) => {
 		} );
 
 		// Unbind if all images are loaded.
-		if ( ! images.length ) {
+		if ( ! images[0] ) {
 			Splide.off( NEARBY_CHECK_EVENTS );
 		}
 	}
