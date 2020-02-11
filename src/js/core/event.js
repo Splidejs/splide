@@ -45,15 +45,14 @@ export default () => {
 		 */
 		off( events, elm = null ) {
 			events.split( ' ' ).forEach( event => {
-				for ( let i in data ) {
-					const item = data[ i ];
-
+				data = data.filter( item => {
 					if ( item && item.event === event && item.elm === elm ) {
 						unsubscribe( item );
-						delete data[ i ];
-						break;
+						return false;
 					}
-				}
+
+					return true;
+				} );
 			} );
 		},
 

@@ -37,13 +37,6 @@ const SRC_DATA_NAME = 'data-splide-lazy';
  */
 export default ( Splide, Components, name ) => {
 	/**
-	 * Event names for "nearby".
-	 *
-	 * @type {string}
-	 */
-	const NEARBY_CHECK_EVENTS = `mounted refresh moved.${ name }`;
-
-	/**
 	 * Next index for sequential loading.
 	 *
 	 * @type {number}
@@ -105,7 +98,7 @@ export default ( Splide, Components, name ) => {
 			} );
 
 			if ( ! isSequential ) {
-				Splide.on( NEARBY_CHECK_EVENTS, check );
+				Splide.on( `mounted refresh moved.${ name }`, check );
 			}
 		},
 
@@ -142,7 +135,7 @@ export default ( Splide, Components, name ) => {
 
 		// Unbind if all images are loaded.
 		if ( ! images[0] ) {
-			Splide.off( NEARBY_CHECK_EVENTS );
+			Splide.off( `moved.${ name }` );
 		}
 	}
 

@@ -177,15 +177,14 @@ __webpack_require__.d(states_namespaceObject, "DESTROYED", function() { return D
       }
 
       events.split(' ').forEach(function (event) {
-        for (var i in data) {
-          var item = data[i];
-
+        data = data.filter(function (item) {
           if (item && item.event === event && item.elm === elm) {
             unsubscribe(item);
-            delete data[i];
-            break;
+            return false;
           }
-        }
+
+          return true;
+        });
       });
     },
 
@@ -4786,17 +4785,10 @@ var SRC_DATA_NAME = 'data-splide-lazy';
 
 /* harmony default export */ var lazyload = (function (Splide, Components, name) {
   /**
-   * Event names for "nearby".
-   *
-   * @type {string}
-   */
-  var NEARBY_CHECK_EVENTS = "mounted refresh moved." + name;
-  /**
    * Next index for sequential loading.
    *
    * @type {number}
    */
-
   var nextIndex;
   /**
    * Store objects containing an img element and a Slide object.
@@ -4856,7 +4848,7 @@ var SRC_DATA_NAME = 'data-splide-lazy';
       });
 
       if (!isSequential) {
-        Splide.on(NEARBY_CHECK_EVENTS, check);
+        Splide.on("mounted refresh moved." + name, check);
       }
     },
 
@@ -4893,7 +4885,7 @@ var SRC_DATA_NAME = 'data-splide-lazy';
     }); // Unbind if all images are loaded.
 
     if (!images[0]) {
-      Splide.off(NEARBY_CHECK_EVENTS);
+      Splide.off("moved." + name);
     }
   }
   /**
