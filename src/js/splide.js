@@ -42,10 +42,6 @@ export default class Splide {
 		this._o = merge( DEFAULTS, options );
 		this._i = 0;
 		this._c = Components;
-
-		this
-			.on( 'move drag', () => this.State.set( STATES.MOVING ) )
-			.on( 'moved dragged', () => this.State.set( STATES.IDLE ) );
 	}
 
 	/**
@@ -85,6 +81,10 @@ export default class Splide {
 		this.emit( 'ready' );
 
 		applyStyle( this.root, { visibility: 'visible' } );
+
+		this
+			.on( 'move drag', () => this.State.set( STATES.MOVING ) )
+			.on( 'moved dragged', () => this.State.set( STATES.IDLE ) );
 
 		return this;
 	}

@@ -90,6 +90,11 @@ export default ( Splide, Components ) => {
 				this.destroy();
 				this.init();
 			} );
+
+			Splide.on( 'updated', () => {
+				removeClass( root, getClasses() );
+				setTimeout( () => { addClass( root, getClasses() ) } );
+			} );
 		},
 
 		/**

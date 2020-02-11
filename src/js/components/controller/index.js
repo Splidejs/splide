@@ -274,10 +274,9 @@ export default ( Splide, Components ) => {
 	function bind() {
 		Splide
 			.on( 'move', newIndex => { Splide.index = newIndex } )
-			.on( 'updated', newOptions => {
-				options = newOptions;
-				const index = between( Splide.index, 0, Controller.edgeIndex );
-				Splide.index = Controller.rewind( Controller.trim( index ) );
+			.on( 'updated refresh', newOptions => {
+				options = newOptions || options;
+				Splide.index = between( Splide.index, 0, Controller.edgeIndex );
 			} );
 	}
 

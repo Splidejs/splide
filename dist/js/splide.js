@@ -1413,8 +1413,6 @@ function () {
    * @param {Object}          Components  - Optional. Components.
    */
   function Splide(root, options, Components) {
-    var _this = this;
-
     if (options === void 0) {
       options = {};
     }
@@ -1432,11 +1430,6 @@ function () {
     this._o = merge(DEFAULTS, options);
     this._i = 0;
     this._c = Components;
-    this.on('move drag', function () {
-      return _this.State.set(MOVING);
-    }).on('moved dragged', function () {
-      return _this.State.set(IDLE);
-    });
   }
   /**
    * Compose and mount components.
@@ -1451,7 +1444,7 @@ function () {
   var _proto = Splide.prototype;
 
   _proto.mount = function mount(Extensions, Transition) {
-    var _this2 = this;
+    var _this = this;
 
     if (Extensions === void 0) {
       Extensions = {};
@@ -1470,7 +1463,7 @@ function () {
         if (required === undefined || required) {
           component.mount && component.mount();
         } else {
-          delete _this2.Components[key];
+          delete _this.Components[key];
         }
       });
     } catch (e) {
@@ -1487,6 +1480,11 @@ function () {
     this.emit('ready');
     applyStyle(this.root, {
       visibility: 'visible'
+    });
+    this.on('move drag', function () {
+      return _this.State.set(MOVING);
+    }).on('moved dragged', function () {
+      return _this.State.set(IDLE);
     });
     return this;
   }
@@ -1642,7 +1640,7 @@ function () {
   ;
 
   _proto.destroy = function destroy(completely) {
-    var _this3 = this;
+    var _this2 = this;
 
     if (completely === void 0) {
       completely = true;
@@ -1651,7 +1649,7 @@ function () {
     // Postpone destroy because it should be done after mount.
     if (this.State.is(CREATED)) {
       this.on('ready', function () {
-        return _this3.destroy(completely);
+        return _this2.destroy(completely);
       });
       return;
     }
@@ -2116,6 +2114,12 @@ var UID_NAME = 'uid';
         _this.destroy();
 
         _this.init();
+      });
+      Splide.on('updated', function () {
+        removeClass(root, getClasses());
+        setTimeout(function () {
+          addClass(root, getClasses());
+        });
       });
     },
 
@@ -2585,10 +2589,9 @@ var controller_floor = Math.floor;
   function bind() {
     Splide.on('move', function (newIndex) {
       Splide.index = newIndex;
-    }).on('updated', function (newOptions) {
-      options = newOptions;
-      var index = between(Splide.index, 0, Controller.edgeIndex);
-      Splide.index = Controller.rewind(Controller.trim(index));
+    }).on('updated refresh', function (newOptions) {
+      options = newOptions || options;
+      Splide.index = between(Splide.index, 0, Controller.edgeIndex);
     });
   }
   /**
