@@ -11,8 +11,8 @@
 * Merge Slides component to Elements.
 * Splide can be destroyed.
 * Add or remove slides dynamically.
-* [Video](https://splidejs.com/video/) extension is released.
-* [URL Hash Navigation](https://splidejs.com/url-hash-navigation/) extension is released.
+* [Video](https://splidejs.com/extension-video/) extension is released.
+* [URL Hash Navigation](https://splidejs.com/extension-url-hash-navigation/) extension is released.
 
 ## Features
 * Pure JavaScript without any dependencies
