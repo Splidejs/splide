@@ -26,7 +26,10 @@ export default function compose( Splide, Components, Transition ) {
 		components[ name ] = Component( Splide, components, name.toLowerCase() );
 	} );
 
-	Transition = Transition || Splide.is( FADE ) ? Fade : Slide;
+	if ( ! Transition ) {
+		Transition = Splide.is( FADE ) ? Fade : Slide;
+	}
+
 	components.Transition = Transition( Splide, components );
 
 	return components;

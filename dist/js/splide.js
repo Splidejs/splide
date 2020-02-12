@@ -1292,7 +1292,11 @@ function compose(Splide, Components, Transition) {
   each(Components, function (Component, name) {
     components[name] = Component(Splide, components, name.toLowerCase());
   });
-  Transition = Transition || Splide.is(FADE) ? fade : transitions_slide;
+
+  if (!Transition) {
+    Transition = Splide.is(FADE) ? fade : transitions_slide;
+  }
+
   components.Transition = Transition(Splide, components);
   return components;
 }
