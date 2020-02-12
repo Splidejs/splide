@@ -93,7 +93,7 @@ export default ( Splide, Components ) => {
 
 			Splide.on( 'updated', () => {
 				removeClass( root, getClasses() );
-				setTimeout( () => { addClass( root, getClasses() ) } );
+				addClass( root, getClasses() );
 			} );
 		},
 

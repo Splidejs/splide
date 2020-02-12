@@ -2120,9 +2120,7 @@ var UID_NAME = 'uid';
       });
       Splide.on('updated', function () {
         removeClass(root, getClasses());
-        setTimeout(function () {
-          addClass(root, getClasses());
-        });
+        addClass(root, getClasses());
       });
     },
 
