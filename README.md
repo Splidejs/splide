@@ -89,6 +89,7 @@ Here is a list of options and brief explanations. Visit [this page](https://spli
 * **type**: Determine a slider type.
 * **rewind**: Whether to rewind a slider before the first slide or after the last one.
 * **speed**: Transition speed in milliseconds.
+* **rewindSpeed**: Transition speed on rewind in milliseconds.
 * **width**: Define slider max width.
 * **height**: Define slider height.
 * **fixedWidth**: Fix width of slides.
