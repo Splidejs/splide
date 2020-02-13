@@ -4859,6 +4859,9 @@ var SRC_DATA_NAME = 'data-splide-lazy';
                 img: img,
                 Slide: Slide
               });
+              applyStyle(img, {
+                display: 'none'
+              });
             }
           });
         });
@@ -4934,9 +4937,6 @@ var SRC_DATA_NAME = 'data-splide-lazy';
       loaded(img, spinner, Slide, true);
     };
 
-    applyStyle(img, {
-      display: 'none'
-    });
     setAttribute(img, 'src', getAttribute(img, SRC_DATA_NAME));
   }
   /**

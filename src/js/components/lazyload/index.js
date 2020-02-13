@@ -88,6 +88,7 @@ export default ( Splide, Components, name ) => {
 					each( Slide.slide.querySelectorAll( `[${ SRC_DATA_NAME }]` ), img => {
 						if ( ! img.src ) {
 							images.push( { img, Slide } );
+							applyStyle( img, { display: 'none' } );
 						}
 					} );
 				} );
@@ -156,7 +157,6 @@ export default ( Splide, Components, name ) => {
 		img.onload  = () => { loaded( img, spinner, Slide, false ) };
 		img.onerror = () => { loaded( img, spinner, Slide, true ) };
 
-		applyStyle( img, { display: 'none' } );
 		setAttribute( img, 'src', getAttribute( img, SRC_DATA_NAME ) );
 	}
 
