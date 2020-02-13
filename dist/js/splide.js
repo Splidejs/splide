@@ -384,6 +384,13 @@ var DEFAULTS = {
   speed: 400,
 
   /**
+   * Transition speed on rewind in milliseconds.
+   *
+   * @type {number}
+   */
+  rewindSpeed: 0,
+
+  /**
    * Define slider max width.
    *
    * @type {number}
@@ -1109,6 +1116,34 @@ function dom_loaded(elm, callback) {
     callback();
   }
 }
+// CONCATENATED MODULE: ./src/js/constants/types.js
+/**
+ * Export slider types.
+ *
+ * @author    Naotoshi Fujita
+ * @copyright Naotoshi Fujita. All rights reserved.
+ */
+
+/**
+ * Normal slider.
+ *
+ * @type {string}
+ */
+var SLIDE = 'slide';
+/**
+ * Loop after the last slide and before the first one.
+ *
+ * @type {string}
+ */
+
+var LOOP = 'loop';
+/**
+ * The track doesn't move.
+ *
+ * @type {string}
+ */
+
+var FADE = 'fade';
 // CONCATENATED MODULE: ./src/js/transitions/slide/index.js
 /**
  * The component for general slide effect transition.
@@ -1116,6 +1151,7 @@ function dom_loaded(elm, callback) {
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
+
 
 /**
  * The component for general slide effect transition.
@@ -1158,14 +1194,24 @@ function dom_loaded(elm, callback) {
      *
      * @param {number}   destIndex - Destination slide index that might be clone's.
      * @param {number}   newIndex  - New index.
+     * @param {number}   prevIndex - Previous index.
      * @param {Object}   coord     - Destination coordinates.
      * @param {function} done      - Callback function must be invoked when transition is completed.
      */
-    start: function start(destIndex, newIndex, coord, done) {
+    start: function start(destIndex, newIndex, prevIndex, coord, done) {
       var options = Splide.options;
+      var edgeIndex = Components.Controller.edgeIndex;
+      var speed = options.speed;
       endCallback = done;
+
+      if (Splide.is(SLIDE)) {
+        if (prevIndex === 0 && newIndex >= edgeIndex || prevIndex >= edgeIndex && newIndex === 0) {
+          speed = options.rewindSpeed || speed;
+        }
+      }
+
       applyStyle(list, {
-        transition: "transform " + options.speed + "ms " + options.easing,
+        transition: "transform " + speed + "ms " + options.easing,
         transform: "translate(" + coord.x + "px," + coord.y + "px)"
       });
     }
@@ -1207,10 +1253,11 @@ function dom_loaded(elm, callback) {
      *
      * @param {number}    destIndex - Destination slide index that might be clone's.
      * @param {number}    newIndex  - New index.
+     * @param {number}    prevIndex - Previous index.
      * @param {Object}    coord     - Destination coordinates.
      * @param {function}  done      - Callback function must be invoked when transition is completed.
      */
-    start: function start(destIndex, newIndex, coord, done) {
+    start: function start(destIndex, newIndex, prevIndex, coord, done) {
       apply(newIndex);
       done();
     }
@@ -1239,34 +1286,6 @@ function dom_loaded(elm, callback) {
  */
 
 
-// CONCATENATED MODULE: ./src/js/constants/types.js
-/**
- * Export slider types.
- *
- * @author    Naotoshi Fujita
- * @copyright Naotoshi Fujita. All rights reserved.
- */
-
-/**
- * Normal slider.
- *
- * @type {string}
- */
-var SLIDE = 'slide';
-/**
- * Loop after the last slide and before the first one.
- *
- * @type {string}
- */
-
-var LOOP = 'loop';
-/**
- * The track doesn't move.
- *
- * @type {string}
- */
-
-var FADE = 'fade';
 // CONCATENATED MODULE: ./src/js/core/composer.js
 /**
  * Provide a function for composing components.
@@ -2927,7 +2946,7 @@ var controller_floor = Math.floor;
       }
 
       if (Math.abs(newPosition - currPosition) >= 1 || isFade) {
-        Components.Transition.start(destIndex, newIndex, this.toCoord(newPosition), function () {
+        Components.Transition.start(destIndex, newIndex, prevIndex, this.toCoord(newPosition), function () {
           _this2.end(destIndex, newIndex, prevIndex, silently);
         });
       } else {

@@ -36,6 +36,13 @@ export const DEFAULTS = {
 	speed: 400,
 
 	/**
+	 * Transition speed on rewind in milliseconds.
+	 *
+	 * @type {number}
+	 */
+	rewindSpeed: 0,
+
+	/**
 	 * Define slider max width.
 	 *
 	 * @type {number}

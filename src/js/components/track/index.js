@@ -92,7 +92,7 @@ export default ( Splide, Components ) => {
 			}
 
 			if ( Math.abs( newPosition - currPosition ) >= 1 || isFade ) {
-				Components.Transition.start( destIndex, newIndex, this.toCoord( newPosition ), () => {
+				Components.Transition.start( destIndex, newIndex, prevIndex, this.toCoord( newPosition ), () => {
 					this.end( destIndex, newIndex, prevIndex, silently );
 				} );
 			} else {

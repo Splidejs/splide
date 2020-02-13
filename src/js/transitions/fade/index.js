@@ -35,10 +35,11 @@ export default ( Splide, Components ) => {
 		 *
 		 * @param {number}    destIndex - Destination slide index that might be clone's.
 		 * @param {number}    newIndex  - New index.
+		 * @param {number}    prevIndex - Previous index.
 		 * @param {Object}    coord     - Destination coordinates.
 		 * @param {function}  done      - Callback function must be invoked when transition is completed.
 		 */
-		start( destIndex, newIndex, coord, done ) {
+		start( destIndex, newIndex, prevIndex, coord, done ) {
 			apply( newIndex );
 			done();
 		},
