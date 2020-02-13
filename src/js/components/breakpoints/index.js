@@ -101,8 +101,6 @@ export default ( Splide ) => {
 			if ( completely ) {
 				removeEventListener( 'resize', throttledCheck );
 			}
-
-			prevPoint = -1;
 		},
 	};
 

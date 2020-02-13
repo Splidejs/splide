@@ -5581,8 +5581,6 @@ var breakpoints_THROTTLE = 50;
       if (completely) {
         removeEventListener('resize', throttledCheck);
       }
-
-      prevPoint = -1;
     }
   };
   /**
