@@ -2,6 +2,10 @@
   &__pagination {
     display: inline-flex;
     align-items: center;
+    width: 95%;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 0;
 
     li {
       list-style-type: none;

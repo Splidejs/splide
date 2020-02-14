@@ -7,5 +7,9 @@
         display: block;
       }
     }
+
+    > #{$root}__pagination {
+      width: auto;
+    }
   }
 }

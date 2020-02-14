@@ -48,11 +48,32 @@ const css = {
 		path: './src/sass/core/*.scss',
 		dest: './dist/css',
 	},
-	themes: {
-		path: [
-			'./src/sass/themes/default/*.scss',
-		],
-		dest: './dist/css/themes',
+	default: {
+		path    : './src/sass/core/*.scss',
+		dest    : './dist/css/themes',
+		basename: 'splide-default',
+		merge   : {
+			filename: 'splide.css',
+			path    : './src/sass/themes/default/*.scss',
+		},
+	},
+	skyblue: {
+		path    : './src/sass/core/*.scss',
+		dest    : './dist/css/themes',
+		basename: 'splide-skyblue',
+		merge   : {
+			filename: 'splide.css',
+			path    : './src/sass/themes/sky-blue/*.scss',
+		},
+	},
+	seagreen: {
+		path    : './src/sass/core/*.scss',
+		dest    : './dist/css/themes',
+		basename: 'splide-sea-green',
+		merge   : {
+			filename: 'splide.css',
+			path    : './src/sass/themes/sea-green/*.scss',
+		},
 	},
 };
 
@@ -86,13 +107,19 @@ gulp.task( 'build:sass', done => {
 				.pipe( concat( settings.merge.filename ) );
 		}
 
-		stream
+		stream = stream
 			.pipe( sassGlob() )
 			.pipe( sass() )
 			.pipe( postcss( [
 				cssnano( { reduceIdents: false } ),
 				autoprefixer( { overrideBrowserslist: [ '> 5%' ] } )
-			] ) )
+			] ) );
+
+		if ( settings.basename ) {
+			stream = stream.pipe( rename( { basename: settings.basename } ) );
+		}
+
+		stream
 			.pipe( rename( { suffix: '.min' } ) )
 			.pipe( gulp.dest( settings.dest ) );
 	} );
