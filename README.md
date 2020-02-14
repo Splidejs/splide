@@ -6,6 +6,7 @@
 * [Documents](https://splidejs.com/category/users-guide/)
 
 ## News
+* Add some [themes](https://splidejs.com/themes/).
 * [Grid](https://splidejs.com/extension-grid/) extension is released. 
 * [Auto Width](https://splidejs.com/auto-width/) is implemented. Each slide can have its own width.
 * [Breakpoints](https://splidejs.com/options/#breakpoints) accept 'destroy' option.
