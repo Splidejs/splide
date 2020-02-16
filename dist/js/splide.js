@@ -1225,6 +1225,7 @@ var FADE = 'fade';
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
+
 /**
  * The component for fade transition.
  *
@@ -1258,8 +1259,15 @@ var FADE = 'fade';
      * @param {function}  done      - Callback function must be invoked when transition is completed.
      */
     start: function start(destIndex, newIndex, prevIndex, coord, done) {
+      var track = Components.Elements.track;
+      applyStyle(track, {
+        height: unit(track.clientHeight)
+      });
       apply(newIndex);
       done();
+      applyStyle(track, {
+        height: ''
+      });
     }
   };
   /**

@@ -6,6 +6,7 @@
  */
 
 import { applyStyle } from '../../utils/dom';
+import { unit } from "../../utils/utils";
 
 
 /**
@@ -40,8 +41,14 @@ export default ( Splide, Components ) => {
 		 * @param {function}  done      - Callback function must be invoked when transition is completed.
 		 */
 		start( destIndex, newIndex, prevIndex, coord, done ) {
+			const track = Components.Elements.track;
+
+			applyStyle( track, { height: unit( track.clientHeight ) } );
+
 			apply( newIndex );
 			done();
+
+			applyStyle( track, { height: '' } );
 		},
 	};
 
