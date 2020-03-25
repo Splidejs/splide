@@ -174,7 +174,7 @@ export default ( Splide, Components, name ) => {
 	 * @return {Element} - A created arrow element.
 	 */
 	function createArrow( prev ) {
-		const arrow = `<button class="${ classes.arrow } ${ prev ? classes.prev : classes.next }">`
+		const arrow = `<button class="${ classes.arrow } ${ prev ? classes.prev : classes.next }" type="button">`
 			+	`<svg xmlns="${ XML_NAME_SPACE }"	viewBox="0 0 ${ SIZE } ${ SIZE }"	width="${ SIZE }"	height="${ SIZE }">`
 			+ `<path d="${ Splide.options.arrowPath || PATH }" />`;
 

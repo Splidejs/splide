@@ -1,8 +1,8 @@
 /*!
  * Splide.js
- * Version  : 2.2.0
+ * Version  : 2.2.3
  * License  : MIT
- * Copyright: 2019 Naotoshi Fujita
+ * Copyright: 2020 Naotoshi Fujita
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -105,7 +105,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+// ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, "default", function() { return /* binding */ module_Splide; });
+
+// NAMESPACE OBJECT: ./src/js/constants/states.js
 var states_namespaceObject = {};
 __webpack_require__.r(states_namespaceObject);
 __webpack_require__.d(states_namespaceObject, "CREATED", function() { return CREATED; });
@@ -1430,9 +1436,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
  * providing some APIs to control the behavior.
  */
 
-var splide_Splide =
-/*#__PURE__*/
-function () {
+var splide_Splide = /*#__PURE__*/function () {
   /**
    * Splide constructor.
    *
@@ -4581,7 +4585,7 @@ var SIZE = 40;
 
 
   function createArrow(prev) {
-    var arrow = "<button class=\"" + classes.arrow + " " + (prev ? classes.prev : classes.next) + "\">" + ("<svg xmlns=\"" + XML_NAME_SPACE + "\"\tviewBox=\"0 0 " + SIZE + " " + SIZE + "\"\twidth=\"" + SIZE + "\"\theight=\"" + SIZE + "\">") + ("<path d=\"" + (Splide.options.arrowPath || PATH) + "\" />");
+    var arrow = "<button class=\"" + classes.arrow + " " + (prev ? classes.prev : classes.next) + "\" type=\"button\">" + ("<svg xmlns=\"" + XML_NAME_SPACE + "\"\tviewBox=\"0 0 " + SIZE + " " + SIZE + "\"\twidth=\"" + SIZE + "\"\theight=\"" + SIZE + "\">") + ("<path d=\"" + (Splide.options.arrowPath || PATH) + "\" />");
     return domify(arrow);
   }
 
@@ -4763,7 +4767,8 @@ var UPDATE_EVENT = 'updated.page refresh.page';
     }).map(function (Slide, page) {
       var li = create('li', {});
       var button = create('button', {
-        "class": classes.page
+        "class": classes.page,
+        type: 'button'
       });
       append(li, button);
       append(list, li);
@@ -5709,7 +5714,16 @@ var LIGHT = {
   A11y: a11y
 };
 // CONCATENATED MODULE: ./build/module/module.js
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return module_Splide; });
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (typeof call === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
 /**
@@ -5724,10 +5738,10 @@ function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.crea
  * Export Splide class for import from other projects.
  */
 
-var module_Splide =
-/*#__PURE__*/
-function (_Core) {
+var module_Splide = /*#__PURE__*/function (_Core) {
   _inheritsLoose(Splide, _Core);
+
+  var _super = _createSuper(Splide);
 
   function Splide(root, options) {
     return _Core.call(this, root, options, COMPLETE) || this;

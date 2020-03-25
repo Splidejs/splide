@@ -172,7 +172,7 @@ export default ( Splide, Components, name ) => {
 			.filter( Slide => options.focus !== false || Slide.index % options.perPage === 0 )
 			.map( ( Slide, page ) => {
 				const li     = create( 'li', {} );
-				const button = create( 'button', { class: classes.page } );
+				const button = create( 'button', { class: classes.page, type: 'button' } );
 
 				append( li, button );
 				append( list, li );
