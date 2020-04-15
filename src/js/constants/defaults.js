@@ -233,12 +233,28 @@ export const DEFAULTS = {
 	drag: true,
 
 	/**
-	 * Threshold for determining if the action is "flick" or "swipe".
+	 * The angle threshold for drag.
+	 * The slider starts moving only when the drag angle is less than this threshold.
+	 *
+	 * @type {number}
+	 */
+	dragAngleThreshold: 30,
+
+	/**
+	 * Distance threshold for determining if the action is "flick" or "swipe".
+	 * When a drag distance is over this value, the action will be treated as "swipe", not "flick".
+	 *
+	 * @type {number}
+	 */
+	swipeDistanceThreshold: 150,
+
+	/**
+	 * Velocity threshold for determining if the action is "flick" or "swipe".
 	 * Around 0.5 is recommended.
 	 *
 	 * @type {number}
 	 */
-	flickThreshold: .6,
+	flickVelocityThreshold: .6,
 
 	/**
 	 * Determine power of flick. The larger number this is, the farther a slider runs by flick.

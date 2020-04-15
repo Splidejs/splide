@@ -587,12 +587,28 @@ var DEFAULTS = {
   drag: true,
 
   /**
-   * Threshold for determining if the action is "flick" or "swipe".
+   * The angle threshold for drag.
+   * The slider starts moving only when the drag angle is less than this threshold.
+   *
+   * @type {number}
+   */
+  dragAngleThreshold: 30,
+
+  /**
+   * Distance threshold for determining if the action is "flick" or "swipe".
+   * When a drag distance is over this value, the action will be treated as "swipe", not "flick".
+   *
+   * @type {number}
+   */
+  swipeDistanceThreshold: 150,
+
+  /**
+   * Velocity threshold for determining if the action is "flick" or "swipe".
    * Around 0.5 is recommended.
    *
    * @type {number}
    */
-  flickThreshold: .6,
+  flickVelocityThreshold: .6,
 
   /**
    * Determine power of flick. The larger number this is, the farther a slider runs by flick.
@@ -3732,20 +3748,6 @@ var abs = Math.abs;
 
 var FRICTION_REDUCER = 7;
 /**
- * To start dragging the track, the drag angle must be less than this threshold.
- *
- * @type {number}
- */
-
-var ANGLE_THRESHOLD = 30;
-/**
- * When a drag distance is over this value, the action will be treated as "swipe", not "flick".
- *
- * @type {number}
- */
-
-var SWIPE_THRESHOLD = 150;
-/**
  * The component supporting mouse drag and swipe.
  *
  * @param {Splide} Splide     - A Splide instance.
@@ -3908,7 +3910,7 @@ var SWIPE_THRESHOLD = 150;
         angle = 90 - angle;
       }
 
-      return angle < ANGLE_THRESHOLD;
+      return angle < Splide.options.dragAngleThreshold;
     }
 
     return false;
@@ -3974,7 +3976,7 @@ var SWIPE_THRESHOLD = 150;
       var sign = velocity < 0 ? -1 : 1;
       var destination = Track.position;
 
-      if (absV > options.flickThreshold && abs(info.offset[axis]) < SWIPE_THRESHOLD) {
+      if (absV > options.flickVelocityThreshold && abs(info.offset[axis]) < options.swipeDistanceThreshold) {
         destination += sign * Math.min(absV * options.flickPower, Layout.width * (options.flickMaxPages || 1));
       }
 
@@ -5714,16 +5716,6 @@ var LIGHT = {
   A11y: a11y
 };
 // CONCATENATED MODULE: ./build/module/module.js
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
-
-function _possibleConstructorReturn(self, call) { if (call && (typeof call === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
 /**
@@ -5740,8 +5732,6 @@ function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.crea
 
 var module_Splide = /*#__PURE__*/function (_Core) {
   _inheritsLoose(Splide, _Core);
-
-  var _super = _createSuper(Splide);
 
   function Splide(root, options) {
     return _Core.call(this, root, options, COMPLETE) || this;

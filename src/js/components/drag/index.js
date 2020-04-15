@@ -7,8 +7,8 @@
 
 import { LOOP } from '../../constants/types';
 import { TTB } from '../../constants/directions';
-import { between } from '../../utils/utils';
 import { IDLE } from '../../constants/states';
+import { between } from '../../utils/utils';
 import { each } from "../../utils/object";
 
 const { abs } = Math;
@@ -22,20 +22,6 @@ const { abs } = Math;
  * @type {number}
  */
 const FRICTION_REDUCER = 7;
-
-/**
- * To start dragging the track, the drag angle must be less than this threshold.
- *
- * @type {number}
- */
-const ANGLE_THRESHOLD = 30;
-
-/**
- * When a drag distance is over this value, the action will be treated as "swipe", not "flick".
- *
- * @type {number}
- */
-const SWIPE_THRESHOLD = 150;
 
 
 /**
@@ -197,7 +183,7 @@ export default ( Splide, Components ) => {
 				angle = 90 - angle;
 			}
 
-			return angle < ANGLE_THRESHOLD;
+			return angle < Splide.options.dragAngleThreshold;
 		}
 
 		return false;
@@ -259,7 +245,7 @@ export default ( Splide, Components ) => {
 
 			let destination = Track.position;
 
-			if ( absV > options.flickThreshold && abs( info.offset[ axis ] ) < SWIPE_THRESHOLD ) {
+			if ( absV > options.flickVelocityThreshold && abs( info.offset[ axis ] ) < options.swipeDistanceThreshold ) {
 				destination += sign * Math.min( absV * options.flickPower, Layout.width * ( options.flickMaxPages || 1 ) );
 			}
 
