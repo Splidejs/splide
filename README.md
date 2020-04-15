@@ -138,6 +138,7 @@ Here is a list of options and brief explanations. Visit [this page](https://spli
 Splide provides some APIs and the way to customize the behaviour programmatically.
 * [APIs](https://splidejs.com/apis/)
 * [Extension](https://splidejs.com/extension/)
+* [Grid](https://splidejs.com/grid/)
 
 ## License
 Splide is released under the MIT license.  
