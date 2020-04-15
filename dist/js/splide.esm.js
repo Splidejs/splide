@@ -4,7 +4,17 @@
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
-/******/ (function(modules) { // webpackBootstrap
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["Splide"] = factory();
+	else
+		root["Splide"] = factory();
+})(window, function() {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 /******/
@@ -99,7 +109,7 @@
 __webpack_require__.r(__webpack_exports__);
 
 // EXPORTS
-__webpack_require__.d(__webpack_exports__, "Splide", function() { return /* binding */ complete_Splide; });
+__webpack_require__.d(__webpack_exports__, "default", function() { return /* binding */ module_Splide; });
 
 // NAMESPACE OBJECT: ./src/js/constants/states.js
 var states_namespaceObject = {};
@@ -5705,11 +5715,11 @@ var LIGHT = {
   Pagination: pagination,
   A11y: a11y
 };
-// CONCATENATED MODULE: ./build/complete/complete.js
+// CONCATENATED MODULE: ./build/module/module.js
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
 /**
- * Export "Splide" class for frontend with full components.
+ * Export Splide class for import.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
@@ -5717,10 +5727,10 @@ function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.crea
 
 
 /**
- * Export Splide with all components.
+ * Export Splide class for import from other projects.
  */
 
-var complete_Splide = /*#__PURE__*/function (_Core) {
+var module_Splide = /*#__PURE__*/function (_Core) {
   _inheritsLoose(Splide, _Core);
 
   function Splide(root, options) {
@@ -5728,9 +5738,10 @@ var complete_Splide = /*#__PURE__*/function (_Core) {
   }
 
   return Splide;
-}(splide_Splide); // Register the class as a global variable for non-ES6 environment.
+}(splide_Splide);
 
-window.Splide = complete_Splide;
+
 
 /***/ })
 /******/ ]);
+});

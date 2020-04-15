@@ -1,10 +1,9 @@
-const uglify  = require( 'uglifyjs-webpack-plugin' );
 const webpack = require( 'webpack' );
 
 module.exports = {
 	entry: './build/complete/complete.js',
 	output: {
-		filename: 'splide.min.js',
+		filename: 'splide.js',
 	},
 	module: {
 		rules: [
@@ -22,7 +21,7 @@ module.exports = {
 		} ),
 	],
 	optimization: {
-		minimizer: [ new uglify() ],
+		minimize: false,
 	},
 	mode: 'production',
 };

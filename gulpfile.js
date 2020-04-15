@@ -23,14 +23,17 @@ const js = {
 	complete: {
 		path: './build/complete/config',
 		dest: './dist/js',
+	},
+	minified: {
+		path: './build/complete/config-min',
+		dest: './dist/js',
 		gzip: true,
 	},
-	module: {
+	modular: {
 		path: './build/module/config',
 		dest: './dist/js',
 	},
 };
-
 
 /*
  * Path definitions.
