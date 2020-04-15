@@ -115,7 +115,9 @@ Here is a list of options and brief explanations. Visit [this page](https://spli
 * **preloadPages**: Determine how many pages around an active slide should be loaded beforehand. This only works the lazyLoad option is “nearby”.
 * **keyboard**: Whether to control a slider via keyboard.
 * **drag**: Whether to allow mouse drag and touch swipe.
-* **flickThreshold**: Threshold for determining if the action is “flick” or “swipe”.
+* **dragAngleThreshold**: The angle threshold for drag.
+* **swipeDistanceThreshold**: Distance threshold for determining if the action is "flick" or "swipe".
+* **flickVelocityThreshold**: Velocity threshold for determining if the action is "flick" or "swipe".
 * **flickPower**: Determine power of flick. The larger number this is, the farther a slider runs by flick.
 * **flickMaxPages**: Limit a number of pages to move by flick.
 * **direction**: Slider direction.
