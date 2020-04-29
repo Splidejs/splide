@@ -5177,7 +5177,7 @@ var TAB_INDEX = 'tabindex';
      * Destroy.
      */
     destroy: function destroy() {
-      var arrows = Components.Arrows.arrows;
+      var arrows = Components.Arrows ? Components.Arrows.arrows : {};
       removeAttribute(Elements.slides.concat([arrows.prev, arrows.next, Elements.play, Elements.pause]), [ARIA_HIDDEN, TAB_INDEX, ARIA_CONTROLS, ARIA_LABEL, ARIA_CURRENRT, 'role']);
     }
   };

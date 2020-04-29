@@ -72,7 +72,7 @@ export default ( Splide, Components ) => {
 		 * Destroy.
 		 */
 		destroy() {
-			const arrows = Components.Arrows.arrows;
+			const arrows = Components.Arrows ? Components.Arrows.arrows : {};
 
 			removeAttribute(
 				Elements.slides.concat( [ arrows.prev, arrows.next, Elements.play, Elements.pause ] ),
