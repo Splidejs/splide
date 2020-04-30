@@ -7,12 +7,11 @@
 
 import Event from './core/event';
 import State from './core/state';
-import { DEFAULTS } from './constants/defaults';
-
 import compose from './core/composer';
 import { error, exist } from './utils/error';
-import { applyStyle, find } from './utils/dom';
+import { applyStyle } from './utils/dom';
 import { merge, each, values } from './utils/object';
+import { DEFAULTS } from './constants/defaults';
 import * as STATES from './constants/states';
 
 
@@ -26,12 +25,12 @@ export default class Splide {
 	 *
 	 * @throws {Error} When the given root element or selector is invalid.
 	 *
-	 * @param {Element|string}  root        - A selector for a root element or an element itself.
-	 * @param {Object}          options     - Optional. Options to change default behaviour.
-	 * @param {Object}          Components  - Optional. Components.
+	 * @param {Element|string}  root       - A selector for a root element or an element itself.
+	 * @param {Object}          options    - Optional. Options to change default behaviour.
+	 * @param {Object}          Components - Optional. Components.
 	 */
 	constructor( root, options = {}, Components = {} ) {
-		this.root = root instanceof Element ? root : find( document, root );
+		this.root = root instanceof Element ? root : document.querySelector( root );
 		exist( this.root, 'An invalid element/selector was given.' );
 
 		this.Components = null;
