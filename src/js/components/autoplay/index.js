@@ -155,9 +155,9 @@ export default ( Splide, Components, name ) => {
 	 * @param {boolean}   play  - Determine whether to play or pause.
 	 */
 	function switchOn( elms, event, flag, play ) {
-		for ( let i in elms ) {
-			Splide.on( event, () => { Autoplay[ play ? 'play' : 'pause' ]( flag ) }, elms[ i ] );
-		}
+		elms.forEach( elm => {
+			Splide.on( event, () => { Autoplay[ play ? 'play' : 'pause' ]( flag ) }, elm );
+		} );
 	}
 
 	return Autoplay;

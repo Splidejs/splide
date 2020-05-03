@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.2.5
+ * Version  : 2.2.6
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -4269,11 +4269,11 @@ var PAUSE_FLAGS = {
 
 
   function switchOn(elms, event, flag, play) {
-    for (var i in elms) {
+    elms.forEach(function (elm) {
       Splide.on(event, function () {
         Autoplay[play ? 'play' : 'pause'](flag);
-      }, elms[i]);
-    }
+      }, elm);
+    });
   }
 
   return Autoplay;
