@@ -91,6 +91,7 @@ export default ( Splide, Components ) => {
 		applyStyle( Elements.track, { height: unit( Layout.height ) } );
 
 		const slideHeight = unit( Layout.slideHeight() );
+		const width       = Layout.width;
 
 		Elements.each( Slide => {
 			applyStyle( Slide.container, { height: slideHeight } );
@@ -100,6 +101,11 @@ export default ( Splide, Components ) => {
 				height: Slide.container ? null : slideHeight,
 			} );
 		} );
+
+		// When the scrollbar is made hidden, the track width is changed but the resize event is not fired.
+		if ( width !== Layout.width ) {
+			resize();
+		}
 	}
 
 	return Layout;

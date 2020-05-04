@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.2.6
+ * Version  : 2.2.7
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -3702,6 +3702,7 @@ var THROTTLE = 100;
       height: unit(Layout.height)
     });
     var slideHeight = unit(Layout.slideHeight());
+    var width = Layout.width;
     Elements.each(function (Slide) {
       applyStyle(Slide.container, {
         height: slideHeight
@@ -3710,7 +3711,11 @@ var THROTTLE = 100;
         width: Splide.options.autoWidth ? null : unit(Layout.slideWidth(Slide.index)),
         height: Slide.container ? null : slideHeight
       });
-    });
+    }); // When the scrollbar is made hidden, the track width is changed but the resize event is not fired.
+
+    if (width !== Layout.width) {
+      resize();
+    }
   }
 
   return Layout;
