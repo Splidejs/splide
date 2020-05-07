@@ -2025,10 +2025,11 @@ var STYLE_RESTORE_EVENTS = 'update.slide';
       var floor = Math.floor;
       var Components = Splide.Components;
       var Track = Components.Track;
-      var prop = Splide.options.direction === TTB ? 'clientHeight' : 'clientWidth';
+      var Layout = Components.Layout;
+      var isVertical = Splide.options.direction === TTB;
       var position = floor((Track.toPosition(index) + Track.offset(index) - Track.position) * Track.sign);
-      var edge = floor(position + slide[prop]);
-      var size = Components.Elements.track[prop];
+      var edge = floor(position + Layout[isVertical ? 'slideHeight' : 'slideWidth'](index));
+      var size = Layout[isVertical ? 'height' : 'width'];
       return 0 <= position && position <= size && 0 <= edge && edge <= size;
     },
 

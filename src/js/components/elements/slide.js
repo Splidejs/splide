@@ -142,10 +142,11 @@ export default ( Splide, index, realIndex, slide ) => {
 			const { floor }  = Math;
 			const Components = Splide.Components;
 			const Track      = Components.Track;
-			const prop       = Splide.options.direction === TTB ? 'clientHeight' : 'clientWidth';
+			const Layout     = Components.Layout;
+			const isVertical = Splide.options.direction === TTB;
 			const position   = floor( ( Track.toPosition( index ) + Track.offset( index ) - Track.position ) * Track.sign );
-			const edge       = floor( position + slide[ prop ] );
-			const size       = Components.Elements.track[ prop ];
+			const edge       = floor( position + Layout[ isVertical ? 'slideHeight' : 'slideWidth' ]( index ) );
+			const size       = Layout[ isVertical ? 'height' : 'width' ];
 
 			return ( 0 <= position && position <= size && 0 <= edge && edge <= size );
 		},
