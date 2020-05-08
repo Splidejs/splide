@@ -64,7 +64,10 @@ export default ( Splide, Components ) => {
 
 			this.gap = toPixel( root, options.gap );
 
-			const padding = options.padding;
+			const padding =
+				typeof options.padding === "object"
+					? { top: 0, bottom: 0, ...options.padding }
+					: options.padding;
 			const { top = padding, bottom = padding } = padding;
 
 			this.padding = {
