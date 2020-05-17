@@ -6,6 +6,8 @@
 * [Documents](https://splidejs.com/category/users-guide/)
 
 ## News
+* Add 'resetProgress' and 'throttle' options.
+* Breakpoints accept 'drag' and 'pagination'.
 * Add some [themes](https://splidejs.com/themes/).
 * [Grid](https://splidejs.com/extension-grid/) extension is released. 
 * [Auto Width](https://splidejs.com/auto-width/) is implemented. Each slide can have its own width.
