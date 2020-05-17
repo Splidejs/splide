@@ -111,6 +111,7 @@ Here is a list of options and brief explanations. Visit [this page](https://spli
 * **interval**: Autoplay interval in milliseconds.
 * **pauseOnHover**: Whether to stop autoplay while a slider is hovered.
 * **pauseOnFocus**: Whether to stop autoplay while a slider elements are focused.
+* **resetProgress**: Whether to reset progress of the autoplay timer when resumed.
 * **lazyLoad**: Enable lazy load for images.
 * **preloadPages**: Determine how many pages around an active slide should be loaded beforehand. This only works the lazyLoad option is “nearby”.
 * **keyboard**: Whether to control a slider via keyboard.
