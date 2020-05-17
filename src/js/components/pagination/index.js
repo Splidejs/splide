@@ -81,7 +81,7 @@ export default ( Splide, Components, name ) => {
 		mounted() {
 			const index = Splide.index;
 			Splide.emit( `${ name }:mounted`, data, this.getItem( index ) );
-			update( index, -1 );
+			updateAttributes( index, -1 );
 		},
 
 		/**
@@ -95,7 +95,9 @@ export default ( Splide, Components, name ) => {
 				data.items.forEach( item => { Splide.off( 'click', item.button ) } );
 			}
 
-			Splide.off( ATTRIBUTES_UPDATE_EVENT ).off( UPDATE_EVENT );
+			// Do not remove UPDATE events to recreate pagination if needed.
+			Splide.off( ATTRIBUTES_UPDATE_EVENT );
+
 			data = {};
 		},
 
@@ -121,11 +123,11 @@ export default ( Splide, Components, name ) => {
 	};
 
 	/**
-	 * Listen some events.
+	 * Listen to some events.
 	 */
 	function bind() {
 		Splide
-			.on( ATTRIBUTES_UPDATE_EVENT, update )
+			.on( ATTRIBUTES_UPDATE_EVENT, updateAttributes )
 			.on( UPDATE_EVENT, () => {
 				Pagination.destroy();
 
@@ -142,7 +144,7 @@ export default ( Splide, Components, name ) => {
 	 * @param {number} index     - Active index.
 	 * @param {number} prevIndex - Prev index.
 	 */
-	function update( index, prevIndex ) {
+	function updateAttributes( index, prevIndex ) {
 		const prev   = Pagination.getItem( prevIndex );
 		const curr   = Pagination.getItem( index );
 		const active = STATUS_CLASSES.active;

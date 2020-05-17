@@ -4679,7 +4679,7 @@ var UPDATE_EVENT = 'updated.page refresh.page';
     mounted: function mounted() {
       var index = Splide.index;
       Splide.emit(name + ":mounted", data, this.getItem(index));
-      update(index, -1);
+      updateAttributes(index, -1);
     },
 
     /**
@@ -4693,9 +4693,10 @@ var UPDATE_EVENT = 'updated.page refresh.page';
         data.items.forEach(function (item) {
           Splide.off('click', item.button);
         });
-      }
+      } // Do not remove UPDATE events to recreate pagination if needed.
 
-      Splide.off(ATTRIBUTES_UPDATE_EVENT).off(UPDATE_EVENT);
+
+      Splide.off(ATTRIBUTES_UPDATE_EVENT);
       data = {};
     },
 
@@ -4721,11 +4722,11 @@ var UPDATE_EVENT = 'updated.page refresh.page';
 
   };
   /**
-   * Listen some events.
+   * Listen to some events.
    */
 
   function bind() {
-    Splide.on(ATTRIBUTES_UPDATE_EVENT, update).on(UPDATE_EVENT, function () {
+    Splide.on(ATTRIBUTES_UPDATE_EVENT, updateAttributes).on(UPDATE_EVENT, function () {
       Pagination.destroy();
 
       if (Splide.options.pagination) {
@@ -4742,7 +4743,7 @@ var UPDATE_EVENT = 'updated.page refresh.page';
    */
 
 
-  function update(index, prevIndex) {
+  function updateAttributes(index, prevIndex) {
     var prev = Pagination.getItem(prevIndex);
     var curr = Pagination.getItem(index);
     var active = STATUS_CLASSES.active;
