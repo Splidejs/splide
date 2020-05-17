@@ -1211,6 +1211,13 @@ var DEFAULTS = {
   pauseOnFocus: true,
 
   /**
+   * Whether to reset progress of the autoplay timer when resumed.
+   *
+   * @type {boolean}
+   */
+  resetProgress: true,
+
+  /**
    * Loading images lazily.
    * Image src must be provided by a data-splide-lazy attribute.
    *
@@ -3571,6 +3578,10 @@ function createInterval(callback, interval, progress) {
     if (!_pause) {
       if (!start) {
         start = timestamp;
+
+        if (rate && rate < 1) {
+          start -= rate * interval;
+        }
       }
 
       elapse = timestamp - start;
@@ -3595,11 +3606,16 @@ function createInterval(callback, interval, progress) {
       _pause = true;
       start = 0;
     },
-    play: function play() {
+    play: function play(reset) {
       start = 0;
 
       if (_pause) {
         _pause = false;
+
+        if (reset) {
+          rate = 0;
+        }
+
         requestAnimationFrame(step);
       }
     }
@@ -4207,7 +4223,7 @@ var PAUSE_FLAGS = {
 
       if (!flags.length) {
         Splide.emit(name + ":play");
-        interval.play();
+        interval.play(Splide.options.resetProgress);
       }
     },
 

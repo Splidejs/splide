@@ -192,6 +192,13 @@ export const DEFAULTS = {
 	pauseOnFocus: true,
 
 	/**
+	 * Whether to reset progress of the autoplay timer when resumed.
+	 *
+	 * @type {boolean}
+	 */
+	resetProgress: true,
+
+	/**
 	 * Loading images lazily.
 	 * Image src must be provided by a data-splide-lazy attribute.
 	 *

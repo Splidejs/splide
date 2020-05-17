@@ -93,7 +93,7 @@ export default ( Splide, Components, name ) => {
 
 			if ( ! flags.length ) {
 				Splide.emit( `${ name }:play` );
-				interval.play();
+				interval.play( Splide.options.resetProgress );
 			}
 		},
 

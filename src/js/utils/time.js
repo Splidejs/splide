@@ -44,6 +44,10 @@ export function createInterval( callback, interval, progress ) {
 		if ( ! pause ) {
 			if ( ! start ) {
 				start = timestamp;
+
+				if ( rate && rate < 1 ) {
+					start -= rate * interval;
+				}
 			}
 
 			elapse = timestamp - start;
@@ -69,11 +73,16 @@ export function createInterval( callback, interval, progress ) {
 			start = 0;
 		},
 
-		play() {
+		play( reset ) {
 			start = 0;
 
 			if ( pause ) {
 				pause = false;
+
+				if ( reset ) {
+					rate = 0;
+				}
+
 				requestAnimationFrame( step );
 			}
 		},
