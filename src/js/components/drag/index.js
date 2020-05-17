@@ -96,18 +96,11 @@ export default ( Splide, Components ) => {
 	 */
 	const Drag = {
 		/**
-		 * Mount only when the drag option is true.
-		 *
-		 * @type {boolean}
-		 */
-		required: Splide.options.drag,
-
-		/**
 		 * Whether dragging is disabled or not.
 		 *
 		 * @type {boolean}
 		 */
-		disabled: false,
+		disabled: ! Splide.options.drag,
 
 		/**
 		 * Called when the component is mounted.
@@ -126,6 +119,9 @@ export default ( Splide, Components ) => {
 							.off( 'dragstart', elm )
 							.on( 'dragstart', e => { e.preventDefault() }, elm, { passive: false } );
 					} );
+				} )
+				.on( 'mounted updated', () => {
+					this.disabled = ! Splide.options.drag;
 				} );
 		},
 	};

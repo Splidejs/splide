@@ -124,9 +124,9 @@ export default ( Splide ) => {
 				if ( State.is( DESTROYED ) ) {
 					State.set( CREATED );
 					Splide.mount();
-				} else {
-					Splide.options = options;
 				}
+
+				Splide.options = options;
 			}
 		}
 	}

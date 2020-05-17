@@ -328,6 +328,13 @@ export const DEFAULTS = {
 	updateOnMove: false,
 
 	/**
+	 * Throttle duration in milliseconds for the resize event.
+	 *
+	 * @type {number}
+	 */
+	throttle: 100,
+
+	/**
 	 * Breakpoints definitions.
 	 *
 	 * @example

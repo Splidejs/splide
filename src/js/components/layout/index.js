@@ -14,13 +14,6 @@ import { applyStyle, removeAttribute } from '../../utils/dom';
 import { assign } from "../../utils/object";
 import { TTB } from "../../constants/directions";
 
-/**
- * Interval time for throttle.
- *
- * @type {number}
- */
-const THROTTLE = 100;
-
 
 /**
  * The component for handing slide layouts and their sizes.
@@ -78,7 +71,7 @@ export default ( Splide, Components ) => {
 	 */
 	function bind() {
 		Splide
-			.on( 'resize load', throttle( () => { Splide.emit( 'resize' ) }, THROTTLE ), window )
+			.on( 'resize load', throttle( () => { Splide.emit( 'resize' ) }, Splide.options.throttle ), window )
 			.on( 'resize', resize )
 			.on( 'updated refresh', init );
 	}

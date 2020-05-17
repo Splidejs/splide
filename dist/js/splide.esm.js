@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.2.8
+ * Version  : 2.3.0
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -1355,6 +1355,13 @@ var DEFAULTS = {
    * @type {boolean}
    */
   updateOnMove: false,
+
+  /**
+   * Throttle duration in milliseconds for the resize event.
+   *
+   * @type {number}
+   */
+  throttle: 100,
 
   /**
    * Breakpoints definitions.
@@ -3646,13 +3653,6 @@ function createInterval(callback, interval, progress) {
 
 
 /**
- * Interval time for throttle.
- *
- * @type {number}
- */
-
-var THROTTLE = 100;
-/**
  * The component for handing slide layouts and their sizes.
  *
  * @param {Splide} Splide     - A Splide instance.
@@ -3713,7 +3713,7 @@ var THROTTLE = 100;
   function bind() {
     Splide.on('resize load', throttle(function () {
       Splide.emit('resize');
-    }, THROTTLE), window).on('resize', resize).on('updated refresh', init);
+    }, Splide.options.throttle), window).on('resize', resize).on('updated refresh', init);
   }
   /**
    * Resize the list and slides including clones.
@@ -3842,23 +3842,18 @@ var FRICTION_REDUCER = 7;
 
   var Drag = {
     /**
-     * Mount only when the drag option is true.
-     *
-     * @type {boolean}
-     */
-    required: Splide.options.drag,
-
-    /**
      * Whether dragging is disabled or not.
      *
      * @type {boolean}
      */
-    disabled: false,
+    disabled: !Splide.options.drag,
 
     /**
      * Called when the component is mounted.
      */
     mount: function mount() {
+      var _this = this;
+
       var list = Components.Elements.list;
       Splide.on('touchstart mousedown', start, list).on('touchmove mousemove', move, list, {
         passive: false
@@ -3871,6 +3866,8 @@ var FRICTION_REDUCER = 7;
             passive: false
           });
         });
+      }).on('mounted updated', function () {
+        _this.disabled = !Splide.options.drag;
       });
     }
   };
@@ -4648,7 +4645,7 @@ var UPDATE_EVENT = 'updated.page refresh.page';
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ var pagination = (function (Splide, Components, name) {
+/* harmony default export */ var components_pagination = (function (Splide, Components, name) {
   /**
    * Store all data for pagination.
    * - list: A list element.
@@ -4676,26 +4673,41 @@ var UPDATE_EVENT = 'updated.page refresh.page';
      *
      * @type {boolean}
      */
-    required: Splide.options.pagination,
+    // required: Splide.options.pagination,
 
     /**
      * Called when the component is mounted.
      */
     mount: function mount() {
-      data = createPagination();
-      var slider = Elements.slider;
-      var parent = Splide.options.pagination === 'slider' && slider ? slider : Splide.root;
-      append(parent, data.list);
-      bind();
+      var pagination = Splide.options.pagination;
+
+      if (pagination) {
+        data = createPagination();
+        var slider = Elements.slider;
+        var parent = pagination === 'slider' && slider ? slider : Splide.root;
+        append(parent, data.list);
+        Splide.on(ATTRIBUTES_UPDATE_EVENT, updateAttributes);
+      }
+
+      Splide.off(UPDATE_EVENT).on(UPDATE_EVENT, function () {
+        Pagination.destroy();
+
+        if (Splide.options.pagination) {
+          Pagination.mount();
+          Pagination.mounted();
+        }
+      });
     },
 
     /**
      * Called after all components are mounted.
      */
     mounted: function mounted() {
-      var index = Splide.index;
-      Splide.emit(name + ":mounted", data, this.getItem(index));
-      updateAttributes(index, -1);
+      if (Splide.options.pagination) {
+        var index = Splide.index;
+        Splide.emit(name + ":mounted", data, this.getItem(index));
+        updateAttributes(index, -1);
+      }
     },
 
     /**
@@ -4709,7 +4721,7 @@ var UPDATE_EVENT = 'updated.page refresh.page';
         data.items.forEach(function (item) {
           Splide.off('click', item.button);
         });
-      } // Do not remove UPDATE events to recreate pagination if needed.
+      } // Do not remove UPDATE_EVENT to recreate pagination if needed.
 
 
       Splide.off(ATTRIBUTES_UPDATE_EVENT);
@@ -4738,26 +4750,11 @@ var UPDATE_EVENT = 'updated.page refresh.page';
 
   };
   /**
-   * Listen to some events.
-   */
-
-  function bind() {
-    Splide.on(ATTRIBUTES_UPDATE_EVENT, updateAttributes).on(UPDATE_EVENT, function () {
-      Pagination.destroy();
-
-      if (Splide.options.pagination) {
-        Pagination.mount();
-        Pagination.mounted();
-      }
-    });
-  }
-  /**
    * Update attributes.
    *
    * @param {number} index     - Active index.
    * @param {number} prevIndex - Prev index.
    */
-
 
   function updateAttributes(index, prevIndex) {
     var prev = Pagination.getItem(prevIndex);
@@ -5547,7 +5544,7 @@ var TRIGGER_KEYS = [' ', 'Enter', 'Spacebar'];
  * @type {number}
  */
 
-var breakpoints_THROTTLE = 50;
+var THROTTLE = 50;
 /**
  * The component for updating options according to a current window width.
  *
@@ -5569,7 +5566,7 @@ var breakpoints_THROTTLE = 50;
    * @type {Function}
    */
 
-  var throttledCheck = throttle(check, breakpoints_THROTTLE);
+  var throttledCheck = throttle(check, THROTTLE);
   /**
    * Keep initial options.
    *
@@ -5660,9 +5657,9 @@ var breakpoints_THROTTLE = 50;
         if (State.is(DESTROYED)) {
           State.set(CREATED);
           Splide.mount();
-        } else {
-          Splide.options = options;
         }
+
+        Splide.options = options;
       }
     }
   }
@@ -5720,7 +5717,7 @@ var COMPLETE = {
   Autoplay: components_autoplay,
   Cover: components_cover,
   Arrows: components_arrows,
-  Pagination: pagination,
+  Pagination: components_pagination,
   LazyLoad: lazyload,
   Keyboard: keyboard,
   Sync: sync,
@@ -5735,7 +5732,7 @@ var LIGHT = {
   Layout: layout,
   Drag: drag,
   Arrows: components_arrows,
-  Pagination: pagination,
+  Pagination: components_pagination,
   A11y: a11y
 };
 // CONCATENATED MODULE: ./build/module/module.js

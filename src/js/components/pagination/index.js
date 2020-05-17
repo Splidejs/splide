@@ -56,32 +56,42 @@ export default ( Splide, Components, name ) => {
 	 */
 	const Pagination = {
 		/**
-		 * Required only when the pagination option is true.
-		 *
-		 * @type {boolean}
-		 */
-		required: Splide.options.pagination,
-
-		/**
 		 * Called when the component is mounted.
 		 */
 		mount() {
-			data = createPagination();
+			const pagination = Splide.options.pagination;
 
-			const slider = Elements.slider;
-			const parent = Splide.options.pagination === 'slider' && slider ? slider : Splide.root;
-			append( parent, data.list );
+			if ( pagination ) {
+				data = createPagination();
 
-			bind();
+				const slider = Elements.slider;
+				const parent = pagination === 'slider' && slider ? slider : Splide.root;
+				append( parent, data.list );
+
+				Splide.on( ATTRIBUTES_UPDATE_EVENT, updateAttributes );
+			}
+
+			Splide
+				.off( UPDATE_EVENT )
+				.on( UPDATE_EVENT, () => {
+					Pagination.destroy();
+
+					if ( Splide.options.pagination ) {
+						Pagination.mount();
+						Pagination.mounted();
+					}
+				} );
 		},
 
 		/**
 		 * Called after all components are mounted.
 		 */
 		mounted() {
-			const index = Splide.index;
-			Splide.emit( `${ name }:mounted`, data, this.getItem( index ) );
-			updateAttributes( index, -1 );
+			if ( Splide.options.pagination ) {
+				const index = Splide.index;
+				Splide.emit( `${ name }:mounted`, data, this.getItem( index ) );
+				updateAttributes( index, -1 );
+			}
 		},
 
 		/**
@@ -95,7 +105,7 @@ export default ( Splide, Components, name ) => {
 				data.items.forEach( item => { Splide.off( 'click', item.button ) } );
 			}
 
-			// Do not remove UPDATE events to recreate pagination if needed.
+			// Do not remove UPDATE_EVENT to recreate pagination if needed.
 			Splide.off( ATTRIBUTES_UPDATE_EVENT );
 
 			data = {};
@@ -121,22 +131,6 @@ export default ( Splide, Components, name ) => {
 			return data;
 		},
 	};
-
-	/**
-	 * Listen to some events.
-	 */
-	function bind() {
-		Splide
-			.on( ATTRIBUTES_UPDATE_EVENT, updateAttributes )
-			.on( UPDATE_EVENT, () => {
-				Pagination.destroy();
-
-				if ( Splide.options.pagination ) {
-					Pagination.mount();
-					Pagination.mounted();
-				}
-			} );
-	}
 
 	/**
 	 * Update attributes.
