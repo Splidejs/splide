@@ -127,6 +127,7 @@ Here is a list of options and brief explanations. Visit [this page](https://spli
 * **isNavigation**: Determine if a slider is navigation for another.
 * **trimSpace**: Whether to trim spaces before the fist slide or after the last one.
 * **updateOnMove**: If true, update slide status(eg. "is-active" class) before transition.
+* **throttle**: Throttle duration for the resize event.
 * **breakpoints**: Breakpoints definitions.
 * **classes**: Collection of class names.
 * **i18n**: Collection of texts for i18n.
