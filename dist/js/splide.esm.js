@@ -1349,8 +1349,8 @@ var DEFAULTS = {
   trimSpace: true,
 
   /**
-   * Slide status is updated after move as default.
-   * If true, it will be updated before move.
+   * The "is-active" class is added after transition as default.
+   * If true, it will be added before move.
    *
    * @type {boolean}
    */
@@ -1927,12 +1927,19 @@ var STYLE_RESTORE_EVENTS = 'update.slide';
 
 /* harmony default export */ var elements_slide = (function (Splide, index, realIndex, slide) {
   /**
+   * Whether to update "is-active" class before or after transition.
+   *
+   * @type {boolean}
+   */
+  var updateOnMove = Splide.options.updateOnMove;
+  /**
    * Events when the slide status is updated.
    * Append a namespace to remove listeners later.
    *
    * @type {string}
    */
-  var STATUS_UPDATE_EVENTS = 'ready.slide updated.slide resize.slide ' + (Splide.options.updateOnMove ? 'move.slide' : 'moved.slide');
+
+  var STATUS_UPDATE_EVENTS = 'ready.slide updated.slide resize.slide moved.slide' + (updateOnMove ? ' move.slide' : '');
   /**
    * Slide sub component object.
    *
@@ -1995,6 +2002,18 @@ var STYLE_RESTORE_EVENTS = 'update.slide';
       Splide.on(STATUS_UPDATE_EVENTS, function () {
         return _this.update();
       }).on(STYLE_RESTORE_EVENTS, restoreStyles);
+      /*
+       * Add "is-active" class to a clone element temporarily
+       * and it will be removed on "moved" event.
+       */
+
+      if (updateOnMove) {
+        Splide.on('move.slide', function () {
+          if (Splide.index === realIndex) {
+            _update(true, false);
+          }
+        });
+      }
     },
 
     /**
@@ -3205,7 +3224,7 @@ var controller_floor = Math.floor;
       var clone = cloneDeeply(elm);
       before(clone, slides[0]);
       clones.push(clone);
-      Elements.register(clone, index - count, index);
+      Elements.register(clone, index - count, length + index - count);
     });
   }
   /**
@@ -4669,13 +4688,6 @@ var UPDATE_EVENT = 'updated.page refresh.page';
 
   var Pagination = {
     /**
-     * Required only when the pagination option is true.
-     *
-     * @type {boolean}
-     */
-    // required: Splide.options.pagination,
-
-    /**
      * Called when the component is mounted.
      */
     mount: function mount() {
@@ -5707,8 +5719,8 @@ var THROTTLE = 50;
 var COMPLETE = {
   Options: components_options,
   Breakpoints: components_breakpoints,
-  Elements: components_elements,
   Controller: controller,
+  Elements: components_elements,
   Track: components_track,
   Clones: components_clones,
   Layout: layout,

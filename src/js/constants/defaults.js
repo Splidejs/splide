@@ -320,8 +320,8 @@ export const DEFAULTS = {
 	trimSpace: true,
 
 	/**
-	 * Slide status is updated after move as default.
-	 * If true, it will be updated before move.
+	 * The "is-active" class is added after transition as default.
+	 * If true, it will be added before move.
 	 *
 	 * @type {boolean}
 	 */

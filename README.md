@@ -128,7 +128,7 @@ Here is a list of options and brief explanations. Visit [this page](https://spli
 * **accessibility**: Whether to enable accessibility(ARIA attributes) or not.
 * **isNavigation**: Determine if a slider is navigation for another.
 * **trimSpace**: Whether to trim spaces before the fist slide or after the last one.
-* **updateOnMove**: If true, update slide status(eg. "is-active" class) before transition.
+* **updateOnMove**: If true, "is-active" class added to the slide element before transition.
 * **throttle**: Throttle duration for the resize event.
 * **breakpoints**: Breakpoints definitions.
 * **classes**: Collection of class names.

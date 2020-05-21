@@ -32,13 +32,20 @@ const STYLE_RESTORE_EVENTS = 'update.slide';
  */
 export default ( Splide, index, realIndex, slide ) => {
 	/**
+	 * Whether to update "is-active" class before or after transition.
+	 *
+	 * @type {boolean}
+	 */
+	const updateOnMove = Splide.options.updateOnMove;
+
+	/**
 	 * Events when the slide status is updated.
 	 * Append a namespace to remove listeners later.
 	 *
 	 * @type {string}
 	 */
-	const STATUS_UPDATE_EVENTS = 'ready.slide updated.slide resize.slide '
-		+ ( Splide.options.updateOnMove ? 'move.slide' : 'moved.slide' );
+	const STATUS_UPDATE_EVENTS = 'ready.slide updated.slide resize.slide moved.slide'
+		+ ( updateOnMove ? ' move.slide' : '' );
 
 	/**
 	 * Slide sub component object.
@@ -99,6 +106,18 @@ export default ( Splide, index, realIndex, slide ) => {
 			Splide
 				.on( STATUS_UPDATE_EVENTS, () => this.update() )
 				.on( STYLE_RESTORE_EVENTS, restoreStyles );
+
+			/*
+			 * Add "is-active" class to a clone element temporarily
+			 * and it will be removed on "moved" event.
+			 */
+			if ( updateOnMove ) {
+				Splide.on( 'move.slide', () => {
+					if ( Splide.index === realIndex ) {
+						update( true, false );
+					}
+				} );
+			}
 		},
 
 		/**

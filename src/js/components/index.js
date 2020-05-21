@@ -26,8 +26,8 @@ import Breakpoints from './breakpoints';
 export const COMPLETE = {
 	Options,
 	Breakpoints,
-	Elements,
 	Controller,
+	Elements,
 	Track,
 	Clones,
 	Layout,

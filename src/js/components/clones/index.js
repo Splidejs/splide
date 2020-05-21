@@ -109,7 +109,7 @@ export default ( Splide, Components ) => {
 			before( clone, slides[0] );
 			clones.push( clone );
 
-			Elements.register( clone, index - count, index );
+			Elements.register( clone, index - count, length + index - count );
 		} );
 	}
 
