@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.3.0
+ * Version  : 2.3.1
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
