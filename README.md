@@ -136,7 +136,7 @@ Here is a list of options and brief explanations. Visit [this page](https://spli
 
 ## Extensions
 * [Video](https://splidejs.com/extension-video/): Assign HTML video, YouTube or Vimeo to slides.
-* [URL Hash Navigation](https://splidejs.com/extension-url-hash/): Listen to hash change and move a slider to a slide having the hash data attribute.
+* [URL Hash Navigation](https://splidejs.com/extension-url-hash-navigation/): Listen to hash change and move a slider to a slide having the hash data attribute.
 * [Grid](https://splidejs.com/extension-grid/): Create rows and cols in a slider. 
 
 ## API and Extension
