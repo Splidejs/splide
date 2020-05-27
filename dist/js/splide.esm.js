@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.3.1
+ * Version  : 2.3.2
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -2474,7 +2474,7 @@ var controller_floor = Math.floor;
      */
     parse: function parse(control) {
       var index = Splide.index;
-      var matches = String(control).match(/([+\-<>])(\d+)?/);
+      var matches = String(control).match(/([+\-<>]+)(\d+)?/);
       var indicator = matches ? matches[1] : '';
       var number = matches ? parseInt(matches[2]) : 0;
 
@@ -2488,11 +2488,8 @@ var controller_floor = Math.floor;
           break;
 
         case '>':
-          index = this.toIndex(number > -1 ? number : this.toPage(index) + 1);
-          break;
-
         case '<':
-          index = this.toIndex(number > -1 ? number : this.toPage(index) - 1);
+          index = parsePage(number, index, indicator === '<');
           break;
 
         default:
@@ -2663,7 +2660,7 @@ var controller_floor = Math.floor;
 
   };
   /**
-   * Listen some events.
+   * Listen to some events.
    */
 
   function bind() {
@@ -2683,6 +2680,31 @@ var controller_floor = Math.floor;
 
   function hasFocus() {
     return options.focus !== false;
+  }
+  /**
+   * Return the next or previous page index computed by the page number and current index.
+   *
+   * @param {number}  number - Specify the page number.
+   * @param {number}  index  - Current index.
+   * @param {boolean} prev   - Prev or next.
+   *
+   * @return {number} - Slide index.
+   */
+
+
+  function parsePage(number, index, prev) {
+    if (number > -1) {
+      return Controller.toIndex(number);
+    }
+
+    var perMove = options.perMove;
+    var sign = prev ? -1 : 1;
+
+    if (perMove) {
+      return index + perMove * sign;
+    }
+
+    return Controller.toIndex(Controller.toPage(index) + sign);
   }
 
   return Controller;
@@ -4563,26 +4585,15 @@ var SIZE = 40;
     }
   };
   /**
-   * Listen native and custom events.
+   * Listen to native and custom events.
    */
 
   function bind() {
     Splide.on('click', function () {
-      return onClick(true);
+      Splide.go('<');
     }, prev).on('click', function () {
-      return onClick(false);
+      Splide.go('>');
     }, next).on('mounted move updated refresh', updateDisabled);
-  }
-  /**
-   * Called when an arrow is clicked.
-   *
-   * @param {boolean} prev - If true, the previous arrow is clicked.
-   */
-
-
-  function onClick(prev) {
-    var perMove = Splide.options.perMove;
-    Splide.go(perMove ? "" + (prev ? '-' : '+') + perMove : prev ? '<' : '>');
   }
   /**
    * Update a disabled attribute.

@@ -77,7 +77,7 @@ export default ( Splide, Components ) => {
 		parse( control ) {
 			let index = Splide.index;
 
-			const matches   = String( control ).match( /([+\-<>])(\d+)?/ );
+			const matches   = String( control ).match( /([+\-<>]+)(\d+)?/ );
 			const indicator = matches ? matches[1] : '';
 			const number    = matches ? parseInt( matches[2] ) : 0;
 
@@ -91,11 +91,8 @@ export default ( Splide, Components ) => {
 					break;
 
 				case '>':
-					index = this.toIndex( number > -1 ? number : this.toPage( index ) + 1 );
-					break;
-
 				case '<':
-					index = this.toIndex( number > -1 ? number : this.toPage( index ) - 1 );
+					index = parsePage( number, index, indicator === '<' );
 					break;
 
 				default:
@@ -269,7 +266,7 @@ export default ( Splide, Components ) => {
 	};
 
 	/**
-	 * Listen some events.
+	 * Listen to some events.
 	 */
 	function bind() {
 		Splide
@@ -287,6 +284,30 @@ export default ( Splide, Components ) => {
 	 */
 	function hasFocus() {
 		return options.focus !== false;
+	}
+
+	/**
+	 * Return the next or previous page index computed by the page number and current index.
+	 *
+	 * @param {number}  number - Specify the page number.
+	 * @param {number}  index  - Current index.
+	 * @param {boolean} prev   - Prev or next.
+	 *
+	 * @return {number} - Slide index.
+	 */
+	function parsePage( number, index, prev ) {
+		if ( number > -1 ) {
+			return Controller.toIndex( number );
+		}
+
+		const perMove = options.perMove;
+		const sign    = prev ? -1 : 1;
+
+		if ( perMove ) {
+			return index + perMove * sign;
+		}
+
+		return Controller.toIndex( Controller.toPage( index ) + sign );
 	}
 
 	return Controller;

@@ -119,23 +119,13 @@ export default ( Splide, Components, name ) => {
 	};
 
 	/**
-	 * Listen native and custom events.
+	 * Listen to native and custom events.
 	 */
 	function bind() {
 		Splide
-			.on( 'click', () => onClick( true ), prev )
-			.on( 'click', () => onClick( false ), next )
+			.on( 'click', () => { Splide.go( '<' ) }, prev )
+			.on( 'click', () => { Splide.go( '>' ) }, next )
 			.on( 'mounted move updated refresh', updateDisabled );
-	}
-
-	/**
-	 * Called when an arrow is clicked.
-	 *
-	 * @param {boolean} prev - If true, the previous arrow is clicked.
-	 */
-	function onClick( prev ) {
-		const perMove = Splide.options.perMove;
-		Splide.go( perMove ? `${ prev ? '-' : '+' }${ perMove }` : ( prev ? '<' : '>' ) );
 	}
 
 	/**
