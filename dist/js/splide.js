@@ -1973,13 +1973,6 @@ var STYLE_RESTORE_EVENTS = 'update.slide';
     isClone: realIndex > -1,
 
     /**
-     * Hold the original styles.
-     *
-     * @type {string}
-     */
-    styles: getAttribute(slide, 'style') || '',
-
-    /**
      * Called when the component is mounted.
      */
     mount: function mount() {
@@ -2003,7 +1996,14 @@ var STYLE_RESTORE_EVENTS = 'update.slide';
             _update(true, false);
           }
         });
-      }
+      } // Make sure the slide is shown.
+
+
+      applyStyle(slide, {
+        display: ''
+      }); // Hold the original styles.
+
+      this.styles = getAttribute(slide, 'style') || '';
     },
 
     /**
@@ -2285,7 +2285,8 @@ var UID_NAME = 'uid';
       }
 
       if (slide instanceof Element) {
-        var ref = this.slides[index];
+        var ref = this.slides[index]; // This will be removed in mount() of Slide component.
+
         applyStyle(slide, {
           display: 'none'
         });
@@ -2299,9 +2300,6 @@ var UID_NAME = 'uid';
         }
 
         dom_loaded(slide, function () {
-          applyStyle(slide, {
-            display: ''
-          });
           callback && callback(slide);
         });
       }

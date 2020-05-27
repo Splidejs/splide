@@ -5,7 +5,7 @@
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
-import { find, addClass, removeClass, hasClass, getAttribute, setAttribute } from '../../utils/dom';
+import { find, addClass, removeClass, hasClass, getAttribute, setAttribute, applyStyle } from '../../utils/dom';
 import { FADE, SLIDE } from '../../constants/types';
 import { STATUS_CLASSES } from '../../constants/classes';
 import { values } from "../../utils/object";
@@ -89,13 +89,6 @@ export default ( Splide, index, realIndex, slide ) => {
 		isClone: realIndex > -1,
 
 		/**
-		 * Hold the original styles.
-		 *
-		 * @type {string}
-		 */
-		styles: getAttribute( slide, 'style' ) || '',
-
-		/**
 		 * Called when the component is mounted.
 		 */
 		mount() {
@@ -118,6 +111,12 @@ export default ( Splide, index, realIndex, slide ) => {
 					}
 				} );
 			}
+
+			// Make sure the slide is shown.
+			applyStyle( slide, { display: '' } );
+
+			// Hold the original styles.
+			this.styles = getAttribute( slide, 'style' ) || '';
 		},
 
 		/**

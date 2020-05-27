@@ -181,6 +181,8 @@ export default ( Splide, Components ) => {
 
 			if ( slide instanceof Element ) {
 				const ref = this.slides[ index ];
+
+				// This will be removed in mount() of Slide component.
 				applyStyle( slide, { display: 'none' } );
 
 				if ( ref ) {
@@ -191,10 +193,7 @@ export default ( Splide, Components ) => {
 					this.slides.push( slide );
 				}
 
-				loaded( slide, () => {
-					applyStyle( slide, { display: '' } );
-					callback && callback( slide );
-				} );
+				loaded( slide, () => { callback && callback( slide ) } );
 			}
 		},
 
