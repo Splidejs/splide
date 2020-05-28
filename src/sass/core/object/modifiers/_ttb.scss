@@ -2,13 +2,10 @@
   $root: &;
 
   &--ttb {
-    > #{$root}__track {
-      > #{$root}__list {
-        display: block;
-      }
+    #{$root}__list {
+      display: block;
     }
-
-    > #{$root}__pagination {
+    #{$root}__pagination {
       width: auto;
     }
   }

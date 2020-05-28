@@ -2,12 +2,8 @@
   $root: &;
 
   &--draggable {
-    > #{$root}__track {
-      > #{$root}__list {
-        > #{$root}__slide {
-          user-select: none;
-        }
-      }
+    #{$root}__slide {
+      user-select: none;
     }
   }
 }
