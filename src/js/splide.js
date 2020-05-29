@@ -41,6 +41,8 @@ export default class Splide {
 		this._o = merge( DEFAULTS, options );
 		this._i = 0;
 		this._c = Components;
+		this._e = {}; // Extensions
+		this._t = null; // Transition
 	}
 
 	/**
@@ -49,10 +51,13 @@ export default class Splide {
 	 * @param {Object}   Extensions - Optional. Additional components.
 	 * @param {function} Transition - Optional. Set a custom transition component.
 	 *
-	 * @return {Splide|null} - This instance or null if an exception occurred.
+	 * @return {Splide|undefined} - This instance or undefined if an exception occurred.
 	 */
-	mount( Extensions = {}, Transition = null ) {
-		this.Components = this.Components || compose( this, merge( this._c, Extensions ), Transition );
+	mount( Extensions = this._e, Transition = this._t ) {
+		this._e = Extensions;
+		this._t = Transition;
+
+		this.Components = compose( this, merge( this._c, Extensions ), Transition );
 
 		try {
 			each( this.Components, ( component, key ) => {
@@ -66,24 +71,25 @@ export default class Splide {
 			} );
 		} catch ( e ) {
 			error( e.message );
-			return null;
+			return;
 		}
 
-		this.State.set( STATES.MOUNTED );
+		const { State } = this;
+		State.set( STATES.MOUNTED );
 
 		each( this.Components, component => {
 			component.mounted && component.mounted();
 		} );
 
 		this.emit( 'mounted' );
-		this.State.set( STATES.IDLE );
+		State.set( STATES.IDLE );
 		this.emit( 'ready' );
 
 		applyStyle( this.root, { visibility: 'visible' } );
 
 		this
-			.on( 'move drag', () => this.State.set( STATES.MOVING ) )
-			.on( 'moved dragged', () => this.State.set( STATES.IDLE ) );
+			.on( 'move drag', () => State.set( STATES.MOVING ) )
+			.on( 'moved dragged', () => State.set( STATES.IDLE ) );
 
 		return this;
 	}

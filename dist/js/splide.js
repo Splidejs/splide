@@ -1484,6 +1484,9 @@ var splide_Splide = /*#__PURE__*/function () {
     this._o = merge(DEFAULTS, options);
     this._i = 0;
     this._c = Components;
+    this._e = {}; // Extensions
+
+    this._t = null; // Transition
   }
   /**
    * Compose and mount components.
@@ -1491,7 +1494,7 @@ var splide_Splide = /*#__PURE__*/function () {
    * @param {Object}   Extensions - Optional. Additional components.
    * @param {function} Transition - Optional. Set a custom transition component.
    *
-   * @return {Splide|null} - This instance or null if an exception occurred.
+   * @return {Splide|undefined} - This instance or undefined if an exception occurred.
    */
 
 
@@ -1501,14 +1504,16 @@ var splide_Splide = /*#__PURE__*/function () {
     var _this = this;
 
     if (Extensions === void 0) {
-      Extensions = {};
+      Extensions = this._e;
     }
 
     if (Transition === void 0) {
-      Transition = null;
+      Transition = this._t;
     }
 
-    this.Components = this.Components || compose(this, merge(this._c, Extensions), Transition);
+    this._e = Extensions;
+    this._t = Transition;
+    this.Components = compose(this, merge(this._c, Extensions), Transition);
 
     try {
       each(this.Components, function (component, key) {
@@ -1522,23 +1527,24 @@ var splide_Splide = /*#__PURE__*/function () {
       });
     } catch (e) {
       error_error(e.message);
-      return null;
+      return;
     }
 
-    this.State.set(MOUNTED);
+    var State = this.State;
+    State.set(MOUNTED);
     each(this.Components, function (component) {
       component.mounted && component.mounted();
     });
     this.emit('mounted');
-    this.State.set(IDLE);
+    State.set(IDLE);
     this.emit('ready');
     applyStyle(this.root, {
       visibility: 'visible'
     });
     this.on('move drag', function () {
-      return _this.State.set(MOVING);
+      return State.set(MOVING);
     }).on('moved dragged', function () {
-      return _this.State.set(IDLE);
+      return State.set(IDLE);
     });
     return this;
   }
