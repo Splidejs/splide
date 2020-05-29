@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.3.3
+ * Version  : 2.3.4
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -3240,13 +3240,13 @@ var controller_floor = Math.floor;
       var clone = cloneDeeply(elm);
       append(Elements.list, clone);
       clones.push(clone);
-      Elements.register(clone, index + length, index);
+      Elements.register(clone, index + length, index % length);
     });
     slides.slice(-count).forEach(function (elm, index) {
       var clone = cloneDeeply(elm);
       before(clone, slides[0]);
       clones.push(clone);
-      Elements.register(clone, index - count, length + index - count);
+      Elements.register(clone, index - count, (length + index - count % length) % length);
     });
   }
   /**

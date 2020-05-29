@@ -101,7 +101,7 @@ export default ( Splide, Components ) => {
 			append( Elements.list, clone );
 			clones.push( clone );
 
-			Elements.register( clone, index + length, index );
+			Elements.register( clone, index + length, index % length );
 		} );
 
 		slides.slice( -count ).forEach( ( elm, index ) => {
@@ -109,7 +109,7 @@ export default ( Splide, Components ) => {
 			before( clone, slides[0] );
 			clones.push( clone );
 
-			Elements.register( clone, index - count, length + index - count );
+			Elements.register( clone, index - count, ( length + index - count % length ) % length );
 		} );
 	}
 
