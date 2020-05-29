@@ -98,7 +98,8 @@ export default ( Splide, index, realIndex, slide ) => {
 
 			Splide
 				.on( STATUS_UPDATE_EVENTS, () => this.update() )
-				.on( STYLE_RESTORE_EVENTS, restoreStyles );
+				.on( STYLE_RESTORE_EVENTS, restoreStyles )
+				.on( 'click', () => Splide.emit( 'click', this ), slide );
 
 			/*
 			 * Add "is-active" class to a clone element temporarily
@@ -123,7 +124,7 @@ export default ( Splide, index, realIndex, slide ) => {
 		 * Destroy.
 		 */
 		destroy() {
-			Splide.off( STATUS_UPDATE_EVENTS ).off( STYLE_RESTORE_EVENTS );
+			Splide.off( STATUS_UPDATE_EVENTS ).off( STYLE_RESTORE_EVENTS ).off( 'click', slide );
 			removeClass( slide, values( STATUS_CLASSES ) );
 			restoreStyles();
 		},

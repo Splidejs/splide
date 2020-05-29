@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.3.2
+ * Version  : 2.3.3
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -1984,7 +1984,9 @@ var STYLE_RESTORE_EVENTS = 'update.slide';
 
       Splide.on(STATUS_UPDATE_EVENTS, function () {
         return _this.update();
-      }).on(STYLE_RESTORE_EVENTS, restoreStyles);
+      }).on(STYLE_RESTORE_EVENTS, restoreStyles).on('click', function () {
+        return Splide.emit('click', _this);
+      }, slide);
       /*
        * Add "is-active" class to a clone element temporarily
        * and it will be removed on "moved" event.
@@ -2010,7 +2012,7 @@ var STYLE_RESTORE_EVENTS = 'update.slide';
      * Destroy.
      */
     destroy: function destroy() {
-      Splide.off(STATUS_UPDATE_EVENTS).off(STYLE_RESTORE_EVENTS);
+      Splide.off(STATUS_UPDATE_EVENTS).off(STYLE_RESTORE_EVENTS).off('click', slide);
       removeClass(slide, values(STATUS_CLASSES));
       restoreStyles();
     },
