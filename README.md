@@ -11,7 +11,7 @@
 * [Documents](https://splidejs.com/category/users-guide/)
 
 ## News
-* [Vue Splide](https://github.com/Splidejs/vue-splide) is released.
+* [Vue Splide](https://splidejs.com/integration-vue-splide/) is released.
 * Add 'resetProgress' and 'throttle' options.
 * Breakpoints accept 'drag' and 'pagination'.
 * Add some [themes](https://splidejs.com/themes/).
@@ -148,7 +148,7 @@ Here is a list of options and brief explanations. Visit [this page](https://spli
 * [Grid](https://splidejs.com/extension-grid/): Create rows and cols in a slider.
 
 ## Integration
-* [Vue Splide](https://github.com/Splidejs/vue-splide) 
+* [Vue Splide](https://splidejs.com/integration-vue-splide/) 
 
 ## API and Extension
 Splide provides some APIs and the way to customize the behaviour programmatically.
