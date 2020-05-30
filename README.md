@@ -1,3 +1,4 @@
+# Splide
 <p align="center">
   <a href="https://splidejs.com/" target="_blank">
     <img src="images/hero.png">
