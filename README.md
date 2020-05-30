@@ -142,7 +142,7 @@ Here is a list of options and brief explanations. Visit [this page](https://spli
 * [URL Hash Navigation](https://splidejs.com/extension-url-hash-navigation/): Listen to hash change and move a slider to a slide having the hash data attribute.
 * [Grid](https://splidejs.com/extension-grid/): Create rows and cols in a slider.
 
-## Components
+## Integration
 * [Vue Splide](https://github.com/Splidejs/vue-splide) 
 
 ## API and Extension
