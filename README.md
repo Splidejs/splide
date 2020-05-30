@@ -6,6 +6,7 @@
 * [Documents](https://splidejs.com/category/users-guide/)
 
 ## News
+* [Vue Splide](https://github.com/Splidejs/vue-splide) is released.
 * Add 'resetProgress' and 'throttle' options.
 * Breakpoints accept 'drag' and 'pagination'.
 * Add some [themes](https://splidejs.com/themes/).
@@ -71,6 +72,8 @@ Only the NPM way is explained in the following steps. Visit [this page](https://
     new Splide( '#splide' ).mount();
     ```
     Note that only the first element will be initialized even if using a class name.
+    
+[Vue Splide](https://github.com/Splidejs/vue-splide) is useful to integrate Splide if you are using Vue.
 
 ## Options
 ### Changing Options
@@ -137,7 +140,10 @@ Here is a list of options and brief explanations. Visit [this page](https://spli
 ## Extensions
 * [Video](https://splidejs.com/extension-video/): Assign HTML video, YouTube or Vimeo to slides.
 * [URL Hash Navigation](https://splidejs.com/extension-url-hash-navigation/): Listen to hash change and move a slider to a slide having the hash data attribute.
-* [Grid](https://splidejs.com/extension-grid/): Create rows and cols in a slider. 
+* [Grid](https://splidejs.com/extension-grid/): Create rows and cols in a slider.
+
+## Components
+* [Vue Splide](https://github.com/Splidejs/vue-splide) 
 
 ## API and Extension
 Splide provides some APIs and the way to customize the behaviour programmatically.
