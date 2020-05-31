@@ -153,7 +153,6 @@ Here is a list of options and brief explanations. Visit [this page](https://spli
     <a href="https://vuejs.org/" target="_blank">
         <img width="100px" src="images/vue-logo.png">
     </a>
-    <span>&nbsp;</span>
     <a href="https://reactjs.org/" target="_blank">
         <img width="100px" src="images/react-logo.png">
     </a>
