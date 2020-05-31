@@ -11,6 +11,7 @@
 * [Documents](https://splidejs.com/category/users-guide/)
 
 ## News
+* [React Splide](https://splidejs.com/integration-react-splide/) is released.
 * [Vue Splide](https://splidejs.com/integration-vue-splide/) is released.
 * Add 'resetProgress' and 'throttle' options.
 * Breakpoints accept 'drag' and 'pagination'.
@@ -148,7 +149,20 @@ Here is a list of options and brief explanations. Visit [this page](https://spli
 * [Grid](https://splidejs.com/extension-grid/): Create rows and cols in a slider.
 
 ## Integration
+<p>
+    <a href="https://vuejs.org/" target="_blank">
+        <img width="100px" src="images/vue-logo.png">
+    </a>
+    <span>&nbsp;</span>
+    <a href="https://reactjs.org/" target="_blank">
+        <img width="100px" src="images/react-logo.png">
+    </a>
+</p>
+
+Easy to intagrate a Splide slider or carousel into your Vue or React project.
+
 * [Vue Splide](https://splidejs.com/integration-vue-splide/) 
+* [React Splide](https://splidejs.com/integration-vue-splide/) 
 
 ## API and Extension
 Splide provides some APIs and the way to customize the behaviour programmatically.
