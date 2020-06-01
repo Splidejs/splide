@@ -1,4 +1,6 @@
 .splide {
+  $root: &;
+
   &__arrow {
     position: absolute;
     z-index: 1;
@@ -36,6 +38,20 @@
 
     &--next {
       right: 1em;
+    }
+  }
+
+  &__slider {
+    > #{$root}__arrows {
+      #{$root}__arrow {
+        &--prev {
+          left: -2.5em;
+        }
+
+        &--next {
+          right: -2.5em;
+        }
+      }
     }
   }
 }
