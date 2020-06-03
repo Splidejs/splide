@@ -16,7 +16,7 @@
 * Add 'resetProgress' and 'throttle' options.
 * Breakpoints accept 'drag' and 'pagination'.
 * Add some [themes](https://splidejs.com/themes/).
-* [Grid](https://splidejs.com/extension-grid/) extension is released. 
+* [Grid](https://splidejs.com/extension-grid/) extension is released.
 * [Auto Width](https://splidejs.com/auto-width/) is implemented. Each slide can have its own width.
 * [Breakpoints](https://splidejs.com/options/#breakpoints) accept 'destroy' option.
 * Merge Slides component to Elements.
@@ -78,7 +78,7 @@ Only the NPM way is explained in the following steps. Visit [this page](https://
     new Splide( '#splide' ).mount();
     ```
     Note that only the first element will be initialized even if using a class name.
-    
+
 [Vue Splide](https://github.com/Splidejs/vue-splide) is useful to integrate Splide if you are using Vue.
 
 ## Options
@@ -90,7 +90,7 @@ new Splide( '#splide', {
   perPage: 3,
 } );
 ```
-Or set a ```data-splide``` attribute to a root element in a JSON format: 
+Or set a ```data-splide``` attribute to a root element in a JSON format:
 ```html
 <div id="splide" class="splide" data-splide='{"type":"loop","perPage":3}'>
 </div>
@@ -160,8 +160,8 @@ Here is a list of options and brief explanations. Visit [this page](https://spli
 
 Easy to intagrate a Splide slider or carousel into your Vue or React project.
 
-* [Vue Splide](https://splidejs.com/integration-vue-splide/) 
-* [React Splide](https://splidejs.com/integration-vue-splide/) 
+* [Vue Splide](https://splidejs.com/integration-vue-splide/)
+* [React Splide](https://splidejs.com/integration-react-splide/)
 
 ## API and Extension
 Splide provides some APIs and the way to customize the behaviour programmatically.
@@ -169,5 +169,5 @@ Splide provides some APIs and the way to customize the behaviour programmaticall
 * [Extension](https://splidejs.com/extension/)
 
 ## License
-Splide is released under the MIT license.  
+Splide is released under the MIT license.
 © 2020 Naotoshi Fujita
