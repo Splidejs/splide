@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.3.7
+ * Version  : 2.3.8
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -1131,6 +1131,14 @@ var DEFAULTS = {
    * @type {number}
    */
   perMove: 0,
+
+  /**
+   * Determine manually how many clones should be generated on the left and right side.
+   * The total number of clones will be twice of this number.
+   *
+   * @type {number}
+   */
+  clones: 0,
 
   /**
    * Start index.
@@ -3151,6 +3159,7 @@ var controller_floor = Math.floor;
  */
 
 
+
 /**
  * The component for cloning some slides for "loop" mode of the track.
  *
@@ -3225,7 +3234,7 @@ var controller_floor = Math.floor;
 
   };
   /**
-   * Generate and append clones.
+   * Generate and append/prepend clones.
    */
 
   function generateClones() {
@@ -3240,14 +3249,16 @@ var controller_floor = Math.floor;
 
     while (slides.length < count) {
       slides = slides.concat(slides);
-    }
+    } // Clones after the last element.
+
 
     slides.slice(0, count).forEach(function (elm, index) {
       var clone = cloneDeeply(elm);
       append(Elements.list, clone);
       clones.push(clone);
       Elements.register(clone, index + length, index % length);
-    });
+    }); // Clones before the first element.
+
     slides.slice(-count).forEach(function (elm, index) {
       var clone = cloneDeeply(elm);
       before(clone, slides[0]);
@@ -3258,6 +3269,8 @@ var controller_floor = Math.floor;
   /**
    * Return half count of clones to be generated.
    * Clone count is determined by:
+   * - "clones" value in the options.
+   * - Number of slides that can be placed in a view in "fixed" mode.
    * - Max pages a flick action can move.
    * - Whether the slide length is enough for perPage.
    *
@@ -3268,11 +3281,21 @@ var controller_floor = Math.floor;
   function getCloneCount() {
     var options = Splide.options;
 
-    if (options.autoWidth) {
-      return Elements.length;
+    if (options.clones) {
+      return options.clones;
+    } // Use the slide length in autoWidth mode because the number candnot be calculated.
+
+
+    var baseCount = options.autoWidth ? Elements.length : options.perPage;
+    var dimension = options.direction === TTB ? 'Height' : 'Width';
+    var fixedSize = options["fixed" + dimension];
+
+    if (fixedSize) {
+      // Roughly determine the count. This needs not to be strict.
+      baseCount = Math.ceil(Elements.track["client" + dimension] / fixedSize);
     }
 
-    return options.perPage * (options.drag ? options.flickMaxPages + 1 : 1);
+    return baseCount * (options.drag ? options.flickMaxPages + 1 : 1);
   }
   /**
    * Clone deeply the given element.

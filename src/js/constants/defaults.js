@@ -104,6 +104,14 @@ export const DEFAULTS = {
 	perMove: 0,
 
 	/**
+	 * Determine manually how many clones should be generated on the left and right side.
+	 * The total number of clones will be twice of this number.
+	 *
+	 * @type {number}
+	 */
+	clones: 0,
+
+	/**
 	 * Start index.
 	 *
 	 * @type {number}
