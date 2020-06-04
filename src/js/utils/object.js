@@ -5,6 +5,8 @@
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
+const { keys } = Object;
+
 /**
  * Iterate an object like Array.forEach.
  * IE doesn't support forEach of HTMLCollection.
@@ -13,7 +15,7 @@
  * @param {function}  callback  - A function handling each value. Arguments are value, property and index.
  */
 export function each( obj, callback ) {
-	Object.keys( obj ).some( ( key, index ) => {
+	keys( obj ).some( ( key, index ) => {
 		return callback( obj[ key ], key, index );
 	} );
 }
@@ -27,7 +29,7 @@ export function each( obj, callback ) {
  * @return {Array} - An array containing all values of the given object.
  */
 export function values( obj ) {
-	return Object.keys( obj ).map( key => obj[ key ] );
+	return keys( obj ).map( key => obj[ key ] );
 }
 
 /**
@@ -76,7 +78,7 @@ export function merge( { ...to }, from ) {
 export function assign( to, from ) {
 	to._s = from;
 
-	Object.keys( from ).forEach( key => {
+	keys( from ).forEach( key => {
 		if ( ! to[ key ] ) {
 			Object.defineProperty( to, key, Object.getOwnPropertyDescriptor( from, key ) );
 		}

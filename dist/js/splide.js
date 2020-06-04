@@ -276,7 +276,7 @@ function _extends() { _extends = Object.assign || function (target) { for (var i
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+var keys = Object.keys;
 /**
  * Iterate an object like Array.forEach.
  * IE doesn't support forEach of HTMLCollection.
@@ -284,8 +284,9 @@ function _extends() { _extends = Object.assign || function (target) { for (var i
  * @param {Object}    obj       - An object.
  * @param {function}  callback  - A function handling each value. Arguments are value, property and index.
  */
+
 function each(obj, callback) {
-  Object.keys(obj).some(function (key, index) {
+  keys(obj).some(function (key, index) {
     return callback(obj[key], key, index);
   });
 }
@@ -299,7 +300,7 @@ function each(obj, callback) {
  */
 
 function values(obj) {
-  return Object.keys(obj).map(function (key) {
+  return keys(obj).map(function (key) {
     return obj[key];
   });
 }
@@ -350,7 +351,7 @@ function merge(_ref, from) {
 
 function object_assign(to, from) {
   to._s = from;
-  Object.keys(from).forEach(function (key) {
+  keys(from).forEach(function (key) {
     if (!to[key]) {
       Object.defineProperty(to, key, Object.getOwnPropertyDescriptor(from, key));
     }
@@ -491,7 +492,7 @@ function find(elm, selector) {
 function child(parent, tagOrClassName) {
   if (parent) {
     return values(parent.children).filter(function (child) {
-      return hasClass(child, tagOrClassName.split(' ')[0]) || child.tagName.toLowerCase() === tagOrClassName;
+      return hasClass(child, tagOrClassName.split(' ')[0]) || child.tagName === tagOrClassName;
     })[0] || null;
   }
 
@@ -534,8 +535,9 @@ function domify(html) {
 
 function dom_remove(elms) {
   toArray(elms).forEach(function (elm) {
-    if (elm && elm.parentElement) {
-      elm.parentElement.removeChild(elm);
+    if (elm) {
+      var parent = elm.parentElement;
+      parent && parent.removeChild(elm);
     }
   });
 }
@@ -559,8 +561,9 @@ function append(parent, child) {
  */
 
 function before(elm, ref) {
-  if (elm && ref && ref.parentElement) {
-    ref.parentElement.insertBefore(elm, ref);
+  if (elm && ref) {
+    var parent = ref.parentElement;
+    parent && parent.insertBefore(elm, ref);
   }
 }
 /**
@@ -1977,7 +1980,7 @@ var STYLE_RESTORE_EVENTS = 'update.slide';
      *
      * @type {Element|null}
      */
-    container: find(slide, "." + Splide.classes.container),
+    container: child(slide, Splide.classes.container),
 
     /**
      * Whether this is a cloned slide or not.
@@ -2007,8 +2010,8 @@ var STYLE_RESTORE_EVENTS = 'update.slide';
        */
 
       if (updateOnMove) {
-        Splide.on('move.slide', function () {
-          if (Splide.index === realIndex) {
+        Splide.on('move.slide', function (newIndex) {
+          if (newIndex === realIndex) {
             _update(true, false);
           }
         });
@@ -2204,8 +2207,7 @@ var UID_NAME = 'uid';
         _this.destroy();
 
         _this.init();
-      });
-      Splide.on('updated', function () {
+      }).on('updated', function () {
         removeClass(root, getClasses());
         addClass(root, getClasses());
       });
@@ -2301,7 +2303,7 @@ var UID_NAME = 'uid';
       }
 
       if (slide instanceof Element) {
-        var ref = this.slides[index]; // This will be removed in mount() of Slide component.
+        var ref = this.slides[index]; // This will be removed in mount() of a Slide component.
 
         applyStyle(slide, {
           display: 'none'
@@ -3167,6 +3169,13 @@ var controller_floor = Math.floor;
    */
   var clones = [];
   /**
+   * Store the current clone count on one side.
+   *
+   * @type {number}
+   */
+
+  var cloneCount = 0;
+  /**
    * Keep Elements component.
    *
    * @type {Object}
@@ -3184,14 +3193,12 @@ var controller_floor = Math.floor;
      * Called when the component is mounted.
      */
     mount: function mount() {
-      var _this = this;
-
       if (Splide.is(LOOP)) {
-        generateClones();
-        Splide.on('refresh', function () {
-          _this.destroy();
-
-          generateClones();
+        init();
+        Splide.on('refresh', init).on('resize', function () {
+          if (cloneCount !== getCloneCount()) {
+            Splide.refresh();
+          }
         });
       }
     },
@@ -3224,17 +3231,28 @@ var controller_floor = Math.floor;
 
   };
   /**
-   * Generate and append/prepend clones.
+   * Initialization.
    */
 
-  function generateClones() {
+  function init() {
+    Clones.destroy();
+    cloneCount = getCloneCount();
+    generateClones(cloneCount);
+  }
+  /**
+   * Generate and append/prepend clones.
+   *
+   * @param {number} count - The half number of clones.
+   */
+
+
+  function generateClones(count) {
     var length = Elements.length;
 
     if (!length) {
       return;
     }
 
-    var count = getCloneCount();
     var slides = Elements.slides;
 
     while (slides.length < count) {
@@ -3273,7 +3291,7 @@ var controller_floor = Math.floor;
 
     if (options.clones) {
       return options.clones;
-    } // Use the slide length in autoWidth mode because the number candnot be calculated.
+    } // Use the slide length in autoWidth mode because the number cannot be calculated.
 
 
     var baseCount = options.autoWidth ? Elements.length : options.perPage;
@@ -3281,7 +3299,7 @@ var controller_floor = Math.floor;
     var fixedSize = options["fixed" + dimension];
 
     if (fixedSize) {
-      // Roughly determine the count. This needs not to be strict.
+      // Roughly calculate the count. This needs not to be strict.
       baseCount = Math.ceil(Elements.track["client" + dimension] / fixedSize);
     }
 
@@ -4432,7 +4450,7 @@ var PAUSE_FLAGS = {
 
   function apply(uncover) {
     Components.Elements.each(function (Slide) {
-      var img = child(Slide.slide, 'img') || child(Slide.container, 'img');
+      var img = child(Slide.slide, 'IMG') || child(Slide.container, 'IMG');
 
       if (img && img.src) {
         cover(img, uncover);
@@ -5211,6 +5229,13 @@ var TAB_INDEX = 'tabindex';
 
   var Elements = Components.Elements;
   /**
+   * All attributes related with A11y.
+   *
+   * @type {string[]}
+   */
+
+  var allAttributes = [ARIA_HIDDEN, TAB_INDEX, ARIA_CONTROLS, ARIA_LABEL, ARIA_CURRENRT, 'role'];
+  /**
    * A11y component object.
    *
    * @type {Object}
@@ -5232,7 +5257,9 @@ var TAB_INDEX = 'tabindex';
         updateSlide(Slide.slide, true);
       }).on('hidden', function (Slide) {
         updateSlide(Slide.slide, false);
-      }).on('arrows:mounted', initArrows).on('arrows:updated', updateArrows).on('pagination:mounted', initPagination).on('pagination:updated', updatePagination);
+      }).on('arrows:mounted', initArrows).on('arrows:updated', updateArrows).on('pagination:mounted', initPagination).on('pagination:updated', updatePagination).on('refresh', function () {
+        removeAttribute(Components.Clones.clones, allAttributes);
+      });
 
       if (Splide.options.isNavigation) {
         Splide.on('navigation:mounted', initNavigation).on('active', function (Slide) {
@@ -5249,8 +5276,9 @@ var TAB_INDEX = 'tabindex';
      * Destroy.
      */
     destroy: function destroy() {
-      var arrows = Components.Arrows ? Components.Arrows.arrows : {};
-      removeAttribute(Elements.slides.concat([arrows.prev, arrows.next, Elements.play, Elements.pause]), [ARIA_HIDDEN, TAB_INDEX, ARIA_CONTROLS, ARIA_LABEL, ARIA_CURRENRT, 'role']);
+      var Arrows = Components.Arrows;
+      var arrows = Arrows ? Arrows.arrows : {};
+      removeAttribute(Elements.slides.concat([arrows.prev, arrows.next, Elements.play, Elements.pause]), allAttributes);
     }
   };
   /**
@@ -5367,16 +5395,15 @@ var TAB_INDEX = 'tabindex';
 
 
   function initNavigation(main) {
-    Elements.each(function (_ref) {
-      var slide = _ref.slide,
-          realIndex = _ref.realIndex,
-          index = _ref.index;
+    Elements.each(function (Slide) {
+      var slide = Slide.slide;
+      var realIndex = Slide.realIndex;
 
       if (!isButton(slide)) {
         setAttribute(slide, 'role', 'button');
       }
 
-      var slideIndex = realIndex > -1 ? realIndex : index;
+      var slideIndex = realIndex > -1 ? realIndex : Slide.index;
       var label = sprintf(i18n.slideX, slideIndex + 1);
       var mainSlide = main.Components.Elements.getSlide(slideIndex);
       setAttribute(slide, ARIA_LABEL, label);
@@ -5394,8 +5421,8 @@ var TAB_INDEX = 'tabindex';
    */
 
 
-  function updateNavigation(_ref2, active) {
-    var slide = _ref2.slide;
+  function updateNavigation(_ref, active) {
+    var slide = _ref.slide;
 
     if (active) {
       setAttribute(slide, ARIA_CURRENRT, true);
@@ -5413,7 +5440,7 @@ var TAB_INDEX = 'tabindex';
 
 
   function isButton(elm) {
-    return elm.tagName.toLowerCase() === 'button';
+    return elm.tagName === 'BUTTON';
   }
 
   return A11y;

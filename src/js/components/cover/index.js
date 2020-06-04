@@ -60,7 +60,7 @@ export default ( Splide, Components ) => {
 	 */
 	function apply( uncover ) {
 		Components.Elements.each( Slide => {
-			const img = child( Slide.slide, 'img' ) || child( Slide.container, 'img' );
+			const img = child( Slide.slide, 'IMG' ) || child( Slide.container, 'IMG' );
 
 			if ( img && img.src ) {
 				cover( img, uncover );

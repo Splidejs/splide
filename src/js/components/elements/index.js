@@ -86,15 +86,14 @@ export default ( Splide, Components ) => {
 			collect();
 			this.init();
 
-			Splide.on( 'refresh', () => {
-				this.destroy();
-				this.init();
-			} );
-
-			Splide.on( 'updated', () => {
-				removeClass( root, getClasses() );
-				addClass( root, getClasses() );
-			} );
+			Splide
+				.on( 'refresh', () => {
+					this.destroy();
+					this.init();
+				} ).on( 'updated', () => {
+					removeClass( root, getClasses() );
+					addClass( root, getClasses() );
+				} );
 		},
 
 		/**
@@ -182,7 +181,7 @@ export default ( Splide, Components ) => {
 			if ( slide instanceof Element ) {
 				const ref = this.slides[ index ];
 
-				// This will be removed in mount() of Slide component.
+				// This will be removed in mount() of a Slide component.
 				applyStyle( slide, { display: 'none' } );
 
 				if ( ref ) {

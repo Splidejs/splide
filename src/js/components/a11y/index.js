@@ -34,6 +34,13 @@ export default ( Splide, Components ) => {
 	const Elements = Components.Elements;
 
 	/**
+	 * All attributes related with A11y.
+	 *
+	 * @type {string[]}
+	 */
+	const allAttributes = [ ARIA_HIDDEN, TAB_INDEX, ARIA_CONTROLS, ARIA_LABEL, ARIA_CURRENRT, 'role' ];
+
+	/**
 	 * A11y component object.
 	 *
 	 * @type {Object}
@@ -56,7 +63,8 @@ export default ( Splide, Components ) => {
 				.on( 'arrows:mounted', initArrows )
 				.on( 'arrows:updated', updateArrows )
 				.on( 'pagination:mounted', initPagination )
-				.on( 'pagination:updated', updatePagination );
+				.on( 'pagination:updated', updatePagination )
+				.on( 'refresh', () => { removeAttribute( Components.Clones.clones, allAttributes ) } );
 
 			if ( Splide.options.isNavigation ) {
 				Splide
@@ -72,11 +80,12 @@ export default ( Splide, Components ) => {
 		 * Destroy.
 		 */
 		destroy() {
-			const arrows = Components.Arrows ? Components.Arrows.arrows : {};
+			const Arrows = Components.Arrows;
+			const arrows = Arrows ? Arrows.arrows : {};
 
 			removeAttribute(
 				Elements.slides.concat( [ arrows.prev, arrows.next, Elements.play, Elements.pause ] ),
-				[ ARIA_HIDDEN, TAB_INDEX, ARIA_CONTROLS, ARIA_LABEL, ARIA_CURRENRT, 'role' ]
+				allAttributes
 			);
 		},
 	};
@@ -189,12 +198,15 @@ export default ( Splide, Components ) => {
 	 * @param {Splide} main - A main Splide instance.
 	 */
 	function initNavigation( main ) {
-		Elements.each( ( { slide, realIndex, index } ) => {
+		Elements.each( Slide => {
+			const slide     = Slide.slide;
+			const realIndex = Slide.realIndex;
+
 			if ( ! isButton( slide ) ) {
 				setAttribute( slide, 'role', 'button' );
 			}
 
-			const slideIndex = realIndex > -1 ? realIndex : index;
+			const slideIndex = realIndex > -1 ? realIndex : Slide.index;
 			const label      = sprintf( i18n.slideX, slideIndex + 1 );
 			const mainSlide  = main.Components.Elements.getSlide( slideIndex );
 
@@ -228,7 +240,7 @@ export default ( Splide, Components ) => {
 	 * @return {boolean} - True if the given element is button.
 	 */
 	function isButton( elm ) {
-		return elm.tagName.toLowerCase() === 'button';
+		return elm.tagName === 'BUTTON';
 	}
 
 	return A11y;

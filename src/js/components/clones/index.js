@@ -27,6 +27,13 @@ export default ( Splide, Components ) => {
 	let clones = [];
 
 	/**
+	 * Store the current clone count on one side.
+	 *
+	 * @type {number}
+	 */
+	let cloneCount = 0;
+
+	/**
 	 * Keep Elements component.
 	 *
 	 * @type {Object}
@@ -44,12 +51,15 @@ export default ( Splide, Components ) => {
 		 */
 		mount() {
 			if ( Splide.is( LOOP ) ) {
-				generateClones();
+				init();
 
-				Splide.on( 'refresh', () => {
-					this.destroy();
-					generateClones();
-				} );
+				Splide
+					.on( 'refresh', init )
+					.on( 'resize', () => {
+						if ( cloneCount !== getCloneCount() ) {
+							Splide.refresh();
+						}
+					} );
 			}
 		},
 
@@ -81,17 +91,27 @@ export default ( Splide, Components ) => {
 	};
 
 	/**
-	 * Generate and append/prepend clones.
+	 * Initialization.
 	 */
-	function generateClones() {
+	function init() {
+		Clones.destroy();
+		cloneCount = getCloneCount();
+		generateClones( cloneCount );
+	}
+
+	/**
+	 * Generate and append/prepend clones.
+	 *
+	 * @param {number} count - The half number of clones.
+	 */
+	function generateClones( count ) {
 		const length = Elements.length;
 
 		if ( ! length ) {
 			return;
 		}
 
-		const count = getCloneCount();
-		let slides  = Elements.slides;
+		let slides = Elements.slides;
 
 		while ( slides.length < count ) {
 			slides = slides.concat( slides );
@@ -133,14 +153,14 @@ export default ( Splide, Components ) => {
 			return options.clones;
 		}
 
-		// Use the slide length in autoWidth mode because the number candnot be calculated.
+		// Use the slide length in autoWidth mode because the number cannot be calculated.
 		let baseCount = options.autoWidth ? Elements.length : options.perPage;
 
 		const dimension = options.direction === TTB ? 'Height' : 'Width';
 		const fixedSize = options[ `fixed${ dimension }` ];
 
 		if ( fixedSize ) {
-			// Roughly determine the count. This needs not to be strict.
+			// Roughly calculate the count. This needs not to be strict.
 			baseCount = Math.ceil( Elements.track[ `client${ dimension }` ] / fixedSize );
 		}
 

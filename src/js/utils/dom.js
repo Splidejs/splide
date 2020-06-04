@@ -33,7 +33,7 @@ export function find( elm, selector ) {
 export function child( parent, tagOrClassName ) {
 	if ( parent ) {
 		return values( parent.children ).filter( child => {
-			return hasClass( child, tagOrClassName.split( ' ' )[0] ) || child.tagName.toLowerCase() === tagOrClassName;
+			return hasClass( child, tagOrClassName.split( ' ' )[0] ) || child.tagName === tagOrClassName;
 		} )[0] || null;
 	}
 
@@ -76,8 +76,9 @@ export function domify( html ) {
  */
 export function remove( elms ) {
 	toArray( elms ).forEach( elm => {
-		if ( elm && elm.parentElement ) {
-			elm.parentElement.removeChild( elm );
+		if ( elm ) {
+			const parent = elm.parentElement;
+			parent && parent.removeChild( elm );
 		}
 	} );
 }
@@ -101,8 +102,9 @@ export function append( parent, child ) {
  * @param {Element}      elm - An element to be inserted.
  */
 export function before( elm, ref ) {
-	if ( elm && ref && ref.parentElement ) {
-		ref.parentElement.insertBefore( elm, ref );
+	if ( elm && ref ) {
+		const parent = ref.parentElement;
+		parent && parent.insertBefore( elm, ref );
 	}
 }
 

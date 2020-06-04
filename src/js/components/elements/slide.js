@@ -5,7 +5,7 @@
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
-import { find, addClass, removeClass, hasClass, getAttribute, setAttribute, applyStyle } from '../../utils/dom';
+import { child, addClass, removeClass, hasClass, getAttribute, setAttribute, applyStyle } from '../../utils/dom';
 import { FADE, SLIDE } from '../../constants/types';
 import { STATUS_CLASSES } from '../../constants/classes';
 import { values } from "../../utils/object";
@@ -79,7 +79,7 @@ export default ( Splide, index, realIndex, slide ) => {
 		 *
 		 * @type {Element|null}
 		 */
-		container: find( slide, `.${ Splide.classes.container }` ),
+		container: child( slide, Splide.classes.container ),
 
 		/**
 		 * Whether this is a cloned slide or not.
@@ -106,8 +106,8 @@ export default ( Splide, index, realIndex, slide ) => {
 			 * and it will be removed on "moved" event.
 			 */
 			if ( updateOnMove ) {
-				Splide.on( 'move.slide', () => {
-					if ( Splide.index === realIndex ) {
+				Splide.on( 'move.slide', newIndex => {
+					if ( newIndex === realIndex ) {
 						update( true, false );
 					}
 				} );
