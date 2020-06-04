@@ -110,6 +110,7 @@ Here is a list of options and brief explanations. Visit [this page](https://spli
 * **autoWidth**: If true, slide width will be determined by the element width itself.
 * **perPage**: Determine how many slides should be displayed per page.
 * **perMove**: Determine how many slides should be moved when a slider goes to next or previous page.
+* **clones**: Manually determine how many clones should be generated on one side.
 * **start**: Start index.
 * **focus**: Determine which slide should be focused.
 * **gap**: Gap between slides.
