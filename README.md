@@ -79,18 +79,18 @@ Only the NPM way is explained in the following steps. Visit [this page](https://
     ```
     Note that only the first element will be initialized even if using a class name.
 
-[Vue Splide](https://github.com/Splidejs/vue-splide) is useful to integrate Splide if you are using Vue.
+See the [Integration](#integration) section for your Vue or React project.
 
 ## Options
 ### Changing Options
-Pass an object to the second argument of the ```Splide``` constructor:
+Pass an object to the second argument of the `Splide` constructor:
 ```javascript
 new Splide( '#splide', {
   type   : 'loop',
   perPage: 3,
 } );
 ```
-Or set a ```data-splide``` attribute to a root element in a JSON format:
+Or set a data-splide` attribute to a root element in a JSON format:
 ```html
 <div id="splide" class="splide" data-splide='{"type":"loop","perPage":3}'>
 </div>
@@ -159,7 +159,7 @@ Here is a list of options and brief explanations. Visit [this page](https://spli
     </a>
 </p>
 
-Easy to intagrate a Splide slider or carousel into your Vue or React project.
+Easy to integrate the Splide slider or carousel into your Vue or React project.
 
 * [Vue Splide](https://splidejs.com/integration-vue-splide/)
 * [React Splide](https://splidejs.com/integration-react-splide/)
