@@ -68,7 +68,7 @@ export const DEFAULTS = {
 	 * Fix height of slides. CSS format is allowed such as 10em, 80vh but % unit is not accepted.
 	 * heightRatio option will be ignored when this option is falsy.
 	 *
-	 * @type {number}
+	 * @type {number|string}
 	 */
 	fixedHeight: 0,
 
@@ -343,15 +343,22 @@ export const DEFAULTS = {
 	throttle: 100,
 
 	/**
-	 * Breakpoints definitions.
+	 * Whether to destroy a slider or not.
+	 *
+	 * @type {boolean}
+	 */
+	destroy: false,
+
+	/**
+	 * Options for specific breakpoints.
 	 *
 	 * @example
 	 * {
-	 *   '1000': {
+	 *   1000: {
 	 *     perPage: 3,
 	 *     gap: 20
 	 *   },
-	 *   '600': {
+	 *   600: {
 	 *     perPage: 1,
 	 *     gap: 5,
 	 *   }

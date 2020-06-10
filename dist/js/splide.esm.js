@@ -1100,7 +1100,7 @@ var DEFAULTS = {
    * Fix height of slides. CSS format is allowed such as 10em, 80vh but % unit is not accepted.
    * heightRatio option will be ignored when this option is falsy.
    *
-   * @type {number}
+   * @type {number|string}
    */
   fixedHeight: 0,
 
@@ -1375,15 +1375,22 @@ var DEFAULTS = {
   throttle: 100,
 
   /**
-   * Breakpoints definitions.
+   * Whether to destroy a slider or not.
+   *
+   * @type {boolean}
+   */
+  destroy: false,
+
+  /**
+   * Options for specific breakpoints.
    *
    * @example
    * {
-   *   '1000': {
+   *   1000: {
    *     perPage: 3,
    *     gap: 20
    *   },
-   *   '600': {
+   *   600: {
    *     perPage: 1,
    *     gap: 5,
    *   }
@@ -2488,7 +2495,7 @@ var controller_floor = Math.floor;
      *
      * @param {string} control - A control target pattern.
      *
-     * @return {string|number} - A parsed target.
+     * @return {number} - A parsed target.
      */
     parse: function parse(control) {
       var index = Splide.index;
@@ -2544,7 +2551,7 @@ var controller_floor = Math.floor;
     /**
      * Compute page number from the given slide index.
      *
-     * @param index - Slide index.
+     * @param {number} index - Slide index.
      *
      * @return {number} - A computed page number.
      */
@@ -3036,8 +3043,6 @@ var controller_floor = Math.floor;
      * @param {boolean} silently  - If true, suppress emitting events.
      */
     go: function go(destIndex, newIndex, silently) {
-      var _this2 = this;
-
       var newPosition = getTrimmedPosition(destIndex);
       var prevIndex = Splide.index;
 
@@ -3047,36 +3052,14 @@ var controller_floor = Math.floor;
 
       if (Math.abs(newPosition - currPosition) >= 1 || isFade) {
         Components.Transition.start(destIndex, newIndex, prevIndex, this.toCoord(newPosition), function () {
-          _this2.end(destIndex, newIndex, prevIndex, silently);
+          onTransitionEnd(destIndex, newIndex, prevIndex, silently);
         });
       } else {
         if (destIndex !== prevIndex && Splide.options.trimSpace === 'move') {
           Components.Controller.go(destIndex + destIndex - prevIndex, silently);
         } else {
-          this.end(destIndex, newIndex, prevIndex, silently);
+          onTransitionEnd(destIndex, newIndex, prevIndex, silently);
         }
-      }
-    },
-
-    /**
-     * Called whenever slides arrive at a destination.
-     *
-     * @param {number}  destIndex - A destination index.
-     * @param {number}  newIndex  - A new index.
-     * @param {number}  prevIndex - A previous index.
-     * @param {boolean} silently  - If true, suppress emitting events.
-     */
-    end: function end(destIndex, newIndex, prevIndex, silently) {
-      applyStyle(list, {
-        transition: ''
-      });
-
-      if (!isFade) {
-        this.jump(newIndex);
-      }
-
-      if (!silently) {
-        Splide.emit('moved', newIndex, prevIndex, destIndex);
       }
     },
 
@@ -3141,10 +3124,33 @@ var controller_floor = Math.floor;
 
   }, isVertical ? vertical(Splide, Components) : horizontal(Splide, Components));
   /**
+   * Called whenever slides arrive at a destination.
+   *
+   * @param {number}  destIndex - A destination index.
+   * @param {number}  newIndex  - A new index.
+   * @param {number}  prevIndex - A previous index.
+   * @param {boolean} silently  - If true, suppress emitting events.
+   */
+
+  function onTransitionEnd(destIndex, newIndex, prevIndex, silently) {
+    applyStyle(list, {
+      transition: ''
+    });
+
+    if (!isFade) {
+      Track.jump(newIndex);
+    }
+
+    if (!silently) {
+      Splide.emit('moved', newIndex, prevIndex, destIndex);
+    }
+  }
+  /**
    * Convert index to the trimmed position.
    *
    * @return {number} - Trimmed position.
    */
+
 
   function getTrimmedPosition(index) {
     return Track.trim(Track.toPosition(index));

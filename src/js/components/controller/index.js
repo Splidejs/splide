@@ -72,7 +72,7 @@ export default ( Splide, Components ) => {
 		 *
 		 * @param {string} control - A control target pattern.
 		 *
-		 * @return {string|number} - A parsed target.
+		 * @return {number} - A parsed target.
 		 */
 		parse( control ) {
 			let index = Splide.index;
@@ -131,7 +131,7 @@ export default ( Splide, Components ) => {
 		/**
 		 * Compute page number from the given slide index.
 		 *
-		 * @param index - Slide index.
+		 * @param {number} index - Slide index.
 		 *
 		 * @return {number} - A computed page number.
 		 */
