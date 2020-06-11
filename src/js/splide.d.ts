@@ -647,7 +647,7 @@ export class Splide {
 	off( events: keyof ElementEventMap, elm?: Element | Window | Document ): this;
 	off( events: string, elm?: Element | Window | Document ): this;
 
-	emit( events: string, ...args: any[] ): this;
+	emit( event: string, ...args: any[] ): this;
 
 	go( control: string | number, wait?: boolean ): this;
 
