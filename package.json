@@ -1,11 +1,12 @@
 {
   "name": "@splidejs/splide",
-  "version": "2.3.8",
+  "version": "2.3.9",
   "description": "Splide is a lightweight and powerful slider without any dependencies.",
   "author": "Naotoshi Fujita",
   "license": "MIT",
   "main": "dist/js/splide.js",
   "module": "dist/js/splide.esm.js",
+  "types": "src/js/splide.d.ts",
   "keywords": [
     "splide",
     "slider",

@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.3.8
+ * Version  : 2.3.9
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -5800,12 +5800,13 @@ var COMPLETE = {
 };
 var LIGHT = {
   Options: components_options,
-  Elements: components_elements,
   Controller: controller,
+  Elements: components_elements,
   Track: components_track,
   Clones: components_clones,
   Layout: layout,
   Drag: drag,
+  Click: click,
   Arrows: components_arrows,
   Pagination: components_pagination,
   A11y: a11y
