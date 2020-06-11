@@ -45,12 +45,13 @@ export const COMPLETE = {
 
 export const LIGHT = {
 	Options,
-	Elements,
 	Controller,
+	Elements,
 	Track,
 	Clones,
 	Layout,
 	Drag,
+	Click,
 	Arrows,
 	Pagination,
 	A11y,
