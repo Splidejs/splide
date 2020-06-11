@@ -269,17 +269,17 @@ export interface SplideOptions extends BreakpointOptions {
  * It is created by Event constructor.
  */
 export interface EventObject {
-	on( events: SplideEvent, handler: ( ...args: any ) => any ): void;
-	on( events: string, handler: ( ...args: any ) => any ): void;
+	on( events: SplideEvent, handler: ( ...args: any ) => void ): void;
+	on( events: string, handler: ( ...args: any ) => void ): void;
 	on<K extends keyof ElementEventMap>(
 		events: K,
-		handler: ( e: ElementEventMap[K] ) => any,
+		handler: ( e: ElementEventMap[K] ) => void,
 		elm?: HTMLElement | Window | Document,
 		options?: boolean | AddEventListenerOptions
 	): void;
 	on(
 		events: string,
-		handler: ( e: Event ) => any,
+		handler: ( e: Event ) => void,
 		elm?: HTMLElement | Window | Document,
 		options?: boolean | AddEventListenerOptions
 	): void;
@@ -628,23 +628,22 @@ export class Splide {
 
 	sync( splide: Splide ): this;
 
-	on( events: SplideEvent, handler: ( ...args: any[] ) => any ): this;
-	on( events: string, handler: ( ...args: any[] ) => any ): this;
+	on( events: SplideEvent, handler: ( ...args: any[] ) => void ): this;
+	on( events: string, handler: ( ...args: any[] ) => void ): this;
 	on<K extends keyof ElementEventMap>(
 		events: K,
-		handler: ( e: ElementEventMap[K] ) => any,
+		handler: ( e: ElementEventMap[K] ) => void,
 		elm?: HTMLElement | Window | Document,
 		options?: boolean | AddEventListenerOptions
 	): this;
 	on(
 		events: string,
-		handler: ( e: Event ) => any,
+		handler: ( e: Event ) => void,
 		elm?: HTMLElement | Window | Document,
 		options?: boolean | AddEventListenerOptions
 	): this;
 
 	off( events: SplideEvent ): this;
-	off( events: string ): this;
 	off( events: keyof ElementEventMap, elm?: Element | Window | Document ): this;
 	off( events: string, elm?: Element | Window | Document ): this;
 
