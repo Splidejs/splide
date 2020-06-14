@@ -91,7 +91,7 @@ new Splide( '#splide', {
   perPage: 3,
 } );
 ```
-Or set a data-splide` attribute to a root element in a JSON format:
+Or set a `data-splide` attribute to a root element in a JSON format:
 ```html
 <div id="splide" class="splide" data-splide='{"type":"loop","perPage":3}'>
 </div>
