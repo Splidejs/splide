@@ -591,7 +591,7 @@ export interface Track extends Component {
 	translate( position: number ): void;
 	trim( position: number ): number;
 	toCoord( position: number ): Coordinates;
-	toPosition( index: number ): Coordinates;
+	toPosition( index: number ): number;
 	toIndex( index: number ): number;
 	offset(): number;
 }
