@@ -651,7 +651,7 @@ export class Splide {
 
 	go( control: string | number, wait?: boolean ): this;
 
-	is( type: SplideType ): this;
+	is( type: SplideType ): boolean;
 
 	add( slide: HTMLElement | string, index?: number ): this;
 
