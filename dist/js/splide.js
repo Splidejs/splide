@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.3.9
+ * Version  : 2.4.0
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -817,10 +817,6 @@ var FADE = 'fade';
  */
 
 /* harmony default export */ var fade = (function (Splide, Components) {
-  if (Components.Drag) {
-    Components.Drag.required = false;
-  }
-
   var Fade = {
     /**
      * Called when the component is mounted.
@@ -3885,7 +3881,7 @@ var FRICTION_REDUCER = 7;
   var startCoord;
   /**
    * Analyzed info on starting drag.
-   * 
+   *
    * @type {Object|null}
    */
 
@@ -3930,7 +3926,7 @@ var FRICTION_REDUCER = 7;
      *
      * @type {boolean}
      */
-    disabled: !Splide.options.drag,
+    disabled: false,
 
     /**
      * Called when the component is mounted.
@@ -3984,8 +3980,10 @@ var FRICTION_REDUCER = 7;
           e.preventDefault();
         }
 
-        var position = startCoord[axis] + currentInfo.offset[axis];
-        Track.translate(resist(position));
+        if (!Splide.is(FADE)) {
+          var position = startCoord[axis] + currentInfo.offset[axis];
+          Track.translate(resist(position));
+        }
       } else {
         if (shouldMove(currentInfo)) {
           Splide.emit('drag', startInfo);
@@ -4028,7 +4026,7 @@ var FRICTION_REDUCER = 7;
 
 
   function resist(position) {
-    if (!Splide.is(LOOP)) {
+    if (Splide.is(SLIDE)) {
       var sign = Track.sign;
 
       var _start = sign * Track.trim(Track.toPosition(0));
@@ -4076,24 +4074,35 @@ var FRICTION_REDUCER = 7;
     if (absV > 0) {
       var Layout = Components.Layout;
       var options = Splide.options;
+      var index = Splide.index;
       var sign = velocity < 0 ? -1 : 1;
-      var destination = Track.position;
+      var adjacent = index + sign * Track.sign;
+      var destIndex = index;
 
-      if (absV > options.flickVelocityThreshold && abs(info.offset[axis]) < options.swipeDistanceThreshold) {
-        destination += sign * Math.min(absV * options.flickPower, Layout.width * (options.flickMaxPages || 1));
+      if (!Splide.is(FADE)) {
+        var destination = Track.position;
+
+        if (absV > options.flickVelocityThreshold && abs(info.offset[axis]) < options.swipeDistanceThreshold) {
+          destination += sign * Math.min(absV * options.flickPower, Layout.width * (options.flickMaxPages || 1));
+        }
+
+        destIndex = Track.toIndex(destination);
+      }
+      /*
+       * Do not allow the track to go to a previous position.
+       * Always use the adjacent index for the fade mode.
+       */
+
+
+      if (destIndex === index) {
+        destIndex = adjacent;
       }
 
-      var index = Track.toIndex(destination); // Do not allow the track to go to a previous position.
-
-      if (index === Splide.index) {
-        index += sign * Track.sign;
+      if (Splide.is(SLIDE)) {
+        destIndex = between(destIndex, 0, Controller.edgeIndex);
       }
 
-      if (!Splide.is(LOOP)) {
-        index = between(index, 0, Controller.edgeIndex);
-      }
-
-      Controller.go(index, options.isNavigation);
+      Controller.go(destIndex, options.isNavigation);
     }
   }
   /**

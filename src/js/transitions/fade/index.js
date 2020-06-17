@@ -18,10 +18,6 @@ import { unit } from "../../utils/utils";
  * @return {Object} - The component object.
  */
 export default ( Splide, Components ) => {
-	if ( Components.Drag ) {
-		Components.Drag.required = false;
-	}
-
 	const Fade = {
 		/**
 		 * Called when the component is mounted.

@@ -5,7 +5,7 @@
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
-import { LOOP } from '../../constants/types';
+import { FADE, SLIDE } from '../../constants/types';
 import { TTB } from '../../constants/directions';
 import { IDLE } from '../../constants/states';
 import { between } from '../../utils/utils';
@@ -56,7 +56,7 @@ export default ( Splide, Components ) => {
 
 	/**
 	 * Analyzed info on starting drag.
-	 * 
+	 *
 	 * @type {Object|null}
 	 */
 	let startInfo;
@@ -100,7 +100,7 @@ export default ( Splide, Components ) => {
 		 *
 		 * @type {boolean}
 		 */
-		disabled: ! Splide.options.drag,
+		disabled: false,
 
 		/**
 		 * Called when the component is mounted.
@@ -153,8 +153,10 @@ export default ( Splide, Components ) => {
 					e.preventDefault();
 				}
 
-				const position = startCoord[ axis ] + currentInfo.offset[ axis ];
-				Track.translate( resist( position ) );
+				if ( ! Splide.is( FADE ) ) {
+					const position = startCoord[ axis ] + currentInfo.offset[ axis ];
+					Track.translate( resist( position ) );
+				}
 			} else {
 				if ( shouldMove( currentInfo ) ) {
 					Splide.emit( 'drag', startInfo );
@@ -193,7 +195,7 @@ export default ( Splide, Components ) => {
 	 * @return {Object} - Adjusted position.
 	 */
 	function resist( position ) {
-		if ( ! Splide.is( LOOP ) ) {
+		if ( Splide.is( SLIDE ) ) {
 			const sign  = Track.sign;
 			const start = sign * Track.trim( Track.toPosition( 0 ) );
 			const end   = sign * Track.trim( Track.toPosition( Controller.edgeIndex ) );
@@ -235,28 +237,37 @@ export default ( Splide, Components ) => {
 		const absV     = abs( velocity );
 
 		if ( absV > 0 ) {
-			const Layout  = Components.Layout;
-			const options = Splide.options;
-			const sign    = velocity < 0 ? -1 : 1;
+			const Layout   = Components.Layout;
+			const options  = Splide.options;
+			const index    = Splide.index;
+			const sign     = velocity < 0 ? -1 : 1;
+			const adjacent = index + sign * Track.sign;
 
-			let destination = Track.position;
+			let destIndex = index;
 
-			if ( absV > options.flickVelocityThreshold && abs( info.offset[ axis ] ) < options.swipeDistanceThreshold ) {
-				destination += sign * Math.min( absV * options.flickPower, Layout.width * ( options.flickMaxPages || 1 ) );
+			if ( ! Splide.is( FADE ) ) {
+				let destination = Track.position;
+
+				if ( absV > options.flickVelocityThreshold && abs( info.offset[ axis ] ) < options.swipeDistanceThreshold ) {
+					destination += sign * Math.min( absV * options.flickPower, Layout.width * ( options.flickMaxPages || 1 ) );
+				}
+
+				destIndex = Track.toIndex( destination );
 			}
 
-			let index = Track.toIndex( destination );
-
-			// Do not allow the track to go to a previous position.
-			if ( index === Splide.index ) {
-				index += sign * Track.sign;
+			/*
+			 * Do not allow the track to go to a previous position.
+			 * Always use the adjacent index for the fade mode.
+			 */
+			if ( destIndex === index ) {
+				destIndex = adjacent;
 			}
 
-			if ( ! Splide.is( LOOP ) ) {
-				index = between( index, 0, Controller.edgeIndex );
+			if ( Splide.is( SLIDE ) ) {
+				destIndex = between( destIndex, 0, Controller.edgeIndex );
 			}
 
-			Controller.go( index, options.isNavigation );
+			Controller.go( destIndex, options.isNavigation );
 		}
 	}
 
