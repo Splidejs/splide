@@ -237,11 +237,10 @@ export default ( Splide, Components ) => {
 		const absV     = abs( velocity );
 
 		if ( absV > 0 ) {
-			const Layout   = Components.Layout;
-			const options  = Splide.options;
-			const index    = Splide.index;
-			const sign     = velocity < 0 ? -1 : 1;
-			const adjacent = index + sign * Track.sign;
+			const Layout  = Components.Layout;
+			const options = Splide.options;
+			const index   = Splide.index;
+			const sign    = velocity < 0 ? -1 : 1;
 
 			let destIndex = index;
 
@@ -260,7 +259,7 @@ export default ( Splide, Components ) => {
 			 * Always use the adjacent index for the fade mode.
 			 */
 			if ( destIndex === index ) {
-				destIndex = adjacent;
+				destIndex = index + sign * Track.sign;
 			}
 
 			if ( Splide.is( SLIDE ) ) {
