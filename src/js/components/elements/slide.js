@@ -77,7 +77,7 @@ export default ( Splide, index, realIndex, slide ) => {
 		/**
 		 * Container element if available.
 		 *
-		 * @type {Element|null}
+		 * @type {Element|undefined}
 		 */
 		container: child( slide, Splide.classes.container ),
 

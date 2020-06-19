@@ -522,13 +522,12 @@ export interface Keyboard extends Component {}
 export interface Layout extends Component {
 	margin: string;
 	height: number;
-	listHeight: number;
 
 	readonly width: number;
-	readonly listWidth: number;
 
 	init(): void;
 	totalWidth( index: number | undefined ): number;
+	totalHeight( index: number | undefined ): number;
 	slideWidth( index: number ): number;
 	slideHeight( index: number ): number;
 }

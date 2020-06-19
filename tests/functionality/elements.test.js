@@ -6,10 +6,18 @@ import { COMPLETE } from '../../src/js/components';
 
 describe( 'The "slide" type Splide', () => {
 	let splide;
+	const width = 800;
 
 	beforeEach( () => {
 		document.body.innerHTML = minimum;
 		splide = new Splide( '#splide', {}, COMPLETE ).mount();
+
+		// Set up the getBoundingClientRect.
+		splide.Components.Elements.getSlides( true ).forEach( Slide => {
+			Slide.slide.getBoundingClientRect = jest.fn( () => ( {
+				right: width * ( Slide.index + 1 + splide.Components.Clones.length  / 2 ),
+			} ) );
+		} );
 	} );
 
 	test( 'should init index and slide attributes correctly.', () => {
@@ -24,12 +32,12 @@ describe( 'The "slide" type Splide', () => {
 
 	test( 'should move slides and update attributes correctly.', done => {
 		const { Track, Elements: { track, list } } = splide.Components;
-		Object.defineProperty( track, 'clientWidth', { value: 800 } );
+		Object.defineProperty( track, 'clientWidth', { value: width } );
 
 		expect( parseInt( Track.position ) ).toBe( 0 );
 
 		splide.on( 'moved', ( newIndex, prevIndex ) => {
-			expect( Track.position ).toBe( -800 );
+			expect( Track.position ).toBe( -width );
 
 			const prevSlide   = splide.Components.Elements.getSlide( prevIndex );
 			const newSlide    = splide.Components.Elements.getSlide( newIndex );

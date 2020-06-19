@@ -50,7 +50,7 @@
   "scripts": {
     "build:js": "gulp build:js",
     "build:sass": "gulp build:sass",
-    "test": "jest",
+    "test": "jest --clearCache && jest",
     "lint": "gulp lint"
   }
 }

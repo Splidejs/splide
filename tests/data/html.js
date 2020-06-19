@@ -34,7 +34,7 @@ export const sync = minimum + `
   </div>
 `;
 
-export const width = `
+export const autoWidth = `
   <div id="splide" style="width: 800px" class="splide">
     <div class="splide__track">
       <ul class="splide__list">

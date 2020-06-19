@@ -5,7 +5,7 @@
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
-import { applyStyle } from "../../../utils/dom";
+import { applyStyle, getRect } from "../../../utils/dom";
 import { toPixel, unit } from "../../../utils/utils";
 import { exist } from "../../../utils/error";
 
@@ -79,6 +79,23 @@ export default ( Splide, Components ) => {
 		},
 
 		/**
+		 * Return total height from the top of the list to the bottom of the slide specified by the provided index.
+		 *
+		 * @param {number} index - Optional. A slide index. If undefined, total height of the slider will be returned.
+		 *
+		 * @return {number} - Total height to the bottom of the specified slide, or 0 for an invalid index.
+		 */
+		totalHeight( index = Splide.length - 1 ) {
+			const Slide = Elements.getSlide( index );
+
+			if ( Slide ) {
+				return getRect( Slide.slide ).bottom - getRect( Elements.list ).top + this.gap;
+			}
+
+			return 0;
+		},
+
+		/**
 		 * Return the slide width in px.
 		 *
 		 * @return {number} - The slide width.
@@ -115,24 +132,6 @@ export default ( Splide, Components ) => {
 			const height = options.height || this.width * options.heightRatio;
 			exist( height, '"height" or "heightRatio" is missing.' );
 			return toPixel( root, height ) - this.padding.top - this.padding.bottom;
-		},
-
-		/**
-		 * Return list width.
-		 *
-		 * @return {number} - Current list width.
-		 */
-		get listWidth() {
-			return this.width;
-		},
-
-		/**
-		 * Return list height.
-		 *
-		 * @return {number} - Current list height.
-		 */
-		get listHeight() {
-			return ( this.slideHeight() + this.gap ) * Elements.total;
 		},
 	}
 }

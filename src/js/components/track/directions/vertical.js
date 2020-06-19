@@ -54,18 +54,7 @@ export default ( Splide, Components ) => {
 		 * @return {Object} - Calculated position.
 		 */
 		toPosition( index ) {
-			return - ( ( index + Components.Clones.length / 2 ) * ( Layout.slideHeight() + Layout.gap ) + this.offset() );
-		},
-
-		/**
-		 * Calculate the closest slide index from the given position.
-		 *
-		 * @return {number} - The closest slide index.
-		 */
-		toIndex( position ) {
-			const slideHeight = Layout.slideHeight();
-			const cloneOffset = ( slideHeight + Layout.gap ) * Components.Clones.length / 2;
-			return Math.round( - ( position + cloneOffset + this.offset() ) / ( slideHeight + Layout.gap ) );
+			return - ( Layout.totalHeight( index ) - Layout.slideHeight() - Layout.gap + this.offset() );
 		},
 
 		/**
@@ -76,7 +65,7 @@ export default ( Splide, Components ) => {
 		 * @return {number} - Trimmed position.
 		 */
 		trim( position ) {
-			const edge = -( Layout.listHeight - ( Layout.height + Layout.gap ) );
+			const edge = -( Layout.totalHeight() - ( Layout.height + Layout.gap ) );
 			return between( position, edge, 0 );
 		},
 
