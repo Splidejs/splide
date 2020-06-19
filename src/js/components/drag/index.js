@@ -13,6 +13,11 @@ import { each } from "../../utils/object";
 
 const { abs } = Math;
 
+/**
+ * If the absolute velocity is greater thant this value,
+ * a slider always goes to a different slide after drag, not allowed to stay on a current slide.
+ */
+const MIN_VELOCITY = 0.1;
 
 /**
  * Adjust how much the track can be pulled on the first or last page.
@@ -255,10 +260,10 @@ export default ( Splide, Components ) => {
 			}
 
 			/*
-			 * Do not allow the track to go to a previous position.
+			 * Do not allow the track to go to a previous position if there is enough velocity.
 			 * Always use the adjacent index for the fade mode.
 			 */
-			if ( destIndex === index ) {
+			if ( destIndex === index && absV > MIN_VELOCITY ) {
 				destIndex = index + sign * Track.sign;
 			}
 
