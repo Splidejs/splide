@@ -195,9 +195,9 @@ export interface SplideOptions extends BreakpointOptions {
 	preloadPages?: number;
 
 	/**
-	 * @default true
+	 * @default 'global'
 	 */
-	keyboard?: boolean;
+	keyboard?: 'global' | 'focused' | boolean;
 
 	/**
 	 * @default 30
@@ -238,6 +238,11 @@ export interface SplideOptions extends BreakpointOptions {
 	 * @default true
 	 */
 	accessibility?: boolean;
+
+	/**
+	 * @default true
+	 */
+	slideFocus?: true,
 
 	/**
 	 * @default false

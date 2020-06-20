@@ -5,6 +5,9 @@
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
+import { removeAttribute, setAttribute } from "../../utils/dom";
+import { TAB_INDEX } from "../../constants/a11y";
+
 /**
  * Map a key to a slide control.
  *
@@ -44,28 +47,41 @@ const KEY_MAP = {
  */
 export default ( Splide ) => {
 	/**
-	 * Hold the root element.
+	 * Hold the target element.
 	 *
-	 * @type {Element}
+	 * @type {Element|Document|undefined}
 	 */
-	const root = Splide.root;
+	let target;
 
 	return {
 		/**
 		 * Called when the component is mounted.
 		 */
 		mount() {
-			const map = KEY_MAP[ Splide.options.direction ];
-
 			Splide.on( 'mounted updated', () => {
-				Splide.off( 'keydown', root );
+				const options  = Splide.options;
+				const root     = Splide.root;
+				const map      = KEY_MAP[ options.direction ];
+				const keyboard = options.keyboard;
 
-				if ( Splide.options.keyboard ) {
+				if ( target ) {
+					Splide.off( 'keydown', target );
+					removeAttribute( root, TAB_INDEX );
+				}
+
+				if ( keyboard ) {
+					if ( keyboard === 'focused' ) {
+						target = root;
+						setAttribute( root, TAB_INDEX, 0 );
+					} else {
+						target = document;
+					}
+
 					Splide.on( 'keydown', e => {
 						if ( map[ e.key ] ) {
 							Splide.go( map[ e.key ] );
 						}
-					}, root );
+					}, target );
 				}
 			} );
 		},

@@ -98,7 +98,10 @@ export default ( Splide, Components ) => {
 	 */
 	function updateSlide( slide, visible ) {
 		setAttribute( slide, ARIA_HIDDEN, ! visible );
-		setAttribute( slide, TAB_INDEX, visible ? 0 : -1 );
+
+		if ( Splide.options.slideFocus ) {
+			setAttribute( slide, TAB_INDEX, visible ? 0 : -1 );
+		}
 	}
 
 	/**

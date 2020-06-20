@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.4.1
+ * Version  : 2.4.2
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -1292,11 +1292,14 @@ var DEFAULTS = {
   easing: 'cubic-bezier(.42,.65,.27,.99)',
 
   /**
-   * Whether to control a slide via keyboard.
+   * Whether to enable keyboard shortcuts
+   * - true or 'global': Listen to keydown event of the document.
+   * - 'focused': Listen to the keydown event of the slider root element. tabindex="0" will be added to the element.
+   * - false: Disable keyboard shortcuts.
    *
-   * @type {boolean}
+   * @type {boolean|string}
    */
-  keyboard: true,
+  keyboard: 'global',
 
   /**
    * Whether to allow mouse drag and touch swipe.
@@ -1369,6 +1372,13 @@ var DEFAULTS = {
    * @type {boolean}
    */
   accessibility: true,
+
+  /**
+   * Whether to add tabindex="0" to visible slides or not.
+   *
+   * @type {boolean}
+   */
+  slideFocus: true,
 
   /**
    * Determine if a slider is navigation for another.
@@ -4990,77 +5000,6 @@ var SRC_DATA_NAME = 'data-splide-lazy';
 
   return Lazyload;
 });
-// CONCATENATED MODULE: ./src/js/components/keyboard/index.js
-/**
- * The component for controlling slides via keyboard.
- *
- * @author    Naotoshi Fujita
- * @copyright Naotoshi Fujita. All rights reserved.
- */
-
-/**
- * Map a key to a slide control.
- *
- * @type {Object}
- */
-var KEY_MAP = {
-  ltr: {
-    ArrowLeft: '<',
-    ArrowRight: '>',
-    // For IE.
-    Left: '<',
-    Right: '>'
-  },
-  rtl: {
-    ArrowLeft: '>',
-    ArrowRight: '<',
-    // For IE.
-    Left: '>',
-    Right: '<'
-  },
-  ttb: {
-    ArrowUp: '<',
-    ArrowDown: '>',
-    // For IE.
-    Up: '<',
-    Down: '>'
-  }
-};
-/**
- * The component for controlling slides via keyboard.
- *
- * @param {Splide} Splide - A Splide instance.
- *
- * @return {Object} - The component object.
- */
-
-/* harmony default export */ var keyboard = (function (Splide) {
-  /**
-   * Hold the root element.
-   *
-   * @type {Element}
-   */
-  var root = Splide.root;
-  return {
-    /**
-     * Called when the component is mounted.
-     */
-    mount: function mount() {
-      var map = KEY_MAP[Splide.options.direction];
-      Splide.on('mounted updated', function () {
-        Splide.off('keydown', root);
-
-        if (Splide.options.keyboard) {
-          Splide.on('keydown', function (e) {
-            if (map[e.key]) {
-              Splide.go(map[e.key]);
-            }
-          }, root);
-        }
-      });
-    }
-  };
-});
 // CONCATENATED MODULE: ./src/js/constants/a11y.js
 /**
  * Export aria attribute names.
@@ -5110,6 +5049,93 @@ var ARIA_HIDDEN = 'aria-hidden';
  */
 
 var TAB_INDEX = 'tabindex';
+// CONCATENATED MODULE: ./src/js/components/keyboard/index.js
+/**
+ * The component for controlling slides via keyboard.
+ *
+ * @author    Naotoshi Fujita
+ * @copyright Naotoshi Fujita. All rights reserved.
+ */
+
+
+/**
+ * Map a key to a slide control.
+ *
+ * @type {Object}
+ */
+
+var KEY_MAP = {
+  ltr: {
+    ArrowLeft: '<',
+    ArrowRight: '>',
+    // For IE.
+    Left: '<',
+    Right: '>'
+  },
+  rtl: {
+    ArrowLeft: '>',
+    ArrowRight: '<',
+    // For IE.
+    Left: '>',
+    Right: '<'
+  },
+  ttb: {
+    ArrowUp: '<',
+    ArrowDown: '>',
+    // For IE.
+    Up: '<',
+    Down: '>'
+  }
+};
+/**
+ * The component for controlling slides via keyboard.
+ *
+ * @param {Splide} Splide - A Splide instance.
+ *
+ * @return {Object} - The component object.
+ */
+
+/* harmony default export */ var components_keyboard = (function (Splide) {
+  /**
+   * Hold the target element.
+   *
+   * @type {Element|Document|undefined}
+   */
+  var target;
+  return {
+    /**
+     * Called when the component is mounted.
+     */
+    mount: function mount() {
+      Splide.on('mounted updated', function () {
+        var options = Splide.options;
+        var root = Splide.root;
+        var map = KEY_MAP[options.direction];
+        var keyboard = options.keyboard;
+
+        if (target) {
+          Splide.off('keydown', target);
+          removeAttribute(root, TAB_INDEX);
+        }
+
+        if (keyboard) {
+          if (keyboard === 'focused') {
+            target = root;
+            setAttribute(root, TAB_INDEX, 0);
+          } else {
+            target = document;
+          }
+
+          Splide.on('keydown', function (e) {
+            if (map[e.key]) {
+              Splide.go(map[e.key]);
+            }
+          }, target);
+        }
+      });
+    }
+  };
+});
 // CONCATENATED MODULE: ./src/js/components/a11y/index.js
 /**
  * The component for enhancing accessibility.
@@ -5205,7 +5231,10 @@ var TAB_INDEX = 'tabindex';
 
   function updateSlide(slide, visible) {
     setAttribute(slide, ARIA_HIDDEN, !visible);
-    setAttribute(slide, TAB_INDEX, visible ? 0 : -1);
+
+    if (Splide.options.slideFocus) {
+      setAttribute(slide, TAB_INDEX, visible ? 0 : -1);
+    }
   }
   /**
    * Initialize arrows if they are available.
@@ -5703,7 +5732,7 @@ var COMPLETE = {
   Arrows: components_arrows,
   Pagination: components_pagination,
   LazyLoad: lazyload,
-  Keyboard: keyboard,
+  Keyboard: components_keyboard,
   Sync: sync,
   A11y: a11y
 };

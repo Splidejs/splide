@@ -57,4 +57,15 @@ describe( 'The A11y', () => {
 		} );
 	} );
 
+	test( 'should add tabindex to slides when slideFocus is true.', () => {
+		const splide = new Splide( '#splide', {}, COMPLETE );
+		splide.mount();
+		expect( splide.Components.Elements.slides[0].getAttribute( 'tabindex' ) ).toBe( '0' );
+	} );
+
+	test( 'should not add tabindex to slides when slideFocus is false.', () => {
+		const splide = new Splide( '#splide', { slideFocus: false }, COMPLETE );
+		splide.mount();
+		expect( splide.Components.Elements.slides[0].getAttribute( 'tabindex' ) ).toBeNull();
+	} );
 } );

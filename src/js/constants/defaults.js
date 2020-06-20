@@ -241,11 +241,14 @@ export const DEFAULTS = {
 	easing: 'cubic-bezier(.42,.65,.27,.99)',
 
 	/**
-	 * Whether to control a slide via keyboard.
+	 * Whether to enable keyboard shortcuts
+	 * - true or 'global': Listen to keydown event of the document.
+	 * - 'focused': Listen to the keydown event of the slider root element. tabindex="0" will be added to the element.
+	 * - false: Disable keyboard shortcuts.
 	 *
-	 * @type {boolean}
+	 * @type {boolean|string}
 	 */
-	keyboard: true,
+	keyboard: 'global',
 
 	/**
 	 * Whether to allow mouse drag and touch swipe.
@@ -318,6 +321,13 @@ export const DEFAULTS = {
 	 * @type {boolean}
 	 */
 	accessibility: true,
+
+	/**
+	 * Whether to add tabindex="0" to visible slides or not.
+	 *
+	 * @type {boolean}
+	 */
+	slideFocus: true,
 
 	/**
 	 * Determine if a slider is navigation for another.
