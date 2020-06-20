@@ -5,12 +5,10 @@
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
-import Vertical from './directions/vertical';
-import Horizontal from './directions/horizontal';
-import { applyStyle } from '../../utils/dom';
+import { applyStyle, getRect } from '../../utils/dom';
 import { LOOP, FADE } from '../../constants/types';
-import { TTB } from '../../constants/directions';
-import { assign } from "../../utils/object";
+import { RTL, TTB } from '../../constants/directions';
+import { between } from "../../utils/utils";
 
 
 /**
@@ -23,18 +21,25 @@ import { assign } from "../../utils/object";
  */
 export default ( Splide, Components ) => {
 	/**
+	 * Hold the Layout component.
+	 *
+	 * @type {Object}
+	 */
+	let Layout;
+
+	/**
+	 * Hold the Layout component.
+	 *
+	 * @type {Object}
+	 */
+	let Elements;
+
+	/**
 	 * Store the list element.
 	 *
 	 * @type {Element}
 	 */
 	let list;
-
-	/**
-	 * Store the current position.
-	 *
-	 * @type {number}
-	 */
-	let currPosition = 0;
 
 	/**
 	 * Whether the current direction is vertical or not.
@@ -55,13 +60,21 @@ export default ( Splide, Components ) => {
 	 *
 	 * @type {Object}
 	 */
-	const Track = assign( {
+	const Track = {
+		/**
+		 * Sign for the direction. Only RTL mode uses the positive sign.
+		 *
+		 * @type {number}
+		 */
+		sign: Splide.options.direction === RTL ? 1 : -1,
+
 		/**
 		 * Called when the component is mounted.
 		 */
 		mount() {
-			list = Components.Elements.list;
-			this.init();
+			Elements = Components.Elements;
+			Layout   = Components.Layout;
+			list     = Elements.list;
 		},
 
 		/**
@@ -70,6 +83,7 @@ export default ( Splide, Components ) => {
 		 */
 		mounted() {
 			if ( ! isFade ) {
+				this.jump( 0 );
 				Splide.on( 'mounted resize updated', () => { this.jump( Splide.index ) } );
 			}
 		},
@@ -91,7 +105,7 @@ export default ( Splide, Components ) => {
 				Splide.emit( 'move', newIndex, prevIndex, destIndex );
 			}
 
-			if ( Math.abs( newPosition - currPosition ) >= 1 || isFade ) {
+			if ( Math.abs( newPosition - this.position ) >= 1 || isFade ) {
 				Components.Transition.start( destIndex, newIndex, prevIndex, this.toCoord( newPosition ), () => {
 					onTransitionEnd( destIndex, newIndex, prevIndex, silently );
 				} );
@@ -119,8 +133,7 @@ export default ( Splide, Components ) => {
 		 * @param {number} position - A new position value.
 		 */
 		translate( position ) {
-			currPosition = position;
-			applyStyle( list, { transform: `translate${ this.axis }(${ position }px)` } );
+			applyStyle( list, { transform: `translate${ isVertical ? 'Y' : 'X' }(${ position }px)` } );
 		},
 
 		/**
@@ -135,7 +148,8 @@ export default ( Splide, Components ) => {
 				return position;
 			}
 
-			return this._s.trim( position );
+			const edge = this.sign * ( Layout.totalSize() - Layout.size - Layout.gap );
+			return between( position, edge, 0 );
 		},
 
 		/**
@@ -149,7 +163,7 @@ export default ( Splide, Components ) => {
 			let index = 0;
 			let minDistance = Infinity;
 
-			Components.Elements.getSlides( true ).forEach( Slide => {
+			Elements.getSlides( true ).forEach( Slide => {
 				const slideIndex = Slide.index;
 				const distance   = Math.abs( this.toPosition( slideIndex ) - position );
 
@@ -177,14 +191,44 @@ export default ( Splide, Components ) => {
 		},
 
 		/**
-		 * Return current position.
+		 * Calculate the track position by a slide index.
+		 *
+		 * @param {number} index - Slide index.
+		 *
+		 * @return {Object} - Calculated position.
+		 */
+		toPosition( index ) {
+			const position = Layout.totalSize( index ) - Layout.slideSize( index ) - Layout.gap;
+			return this.sign * ( position + this.offset( index ) );
+		},
+
+		/**
+		 * Return current offset value, considering direction.
+		 *
+		 * @return {number} - Offset amount.
+		 */
+		offset( index ) {
+			const { focus } = Splide.options;
+			const slideSize = Layout.slideSize( index );
+
+			if ( focus === 'center' ) {
+				return -( Layout.size - slideSize ) / 2;
+			}
+
+			return -( parseInt( focus ) || 0 ) * ( slideSize + Layout.gap );
+		},
+
+		/**
+		 * Return the current position.
+		 * This returns the correct position even while transitioning by CSS.
 		 *
 		 * @return {number} - Current position.
 		 */
 		get position() {
-			return currPosition;
+			const prop = isVertical ? 'top' : 'left';
+			return getRect( list )[ prop ] - getRect( Elements.track )[ prop ] - Layout.padding[ prop ];
 		},
-	}, isVertical ? Vertical( Splide, Components ) : Horizontal( Splide, Components ) );
+	};
 
 	/**
 	 * Called whenever slides arrive at a destination.

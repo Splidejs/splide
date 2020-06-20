@@ -4,27 +4,45 @@ import { COMPLETE } from '../../src/js/components';
 
 
 describe( 'When the autoWidth option is true, ', () => {
-	let splide;
+	let splide, track, slides;
 	const width = 800;
 
 	beforeEach( () => {
 		document.body.innerHTML = autoWidth;
 		splide = new Splide( '#splide', { autoWidth: true }, COMPLETE );
 
-		Object.defineProperty( splide.root.querySelector( '.splide__track' ), 'clientWidth', { value: width } );
+		track  = splide.root.querySelector( '.splide__track' );
+		slides = Object.values( splide.root.querySelectorAll( '.splide__slide' ) );
 
-		let accumulatedWidth = 0;
+		Object.defineProperty( track, 'clientWidth', { value: width } );
+		track.getBoundingClientRect = jest.fn( () => ( { left: 0, right: width } ) );
 
-		splide.root.querySelectorAll( '.splide__slide' ).forEach( slide => {
+		slides.forEach( slide => {
 			const slideWidth = parseInt( slide.style.width );
 
 			Object.defineProperty( slide, 'offsetWidth', { value: slideWidth } );
 			Object.defineProperty( slide, 'clientWidth', { value: slideWidth } );
+		} );
 
-			accumulatedWidth += slideWidth;
-			const right = accumulatedWidth;
+		// Move slides and a list manually because jest does not render HTML and getBoundingClientRect props are always 0.
+		splide.on( 'move', newIndex => {
+			const offset = slides.filter( ( slide, index ) => index < newIndex ).reduce( ( offset, slide ) => {
+				offset += slide.clientWidth;
+				return offset;
+			}, 0 );
 
-			slide.getBoundingClientRect = jest.fn( () => ( { right } ) );
+			let accumulatedWidth = -offset;
+
+			slides.forEach( slide => {
+				const left = accumulatedWidth;
+
+				accumulatedWidth += slide.clientWidth;
+				const right = accumulatedWidth;
+
+				slide.getBoundingClientRect = jest.fn( () => ( { left, right } ) );
+			} );
+
+			splide.Components.Elements.list.getBoundingClientRect = jest.fn( () => ( { left: -offset } ) );
 		} );
 
 		splide.mount();
@@ -64,6 +82,7 @@ describe( 'When the autoWidth option is true, ', () => {
 		} );
 
 		splide.go( 2 );
+
 		splide.Components.Elements.list.dispatchEvent( new Event( 'transitionend' ) );
 	} );
 } );

@@ -242,7 +242,6 @@ export default ( Splide, Components ) => {
 		const absV     = abs( velocity );
 
 		if ( absV > 0 ) {
-			const Layout  = Components.Layout;
 			const options = Splide.options;
 			const index   = Splide.index;
 			const sign    = velocity < 0 ? -1 : 1;
@@ -253,7 +252,10 @@ export default ( Splide, Components ) => {
 				let destination = Track.position;
 
 				if ( absV > options.flickVelocityThreshold && abs( info.offset[ axis ] ) < options.swipeDistanceThreshold ) {
-					destination += sign * Math.min( absV * options.flickPower, Layout.width * ( options.flickMaxPages || 1 ) );
+					destination += sign * Math.min(
+						absV * options.flickPower,
+						Components.Layout.size * ( options.flickMaxPages || 1 )
+					);
 				}
 
 				destIndex = Track.toIndex( destination );

@@ -140,6 +140,11 @@ export interface SplideOptions extends BreakpointOptions {
 	autoWidth?: boolean,
 
 	/**
+	 * @default false
+	 */
+	autoHeight?: boolean,
+
+	/**
 	 * @default 0
 	 */
 	start?: number;
@@ -520,16 +525,18 @@ export interface Keyboard extends Component {}
  * Layout component.
  */
 export interface Layout extends Component {
-	margin: string;
-	height: number;
-
+	readonly margin: string;
+	readonly height: number;
 	readonly width: number;
+	readonly size: number;
 
 	init(): void;
 	totalWidth( index: number | undefined ): number;
 	totalHeight( index: number | undefined ): number;
+	totalSize( index: number | undefined ): number;
 	slideWidth( index: number ): number;
 	slideHeight( index: number ): number;
+	slideSize( index: number | undefined ): number;
 }
 
 /**

@@ -64,21 +64,12 @@ export default ( Splide, Components ) => {
 
 			this.gap = toPixel( root, options.gap );
 
-			const padding =
-				typeof options.padding === "object"
-					? { top: 0, bottom: 0, ...options.padding }
-					: options.padding;
-			const { top = padding, bottom = padding } = padding;
+			const padding = options.padding;
+			const top     = toPixel( root, padding.top || padding );
+			const bottom  = toPixel( root, padding.bottom || padding );
 
-			this.padding = {
-				top   : toPixel( root, top ),
-				bottom: toPixel( root, bottom ),
-			};
-
-			applyStyle( track, {
-				paddingTop   : unit( top ),
-				paddingBottom: unit( bottom ),
-			} );
+			this.padding = { top, bottom };
+			applyStyle( track, { paddingTop : unit( top ), paddingBottom: unit( bottom ) } );
 		},
 
 		/**
@@ -110,9 +101,16 @@ export default ( Splide, Components ) => {
 		/**
 		 * Return the slide height in px.
 		 *
+		 * @param {number} index - Slide index.
+		 *
 		 * @return {number} - The slide height.
 		 */
-		slideHeight() {
+		slideHeight( index ) {
+			if ( options.autoHeight ) {
+				const Slide = Elements.getSlide( index );
+				return Slide ? Slide.slide.offsetHeight : 0;
+			}
+
 			const height = options.fixedHeight || ( this.height + this.gap ) / options.perPage - this.gap;
 			return toPixel( root, height );
 		},

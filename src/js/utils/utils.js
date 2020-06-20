@@ -98,5 +98,5 @@ export function toPixel( root, value ) {
 		remove( div );
 	}
 
-	return value;
+	return +value || 0;
 }

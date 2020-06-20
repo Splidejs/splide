@@ -83,11 +83,18 @@ export const DEFAULTS = {
 	/**
 	 * If true, slide width will be determined by the element width itself.
 	 * - perPage/perMove should be 1.
-	 * - lazyLoad should be false.
 	 *
 	 * @type {boolean}
 	 */
 	autoWidth: false,
+
+	/**
+	 * If true, slide height will be determined by the element width itself.
+	 * - perPage/perMove should be 1.
+	 *
+	 * @type {boolean}
+	 */
+	autoHeight: false,
 
 	/**
 	 * Determine how many slides should be displayed per page.

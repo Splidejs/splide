@@ -32,6 +32,13 @@ export default ( Splide, Components ) => {
 	const Elements = Components.Elements;
 
 	/**
+	 * Whether the slider is vertical or not.
+	 *
+	 * @type {boolean}
+	 */
+	const isVertical = Splide.options.direction === TTB;
+
+	/**
 	 * Layout component object.
 	 *
 	 * @type {Object}
@@ -43,15 +50,28 @@ export default ( Splide, Components ) => {
 		mount() {
 			bind();
 			init();
+
+			// The word "size" means width for a horizontal slider and height for a vertical slider.
+			this.totalSize = isVertical ? this.totalHeight : this.totalWidth;
+			this.slideSize = isVertical ? this.slideHeight : this.slideWidth;
 		},
 
 		/**
-		 * Destroy.
+		 * Destroy the component.
 		 */
 		destroy() {
 			removeAttribute( [ Elements.list, Elements.track ], 'style' );
 		},
-	}, Splide.options.direction === TTB ?	Vertical( Splide, Components ) : Horizontal( Splide, Components ) );
+
+		/**
+		 * Return the slider height on the vertical mode or width on the horizontal mode.
+		 *
+		 * @return {number}
+		 */
+		get size() {
+			return isVertical ? this.height : this.width;
+		},
+	}, isVertical ?	Vertical( Splide, Components ) : Horizontal( Splide, Components ) );
 
 	/**
 	 * Init slider styles according to options.
@@ -77,18 +97,20 @@ export default ( Splide, Components ) => {
 	}
 
 	/**
-	 * Resize the list and slides including clones.
+	 * Resize the track and slide elements.
 	 */
 	function resize() {
+		const options = Splide.options;
+
 		applyStyle( Elements.track, { height: unit( Layout.height ) } );
 
-		const slideHeight = unit( Layout.slideHeight() );
+		const slideHeight = options.autoHeight ? null : unit( Layout.slideHeight() );
 
 		Elements.each( Slide => {
 			applyStyle( Slide.container, { height: slideHeight } );
 
 			applyStyle( Slide.slide, {
-				width : Splide.options.autoWidth ? null : unit( Layout.slideWidth( Slide.index ) ),
+				width : options.autoWidth ? null : unit( Layout.slideWidth( Slide.index ) ),
 				height: Slide.container ? null : slideHeight,
 			} );
 		} );

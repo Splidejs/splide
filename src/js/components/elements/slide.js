@@ -5,7 +5,17 @@
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
-import { child, addClass, removeClass, hasClass, getAttribute, setAttribute, applyStyle } from '../../utils/dom';
+import {
+	child,
+	addClass,
+	removeClass,
+	hasClass,
+	getAttribute,
+	setAttribute,
+	removeAttribute,
+	applyStyle,
+	getRect,
+} from '../../utils/dom';
 import { FADE, SLIDE } from '../../constants/types';
 import { STATUS_CLASSES } from '../../constants/classes';
 import { values } from "../../utils/object";
@@ -127,6 +137,7 @@ export default ( Splide, index, realIndex, slide ) => {
 			Splide.off( STATUS_UPDATE_EVENTS ).off( STYLE_RESTORE_EVENTS ).off( 'click', slide );
 			removeClass( slide, values( STATUS_CLASSES ) );
 			restoreStyles();
+			removeAttribute( this.container, 'style' );
 		},
 
 		/**
@@ -158,16 +169,14 @@ export default ( Splide, index, realIndex, slide ) => {
 				return active;
 			}
 
-			const { floor }  = Math;
-			const Components = Splide.Components;
-			const Track      = Components.Track;
-			const Layout     = Components.Layout;
-			const isVertical = Splide.options.direction === TTB;
-			const position   = floor( ( Track.toPosition( index ) + Track.offset( index ) - Track.position ) * Track.sign );
-			const edge       = floor( position + Layout[ isVertical ? 'slideHeight' : 'slideWidth' ]( index ) );
-			const size       = Layout[ isVertical ? 'height' : 'width' ];
+			const trackRect = getRect( Splide.Components.Elements.track );
+			const slideRect = getRect( slide );
 
-			return ( 0 <= position && position <= size && 0 <= edge && edge <= size );
+			if ( Splide.options.direction === TTB ) {
+				return trackRect.top <= slideRect.top && slideRect.bottom <= trackRect.bottom;
+			}
+
+			return trackRect.left <= slideRect.left && slideRect.right <= trackRect.right;
 		},
 
 		/**

@@ -76,7 +76,7 @@ export default ( Splide ) => {
 		 */
 		mount() {
 			map = Object.keys( breakpoints )
-				.sort( ( n, m ) => parseInt( n ) - parseInt( m ) )
+				.sort( ( n, m ) => +n - +m )
 				.map( point => ( { point, mql: matchMedia( `(max-width:${ point }px)` ) } ) );
 
 			/*

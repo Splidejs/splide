@@ -71,21 +71,12 @@ export default ( Splide, Components ) => {
 
 			this.gap = toPixel( root, options.gap );
 
-			const padding =
-				typeof options.padding === "object"
-					? { left: 0, right: 0, ...options.padding }
-					: options.padding;
-			const { left = padding, right = padding } = padding;
+			const padding = options.padding;
+			const left    = toPixel( root, padding.left || padding );
+			const right   = toPixel( root, padding.right || padding );
 
-			this.padding = {
-				left : toPixel( root, left ),
-				right: toPixel( root, right ),
-			};
-
-			applyStyle( track, {
-				paddingLeft : unit( left ),
-				paddingRight: unit( right ),
-			} );
+			this.padding = { left, right };
+			applyStyle( track, { paddingLeft : unit( left ), paddingRight: unit( right ) } );
 		},
 
 		/**

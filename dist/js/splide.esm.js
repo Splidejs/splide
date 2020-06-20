@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.4.0
+ * Version  : 2.4.1
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -466,7 +466,7 @@ function toPixel(root, value) {
     dom_remove(div);
   }
 
-  return value;
+  return +value || 0;
 }
 // CONCATENATED MODULE: ./src/js/utils/dom.js
 /**
@@ -1134,11 +1134,18 @@ var DEFAULTS = {
   /**
    * If true, slide width will be determined by the element width itself.
    * - perPage/perMove should be 1.
-   * - lazyLoad should be false.
    *
    * @type {boolean}
    */
   autoWidth: false,
+
+  /**
+   * If true, slide height will be determined by the element width itself.
+   * - perPage/perMove should be 1.
+   *
+   * @type {boolean}
+   */
+  autoHeight: false,
 
   /**
    * Determine how many slides should be displayed per page.
@@ -2068,6 +2075,7 @@ var STYLE_RESTORE_EVENTS = 'update.slide';
       Splide.off(STATUS_UPDATE_EVENTS).off(STYLE_RESTORE_EVENTS).off('click', slide);
       removeClass(slide, values(STATUS_CLASSES));
       restoreStyles();
+      removeAttribute(this.container, 'style');
     },
 
     /**
@@ -2100,15 +2108,14 @@ var STYLE_RESTORE_EVENTS = 'update.slide';
         return active;
       }
 
-      var floor = Math.floor;
-      var Components = Splide.Components;
-      var Track = Components.Track;
-      var Layout = Components.Layout;
-      var isVertical = Splide.options.direction === TTB;
-      var position = floor((Track.toPosition(index) + Track.offset(index) - Track.position) * Track.sign);
-      var edge = floor(position + Layout[isVertical ? 'slideHeight' : 'slideWidth'](index));
-      var size = Layout[isVertical ? 'height' : 'width'];
-      return 0 <= position && position <= size && 0 <= edge && edge <= size;
+      var trackRect = getRect(Splide.Components.Elements.track);
+      var slideRect = getRect(slide);
+
+      if (Splide.options.direction === TTB) {
+        return trackRect.top <= slideRect.top && slideRect.bottom <= trackRect.bottom;
+      }
+
+      return trackRect.left <= slideRect.left && slideRect.right <= trackRect.right;
     },
 
     /**
@@ -2452,7 +2459,7 @@ var UID_NAME = 'uid';
 
 
 
-var controller_floor = Math.floor;
+var floor = Math.floor;
 /**
  * The component for controlling the track.
  *
@@ -2558,7 +2565,7 @@ var controller_floor = Math.floor;
       var length = Splide.length;
       var perPage = options.perPage;
       var index = page * perPage;
-      index = index - (this.pageLength * perPage - length) * controller_floor(index / length); // Adjustment for the last page.
+      index = index - (this.pageLength * perPage - length) * floor(index / length); // Adjustment for the last page.
 
       if (length - perPage <= index && index < length) {
         index = length - perPage;
@@ -2583,10 +2590,10 @@ var controller_floor = Math.floor;
       var perPage = options.perPage; // Make the last "perPage" number of slides belong to the last page.
 
       if (length - perPage <= index && index < length) {
-        return controller_floor((length - 1) / perPage);
+        return floor((length - 1) / perPage);
       }
 
-      return controller_floor(index / perPage);
+      return floor(index / perPage);
     },
 
     /**
@@ -2753,180 +2760,6 @@ var controller_floor = Math.floor;
 
   return Controller;
 });
-// CONCATENATED MODULE: ./src/js/components/track/directions/vertical.js
-/**
- * The resolver component for vertical move.
- *
- * @author    Naotoshi Fujita
- * @copyright Naotoshi Fujita. All rights reserved.
- */
-
-/**
- * The resolver component for vertical move.
- *
- * @param {Splide} Splide     - A Splide instance.
- * @param {Object} Components - An object containing components.
- *
- * @return {Object} - The resolver object.
- */
-
-/* harmony default export */ var vertical = (function (Splide, Components) {
-  /**
-   * Hold the Layout object.
-   *
-   * @type {Object}
-   */
-  var Layout;
-  return {
-    /**
-     * Axis of translate.
-     *
-     * @type {string}
-     */
-    axis: 'Y',
-
-    /**
-     * Sign for the direction.
-     *
-     * @return {number}
-     */
-    sign: -1,
-
-    /**
-     * Initialization.
-     */
-    init: function init() {
-      Layout = Components.Layout;
-    },
-
-    /**
-     * Calculate position by index.
-     *
-     * @param {number} index - Slide index.
-     *
-     * @return {Object} - Calculated position.
-     */
-    toPosition: function toPosition(index) {
-      return -(Layout.totalHeight(index) - Layout.slideHeight() - Layout.gap + this.offset());
-    },
-
-    /**
-     * Trim redundant spaces on the left or right edge if necessary.
-     *
-     * @param {number} position - Position value to be trimmed.
-     *
-     * @return {number} - Trimmed position.
-     */
-    trim: function trim(position) {
-      var edge = -(Layout.totalHeight() - (Layout.height + Layout.gap));
-      return between(position, edge, 0);
-    },
-
-    /**
-     * Return current offset value, considering direction.
-     *
-     * @return {number} - Offset amount.
-     */
-    offset: function offset() {
-      var focus = Splide.options.focus;
-      var slideHeight = Layout.slideHeight();
-
-      if (focus === 'center') {
-        return -(Layout.height - slideHeight) / 2;
-      }
-
-      return -(parseInt(focus) || 0) * (slideHeight + Layout.gap);
-    }
-  };
-});
-// CONCATENATED MODULE: ./src/js/components/track/directions/horizontal.js
-/**
- * The resolver component for horizontal move.
- *
- * @author    Naotoshi Fujita
- * @copyright Naotoshi Fujita. All rights reserved.
- */
-
-
-/**
- * The resolver component for horizontal move.
- *
- * @param {Splide} Splide     - A Splide instance.
- * @param {Object} Components - An object containing components.
- *
- * @return {Object} - The resolver object.
- */
-
-/* harmony default export */ var horizontal = (function (Splide, Components) {
-  /**
-   * Hold the Layout component.
-   *
-   * @type {Object}
-   */
-  var Layout;
-  return {
-    /**
-     * Axis of translate.
-     *
-     * @type {string}
-     */
-    axis: 'X',
-
-    /**
-     * Sign for the direction.
-     *
-     * @type {number}
-     */
-    sign: Splide.options.direction === RTL ? 1 : -1,
-
-    /**
-     * Initialization.
-     */
-    init: function init() {
-      Layout = Components.Layout;
-    },
-
-    /**
-     * Calculate the track position by a slide index.
-     *
-     * @param {number} index - Slide index.
-     *
-     * @return {Object} - Calculated position.
-     */
-    toPosition: function toPosition(index) {
-      var slidePosition = Layout.totalWidth(index) - Layout.slideWidth(index) - Layout.gap;
-      return this.sign * (slidePosition + this.offset(index));
-    },
-
-    /**
-     * Trim redundant spaces on the left or right edge if necessary.
-     *
-     * @param {number} position - Position value to be trimmed.
-     *
-     * @return {number} - Trimmed position.
-     */
-    trim: function trim(position) {
-      var edge = this.sign * (Layout.totalWidth() - (Layout.width + Layout.gap));
-      return between(position, edge, 0);
-    },
-
-    /**
-     * Return current offset value, considering direction.
-     *
-     * @return {number} - Offset amount.
-     */
-    offset: function offset(index) {
-      var focus = Splide.options.focus;
-      var slideWidth = Layout.slideWidth(index);
-
-      if (focus === 'center') {
-        return -(Layout.width - slideWidth) / 2;
-      }
-
-      return -(parseInt(focus) || 0) * (slideWidth + Layout.gap);
-    }
-  };
-});
 // CONCATENATED MODULE: ./src/js/components/track/index.js
 /**
  * The component for moving list in the track.
@@ -2934,8 +2767,6 @@ var controller_floor = Math.floor;
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
-
 
 
 
@@ -2951,18 +2782,25 @@ var controller_floor = Math.floor;
 
 /* harmony default export */ var components_track = (function (Splide, Components) {
   /**
+   * Hold the Layout component.
+   *
+   * @type {Object}
+   */
+  var Layout;
+  /**
+   * Hold the Layout component.
+   *
+   * @type {Object}
+   */
+
+  var Elements;
+  /**
    * Store the list element.
    *
    * @type {Element}
    */
-  var list;
-  /**
-   * Store the current position.
-   *
-   * @type {number}
-   */
 
-  var currPosition = 0;
+  var list;
   /**
    * Whether the current direction is vertical or not.
    *
@@ -2983,13 +2821,21 @@ var controller_floor = Math.floor;
    * @type {Object}
    */
 
-  var Track = object_assign({
+  var Track = {
+    /**
+     * Sign for the direction. Only RTL mode uses the positive sign.
+     *
+     * @type {number}
+     */
+    sign: Splide.options.direction === RTL ? 1 : -1,
+
     /**
      * Called when the component is mounted.
      */
     mount: function mount() {
-      list = Components.Elements.list;
-      this.init();
+      Elements = Components.Elements;
+      Layout = Components.Layout;
+      list = Elements.list;
     },
 
     /**
@@ -3000,6 +2846,7 @@ var controller_floor = Math.floor;
       var _this = this;
 
       if (!isFade) {
+        this.jump(0);
         Splide.on('mounted resize updated', function () {
           _this.jump(Splide.index);
         });
@@ -3023,7 +2870,7 @@ var controller_floor = Math.floor;
         Splide.emit('move', newIndex, prevIndex, destIndex);
       }
 
-      if (Math.abs(newPosition - currPosition) >= 1 || isFade) {
+      if (Math.abs(newPosition - this.position) >= 1 || isFade) {
         Components.Transition.start(destIndex, newIndex, prevIndex, this.toCoord(newPosition), function () {
           onTransitionEnd(destIndex, newIndex, prevIndex, silently);
         });
@@ -3051,9 +2898,8 @@ var controller_floor = Math.floor;
      * @param {number} position - A new position value.
      */
     translate: function translate(position) {
-      currPosition = position;
       applyStyle(list, {
-        transform: "translate" + this.axis + "(" + position + "px)"
+        transform: "translate" + (isVertical ? 'Y' : 'X') + "(" + position + "px)"
       });
     },
 
@@ -3069,7 +2915,8 @@ var controller_floor = Math.floor;
         return position;
       }
 
-      return this._s.trim(position);
+      var edge = this.sign * (Layout.totalSize() - Layout.size - Layout.gap);
+      return between(position, edge, 0);
     },
 
     /**
@@ -3084,7 +2931,7 @@ var controller_floor = Math.floor;
 
       var index = 0;
       var minDistance = Infinity;
-      Components.Elements.getSlides(true).forEach(function (Slide) {
+      Elements.getSlides(true).forEach(function (Slide) {
         var slideIndex = Slide.index;
         var distance = Math.abs(_this2.toPosition(slideIndex) - position);
 
@@ -3111,15 +2958,45 @@ var controller_floor = Math.floor;
     },
 
     /**
-     * Return current position.
+     * Calculate the track position by a slide index.
+     *
+     * @param {number} index - Slide index.
+     *
+     * @return {Object} - Calculated position.
+     */
+    toPosition: function toPosition(index) {
+      var position = Layout.totalSize(index) - Layout.slideSize(index) - Layout.gap;
+      return this.sign * (position + this.offset(index));
+    },
+
+    /**
+     * Return current offset value, considering direction.
+     *
+     * @return {number} - Offset amount.
+     */
+    offset: function offset(index) {
+      var focus = Splide.options.focus;
+      var slideSize = Layout.slideSize(index);
+
+      if (focus === 'center') {
+        return -(Layout.size - slideSize) / 2;
+      }
+
+      return -(parseInt(focus) || 0) * (slideSize + Layout.gap);
+    },
+
+    /**
+     * Return the current position.
+     * This returns the correct position even while transitioning by CSS.
      *
      * @return {number} - Current position.
      */
     get position() {
-      return currPosition;
+      var prop = isVertical ? 'top' : 'left';
+      return getRect(list)[prop] - getRect(Elements.track)[prop] - Layout.padding[prop];
     }
 
-  }, isVertical ? vertical(Splide, Components) : horizontal(Splide, Components));
+  };
   /**
    * Called whenever slides arrive at a destination.
    *
@@ -3356,7 +3233,7 @@ var controller_floor = Math.floor;
  * @return {Object} - The resolver object.
  */
 
-/* harmony default export */ var directions_horizontal = (function (Splide, Components) {
+/* harmony default export */ var horizontal = (function (Splide, Components) {
   /**
    * Keep the Elements component.
    *
@@ -3407,13 +3284,11 @@ var controller_floor = Math.floor;
       track = Elements.track;
       this.gap = toPixel(root, options.gap);
       var padding = options.padding;
-      var _padding$left = padding.left,
-          left = _padding$left === void 0 ? padding : _padding$left,
-          _padding$right = padding.right,
-          right = _padding$right === void 0 ? padding : _padding$right;
+      var left = toPixel(root, padding.left || padding);
+      var right = toPixel(root, padding.right || padding);
       this.padding = {
-        left: toPixel(root, left),
-        right: toPixel(root, right)
+        left: left,
+        right: right
       };
       applyStyle(track, {
         paddingLeft: unit(left),
@@ -3509,7 +3384,7 @@ var controller_floor = Math.floor;
  * @return {Object} - The resolver object.
  */
 
-/* harmony default export */ var directions_vertical = (function (Splide, Components) {
+/* harmony default export */ var vertical = (function (Splide, Components) {
   /**
    * Keep the Elements component.
    *
@@ -3553,13 +3428,11 @@ var controller_floor = Math.floor;
       track = Elements.track;
       this.gap = toPixel(root, options.gap);
       var padding = options.padding;
-      var _padding$top = padding.top,
-          top = _padding$top === void 0 ? padding : _padding$top,
-          _padding$bottom = padding.bottom,
-          bottom = _padding$bottom === void 0 ? padding : _padding$bottom;
+      var top = toPixel(root, padding.top || padding);
+      var bottom = toPixel(root, padding.bottom || padding);
       this.padding = {
-        top: toPixel(root, top),
-        bottom: toPixel(root, bottom)
+        top: top,
+        bottom: bottom
       };
       applyStyle(track, {
         paddingTop: unit(top),
@@ -3600,9 +3473,16 @@ var controller_floor = Math.floor;
     /**
      * Return the slide height in px.
      *
+     * @param {number} index - Slide index.
+     *
      * @return {number} - The slide height.
      */
-    slideHeight: function slideHeight() {
+    slideHeight: function slideHeight(index) {
+      if (options.autoHeight) {
+        var Slide = Elements.getSlide(index);
+        return Slide ? Slide.slide.offsetHeight : 0;
+      }
+
       var height = options.fixedHeight || (this.height + this.gap) / options.perPage - this.gap;
       return toPixel(root, height);
     },
@@ -3753,6 +3633,13 @@ function createInterval(callback, interval, progress) {
    */
   var Elements = Components.Elements;
   /**
+   * Whether the slider is vertical or not.
+   *
+   * @type {boolean}
+   */
+
+  var isVertical = Splide.options.direction === TTB;
+  /**
    * Layout component object.
    *
    * @type {Object}
@@ -3764,16 +3651,29 @@ function createInterval(callback, interval, progress) {
      */
     mount: function mount() {
       bind();
-      init();
+      init(); // The word "size" means width for a horizontal slider and height for a vertical slider.
+
+      this.totalSize = isVertical ? this.totalHeight : this.totalWidth;
+      this.slideSize = isVertical ? this.slideHeight : this.slideWidth;
     },
 
     /**
-     * Destroy.
+     * Destroy the component.
      */
     destroy: function destroy() {
       removeAttribute([Elements.list, Elements.track], 'style');
+    },
+
+    /**
+     * Return the slider height on the vertical mode or width on the horizontal mode.
+     *
+     * @return {number}
+     */
+    get size() {
+      return isVertical ? this.height : this.width;
     }
-  }, Splide.options.direction === TTB ? directions_vertical(Splide, Components) : directions_horizontal(Splide, Components));
+
+  }, isVertical ? vertical(Splide, Components) : horizontal(Splide, Components));
   /**
    * Init slider styles according to options.
    */
@@ -3800,21 +3700,22 @@ function createInterval(callback, interval, progress) {
     }, Splide.options.throttle), window).on('resize', resize).on('updated refresh', init);
   }
   /**
-   * Resize the list and slides including clones.
+   * Resize the track and slide elements.
    */
 
 
   function resize() {
+    var options = Splide.options;
     applyStyle(Elements.track, {
       height: unit(Layout.height)
     });
-    var slideHeight = unit(Layout.slideHeight());
+    var slideHeight = options.autoHeight ? null : unit(Layout.slideHeight());
     Elements.each(function (Slide) {
       applyStyle(Slide.container, {
         height: slideHeight
       });
       applyStyle(Slide.slide, {
-        width: Splide.options.autoWidth ? null : unit(Layout.slideWidth(Slide.index)),
+        width: options.autoWidth ? null : unit(Layout.slideWidth(Slide.index)),
         height: Slide.container ? null : slideHeight
       });
     });
@@ -4073,7 +3974,6 @@ var FRICTION_REDUCER = 7;
     var absV = abs(velocity);
 
     if (absV > 0) {
-      var Layout = Components.Layout;
       var options = Splide.options;
       var index = Splide.index;
       var sign = velocity < 0 ? -1 : 1;
@@ -4083,7 +3983,7 @@ var FRICTION_REDUCER = 7;
         var destination = Track.position;
 
         if (absV > options.flickVelocityThreshold && abs(info.offset[axis]) < options.swipeDistanceThreshold) {
-          destination += sign * Math.min(absV * options.flickPower, Layout.width * (options.flickMaxPages || 1));
+          destination += sign * Math.min(absV * options.flickPower, Components.Layout.size * (options.flickMaxPages || 1));
         }
 
         destIndex = Track.toIndex(destination);
@@ -5691,7 +5591,7 @@ var THROTTLE = 50;
      */
     mount: function mount() {
       map = Object.keys(breakpoints).sort(function (n, m) {
-        return parseInt(n) - parseInt(m);
+        return +n - +m;
       }).map(function (point) {
         return {
           point: point,

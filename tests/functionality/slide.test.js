@@ -12,11 +12,27 @@ describe( 'The "slide" type Splide', () => {
 		document.body.innerHTML = minimum;
 		splide = new Splide( '#splide', {}, COMPLETE ).mount();
 
+		const { track, list, slides } = splide.Components.Elements;
+
 		// Set up the getBoundingClientRect.
-		splide.Components.Elements.getSlides( true ).forEach( Slide => {
-			Slide.slide.getBoundingClientRect = jest.fn( () => ( {
-				right: width * ( Slide.index + 1 + splide.Components.Clones.length  / 2 ),
+		slides.forEach( ( slide, index ) => {
+			slide.getBoundingClientRect = jest.fn( () => ( {
+				right: width * index + 1,
 			} ) );
+
+			Object.defineProperty( slide, 'offsetWidth', { value: width } );
+			Object.defineProperty( slide, 'clientWidth', { value: width } );
+		} );
+
+		track.getBoundingClientRect = jest.fn( () => ( { left: 0, right: width } ) );
+
+		splide.on( 'move', newIndex => {
+			const offset = slides.filter( ( slide, index ) => index < newIndex ).reduce( ( offset, slide ) => {
+				offset += slide.clientWidth;
+				return offset;
+			}, 0 );
+
+			list.getBoundingClientRect = jest.fn( () => ( { left: -offset } ) );
 		} );
 	} );
 
