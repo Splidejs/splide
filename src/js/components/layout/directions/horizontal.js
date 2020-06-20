@@ -5,16 +5,9 @@
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
-import { applyStyle } from "../../../utils/dom";
+import { applyStyle, getRect } from "../../../utils/dom";
 import { unit, toPixel } from "../../../utils/utils";
 import { RTL } from '../../../constants/directions';
-
-/**
- * Max width of a slide.
- *
- * @type {number}
- */
-const SLIDE_MAX_WIDTH = 5000;
 
 
 /**
@@ -70,13 +63,6 @@ export default ( Splide, Components ) => {
 		height: 0,
 
 		/**
-		 * Always 0 because the height will be determined by inner contents.
-		 *
-		 * @type {number}
-		 */
-		listHeight: 0,
-
-		/**
 		 * Initialization.
 		 */
 		init() {
@@ -103,18 +89,31 @@ export default ( Splide, Components ) => {
 		},
 
 		/**
-		 * Accumulate slide width including the gap to the designated index.
+		 * Return total width from the left of the list to the right of the slide specified by the provided index.
 		 *
-		 * @param {number|undefined} index - If undefined, width of all slides will be accumulated.
+		 * @param {number} index - Optional. A slide index. If undefined, total width of the slider will be returned.
 		 *
-		 * @return {number} - Accumulated width.
+		 * @return {number} - Total width to the right side of the specified slide, or 0 for an invalid index.
 		 */
-		totalWidth( index ) {
-			return Elements.getSlides( true )
-				.filter( Slide => Slide.index <= index )
-				.reduce( ( accumulator, Slide ) => {
-					return accumulator + this.slideWidth( Slide.index ) + this.gap;
-				}, 0 );
+		totalWidth( index = Splide.length - 1 ) {
+			const Slide = Elements.getSlide( index );
+
+			let width = 0;
+
+			if ( Slide ) {
+				const slideRect = getRect( Slide.slide );
+				const listRect  = getRect( Elements.list );
+
+				if ( options.direction === RTL ) {
+					width = listRect.right - slideRect.left;
+				} else {
+					width = slideRect.right - listRect.left;
+				}
+
+				width += this.gap;
+			}
+
+			return width;
 		},
 
 		/**
@@ -151,16 +150,6 @@ export default ( Splide, Components ) => {
 		 */
 		get width() {
 			return track.clientWidth - this.padding.left - this.padding.right;
-		},
-
-		/**
-		 * Return list width.
-		 *
-		 * @return {number} - Current list width.
-		 */
-		get listWidth() {
-			const total = Elements.total;
-			return options.autoWidth ? total * SLIDE_MAX_WIDTH : this.totalWidth( total );
 		},
 	}
 }

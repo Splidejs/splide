@@ -7,7 +7,6 @@
 
 import { between } from '../../../utils/utils';
 import { RTL } from "../../../constants/directions";
-import { SLIDE } from "../../../constants/types";
 
 
 /**
@@ -25,13 +24,6 @@ export default ( Splide, Components ) => {
 	 * @type {Object}
 	 */
 	let Layout;
-
-	/**
-	 * Hold the Elements component.
-	 *
-	 * @type {Object}
-	 */
-	let Elements;
 
 	return {
 		/**
@@ -52,47 +44,19 @@ export default ( Splide, Components ) => {
 		 * Initialization.
 		 */
 		init() {
-			Layout   = Components.Layout;
-			Elements = Components.Elements;
+			Layout = Components.Layout;
 		},
 
 		/**
-		 * Calculate position by index.
+		 * Calculate the track position by a slide index.
 		 *
 		 * @param {number} index - Slide index.
 		 *
 		 * @return {Object} - Calculated position.
 		 */
 		toPosition( index ) {
-			return this.sign * ( Layout.totalWidth( index - 1 ) + this.offset( index ) );
-		},
-
-		/**
-		 * Calculate the closest slide index from the given position.
-		 *
-		 * @return {number} - The closest slide position.
-		 */
-		toIndex( position ) {
-			position *= this.sign;
-
-			if ( Splide.is( SLIDE ) ) {
-				position = between( position, Layout.totalWidth( Elements.total ), 0 );
-			}
-
-			const Slides = Elements.getSlides( true );
-
-			for ( const i in Slides ) {
-				const Slide = Slides[ i ];
-
-				const slideIndex    = Slide.index;
-				const slidePosition = this.sign * this.toPosition( slideIndex );
-
-				if ( slidePosition < position && position <= slidePosition + Layout.slideWidth( slideIndex ) + Layout.gap ) {
-					return slideIndex;
-				}
-			}
-
-			return 0;
+			const slidePosition = Layout.totalWidth( index ) - Layout.slideWidth( index ) - Layout.gap;
+			return this.sign * ( slidePosition + this.offset( index ) );
 		},
 
 		/**
@@ -103,7 +67,7 @@ export default ( Splide, Components ) => {
 		 * @return {number} - Trimmed position.
 		 */
 		trim( position ) {
-			const edge = this.sign * ( Layout.totalWidth( Elements.total ) - ( Layout.width + Layout.gap ) );
+			const edge = this.sign * ( Layout.totalWidth() - ( Layout.width + Layout.gap ) );
 			return between( position, edge, 0 );
 		},
 

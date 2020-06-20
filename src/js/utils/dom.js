@@ -28,16 +28,28 @@ export function find( elm, selector ) {
  * @param {Element} parent         - A parent element.
  * @param {string}  tagOrClassName - A tag or class name.
  *
- * @return {Element|null} - A found element on success. Null on failure.
+ * @return {Element|undefined} - A found element on success or undefined on failure.
  */
 export function child( parent, tagOrClassName ) {
+	return children( parent, tagOrClassName )[0];
+}
+
+/**
+ * Return chile elements that matches the provided tag or class name.
+ *
+ * @param {Element} parent         - A parent element.
+ * @param {string}  tagOrClassName - A tag or class name.
+ *
+ * @return {Element[]} - Found elements.
+ */
+export function children( parent, tagOrClassName ) {
 	if ( parent ) {
 		return values( parent.children ).filter( child => {
 			return hasClass( child, tagOrClassName.split( ' ' )[0] ) || child.tagName === tagOrClassName;
-		} )[0] || null;
+		} );
 	}
 
-	return null;
+	return [];
 }
 
 /**
@@ -209,6 +221,17 @@ export function removeAttribute( elms, names ) {
 	toArray( names ).forEach( name => {
 		toArray( elms ).forEach( elm => elm && elm.removeAttribute( name ) );
 	} );
+}
+
+/**
+ * Return the Rect object of the provided object.
+ *
+ * @param {Element} elm - An element.
+ *
+ * @return {ClientRect|DOMRect} - A rect object.
+ */
+export function getRect( elm ) {
+	return elm.getBoundingClientRect();
 }
 
 /**

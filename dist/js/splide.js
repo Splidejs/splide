@@ -486,17 +486,29 @@ function find(elm, selector) {
  * @param {Element} parent         - A parent element.
  * @param {string}  tagOrClassName - A tag or class name.
  *
- * @return {Element|null} - A found element on success. Null on failure.
+ * @return {Element|undefined} - A found element on success or undefined on failure.
  */
 
 function child(parent, tagOrClassName) {
+  return children(parent, tagOrClassName)[0];
+}
+/**
+ * Return chile elements that matches the provided tag or class name.
+ *
+ * @param {Element} parent         - A parent element.
+ * @param {string}  tagOrClassName - A tag or class name.
+ *
+ * @return {Element[]} - Found elements.
+ */
+
+function children(parent, tagOrClassName) {
   if (parent) {
     return values(parent.children).filter(function (child) {
       return hasClass(child, tagOrClassName.split(' ')[0]) || child.tagName === tagOrClassName;
-    })[0] || null;
+    });
   }
 
-  return null;
+  return [];
 }
 /**
  * Create an element with some optional attributes.
@@ -671,6 +683,17 @@ function removeAttribute(elms, names) {
       return elm && elm.removeAttribute(name);
     });
   });
+}
+/**
+ * Return the Rect object of the provided object.
+ *
+ * @param {Element} elm - An element.
+ *
+ * @return {ClientRect|DOMRect} - A rect object.
+ */
+
+function getRect(elm) {
+  return elm.getBoundingClientRect();
 }
 /**
  * Trigger the given callback after all images contained by the element are loaded.
@@ -1981,7 +2004,7 @@ var STYLE_RESTORE_EVENTS = 'update.slide';
     /**
      * Container element if available.
      *
-     * @type {Element|null}
+     * @type {Element|undefined}
      */
     container: child(slide, Splide.classes.container),
 
@@ -2373,7 +2396,7 @@ var UID_NAME = 'uid';
     Elements.track = find(root, "." + classes.track);
     Elements.list = child(Elements.track, classes.list);
     exist(Elements.track && Elements.list, 'Track or list was not found.');
-    Elements.slides = values(Elements.list.children);
+    Elements.slides = children(Elements.list, classes.slide);
     var arrows = findParts(classes.arrows);
     Elements.arrows = {
       prev: find(arrows, "." + classes.prev),
@@ -2394,12 +2417,12 @@ var UID_NAME = 'uid';
   function getClasses() {
     var rootClass = classes.root;
     var options = Splide.options;
-    return [rootClass + "--" + options.type, rootClass + "--" + options.direction, options.drag ? rootClass + "--draggable" : '', options.isNavigation ? rootClass + "--nav" : ''];
+    return [rootClass + "--" + options.type, rootClass + "--" + options.direction, options.drag ? rootClass + "--draggable" : '', options.isNavigation ? rootClass + "--nav" : '', STATUS_CLASSES.active];
   }
   /**
    * Find parts only from children of the root or track.
    *
-   * @return {Element|null} - A found element or null.
+   * @return {Element} - A found element or undefined.
    */
 
 
@@ -2774,18 +2797,7 @@ var controller_floor = Math.floor;
      * @return {Object} - Calculated position.
      */
     toPosition: function toPosition(index) {
-      return -((index + Components.Clones.length / 2) * (Layout.slideHeight() + Layout.gap) + this.offset());
-    },
-
-    /**
-     * Calculate the closest slide index from the given position.
-     *
-     * @return {number} - The closest slide index.
-     */
-    toIndex: function toIndex(position) {
-      var slideHeight = Layout.slideHeight();
-      var cloneOffset = (slideHeight + Layout.gap) * Components.Clones.length / 2;
-      return Math.round(-(position + cloneOffset + this.offset()) / (slideHeight + Layout.gap));
+      return -(Layout.totalHeight(index) - Layout.slideHeight() - Layout.gap + this.offset());
     },
 
     /**
@@ -2796,7 +2808,7 @@ var controller_floor = Math.floor;
      * @return {number} - Trimmed position.
      */
     trim: function trim(position) {
-      var edge = -(Layout.listHeight - (Layout.height + Layout.gap));
+      var edge = -(Layout.totalHeight() - (Layout.height + Layout.gap));
       return between(position, edge, 0);
     },
 
@@ -2826,7 +2838,6 @@ var controller_floor = Math.floor;
  */
 
 
-
 /**
  * The resolver component for horizontal move.
  *
@@ -2843,13 +2854,6 @@ var controller_floor = Math.floor;
    * @type {Object}
    */
   var Layout;
-  /**
-   * Hold the Elements component.
-   *
-   * @type {Object}
-   */
-
-  var Elements;
   return {
     /**
      * Axis of translate.
@@ -2870,45 +2874,18 @@ var controller_floor = Math.floor;
      */
     init: function init() {
       Layout = Components.Layout;
-      Elements = Components.Elements;
     },
 
     /**
-     * Calculate position by index.
+     * Calculate the track position by a slide index.
      *
      * @param {number} index - Slide index.
      *
      * @return {Object} - Calculated position.
      */
     toPosition: function toPosition(index) {
-      return this.sign * (Layout.totalWidth(index - 1) + this.offset(index));
-    },
-
-    /**
-     * Calculate the closest slide index from the given position.
-     *
-     * @return {number} - The closest slide position.
-     */
-    toIndex: function toIndex(position) {
-      position *= this.sign;
-
-      if (Splide.is(SLIDE)) {
-        position = between(position, Layout.totalWidth(Elements.total), 0);
-      }
-
-      var Slides = Elements.getSlides(true);
-
-      for (var i in Slides) {
-        var Slide = Slides[i];
-        var slideIndex = Slide.index;
-        var slidePosition = this.sign * this.toPosition(slideIndex);
-
-        if (slidePosition < position && position <= slidePosition + Layout.slideWidth(slideIndex) + Layout.gap) {
-          return slideIndex;
-        }
-      }
-
-      return 0;
+      var slidePosition = Layout.totalWidth(index) - Layout.slideWidth(index) - Layout.gap;
+      return this.sign * (slidePosition + this.offset(index));
     },
 
     /**
@@ -2919,7 +2896,7 @@ var controller_floor = Math.floor;
      * @return {number} - Trimmed position.
      */
     trim: function trim(position) {
-      var edge = this.sign * (Layout.totalWidth(Elements.total) - (Layout.width + Layout.gap));
+      var edge = this.sign * (Layout.totalWidth() - (Layout.width + Layout.gap));
       return between(position, edge, 0);
     },
 
@@ -3083,6 +3060,30 @@ var controller_floor = Math.floor;
       }
 
       return this._s.trim(position);
+    },
+
+    /**
+     * Calculate the closest slide index from the given position.
+     *
+     * @param {number} position - A position converted to an slide index.
+     *
+     * @return {number} - The closest slide index.
+     */
+    toIndex: function toIndex(position) {
+      var _this2 = this;
+
+      var index = 0;
+      var minDistance = Infinity;
+      Components.Elements.getSlides(true).forEach(function (Slide) {
+        var slideIndex = Slide.index;
+        var distance = Math.abs(_this2.toPosition(slideIndex) - position);
+
+        if (distance < minDistance) {
+          minDistance = distance;
+          index = slideIndex;
+        }
+      });
+      return index;
     },
 
     /**
@@ -3337,13 +3338,6 @@ var controller_floor = Math.floor;
 
 
 /**
- * Max width of a slide.
- *
- * @type {number}
- */
-
-var SLIDE_MAX_WIDTH = 5000;
-/**
  * The resolver component for horizontal layout.
  *
  * @param {Splide} Splide     - A Splide instance.
@@ -3396,13 +3390,6 @@ var SLIDE_MAX_WIDTH = 5000;
     height: 0,
 
     /**
-     * Always 0 because the height will be determined by inner contents.
-     *
-     * @type {number}
-     */
-    listHeight: 0,
-
-    /**
      * Initialization.
      */
     init: function init() {
@@ -3425,20 +3412,34 @@ var SLIDE_MAX_WIDTH = 5000;
     },
 
     /**
-     * Accumulate slide width including the gap to the designated index.
+     * Return total width from the left of the list to the right of the slide specified by the provided index.
      *
-     * @param {number|undefined} index - If undefined, width of all slides will be accumulated.
+     * @param {number} index - Optional. A slide index. If undefined, total width of the slider will be returned.
      *
-     * @return {number} - Accumulated width.
+     * @return {number} - Total width to the right side of the specified slide, or 0 for an invalid index.
      */
     totalWidth: function totalWidth(index) {
-      var _this = this;
+      if (index === void 0) {
+        index = Splide.length - 1;
+      }
 
-      return Elements.getSlides(true).filter(function (Slide) {
-        return Slide.index <= index;
-      }).reduce(function (accumulator, Slide) {
-        return accumulator + _this.slideWidth(Slide.index) + _this.gap;
-      }, 0);
+      var Slide = Elements.getSlide(index);
+      var width = 0;
+
+      if (Slide) {
+        var slideRect = getRect(Slide.slide);
+        var listRect = getRect(Elements.list);
+
+        if (options.direction === RTL) {
+          width = listRect.right - slideRect.left;
+        } else {
+          width = slideRect.right - listRect.left;
+        }
+
+        width += this.gap;
+      }
+
+      return width;
     },
 
     /**
@@ -3475,16 +3476,6 @@ var SLIDE_MAX_WIDTH = 5000;
      */
     get width() {
       return track.clientWidth - this.padding.left - this.padding.right;
-    },
-
-    /**
-     * Return list width.
-     *
-     * @return {number} - Current list width.
-     */
-    get listWidth() {
-      var total = Elements.total;
-      return options.autoWidth ? total * SLIDE_MAX_WIDTH : this.totalWidth(total);
     }
 
   };
@@ -3567,6 +3558,27 @@ var SLIDE_MAX_WIDTH = 5000;
     },
 
     /**
+     * Return total height from the top of the list to the bottom of the slide specified by the provided index.
+     *
+     * @param {number} index - Optional. A slide index. If undefined, total height of the slider will be returned.
+     *
+     * @return {number} - Total height to the bottom of the specified slide, or 0 for an invalid index.
+     */
+    totalHeight: function totalHeight(index) {
+      if (index === void 0) {
+        index = Splide.length - 1;
+      }
+
+      var Slide = Elements.getSlide(index);
+
+      if (Slide) {
+        return getRect(Slide.slide).bottom - getRect(Elements.list).top + this.gap;
+      }
+
+      return 0;
+    },
+
+    /**
      * Return the slide width in px.
      *
      * @return {number} - The slide width.
@@ -3603,24 +3615,6 @@ var SLIDE_MAX_WIDTH = 5000;
       var height = options.height || this.width * options.heightRatio;
       exist(height, '"height" or "heightRatio" is missing.');
       return toPixel(root, height) - this.padding.top - this.padding.bottom;
-    },
-
-    /**
-     * Return list width.
-     *
-     * @return {number} - Current list width.
-     */
-    get listWidth() {
-      return this.width;
-    },
-
-    /**
-     * Return list height.
-     *
-     * @return {number} - Current list height.
-     */
-    get listHeight() {
-      return (this.slideHeight() + this.gap) * Elements.total;
     }
 
   };
@@ -3801,15 +3795,10 @@ function createInterval(callback, interval, progress) {
 
 
   function resize() {
-    applyStyle(Elements.list, {
-      width: unit(Layout.listWidth),
-      height: unit(Layout.listHeight)
-    });
     applyStyle(Elements.track, {
       height: unit(Layout.height)
     });
     var slideHeight = unit(Layout.slideHeight());
-    var width = Layout.width;
     Elements.each(function (Slide) {
       applyStyle(Slide.container, {
         height: slideHeight
@@ -3818,11 +3807,7 @@ function createInterval(callback, interval, progress) {
         width: Splide.options.autoWidth ? null : unit(Layout.slideWidth(Slide.index)),
         height: Slide.container ? null : slideHeight
       });
-    }); // When the scrollbar is made hidden, the track width is changed but the resize event is not fired.
-
-    if (width !== Layout.width) {
-      resize();
-    }
+    });
   }
 
   return Layout;
@@ -3840,6 +3825,12 @@ function createInterval(callback, interval, progress) {
 
 
 var abs = Math.abs;
+/**
+ * If the absolute velocity is greater thant this value,
+ * a slider always goes to a different slide after drag, not allowed to stay on a current slide.
+ */
+
+var MIN_VELOCITY = 0.1;
 /**
  * Adjust how much the track can be pulled on the first or last page.
  * The larger number this is, the farther the track moves.
@@ -4076,7 +4067,6 @@ var FRICTION_REDUCER = 7;
       var options = Splide.options;
       var index = Splide.index;
       var sign = velocity < 0 ? -1 : 1;
-      var adjacent = index + sign * Track.sign;
       var destIndex = index;
 
       if (!Splide.is(FADE)) {
@@ -4089,13 +4079,13 @@ var FRICTION_REDUCER = 7;
         destIndex = Track.toIndex(destination);
       }
       /*
-       * Do not allow the track to go to a previous position.
+       * Do not allow the track to go to a previous position if there is enough velocity.
        * Always use the adjacent index for the fade mode.
        */
 
 
-      if (destIndex === index) {
-        destIndex = adjacent;
+      if (destIndex === index && absV > MIN_VELOCITY) {
+        destIndex = index + sign * Track.sign;
       }
 
       if (Splide.is(SLIDE)) {

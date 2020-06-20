@@ -5,10 +5,18 @@ import { COMPLETE } from '../../src/js/components';
 
 describe( 'The "loop" type Splide', () => {
 	let splide;
+	const width = 800;
 
 	beforeEach( () => {
 		document.body.innerHTML = minimum;
 		splide = new Splide( '#splide', { type: 'loop' }, COMPLETE ).mount();
+
+		// Set up the getBoundingClientRect.
+		splide.Components.Elements.getSlides( true ).forEach( Slide => {
+			Slide.slide.getBoundingClientRect = jest.fn( () => ( {
+				right: width * ( Slide.index + 1 + splide.Components.Clones.length  / 2 ),
+			} ) );
+		} );
 	} );
 
 	test( 'should activate a Clones component and yield clone slides', () => {
@@ -17,12 +25,10 @@ describe( 'The "loop" type Splide', () => {
 	} );
 
 	test( 'should init track position according to length of clones.', () => {
-		const { Track, Clones, Elements: { track } } = splide.Components;
-		const width = 800;
-		Object.defineProperty( track, 'clientWidth', { value: width } );
+		const { Track, Clones, Elements } = splide.Components;
 
+		Object.defineProperty( Elements.track, 'clientWidth', { value: width } );
 		global.dispatchEvent( new Event( 'resize' ) );
-
 		expect( Math.abs( Track.toPosition( 0 ) ) ).toBe( width * Clones.length / 2 );
 	} );
 

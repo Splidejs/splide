@@ -139,6 +139,30 @@ export default ( Splide, Components ) => {
 		},
 
 		/**
+		 * Calculate the closest slide index from the given position.
+		 *
+		 * @param {number} position - A position converted to an slide index.
+		 *
+		 * @return {number} - The closest slide index.
+		 */
+		toIndex( position ) {
+			let index = 0;
+			let minDistance = Infinity;
+
+			Components.Elements.getSlides( true ).forEach( Slide => {
+				const slideIndex = Slide.index;
+				const distance   = Math.abs( this.toPosition( slideIndex ) - position );
+
+				if ( distance < minDistance ) {
+					minDistance = distance;
+					index = slideIndex;
+				}
+			} );
+
+			return index;
+		},
+
+		/**
 		 * Return coordinates object by the given position.
 		 *
 		 * @param {number} position - A position value.

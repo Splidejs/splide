@@ -11,6 +11,7 @@ import {
 	addClass,
 	removeClass,
 	child,
+	children,
 	remove,
 	append,
 	before,
@@ -19,8 +20,8 @@ import {
 	loaded,
 } from '../../utils/dom';
 import { exist } from '../../utils/error';
-import { values } from '../../utils/object';
 import { pad } from "../../utils/utils";
+import { STATUS_CLASSES } from "../../constants/classes";
 
 
 /**
@@ -244,7 +245,7 @@ export default ( Splide, Components ) => {
 
 		exist( Elements.track && Elements.list, 'Track or list was not found.' );
 
-		Elements.slides = values( Elements.list.children );
+		Elements.slides = children( Elements.list, classes.slide );
 
 		const arrows = findParts( classes.arrows );
 		Elements.arrows = {
@@ -273,13 +274,14 @@ export default ( Splide, Components ) => {
 			`${ rootClass }--${ options.direction }`,
 			options.drag ? `${ rootClass }--draggable` : '',
 			options.isNavigation ? `${ rootClass }--nav` : '',
+			STATUS_CLASSES.active,
 		];
 	}
 
 	/**
 	 * Find parts only from children of the root or track.
 	 *
-	 * @return {Element|null} - A found element or null.
+	 * @return {Element} - A found element or undefined.
 	 */
 	function findParts( className ) {
 		return child( root, className ) || child( Elements.slider, className );

@@ -1,8 +1,14 @@
 .splide {
+  $root: &;
+
   &__list {
-    display: flex;
-    flex-wrap: wrap;
     margin: 0!important;
     padding: 0 !important;
+  }
+
+  &.is-active {
+    #{$root}__list {
+      display: flex;
+    }
   }
 }
