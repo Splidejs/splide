@@ -11,11 +11,12 @@
 * [Documents](https://splidejs.com/category/users-guide/)
 
 ## News
+* Add `slideFocus` and `waitForTransition`.
 * Add [type definitions](https://github.com/Splidejs/splide/blob/master/src/js/splide.d.ts) for typescript.
 * [React Splide](https://splidejs.com/integration-react-splide/) is released.
 * [Vue Splide](https://splidejs.com/integration-vue-splide/) is released.
-* Add 'resetProgress' and 'throttle' options.
-* Breakpoints accept 'drag' and 'pagination'.
+* Add `resetProgress` and `throttle` options.
+* Breakpoints accept `drag` and `pagination`.
 * Add some [themes](https://splidejs.com/themes/).
 * [Grid](https://splidejs.com/extension-grid/) extension is released.
 * [Auto Width](https://splidejs.com/auto-width/) is implemented. Each slide can have its own width.
@@ -103,6 +104,7 @@ Here is a list of options and brief explanations. Visit [this page](https://spli
 * **rewind**: Whether to rewind a slider before the first slide or after the last one.
 * **speed**: Transition speed in milliseconds.
 * **rewindSpeed**: Transition speed on rewind in milliseconds.
+* **waitForTransition**: Whether to prevent any actions while a slider is transitioning.
 * **width**: Define slider max width.
 * **height**: Define slider height.
 * **fixedWidth**: Fix width of slides.
@@ -137,6 +139,7 @@ Here is a list of options and brief explanations. Visit [this page](https://spli
 * **direction**: Slider direction.
 * **cover**: Whether to convert an img src to background-image of its parent element. height, fixedHeight or heightRatio is required.
 * **accessibility**: Whether to enable accessibility(ARIA attributes) or not.
+* **slideFocus**: Whether to add tabindex="0" to visible slides or not.
 * **isNavigation**: Determine if a slider is navigation for another.
 * **trimSpace**: Whether to trim spaces before the fist slide or after the last one.
 * **updateOnMove**: If true, "is-active" class added to the slide element before transition.
