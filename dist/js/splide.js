@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.4.2
+ * Version  : 2.4.3
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -1084,6 +1084,15 @@ var DEFAULTS = {
   rewindSpeed: 0,
 
   /**
+   * Whether to prevent any actions while a slider is transitioning.
+   * If false, navigation, drag and swipe work while the slider is running.
+   * Even so, it will be forced to wait for transition in some cases in the loop mode to shift a slider.
+   *
+   * @type {boolean}
+   */
+  waitForTransition: true,
+
+  /**
    * Define slider max width.
    *
    * @type {number}
@@ -1687,7 +1696,7 @@ var splide_Splide = /*#__PURE__*/function () {
 
   _proto.go = function go(control, wait) {
     if (wait === void 0) {
-      wait = true;
+      wait = this.options.waitForTransition;
     }
 
     if (this.State.is(IDLE) || this.State.is(MOVING) && !wait) {
@@ -2771,6 +2780,8 @@ var floor = Math.floor;
 
 
 
+
+var abs = Math.abs;
 /**
  * The component for moving list in the track.
  *
@@ -2816,6 +2827,20 @@ var floor = Math.floor;
 
   var isFade = Splide.is(FADE);
   /**
+   * This will be true while transitioning from the last index to the first one.
+   *
+   * @type {boolean}
+   */
+
+  var isLoopPending = false;
+  /**
+   * Sign for the direction. Only RTL mode uses the positive sign.
+   *
+   * @type {number}
+   */
+
+  var sign = Splide.options.direction === RTL ? 1 : -1;
+  /**
    * Track component object.
    *
    * @type {Object}
@@ -2823,11 +2848,11 @@ var floor = Math.floor;
 
   var Track = {
     /**
-     * Sign for the direction. Only RTL mode uses the positive sign.
+     * Make public the sign defined locally.
      *
      * @type {number}
      */
-    sign: Splide.options.direction === RTL ? 1 : -1,
+    sign: sign,
 
     /**
      * Called when the component is mounted.
@@ -2864,7 +2889,13 @@ var floor = Math.floor;
      */
     go: function go(destIndex, newIndex, silently) {
       var newPosition = getTrimmedPosition(destIndex);
-      var prevIndex = Splide.index;
+      var prevIndex = Splide.index; // Prevent any actions while transitioning from the last index to the first one for jump.
+
+      if (Splide.State.is(MOVING) && isLoopPending) {
+        return;
+      }
+
+      isLoopPending = destIndex !== newIndex;
 
       if (!silently) {
         Splide.emit('move', newIndex, prevIndex, destIndex);
@@ -2893,7 +2924,7 @@ var floor = Math.floor;
     },
 
     /**
-     * Set position.
+     * Set the list position by CSS translate property.
      *
      * @param {number} position - A new position value.
      */
@@ -2901,6 +2932,41 @@ var floor = Math.floor;
       applyStyle(list, {
         transform: "translate" + (isVertical ? 'Y' : 'X') + "(" + position + "px)"
       });
+    },
+
+    /**
+     * Cancel the transition and set the list position.
+     * Also, loop the slider if necessary.
+     */
+    cancel: function cancel() {
+      if (Splide.is(LOOP)) {
+        this.shift();
+      } else {
+        // Ensure the current position.
+        this.translate(this.position);
+      }
+
+      applyStyle(list, {
+        transition: ''
+      });
+    },
+
+    /**
+     * Shift the slider if it exceeds borders on the edge.
+     */
+    shift: function shift() {
+      var position = abs(this.position);
+      var left = abs(this.toPosition(0));
+      var right = abs(this.toPosition(Splide.length));
+      var innerSize = right - left;
+
+      if (position < left) {
+        position += innerSize;
+      } else if (position > right) {
+        position -= innerSize;
+      }
+
+      this.translate(sign * position);
     },
 
     /**
@@ -2915,7 +2981,7 @@ var floor = Math.floor;
         return position;
       }
 
-      var edge = this.sign * (Layout.totalSize() - Layout.size - Layout.gap);
+      var edge = sign * (Layout.totalSize() - Layout.size - Layout.gap);
       return between(position, edge, 0);
     },
 
@@ -2933,7 +2999,7 @@ var floor = Math.floor;
       var minDistance = Infinity;
       Elements.getSlides(true).forEach(function (Slide) {
         var slideIndex = Slide.index;
-        var distance = Math.abs(_this2.toPosition(slideIndex) - position);
+        var distance = abs(_this2.toPosition(slideIndex) - position);
 
         if (distance < minDistance) {
           minDistance = distance;
@@ -2966,11 +3032,11 @@ var floor = Math.floor;
      */
     toPosition: function toPosition(index) {
       var position = Layout.totalSize(index) - Layout.slideSize(index) - Layout.gap;
-      return this.sign * (position + this.offset(index));
+      return sign * (position + this.offset(index));
     },
 
     /**
-     * Return current offset value, considering direction.
+     * Return the current offset value, considering direction.
      *
      * @return {number} - Offset amount.
      */
@@ -3010,6 +3076,7 @@ var floor = Math.floor;
     applyStyle(list, {
       transition: ''
     });
+    isLoopPending = false;
 
     if (!isFade) {
       Track.jump(newIndex);
@@ -3735,7 +3802,7 @@ function createInterval(callback, interval, progress) {
 
 
 
-var abs = Math.abs;
+var drag_abs = Math.abs;
 /**
  * If the absolute velocity is greater thant this value,
  * a slider always goes to a different slide after drag, not allowed to stay on a current slide.
@@ -3860,11 +3927,22 @@ var FRICTION_REDUCER = 7;
    */
 
   function start(e) {
-    if (!Drag.disabled && !isDragging && Splide.State.is(IDLE)) {
-      startCoord = Track.toCoord(Track.position);
-      startInfo = analyze(e, {});
-      currentInfo = startInfo;
+    if (!Drag.disabled && !isDragging) {
+      // These prams are used to evaluate whether the slider should start moving.
+      init(e);
     }
+  }
+  /**
+   * Initialize parameters.
+   *
+   * @param {TouchEvent|MouseEvent} e - TouchEvent or MouseEvent object.
+   */
+
+
+  function init(e) {
+    startCoord = Track.toCoord(Track.position);
+    startInfo = analyze(e, {});
+    currentInfo = startInfo;
   }
   /**
    * Called while the track being dragged.
@@ -3890,6 +3968,9 @@ var FRICTION_REDUCER = 7;
         if (shouldMove(currentInfo)) {
           Splide.emit('drag', startInfo);
           isDragging = true;
+          Track.cancel(); // These params are actual drag data.
+
+          init(e);
         }
       }
     }
@@ -3906,17 +3987,17 @@ var FRICTION_REDUCER = 7;
   function shouldMove(_ref) {
     var offset = _ref.offset;
 
-    if (Splide.State.is(IDLE)) {
-      var angle = Math.atan(abs(offset.y) / abs(offset.x)) * 180 / Math.PI;
-
-      if (isVertical) {
-        angle = 90 - angle;
-      }
-
-      return angle < Splide.options.dragAngleThreshold;
+    if (Splide.State.is(MOVING) && Splide.options.waitForTransition) {
+      return false;
     }
 
-    return false;
+    var angle = Math.atan(drag_abs(offset.y) / drag_abs(offset.x)) * 180 / Math.PI;
+
+    if (isVertical) {
+      angle = 90 - angle;
+    }
+
+    return angle < Splide.options.dragAngleThreshold;
   }
   /**
    * Resist dragging the track on the first/last page because there is no more.
@@ -3971,7 +4052,7 @@ var FRICTION_REDUCER = 7;
 
   function go(info) {
     var velocity = info.velocity[axis];
-    var absV = abs(velocity);
+    var absV = drag_abs(velocity);
 
     if (absV > 0) {
       var options = Splide.options;
@@ -3982,7 +4063,7 @@ var FRICTION_REDUCER = 7;
       if (!Splide.is(FADE)) {
         var destination = Track.position;
 
-        if (absV > options.flickVelocityThreshold && abs(info.offset[axis]) < options.swipeDistanceThreshold) {
+        if (absV > options.flickVelocityThreshold && drag_abs(info.offset[axis]) < options.swipeDistanceThreshold) {
           destination += sign * Math.min(absV * options.flickPower, Components.Layout.size * (options.flickMaxPages || 1));
         }
 

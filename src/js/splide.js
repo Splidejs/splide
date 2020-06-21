@@ -152,7 +152,7 @@ export default class Splide {
 	 * @param {string|number} control - A control pattern.
 	 * @param {boolean}       wait    - Optional. Whether to wait for transition.
 	 */
-	go( control, wait = true ) {
+	go( control, wait = this.options.waitForTransition ) {
 		if ( this.State.is( STATES.IDLE ) || ( this.State.is( STATES.MOVING ) && ! wait ) ) {
 			this.Components.Controller.go( control, false );
 		}

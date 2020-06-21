@@ -137,6 +137,11 @@ export interface SplideOptions extends BreakpointOptions {
 	/**
 	 * @default false
 	 */
+	waitForTransition?: boolean,
+
+	/**
+	 * @default false
+	 */
 	autoWidth?: boolean,
 
 	/**
@@ -590,21 +595,19 @@ export interface Sync extends Component {}
  * Track component.
  */
 export interface Track extends Component {
-	axis: 'X' | 'Y';
-	sign: 1 | -1;
-
+	readonly sign: 1 | -1;
 	readonly position: number;
-
-	init(): void;
 
 	go( destIndex: number, newIndex: number, silently: boolean ): void;
 	jump( index: number ): void;
 	translate( position: number ): void;
+	cancel(): void;
+	shift(): void;
 	trim( position: number ): number;
+	toIndex( index: number ): number;
 	toCoord( position: number ): Coordinates;
 	toPosition( index: number ): number;
-	toIndex( index: number ): number;
-	offset(): number;
+	offset( index: number ): number;
 }
 
 /**

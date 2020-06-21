@@ -43,6 +43,15 @@ export const DEFAULTS = {
 	rewindSpeed: 0,
 
 	/**
+	 * Whether to prevent any actions while a slider is transitioning.
+	 * If false, navigation, drag and swipe work while the slider is running.
+	 * Even so, it will be forced to wait for transition in some cases in the loop mode to shift a slider.
+	 *
+	 * @type {boolean}
+	 */
+	waitForTransition: true,
+
+	/**
 	 * Define slider max width.
 	 *
 	 * @type {number}

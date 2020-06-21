@@ -6,9 +6,12 @@
  */
 
 import { applyStyle, getRect } from '../../utils/dom';
+import { between } from "../../utils/utils";
 import { LOOP, FADE } from '../../constants/types';
 import { RTL, TTB } from '../../constants/directions';
-import { between } from "../../utils/utils";
+import { MOVING } from "../../constants/states";
+
+const { abs } = Math;
 
 
 /**
@@ -56,17 +59,31 @@ export default ( Splide, Components ) => {
 	const isFade = Splide.is( FADE );
 
 	/**
+	 * This will be true while transitioning from the last index to the first one.
+	 *
+	 * @type {boolean}
+	 */
+	let isLoopPending = false;
+
+	/**
+	 * Sign for the direction. Only RTL mode uses the positive sign.
+	 *
+	 * @type {number}
+	 */
+	const sign = Splide.options.direction === RTL ? 1 : -1;
+
+	/**
 	 * Track component object.
 	 *
 	 * @type {Object}
 	 */
 	const Track = {
 		/**
-		 * Sign for the direction. Only RTL mode uses the positive sign.
+		 * Make public the sign defined locally.
 		 *
 		 * @type {number}
 		 */
-		sign: Splide.options.direction === RTL ? 1 : -1,
+		sign,
 
 		/**
 		 * Called when the component is mounted.
@@ -101,6 +118,13 @@ export default ( Splide, Components ) => {
 			const newPosition = getTrimmedPosition( destIndex );
 			const prevIndex   = Splide.index;
 
+		  // Prevent any actions while transitioning from the last index to the first one for jump.
+			if ( Splide.State.is( MOVING ) && isLoopPending ) {
+				return;
+			}
+
+			isLoopPending = destIndex !== newIndex;
+
 			if ( ! silently ) {
 				Splide.emit( 'move', newIndex, prevIndex, destIndex );
 			}
@@ -128,12 +152,46 @@ export default ( Splide, Components ) => {
 		},
 
 		/**
-		 * Set position.
+		 * Set the list position by CSS translate property.
 		 *
 		 * @param {number} position - A new position value.
 		 */
 		translate( position ) {
 			applyStyle( list, { transform: `translate${ isVertical ? 'Y' : 'X' }(${ position }px)` } );
+		},
+
+		/**
+		 * Cancel the transition and set the list position.
+		 * Also, loop the slider if necessary.
+		 */
+		cancel() {
+			if ( Splide.is( LOOP ) ) {
+				this.shift();
+			} else {
+				// Ensure the current position.
+				this.translate( this.position );
+			}
+
+			applyStyle( list, { transition: '' } );
+		},
+
+		/**
+		 * Shift the slider if it exceeds borders on the edge.
+		 */
+		shift() {
+			let position = abs( this.position );
+
+			const left      = abs( this.toPosition( 0 ) );
+			const right     = abs( this.toPosition( Splide.length ) );
+			const innerSize = right - left;
+
+			if ( position < left ) {
+				position += innerSize;
+			} else if ( position > right ) {
+				position -= innerSize;
+			}
+
+			this.translate( sign * position );
 		},
 
 		/**
@@ -148,7 +206,7 @@ export default ( Splide, Components ) => {
 				return position;
 			}
 
-			const edge = this.sign * ( Layout.totalSize() - Layout.size - Layout.gap );
+			const edge = sign * ( Layout.totalSize() - Layout.size - Layout.gap );
 			return between( position, edge, 0 );
 		},
 
@@ -165,7 +223,7 @@ export default ( Splide, Components ) => {
 
 			Elements.getSlides( true ).forEach( Slide => {
 				const slideIndex = Slide.index;
-				const distance   = Math.abs( this.toPosition( slideIndex ) - position );
+				const distance   = abs( this.toPosition( slideIndex ) - position );
 
 				if ( distance < minDistance ) {
 					minDistance = distance;
@@ -199,11 +257,11 @@ export default ( Splide, Components ) => {
 		 */
 		toPosition( index ) {
 			const position = Layout.totalSize( index ) - Layout.slideSize( index ) - Layout.gap;
-			return this.sign * ( position + this.offset( index ) );
+			return sign * ( position + this.offset( index ) );
 		},
 
 		/**
-		 * Return current offset value, considering direction.
+		 * Return the current offset value, considering direction.
 		 *
 		 * @return {number} - Offset amount.
 		 */
@@ -240,6 +298,7 @@ export default ( Splide, Components ) => {
 	 */
 	function onTransitionEnd( destIndex, newIndex, prevIndex, silently ) {
 		applyStyle( list, { transition: '' } );
+		isLoopPending = false;
 
 		if ( ! isFade ) {
 			Track.jump( newIndex );

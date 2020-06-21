@@ -7,7 +7,7 @@
 
 import { FADE, SLIDE } from '../../constants/types';
 import { TTB } from '../../constants/directions';
-import { IDLE } from '../../constants/states';
+import { MOVING } from '../../constants/states';
 import { between } from '../../utils/utils';
 import { each } from "../../utils/object";
 
@@ -137,11 +137,21 @@ export default ( Splide, Components ) => {
 	 * @param {TouchEvent|MouseEvent} e - TouchEvent or MouseEvent object.
 	 */
 	function start( e ) {
-		if ( ! Drag.disabled && ! isDragging && Splide.State.is( IDLE ) ) {
-			startCoord  = Track.toCoord( Track.position );
-			startInfo   = analyze( e, {} );
-			currentInfo = startInfo;
+		if ( ! Drag.disabled && ! isDragging ) {
+			// These prams are used to evaluate whether the slider should start moving.
+			init( e );
 		}
+	}
+
+	/**
+	 * Initialize parameters.
+	 *
+	 * @param {TouchEvent|MouseEvent} e - TouchEvent or MouseEvent object.
+	 */
+	function init( e ) {
+		startCoord  = Track.toCoord( Track.position );
+		startInfo   = analyze( e, {} );
+		currentInfo = startInfo;
 	}
 
 	/**
@@ -166,6 +176,10 @@ export default ( Splide, Components ) => {
 				if ( shouldMove( currentInfo ) ) {
 					Splide.emit( 'drag', startInfo );
 					isDragging = true;
+					Track.cancel();
+
+					// These params are actual drag data.
+					init( e );
 				}
 			}
 		}
@@ -179,17 +193,17 @@ export default ( Splide, Components ) => {
 	 * @return {boolean} - True if the track should be moved or false if not.
 	 */
 	function shouldMove( { offset } ) {
-		if ( Splide.State.is( IDLE ) ) {
-			let angle = Math.atan( abs( offset.y ) / abs( offset.x ) ) * 180 / Math.PI;
-
-			if ( isVertical ) {
-				angle = 90 - angle;
-			}
-
-			return angle < Splide.options.dragAngleThreshold;
+		if ( Splide.State.is( MOVING ) && Splide.options.waitForTransition ) {
+			return false;
 		}
 
-		return false;
+		let angle = Math.atan( abs( offset.y ) / abs( offset.x ) ) * 180 / Math.PI;
+
+		if ( isVertical ) {
+			angle = 90 - angle;
+		}
+
+		return angle < Splide.options.dragAngleThreshold;
 	}
 
 	/**
