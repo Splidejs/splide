@@ -110,7 +110,8 @@ Here is a list of options and brief explanations. Visit [this page](https://spli
 * **fixedWidth**: Fix width of slides.
 * **fixedHeight**: Fix height of slides.
 * **heightRatio**: Determine height of slides by ratio to a slider width.
-* **autoWidth**: If true, slide width will be determined by the element width itself.
+* **autoWidth**: If true, slide width will be determined by the element width itself. This is for a horizontal slider.
+* **autoHeight**: If true, slide height will be determined by the element height itself. This is for a vertical slider.
 * **perPage**: Determine how many slides should be displayed per page.
 * **perMove**: Determine how many slides should be moved when a slider goes to next or previous page.
 * **clones**: Manually determine how many clones should be generated on one side.
