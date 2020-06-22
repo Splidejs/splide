@@ -11,7 +11,8 @@
 * [Documents](https://splidejs.com/category/users-guide/)
 
 ## News
-* Add `slideFocus` and `waitForTransition`.
+* Transform Splidejs to the organization.
+* Add `slideFocus` and `waitForTransition` options.
 * Add [type definitions](https://github.com/Splidejs/splide/blob/master/src/js/splide.d.ts) for typescript.
 * [React Splide](https://splidejs.com/integration-react-splide/) is released.
 * [Vue Splide](https://splidejs.com/integration-vue-splide/) is released.
