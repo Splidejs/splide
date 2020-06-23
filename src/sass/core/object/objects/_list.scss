@@ -3,7 +3,9 @@
 
   &__list {
     margin: 0!important;
-    padding: 0 !important;
+    padding: 0!important;
+    width: max-content;
+    will-change: trasform;
   }
 
   &.is-active {
