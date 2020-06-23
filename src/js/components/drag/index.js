@@ -138,8 +138,6 @@ export default ( Splide, Components ) => {
 	 * @param {TouchEvent|MouseEvent} e - TouchEvent or MouseEvent object.
 	 */
 	function start( e ) {
-		console.log( 'start' );
-
 		if ( ! Drag.disabled && ! isDragging ) {
 			// These prams are used to evaluate whether the slider should start moving.
 			init( e );

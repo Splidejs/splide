@@ -154,7 +154,7 @@ export default ( Splide, Components ) => {
 		}
 
 		// Use the slide length in autoWidth mode because the number cannot be calculated.
-		let baseCount = options.autoWidth ? Elements.length : options.perPage;
+		let baseCount = options.autoWidth || options.autoHeight ? Elements.length : options.perPage;
 
 		const dimension = options.direction === TTB ? 'Height' : 'Width';
 		const fixedSize = options[ `fixed${ dimension }` ];

@@ -118,7 +118,7 @@ export default ( Splide, Components ) => {
 			const newPosition = getTrimmedPosition( destIndex );
 			const prevIndex   = Splide.index;
 
-		  // Prevent any actions while transitioning from the last index to the first one for jump.
+			// Prevent any actions while transitioning from the last index to the first one for jump.
 			if ( Splide.State.is( MOVING ) && isLoopPending ) {
 				return;
 			}

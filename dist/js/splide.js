@@ -3251,7 +3251,7 @@ var abs = Math.abs;
     } // Use the slide length in autoWidth mode because the number cannot be calculated.
 
 
-    var baseCount = options.autoWidth ? Elements.length : options.perPage;
+    var baseCount = options.autoWidth || options.autoHeight ? Elements.length : options.perPage;
     var dimension = options.direction === TTB ? 'Height' : 'Width';
     var fixedSize = options["fixed" + dimension];
 
@@ -3928,8 +3928,6 @@ var FRICTION_REDUCER = 7;
    */
 
   function start(e) {
-    console.log('start');
-
     if (!Drag.disabled && !isDragging) {
       // These prams are used to evaluate whether the slider should start moving.
       init(e);
