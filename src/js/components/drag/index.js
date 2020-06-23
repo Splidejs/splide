@@ -111,15 +111,16 @@ export default ( Splide, Components ) => {
 		 * Called when the component is mounted.
 		 */
 		mount() {
-			const list = Components.Elements.list;
+			const Elements = Components.Elements;
+			const track    = Elements.track;
 
 			Splide
-				.on( 'touchstart mousedown', start, list )
-				.on( 'touchmove mousemove', move, list, { passive: false } )
-				.on( 'touchend touchcancel mouseleave mouseup dragend', end, list )
+				.on( 'touchstart mousedown', start, track )
+				.on( 'touchmove mousemove', move, track, { passive: false } )
+				.on( 'touchend touchcancel mouseleave mouseup dragend', end, track )
 				.on( 'mounted refresh', () => {
 					// Prevent dragging an image or anchor itself.
-					each( list.querySelectorAll( 'img, a' ), elm => {
+					each( Elements.list.querySelectorAll( 'img, a' ), elm => {
 						Splide
 							.off( 'dragstart', elm )
 							.on( 'dragstart', e => { e.preventDefault() }, elm, { passive: false } );
@@ -137,6 +138,8 @@ export default ( Splide, Components ) => {
 	 * @param {TouchEvent|MouseEvent} e - TouchEvent or MouseEvent object.
 	 */
 	function start( e ) {
+		console.log( 'start' );
+
 		if ( ! Drag.disabled && ! isDragging ) {
 			// These prams are used to evaluate whether the slider should start moving.
 			init( e );

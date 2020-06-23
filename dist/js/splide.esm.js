@@ -3913,12 +3913,13 @@ var FRICTION_REDUCER = 7;
     mount: function mount() {
       var _this = this;
 
-      var list = Components.Elements.list;
-      Splide.on('touchstart mousedown', start, list).on('touchmove mousemove', move, list, {
+      var Elements = Components.Elements;
+      var track = Elements.track;
+      Splide.on('touchstart mousedown', start, track).on('touchmove mousemove', move, track, {
         passive: false
-      }).on('touchend touchcancel mouseleave mouseup dragend', end, list).on('mounted refresh', function () {
+      }).on('touchend touchcancel mouseleave mouseup dragend', end, track).on('mounted refresh', function () {
         // Prevent dragging an image or anchor itself.
-        each(list.querySelectorAll('img, a'), function (elm) {
+        each(Elements.list.querySelectorAll('img, a'), function (elm) {
           Splide.off('dragstart', elm).on('dragstart', function (e) {
             e.preventDefault();
           }, elm, {
@@ -3937,6 +3938,8 @@ var FRICTION_REDUCER = 7;
    */
 
   function start(e) {
+    console.log('start');
+
     if (!Drag.disabled && !isDragging) {
       // These prams are used to evaluate whether the slider should start moving.
       init(e);
