@@ -76,8 +76,6 @@ export function merge( { ...to }, from ) {
  * @return {Object} - An assigned object.
  */
 export function assign( to, from ) {
-	to._s = from;
-
 	keys( from ).forEach( key => {
 		if ( ! to[ key ] ) {
 			Object.defineProperty( to, key, Object.getOwnPropertyDescriptor( from, key ) );

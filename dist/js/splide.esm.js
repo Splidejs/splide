@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.4.4
+ * Version  : 2.4.5
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -360,7 +360,6 @@ function merge(_ref, from) {
  */
 
 function object_assign(to, from) {
-  to._s = from;
   keys(from).forEach(function (key) {
     if (!to[key]) {
       Object.defineProperty(to, key, Object.getOwnPropertyDescriptor(from, key));
