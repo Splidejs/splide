@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.4.5
+ * Version  : 2.4.6
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -3346,6 +3346,14 @@ var abs = Math.abs;
      * Initialization.
      */
     init: function init() {
+      this.resize();
+    },
+
+    /**
+     * Resize gap and padding.
+     * This must be called on init.
+     */
+    resize: function resize() {
       options = Splide.options;
       track = Elements.track;
       this.gap = toPixel(root, options.gap);
@@ -3487,9 +3495,17 @@ var abs = Math.abs;
     margin: 'marginBottom',
 
     /**
-     * Init slider styles according to options.
+     * Initialization.
      */
     init: function init() {
+      this.resize();
+    },
+
+    /**
+     * Resize gap and padding.
+     * This must be called on init.
+     */
+    resize: function resize() {
       options = Splide.options;
       track = Elements.track;
       this.gap = toPixel(root, options.gap);
@@ -3772,6 +3788,7 @@ function createInterval(callback, interval, progress) {
 
   function resize() {
     var options = Splide.options;
+    Layout.resize();
     applyStyle(Elements.track, {
       height: unit(Layout.height)
     });

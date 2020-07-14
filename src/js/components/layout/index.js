@@ -102,6 +102,8 @@ export default ( Splide, Components ) => {
 	function resize() {
 		const options = Splide.options;
 
+		Layout.resize();
+
 		applyStyle( Elements.track, { height: unit( Layout.height ) } );
 
 		const slideHeight = options.autoHeight ? null : unit( Layout.slideHeight() );

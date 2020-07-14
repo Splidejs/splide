@@ -56,9 +56,17 @@ export default ( Splide, Components ) => {
 		margin: 'marginBottom',
 
 		/**
-		 * Init slider styles according to options.
+		 * Initialization.
 		 */
 		init() {
+			this.resize();
+		},
+
+		/**
+		 * Resize gap and padding.
+		 * This must be called on init.
+		 */
+		resize() {
 			options = Splide.options;
 			track   = Elements.track;
 

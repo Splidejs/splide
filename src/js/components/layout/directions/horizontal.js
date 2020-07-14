@@ -66,6 +66,14 @@ export default ( Splide, Components ) => {
 		 * Initialization.
 		 */
 		init() {
+			this.resize();
+		},
+
+		/**
+		 * Resize gap and padding.
+		 * This must be called on init.
+		 */
+		resize() {
 			options = Splide.options;
 			track   = Elements.track;
 
