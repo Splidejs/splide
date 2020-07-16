@@ -19,12 +19,18 @@ import {
 import { each } from "../../utils/object";
 
 /**
- * The name for a data attribute.
+ * The name for a data attribute of src.
  *
  * @type {string}
  */
 const SRC_DATA_NAME = 'data-splide-lazy';
 
+/**
+ * The name for a data attribute of srcset.
+ *
+ * @type {string}
+ */
+const SRCSET_DATA_NAME = 'data-splide-lazy-srcset';
 
 /**
  * The component for loading slider images lazily.
@@ -85,8 +91,8 @@ export default ( Splide, Components, name ) => {
 				init();
 
 				Components.Elements.each( Slide => {
-					each( Slide.slide.querySelectorAll( `[${ SRC_DATA_NAME }]` ), img => {
-						if ( ! img.src ) {
+					each( Slide.slide.querySelectorAll( `[${ SRC_DATA_NAME }], [${ SRCSET_DATA_NAME }]` ), img => {
+						if ( ! img.src && ! img.srcset ) {
 							images.push( { img, Slide } );
 							applyStyle( img, { display: 'none' } );
 						}
@@ -157,6 +163,7 @@ export default ( Splide, Components, name ) => {
 		img.onload  = () => { loaded( img, spinner, Slide, false ) };
 		img.onerror = () => { loaded( img, spinner, Slide, true ) };
 
+		setAttribute( img, 'srcset', getAttribute( img, SRCSET_DATA_NAME ) );
 		setAttribute( img, 'src', getAttribute( img, SRC_DATA_NAME ) );
 	}
 

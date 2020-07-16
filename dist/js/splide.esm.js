@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.4.6
+ * Version  : 2.4.7
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -4906,12 +4906,19 @@ var UPDATE_EVENT = 'updated.page refresh.page';
 
 
 /**
- * The name for a data attribute.
+ * The name for a data attribute of src.
  *
  * @type {string}
  */
 
 var SRC_DATA_NAME = 'data-splide-lazy';
+/**
+ * The name for a data attribute of srcset.
+ *
+ * @type {string}
+ */
+
+var SRCSET_DATA_NAME = 'data-splide-lazy-srcset';
 /**
  * The component for loading slider images lazily.
  *
@@ -4971,8 +4978,8 @@ var SRC_DATA_NAME = 'data-splide-lazy';
       Splide.on('mounted refresh', function () {
         init();
         Components.Elements.each(function (Slide) {
-          each(Slide.slide.querySelectorAll("[" + SRC_DATA_NAME + "]"), function (img) {
-            if (!img.src) {
+          each(Slide.slide.querySelectorAll("[" + SRC_DATA_NAME + "], [" + SRCSET_DATA_NAME + "]"), function (img) {
+            if (!img.src && !img.srcset) {
               images.push({
                 img: img,
                 Slide: Slide
@@ -5055,6 +5062,7 @@ var SRC_DATA_NAME = 'data-splide-lazy';
       loaded(img, spinner, Slide, true);
     };
 
+    setAttribute(img, 'srcset', getAttribute(img, SRCSET_DATA_NAME));
     setAttribute(img, 'src', getAttribute(img, SRC_DATA_NAME));
   }
   /**
