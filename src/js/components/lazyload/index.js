@@ -163,8 +163,8 @@ export default ( Splide, Components, name ) => {
 		img.onload  = () => { loaded( img, spinner, Slide, false ) };
 		img.onerror = () => { loaded( img, spinner, Slide, true ) };
 
-		setAttribute( img, 'srcset', getAttribute( img, SRCSET_DATA_NAME ) );
-		setAttribute( img, 'src', getAttribute( img, SRC_DATA_NAME ) );
+		setAttribute( img, 'srcset', getAttribute( img, SRCSET_DATA_NAME ) || '' );
+		setAttribute( img, 'src', getAttribute( img, SRC_DATA_NAME ) || '' );
 	}
 
 	/**

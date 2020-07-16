@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.4.7
+ * Version  : 2.4.8
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -5052,8 +5052,8 @@ var SRCSET_DATA_NAME = 'data-splide-lazy-srcset';
       loaded(img, spinner, Slide, true);
     };
 
-    setAttribute(img, 'srcset', getAttribute(img, SRCSET_DATA_NAME));
-    setAttribute(img, 'src', getAttribute(img, SRC_DATA_NAME));
+    setAttribute(img, 'srcset', getAttribute(img, SRCSET_DATA_NAME) || '');
+    setAttribute(img, 'src', getAttribute(img, SRC_DATA_NAME) || '');
   }
   /**
    * Start loading a next image in images array.
