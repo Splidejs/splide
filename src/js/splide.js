@@ -54,6 +54,9 @@ export default class Splide {
 	 * @return {Splide|undefined} - This instance or undefined if an exception occurred.
 	 */
 	mount( Extensions = this._e, Transition = this._t ) {
+		// Reset the state.
+		this.State.set( STATES.CREATED );
+
 		this._e = Extensions;
 		this._t = Transition;
 

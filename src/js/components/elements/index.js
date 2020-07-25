@@ -84,7 +84,6 @@ export default ( Splide, Components ) => {
 		 * Collect main elements and store them as member properties.
 		 */
 		mount() {
-			collect();
 			this.init();
 
 			Splide
@@ -110,6 +109,7 @@ export default ( Splide, Components ) => {
 		 * Initialization.
 		 */
 		init() {
+			collect();
 			addClass( root, getClasses() );
 
 			Elements.slides.forEach( ( slide, index ) => {

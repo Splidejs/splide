@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.4.8
+ * Version  : 2.4.9
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -1583,6 +1583,8 @@ var splide_Splide = /*#__PURE__*/function () {
       Transition = this._t;
     }
 
+    // Reset the state.
+    this.State.set(CREATED);
     this._e = Extensions;
     this._t = Transition;
     this.Components = compose(this, merge(this._c, Extensions), Transition);
@@ -2262,7 +2264,6 @@ var UID_NAME = 'uid';
     mount: function mount() {
       var _this = this;
 
-      collect();
       this.init();
       Splide.on('refresh', function () {
         _this.destroy();
@@ -2289,6 +2290,7 @@ var UID_NAME = 'uid';
      * Initialization.
      */
     init: function init() {
+      collect();
       addClass(root, getClasses());
       Elements.slides.forEach(function (slide, index) {
         Elements.register(slide, index, -1);
