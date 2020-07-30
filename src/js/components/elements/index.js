@@ -112,8 +112,8 @@ export default ( Splide, Components ) => {
 			collect();
 			addClass( root, getClasses() );
 
-			Elements.slides.forEach( ( slide, index ) => {
-				Elements.register( slide, index, -1 );
+			this.slides.forEach( ( slide, index ) => {
+				this.register( slide, index, -1 );
 			} );
 		},
 

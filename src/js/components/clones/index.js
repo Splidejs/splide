@@ -8,6 +8,7 @@
 import { addClass, removeAttribute, append, before, remove } from '../../utils/dom';
 import { LOOP } from '../../constants/types';
 import { TTB } from "../../constants/directions";
+import { toPixel } from "../../utils/utils";
 
 
 /**
@@ -57,6 +58,8 @@ export default ( Splide, Components ) => {
 					.on( 'refresh', init )
 					.on( 'resize', () => {
 						if ( cloneCount !== getCloneCount() ) {
+							// Destroy before refresh not to collect clones by the Elements component.
+							this.destroy();
 							Splide.refresh();
 						}
 					} );
@@ -105,35 +108,33 @@ export default ( Splide, Components ) => {
 	 * @param {number} count - The half number of clones.
 	 */
 	function generateClones( count ) {
-		const length = Elements.length;
+		const { length, register } = Elements;
 
-		if ( ! length ) {
-			return;
+		if ( length ) {
+			let slides = Elements.slides;
+
+			while ( slides.length < count ) {
+				slides = slides.concat( slides );
+			}
+
+			// Clones after the last element.
+			slides.slice( 0, count ).forEach( ( elm, index ) => {
+				const clone = cloneDeeply( elm );
+				append( Elements.list, clone );
+				clones.push( clone );
+
+				register( clone, index + length, index % length );
+			} );
+
+			// Clones before the first element.
+			slides.slice( -count ).forEach( ( elm, index ) => {
+				const clone = cloneDeeply( elm );
+				before( clone, slides[0] );
+				clones.push( clone );
+
+				register( clone, index - count, ( length + index - count % length ) % length );
+			} );
 		}
-
-		let slides = Elements.slides;
-
-		while ( slides.length < count ) {
-			slides = slides.concat( slides );
-		}
-
-		// Clones after the last element.
-		slides.slice( 0, count ).forEach( ( elm, index ) => {
-			const clone = cloneDeeply( elm );
-			append( Elements.list, clone );
-			clones.push( clone );
-
-			Elements.register( clone, index + length, index % length );
-		} );
-
-		// Clones before the first element.
-		slides.slice( -count ).forEach( ( elm, index ) => {
-			const clone = cloneDeeply( elm );
-			before( clone, slides[0] );
-			clones.push( clone );
-
-			Elements.register( clone, index - count, ( length + index - count % length ) % length );
-		} );
 	}
 
 	/**
@@ -157,7 +158,7 @@ export default ( Splide, Components ) => {
 		let baseCount = options.autoWidth || options.autoHeight ? Elements.length : options.perPage;
 
 		const dimension = options.direction === TTB ? 'Height' : 'Width';
-		const fixedSize = options[ `fixed${ dimension }` ];
+		const fixedSize = toPixel( Splide.root, options[ `fixed${ dimension }` ] );
 
 		if ( fixedSize ) {
 			// Roughly calculate the count. This needs not to be strict.

@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.4.9
+ * Version  : 2.4.10
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -2290,10 +2290,12 @@ var UID_NAME = 'uid';
      * Initialization.
      */
     init: function init() {
+      var _this2 = this;
+
       collect();
       addClass(root, getClasses());
-      Elements.slides.forEach(function (slide, index) {
-        Elements.register(slide, index, -1);
+      this.slides.forEach(function (slide, index) {
+        _this2.register(slide, index, -1);
       });
     },
 
@@ -3120,6 +3122,7 @@ var abs = Math.abs;
 
 
 
+
 /**
  * The component for cloning some slides for "loop" mode of the track.
  *
@@ -3161,10 +3164,15 @@ var abs = Math.abs;
      * Called when the component is mounted.
      */
     mount: function mount() {
+      var _this = this;
+
       if (Splide.is(LOOP)) {
         init();
         Splide.on('refresh', init).on('resize', function () {
           if (cloneCount !== getCloneCount()) {
+            // Destroy before refresh not to collect clones by the Elements component.
+            _this.destroy();
+
             Splide.refresh();
           }
         });
@@ -3215,32 +3223,31 @@ var abs = Math.abs;
 
 
   function generateClones(count) {
-    var length = Elements.length;
+    var length = Elements.length,
+        register = Elements.register;
 
-    if (!length) {
-      return;
+    if (length) {
+      var slides = Elements.slides;
+
+      while (slides.length < count) {
+        slides = slides.concat(slides);
+      } // Clones after the last element.
+
+
+      slides.slice(0, count).forEach(function (elm, index) {
+        var clone = cloneDeeply(elm);
+        append(Elements.list, clone);
+        clones.push(clone);
+        register(clone, index + length, index % length);
+      }); // Clones before the first element.
+
+      slides.slice(-count).forEach(function (elm, index) {
+        var clone = cloneDeeply(elm);
+        before(clone, slides[0]);
+        clones.push(clone);
+        register(clone, index - count, (length + index - count % length) % length);
+      });
     }
-
-    var slides = Elements.slides;
-
-    while (slides.length < count) {
-      slides = slides.concat(slides);
-    } // Clones after the last element.
-
-
-    slides.slice(0, count).forEach(function (elm, index) {
-      var clone = cloneDeeply(elm);
-      append(Elements.list, clone);
-      clones.push(clone);
-      Elements.register(clone, index + length, index % length);
-    }); // Clones before the first element.
-
-    slides.slice(-count).forEach(function (elm, index) {
-      var clone = cloneDeeply(elm);
-      before(clone, slides[0]);
-      clones.push(clone);
-      Elements.register(clone, index - count, (length + index - count % length) % length);
-    });
   }
   /**
    * Return half count of clones to be generated.
@@ -3264,7 +3271,7 @@ var abs = Math.abs;
 
     var baseCount = options.autoWidth || options.autoHeight ? Elements.length : options.perPage;
     var dimension = options.direction === TTB ? 'Height' : 'Width';
-    var fixedSize = options["fixed" + dimension];
+    var fixedSize = toPixel(Splide.root, options["fixed" + dimension]);
 
     if (fixedSize) {
       // Roughly calculate the count. This needs not to be strict.
