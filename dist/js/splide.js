@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.4.10
+ * Version  : 2.4.11
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -2830,6 +2830,13 @@ var abs = Math.abs;
 
   var isFade = Splide.is(FADE);
   /**
+   * Whether the slider direction is RTL or not.
+   *
+   * @type {boolean}
+   */
+
+  var isRTL = Splide.options.direction === RTL;
+  /**
    * This will be true while transitioning from the last index to the first one.
    *
    * @type {boolean}
@@ -2842,7 +2849,7 @@ var abs = Math.abs;
    * @type {number}
    */
 
-  var sign = Splide.options.direction === RTL ? 1 : -1;
+  var sign = isRTL ? 1 : -1;
   /**
    * Track component object.
    *
@@ -3061,8 +3068,8 @@ var abs = Math.abs;
      * @return {number} - Current position.
      */
     get position() {
-      var prop = isVertical ? 'top' : 'left';
-      return getRect(list)[prop] - getRect(Elements.track)[prop] - Layout.padding[prop];
+      var prop = isVertical ? 'top' : isRTL ? 'right' : 'left';
+      return getRect(list)[prop] - (getRect(Elements.track)[prop] - Layout.padding[prop] * sign);
     }
 
   };

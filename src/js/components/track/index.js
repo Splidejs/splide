@@ -59,6 +59,13 @@ export default ( Splide, Components ) => {
 	const isFade = Splide.is( FADE );
 
 	/**
+	 * Whether the slider direction is RTL or not.
+	 *
+	 * @type {boolean}
+	 */
+	const isRTL = Splide.options.direction === RTL;
+
+	/**
 	 * This will be true while transitioning from the last index to the first one.
 	 *
 	 * @type {boolean}
@@ -70,7 +77,7 @@ export default ( Splide, Components ) => {
 	 *
 	 * @type {number}
 	 */
-	const sign = Splide.options.direction === RTL ? 1 : -1;
+	const sign = isRTL ? 1 : -1;
 
 	/**
 	 * Track component object.
@@ -283,8 +290,8 @@ export default ( Splide, Components ) => {
 		 * @return {number} - Current position.
 		 */
 		get position() {
-			const prop = isVertical ? 'top' : 'left';
-			return getRect( list )[ prop ] - getRect( Elements.track )[ prop ] - Layout.padding[ prop ];
+			const prop = isVertical ? 'top' : isRTL ? 'right' : 'left';
+			return getRect( list )[ prop ] - ( getRect( Elements.track )[ prop ] - Layout.padding[ prop ] * sign );
 		},
 	};
 
