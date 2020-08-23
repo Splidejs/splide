@@ -1,6 +1,6 @@
 {
   "name": "@splidejs/splide",
-  "version": "2.4.11",
+  "version": "2.4.12",
   "description": "Splide is a lightweight and powerful slider without any dependencies.",
   "author": "Naotoshi Fujita",
   "license": "MIT",
@@ -24,7 +24,7 @@
     "url": "https://github.com/Splidejs/splide/issues"
   },
   "devDependencies": {
-    "@babel/core": "^7.11.1",
+    "@babel/core": "^7.11.4",
     "@babel/preset-env": "^7.11.0",
     "autoprefixer": "^9.8.6",
     "babel-jest": "^26.3.0",
@@ -40,7 +40,7 @@
     "gulp-sass": "^4.1.0",
     "gulp-sass-glob": "^1.1.0",
     "gulp-uglify": "^3.0.2",
-    "jest": "^26.3.0",
+    "jest": "^26.4.2",
     "merge-stream": "^2.0.0",
     "serialize-javascript": "^4.0.0",
     "uglifyjs-webpack-plugin": "^2.2.0",

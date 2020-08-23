@@ -120,9 +120,9 @@ export default ( Splide, Components, name ) => {
 	 * Listen some events.
 	 */
 	function bind() {
-		const options  = Splide.options;
-		const sibling  = Splide.sibling;
-		const elms     = [ Splide.root, sibling ? sibling.root : null ];
+		const options = Splide.options;
+		const sibling = Splide.sibling;
+		const elms    = [ Splide.root, sibling ? sibling.root : null ];
 
 		if ( options.pauseOnHover ) {
 			switchOn( elms, 'mouseleave', PAUSE_FLAGS.HOVER, true );
@@ -134,16 +134,21 @@ export default ( Splide, Components, name ) => {
 			switchOn( elms, 'focusin', PAUSE_FLAGS.FOCUS, false );
 		}
 
-		Splide
-			.on( 'click', () => {
+		if ( Elements.play ) {
+			Splide.on( 'click', () => {
 				// Need to be removed a focus flag at first.
 				Autoplay.play( PAUSE_FLAGS.FOCUS );
 				Autoplay.play( PAUSE_FLAGS.MANUAL );
-			}, Elements.play )
+			}, Elements.play );
+		}
+
+		if ( Elements.pause ) {
+			switchOn( [ Elements.pause ], 'click', PAUSE_FLAGS.MANUAL, false );
+		}
+
+		Splide
 			.on( 'move refresh', () => { Autoplay.play() } ) // Rewind the timer.
 			.on( 'destroy', () => {	Autoplay.pause() } );
-
-		switchOn( [ Elements.pause ], 'click', PAUSE_FLAGS.MANUAL, false );
 	}
 
 	/**

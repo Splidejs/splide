@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.4.11
+ * Version  : 2.4.12
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -4382,17 +4382,24 @@ var PAUSE_FLAGS = {
       switchOn(elms, 'focusin', PAUSE_FLAGS.FOCUS, false);
     }
 
-    Splide.on('click', function () {
-      // Need to be removed a focus flag at first.
-      Autoplay.play(PAUSE_FLAGS.FOCUS);
-      Autoplay.play(PAUSE_FLAGS.MANUAL);
-    }, Elements.play).on('move refresh', function () {
+    if (Elements.play) {
+      Splide.on('click', function () {
+        // Need to be removed a focus flag at first.
+        Autoplay.play(PAUSE_FLAGS.FOCUS);
+        Autoplay.play(PAUSE_FLAGS.MANUAL);
+      }, Elements.play);
+    }
+
+    if (Elements.pause) {
+      switchOn([Elements.pause], 'click', PAUSE_FLAGS.MANUAL, false);
+    }
+
+    Splide.on('move refresh', function () {
       Autoplay.play();
     }) // Rewind the timer.
     .on('destroy', function () {
       Autoplay.pause();
     });
-    switchOn([Elements.pause], 'click', PAUSE_FLAGS.MANUAL, false);
   }
   /**
    * Play or pause on the given event.
