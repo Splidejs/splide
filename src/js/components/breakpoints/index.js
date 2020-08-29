@@ -122,7 +122,6 @@ export default ( Splide ) => {
 				Splide.destroy( destroy === 'completely' );
 			} else {
 				if ( State.is( DESTROYED ) ) {
-					State.set( CREATED );
 					Splide.mount();
 				}
 

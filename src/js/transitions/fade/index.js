@@ -42,9 +42,11 @@ export default ( Splide, Components ) => {
 			applyStyle( track, { height: unit( track.clientHeight ) } );
 
 			apply( newIndex );
-			done();
 
-			applyStyle( track, { height: '' } );
+			setTimeout( () => {
+				done();
+				applyStyle( track, { height: '' } );
+			} );
 		},
 	};
 

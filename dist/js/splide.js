@@ -863,9 +863,11 @@ var FADE = 'fade';
         height: unit(track.clientHeight)
       });
       apply(newIndex);
-      done();
-      applyStyle(track, {
-        height: ''
+      setTimeout(function () {
+        done();
+        applyStyle(track, {
+          height: ''
+        });
       });
     }
   };
@@ -4203,7 +4205,7 @@ var FRICTION_REDUCER = 7;
      *
      * @type {boolean}
      */
-    required: Splide.options.drag && !Splide.is(FADE),
+    required: Splide.options.drag,
 
     /**
      * Called when the component is mounted.
@@ -5787,7 +5789,6 @@ var THROTTLE = 50;
         Splide.destroy(destroy === 'completely');
       } else {
         if (State.is(DESTROYED)) {
-          State.set(CREATED);
           Splide.mount();
         }
 

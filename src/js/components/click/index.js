@@ -36,7 +36,7 @@ export default ( Splide, Components ) => {
 		 *
 		 * @type {boolean}
 		 */
-		required: Splide.options.drag && ! Splide.is( FADE ),
+		required: Splide.options.drag,
 
 		/**
 		 * Called when the component is mounted.
