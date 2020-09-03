@@ -5,8 +5,6 @@
  * @copyright Naotoshi Fujita. All rights reserved.
  */
 
-import { FADE } from "../../constants/types";
-
 
 /**
  * The component for handling a click event.

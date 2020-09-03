@@ -6,7 +6,7 @@
  */
 
 import { throttle } from "../../utils/time";
-import { CREATED, DESTROYED } from "../../constants/states";
+import { DESTROYED } from "../../constants/states";
 
 /**
  * Interval time for throttle.
