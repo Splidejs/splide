@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.4.13
+ * Version  : 2.4.14
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -4185,7 +4185,6 @@ var FRICTION_REDUCER = 7;
  *
  * @return {Object} - The component object.
  */
-
 /* harmony default export */ var click = (function (Splide, Components) {
   /**
    * Whether click is disabled or not.
