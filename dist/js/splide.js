@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.4.12
+ * Version  : 2.4.13
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -5324,7 +5324,7 @@ var KEY_MAP = {
       });
 
       if (Splide.options.isNavigation) {
-        Splide.on('navigation:mounted', initNavigation).on('active', function (Slide) {
+        Splide.on('navigation:mounted navigation:updated', initNavigation).on('active', function (Slide) {
           updateNavigation(Slide, true);
         }).on('inactive', function (Slide) {
           updateNavigation(Slide, false);
@@ -5527,6 +5527,12 @@ var KEY_MAP = {
 
 var SYNC_EVENT = 'move.sync';
 /**
+ * The event names for click navigation.
+ * @type {string}
+ */
+
+var CLICK_EVENTS = 'mouseup touchend';
+/**
  * The keys for triggering the navigation button.
  *
  * @type {String[]}
@@ -5578,6 +5584,12 @@ var TRIGGER_KEYS = [' ', 'Enter', 'Spacebar'];
 
       if (isNavigation) {
         bind();
+        Splide.on('refresh', function () {
+          setTimeout(function () {
+            bind();
+            sibling.emit('navigation:updated', Splide);
+          });
+        });
       }
     },
 
@@ -5626,7 +5638,7 @@ var TRIGGER_KEYS = [' ', 'Enter', 'Spacebar'];
       /*
        * Listen mouseup and touchend events to handle click.
        */
-      Splide.on('mouseup touchend', function (e) {
+      Splide.off(CLICK_EVENTS, slide).on(CLICK_EVENTS, function (e) {
         // Ignore a middle or right click.
         if (!e.button || e.button === 0) {
           moveSibling(index);
@@ -5637,7 +5649,7 @@ var TRIGGER_KEYS = [' ', 'Enter', 'Spacebar'];
        * Note that Array.includes is not supported by IE.
        */
 
-      Splide.on('keyup', function (e) {
+      Splide.off('keyup', slide).on('keyup', function (e) {
         if (TRIGGER_KEYS.indexOf(e.key) > -1) {
           e.preventDefault();
           moveSibling(index);

@@ -16,6 +16,12 @@ import { IDLE } from "../../constants/states";
 const SYNC_EVENT = 'move.sync';
 
 /**
+ * The event names for click navigation.
+ * @type {string}
+ */
+const CLICK_EVENTS = 'mouseup touchend';
+
+/**
  * The keys for triggering the navigation button.
  *
  * @type {String[]}
@@ -67,6 +73,13 @@ export default ( Splide ) => {
 
 			if ( isNavigation ) {
 				bind();
+
+				Splide.on( 'refresh', () => {
+					setTimeout( () => {
+						bind();
+						sibling.emit( 'navigation:updated', Splide );
+					} );
+				} );
 			}
 		},
 
@@ -116,23 +129,27 @@ export default ( Splide ) => {
 			/*
 			 * Listen mouseup and touchend events to handle click.
 			 */
-			Splide.on( 'mouseup touchend', e => {
-				// Ignore a middle or right click.
-				if ( ! e.button || e.button === 0 ) {
-					moveSibling( index );
-				}
-			}, slide );
+			Splide
+				.off( CLICK_EVENTS, slide )
+				.on( CLICK_EVENTS, e => {
+					// Ignore a middle or right click.
+					if ( ! e.button || e.button === 0 ) {
+						moveSibling( index );
+					}
+				}, slide );
 
 			/*
 			 * Subscribe keyup to handle Enter and Space key.
 			 * Note that Array.includes is not supported by IE.
 			 */
-			Splide.on( 'keyup', e => {
-				if ( TRIGGER_KEYS.indexOf( e.key ) > -1 ) {
-					e.preventDefault();
-					moveSibling( index );
-				}
-			}, slide, { passive: false } );
+			Splide
+				.off( 'keyup', slide )
+				.on( 'keyup', e => {
+					if ( TRIGGER_KEYS.indexOf( e.key ) > -1 ) {
+						e.preventDefault();
+						moveSibling( index );
+					}
+				}, slide, { passive: false } );
 		} );
 	}
 

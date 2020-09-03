@@ -68,7 +68,7 @@ export default ( Splide, Components ) => {
 
 			if ( Splide.options.isNavigation ) {
 				Splide
-					.on( 'navigation:mounted', initNavigation )
+					.on( 'navigation:mounted navigation:updated', initNavigation )
 					.on( 'active', Slide => { updateNavigation( Slide, true ) } )
 					.on( 'inactive', Slide => { updateNavigation( Slide, false ) } );
 			}
