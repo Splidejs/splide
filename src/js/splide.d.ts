@@ -44,12 +44,12 @@ export interface BreakpointOptions {
 	/**
 	 * @default 0
 	 */
-	width?: number;
+	width?: number | string;
 
 	/**
 	 * @default 0
 	 */
-	height?: number;
+	height?: number | string;
 
 	/**
 	 * @default 0
@@ -673,7 +673,7 @@ export class Splide {
 
 	refresh(): this;
 
-	destroy( completely: boolean ): this;
+	destroy( completely?: boolean ): this;
 }
 
 // Export the main class as default.
