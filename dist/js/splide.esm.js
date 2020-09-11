@@ -2245,7 +2245,7 @@ var UID_NAME = 'uid';
    * Note that IE doesn't support padStart() to fill the uid by 0.
    */
 
-  if (!root.id) {
+  if (typeof window !== 'undefined' && !root.id) {
     window.splide = window.splide || {};
     var uid = window.splide[UID_NAME] || 0;
     window.splide[UID_NAME] = ++uid;
