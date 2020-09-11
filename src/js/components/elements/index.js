@@ -66,7 +66,7 @@ export default ( Splide, Components ) => {
 	 * Assign unique ID to the root element if it doesn't have the one.
 	 * Note that IE doesn't support padStart() to fill the uid by 0.
 	 */
-	if ( ! root.id ) {
+	if ( typeof window !== 'undefined' && ! root.id ) {
 		window.splide = window.splide || {};
 		let uid = window.splide[ UID_NAME ] || 0;
 		window.splide[ UID_NAME ] = ++uid;

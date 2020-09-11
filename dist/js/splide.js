@@ -2235,7 +2235,7 @@ var UID_NAME = 'uid';
    * Note that IE doesn't support padStart() to fill the uid by 0.
    */
 
-  if (!root.id) {
+  if (typeof window !== 'undefined' && !root.id) {
     window.splide = window.splide || {};
     var uid = window.splide[UID_NAME] || 0;
     window.splide[UID_NAME] = ++uid;
@@ -5905,7 +5905,9 @@ var complete_Splide = /*#__PURE__*/function (_Core) {
   return Splide;
 }(splide_Splide); // Register the class as a global variable for non-ES6 environment.
 
-window.Splide = complete_Splide;
+if (typeof window !== 'undefined') {
+  window.Splide = complete_Splide;
+}
 
 /***/ })
 /******/ ]);
