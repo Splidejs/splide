@@ -2656,9 +2656,11 @@ var floor = Math.floor;
         }
       } else {
         if (index > edge) {
-          index = 0;
+          // If not at the edge yet, go to edge. Otherwise rewind to the start index.
+          index = Splide.index < edge ? edge : 0;
         } else if (index < 0) {
-          index = edge;
+          // If not at 0 yet, go to 0. Otherwise rewind to the edge index.
+          index = Splide.index > 0 ? 0 : edge;
         }
       }
 
