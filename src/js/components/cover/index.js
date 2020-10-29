@@ -41,7 +41,7 @@ export default ( Splide, Components ) => {
 		 * Called when the component is mounted.
 		 */
 		mount() {
-			Splide.on( 'lazyload:loaded', img => { cover( img, false ) } );
+			Splide.on( 'lazyload:loaded', img => { cover( img, true ) } );
 			Splide.on( 'mounted updated refresh', () => apply( false ) );
 		},
 

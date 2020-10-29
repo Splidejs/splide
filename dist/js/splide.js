@@ -4465,7 +4465,7 @@ var PAUSE_FLAGS = {
      */
     mount: function mount() {
       Splide.on('lazyload:loaded', function (img) {
-        cover(img, false);
+        cover(img, true);
       });
       Splide.on('mounted updated refresh', function () {
         return apply(false);
