@@ -37,7 +37,17 @@ describe( 'The Controller', () => {
 
 		splide.options = { rewind: true };
 		expect( Controller.edgeIndex ).toBe( slides.length - perPage );
+		// Expect positive index to scroll to edge index if current index is below edge.
+		splide.index = 0;
+		expect( Controller.trim( 100 ) ).toBe( Controller.edgeIndex );
+		// Expect positive index to rewind to beginning if current index is at edge.
+		splide.index = Controller.edgeIndex;
 		expect( Controller.trim( 100 ) ).toBe( 0 );
+		// Expect negative index to scroll to beginning if index is above 0.
+		splide.index = Controller.edgeIndex;
+		expect( Controller.trim( -100 ) ).toBe( 0 );
+		// Expect negative index to rewind to edge if current index is 0.
+		splide.index = 0;
 		expect( Controller.trim( -100 ) ).toBe( Controller.edgeIndex );
 	} );
 
