@@ -12,6 +12,7 @@ const autoprefixer  = require( 'autoprefixer' );
 const cssnano       = require( 'cssnano' );
 const merge         = require( 'merge-stream' );
 const concat        = require( 'gulp-concat' );
+const webpack       = require( 'webpack' );
 const webpackStream = require( 'webpack-stream' );
 const eslint        = require( 'gulp-eslint' );
 const gzip          = require( 'gulp-gzip' );
@@ -85,7 +86,7 @@ const css = {
  */
 gulp.task( 'build:js', done => {
 	Object.values( js ).forEach( settings => {
-		const stream = webpackStream( { config: require( settings.path ) } )
+		const stream = webpackStream( { config: require( settings.path ) }, webpack )
 			.pipe( gulp.dest( settings.dest ) );
 
 		if ( settings.gzip ) {

@@ -4,111 +4,54 @@
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
-/******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-/******/
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
-/******/ 			return installedModules[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			i: moduleId,
-/******/ 			l: false,
-/******/ 			exports: {}
-/******/ 		};
-/******/
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
-/******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
-/******/
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/
-/******/
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-/******/
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// define getter function for harmony exports
-/******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
-/******/ 		}
-/******/ 	};
-/******/
-/******/ 	// define __esModule on exports
-/******/ 	__webpack_require__.r = function(exports) {
-/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 		}
-/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 	};
-/******/
-/******/ 	// create a fake namespace object
-/******/ 	// mode & 1: value is a module id, require it
-/******/ 	// mode & 2: merge all properties of value into the ns
-/******/ 	// mode & 4: return value when already ns object
-/******/ 	// mode & 8|1: behave like require
-/******/ 	__webpack_require__.t = function(value, mode) {
-/******/ 		if(mode & 1) value = __webpack_require__(value);
-/******/ 		if(mode & 8) return value;
-/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
-/******/ 		var ns = Object.create(null);
-/******/ 		__webpack_require__.r(ns);
-/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
-/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
-/******/ 		return ns;
-/******/ 	};
-/******/
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			function getDefault() { return module['default']; } :
-/******/ 			function getModuleExports() { return module; };
-/******/ 		__webpack_require__.d(getter, 'a', getter);
-/******/ 		return getter;
-/******/ 	};
-/******/
-/******/ 	// Object.prototype.hasOwnProperty.call
-/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
-/******/
-/******/
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
-/******/ })
+/******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	// The require scope
+/******/ 	var __webpack_require__ = {};
+/******/ 	
 /************************************************************************/
-/******/ ([
-/* 0 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop)
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/************************************************************************/
 
-"use strict";
-// ESM COMPAT FLAG
-__webpack_require__.r(__webpack_exports__);
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, "Splide", function() { return /* binding */ complete_Splide; });
+// UNUSED EXPORTS: Splide
 
 // NAMESPACE OBJECT: ./src/js/constants/states.js
 var states_namespaceObject = {};
 __webpack_require__.r(states_namespaceObject);
-__webpack_require__.d(states_namespaceObject, "CREATED", function() { return CREATED; });
-__webpack_require__.d(states_namespaceObject, "MOUNTED", function() { return MOUNTED; });
-__webpack_require__.d(states_namespaceObject, "IDLE", function() { return IDLE; });
-__webpack_require__.d(states_namespaceObject, "MOVING", function() { return MOVING; });
-__webpack_require__.d(states_namespaceObject, "DESTROYED", function() { return DESTROYED; });
+__webpack_require__.d(states_namespaceObject, {
+  "CREATED": () => CREATED,
+  "DESTROYED": () => DESTROYED,
+  "IDLE": () => IDLE,
+  "MOUNTED": () => MOUNTED,
+  "MOVING": () => MOVING
+});
 
 // CONCATENATED MODULE: ./src/js/core/event.js
 /**
@@ -121,7 +64,7 @@ __webpack_require__.d(states_namespaceObject, "DESTROYED", function() { return D
 /**
  * The function for providing an Event object simply managing events.
  */
-/* harmony default export */ var core_event = (function () {
+/* harmony default export */ const core_event = (function () {
   /**
    * Store all event data.
    *
@@ -238,7 +181,7 @@ __webpack_require__.d(states_namespaceObject, "DESTROYED", function() { return D
  *
  * @param {string|number} initialState - Provide the initial state value.
  */
-/* harmony default export */ var state = (function (initialState) {
+/* harmony default export */ const state = (function (initialState) {
   /**
    * Store the current state.
    *
@@ -364,7 +307,7 @@ function object_assign(to, from) {
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 /**
  * Convert the given value to array.
  *
@@ -464,7 +407,7 @@ function toPixel(root, value) {
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 
 /**
  * Find the first element matching the given selector.
@@ -701,7 +644,7 @@ function getRect(elm) {
  * @param {Function} callback - Callback function fired right after all images are loaded.
  */
 
-function dom_loaded(elm, callback) {
+function loaded(elm, callback) {
   var images = elm.querySelectorAll('img');
   var length = images.length;
 
@@ -754,7 +697,7 @@ var FADE = 'fade';
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 
 /**
  * The component for general slide effect transition.
@@ -765,7 +708,7 @@ var FADE = 'fade';
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ var transitions_slide = (function (Splide, Components) {
+/* harmony default export */ const slide = (function (Splide, Components) {
   /**
    * Hold the list element.
    *
@@ -827,7 +770,7 @@ var FADE = 'fade';
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 
 /**
  * The component for fade transition.
@@ -838,7 +781,7 @@ var FADE = 'fade';
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ var fade = (function (Splide, Components) {
+/* harmony default export */ const fade = (function (Splide, Components) {
   var Fade = {
     /**
      * Called when the component is mounted.
@@ -902,7 +845,7 @@ var FADE = 'fade';
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 
 
 /**
@@ -922,7 +865,7 @@ function compose(Splide, Components, Transition) {
   });
 
   if (!Transition) {
-    Transition = Splide.is(FADE) ? fade : transitions_slide;
+    Transition = Splide.is(FADE) ? fade : slide;
   }
 
   components.Transition = Transition(Splide, components);
@@ -948,7 +891,7 @@ var MESSAGE_PREFIX = '[SPLIDE]';
  * @param {string} message - An error message.
  */
 
-function error_error(message) {
+function error(message) {
   console.error(MESSAGE_PREFIX + " " + message);
 }
 /**
@@ -1049,7 +992,7 @@ var I18N = {
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 
 var DEFAULTS = {
   /**
@@ -1520,7 +1463,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
  * providing some APIs to control the behavior.
  */
 
-var splide_Splide = /*#__PURE__*/function () {
+var Splide = /*#__PURE__*/function () {
   /**
    * Splide constructor.
    *
@@ -1592,7 +1535,7 @@ var splide_Splide = /*#__PURE__*/function () {
         }
       });
     } catch (e) {
-      error_error(e.message);
+      error(e.message);
       return;
     }
 
@@ -1889,7 +1832,7 @@ var splide_Splide = /*#__PURE__*/function () {
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 
 
 /**
@@ -1900,7 +1843,7 @@ var splide_Splide = /*#__PURE__*/function () {
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ var components_options = (function (Splide) {
+/* harmony default export */ const options = (function (Splide) {
   /**
    * Retrieve options from the data attribute.
    * Note that IE10 doesn't support dataset property.
@@ -1913,7 +1856,7 @@ var splide_Splide = /*#__PURE__*/function () {
     try {
       Splide.options = JSON.parse(options);
     } catch (e) {
-      error_error(e.message);
+      error(e.message);
     }
   }
 
@@ -1963,7 +1906,7 @@ var TTB = 'ttb';
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 
 
 
@@ -1987,7 +1930,7 @@ var STYLE_RESTORE_EVENTS = 'update.slide';
  * @return {Object} - The sub component object.
  */
 
-/* harmony default export */ var elements_slide = (function (Splide, index, realIndex, slide) {
+/* harmony default export */ const elements_slide = (function (Splide, index, realIndex, slide) {
   /**
    * Whether to update "is-active" class before or after transition.
    *
@@ -2188,7 +2131,7 @@ var STYLE_RESTORE_EVENTS = 'update.slide';
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 
 
 
@@ -2209,7 +2152,7 @@ var UID_NAME = 'uid';
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ var components_elements = (function (Splide, Components) {
+/* harmony default export */ const components_elements = (function (Splide, Components) {
   /**
    * Hold the root element.
    *
@@ -2374,7 +2317,7 @@ var UID_NAME = 'uid';
           this.slides.push(slide);
         }
 
-        dom_loaded(slide, function () {
+        loaded(slide, function () {
           callback && callback(slide);
         });
       }
@@ -2470,7 +2413,7 @@ var UID_NAME = 'uid';
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 
 
 var floor = Math.floor;
@@ -2483,7 +2426,7 @@ var floor = Math.floor;
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ var controller = (function (Splide, Components) {
+/* harmony default export */ const controller = (function (Splide, Components) {
   /**
    * Store current options.
    *
@@ -2781,7 +2724,7 @@ var floor = Math.floor;
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 
 
 
@@ -2796,7 +2739,7 @@ var abs = Math.abs;
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ var components_track = (function (Splide, Components) {
+/* harmony default export */ const track = (function (Splide, Components) {
   /**
    * Hold the Layout component.
    *
@@ -3118,7 +3061,7 @@ var abs = Math.abs;
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 
 
 
@@ -3131,7 +3074,7 @@ var abs = Math.abs;
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ var components_clones = (function (Splide, Components) {
+/* harmony default export */ const clones = (function (Splide, Components) {
   /**
    * Store information of all clones.
    *
@@ -3305,7 +3248,7 @@ var abs = Math.abs;
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 
 
 /**
@@ -3317,7 +3260,7 @@ var abs = Math.abs;
  * @return {Object} - The resolver object.
  */
 
-/* harmony default export */ var horizontal = (function (Splide, Components) {
+/* harmony default export */ const horizontal = (function (Splide, Components) {
   /**
    * Keep the Elements component.
    *
@@ -3464,7 +3407,7 @@ var abs = Math.abs;
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 
 
 /**
@@ -3476,7 +3419,7 @@ var abs = Math.abs;
  * @return {Object} - The resolver object.
  */
 
-/* harmony default export */ var vertical = (function (Splide, Components) {
+/* harmony default export */ const vertical = (function (Splide, Components) {
   /**
    * Keep the Elements component.
    *
@@ -3709,7 +3652,7 @@ function createInterval(callback, interval, progress) {
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 
 
 
@@ -3725,7 +3668,7 @@ function createInterval(callback, interval, progress) {
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ var layout = (function (Splide, Components) {
+/* harmony default export */ const layout = (function (Splide, Components) {
   /**
    * Keep the Elements component.
    *
@@ -3831,7 +3774,7 @@ function createInterval(callback, interval, progress) {
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 
 
 
@@ -3861,7 +3804,7 @@ var FRICTION_REDUCER = 7;
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ var drag = (function (Splide, Components) {
+/* harmony default export */ const drag = (function (Splide, Components) {
   /**
    * Store the Move component.
    *
@@ -4185,7 +4128,7 @@ var FRICTION_REDUCER = 7;
  *
  * @return {Object} - The component object.
  */
-/* harmony default export */ var click = (function (Splide, Components) {
+/* harmony default export */ const click = (function (Splide, Components) {
   /**
    * Whether click is disabled or not.
    *
@@ -4242,7 +4185,7 @@ var FRICTION_REDUCER = 7;
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 
 /**
  * Set of pause flags.
@@ -4263,7 +4206,7 @@ var PAUSE_FLAGS = {
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ var components_autoplay = (function (Splide, Components, name) {
+/* harmony default export */ const autoplay = (function (Splide, Components, name) {
   /**
    * Store pause flags.
    *
@@ -4429,7 +4372,7 @@ var PAUSE_FLAGS = {
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 /**
  * The component for change an img element to background image of its wrapper.
  *
@@ -4439,7 +4382,7 @@ var PAUSE_FLAGS = {
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ var components_cover = (function (Splide, Components) {
+/* harmony default export */ const cover = (function (Splide, Components) {
   /**
    * Hold options.
    *
@@ -4548,7 +4491,7 @@ var SIZE = 40;
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 
 
 /**
@@ -4561,7 +4504,7 @@ var SIZE = 40;
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ var components_arrows = (function (Splide, Components, name) {
+/* harmony default export */ const arrows = (function (Splide, Components, name) {
   /**
    * Previous arrow element.
    *
@@ -4723,7 +4666,7 @@ var SIZE = 40;
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 
 /**
  * The event name for updating some attributes of pagination nodes.
@@ -4749,7 +4692,7 @@ var UPDATE_EVENT = 'updated.page refresh.page';
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ var components_pagination = (function (Splide, Components, name) {
+/* harmony default export */ const pagination = (function (Splide, Components, name) {
   /**
    * Store all data for pagination.
    * - list: A list element.
@@ -4916,7 +4859,7 @@ var UPDATE_EVENT = 'updated.page refresh.page';
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 
 
 /**
@@ -4943,7 +4886,7 @@ var SRCSET_DATA_NAME = 'data-splide-lazy-srcset';
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ var lazyload = (function (Splide, Components, name) {
+/* harmony default export */ const lazyload = (function (Splide, Components, name) {
   /**
    * Next index for sequential loading.
    *
@@ -5176,7 +5119,7 @@ var TAB_INDEX = 'tabindex';
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 
 /**
  * Map a key to a slide control.
@@ -5215,7 +5158,7 @@ var KEY_MAP = {
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ var components_keyboard = (function (Splide) {
+/* harmony default export */ const keyboard = (function (Splide) {
   /**
    * Hold the target element.
    *
@@ -5263,7 +5206,7 @@ var KEY_MAP = {
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 
 
 /**
@@ -5275,7 +5218,7 @@ var KEY_MAP = {
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ var a11y = (function (Splide, Components) {
+/* harmony default export */ const a11y = (function (Splide, Components) {
   /**
    * Hold a i18n object.
    *
@@ -5516,7 +5459,7 @@ var KEY_MAP = {
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 
 /**
  * The event name for sync.
@@ -5546,7 +5489,7 @@ var TRIGGER_KEYS = [' ', 'Enter', 'Spacebar'];
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ var sync = (function (Splide) {
+/* harmony default export */ const sync = (function (Splide) {
   /**
    * Keep the sibling Splide instance.
    *
@@ -5681,7 +5624,7 @@ var TRIGGER_KEYS = [' ', 'Enter', 'Spacebar'];
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 
 /**
  * Interval time for throttle.
@@ -5698,7 +5641,7 @@ var THROTTLE = 50;
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ var components_breakpoints = (function (Splide) {
+/* harmony default export */ const breakpoints = (function (Splide) {
   /**
    * Store breakpoints.
    *
@@ -5831,7 +5774,7 @@ var THROTTLE = 50;
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-
+;
 
 
 
@@ -5849,35 +5792,35 @@ var THROTTLE = 50;
 
 
 var COMPLETE = {
-  Options: components_options,
-  Breakpoints: components_breakpoints,
+  Options: options,
+  Breakpoints: breakpoints,
   Controller: controller,
   Elements: components_elements,
-  Track: components_track,
-  Clones: components_clones,
+  Track: track,
+  Clones: clones,
   Layout: layout,
   Drag: drag,
   Click: click,
-  Autoplay: components_autoplay,
-  Cover: components_cover,
-  Arrows: components_arrows,
-  Pagination: components_pagination,
+  Autoplay: autoplay,
+  Cover: cover,
+  Arrows: arrows,
+  Pagination: pagination,
   LazyLoad: lazyload,
-  Keyboard: components_keyboard,
+  Keyboard: keyboard,
   Sync: sync,
   A11y: a11y
 };
 var LIGHT = {
-  Options: components_options,
+  Options: options,
   Controller: controller,
   Elements: components_elements,
-  Track: components_track,
-  Clones: components_clones,
+  Track: track,
+  Clones: clones,
   Layout: layout,
   Drag: drag,
   Click: click,
-  Arrows: components_arrows,
-  Pagination: components_pagination,
+  Arrows: arrows,
+  Pagination: pagination,
   A11y: a11y
 };
 // CONCATENATED MODULE: ./build/complete/complete.js
@@ -5903,9 +5846,8 @@ var complete_Splide = /*#__PURE__*/function (_Core) {
   }
 
   return Splide;
-}(splide_Splide); // Register the class as a global variable for non-ES6 environment.
+}(Splide); // Register the class as a global variable for non-ES6 environment.
 
 window.Splide = complete_Splide;
-
-/***/ })
-/******/ ]);
+/******/ })()
+;
