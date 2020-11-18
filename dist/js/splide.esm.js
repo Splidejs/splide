@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.4.14
+ * Version  : 2.4.15
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -4144,7 +4144,7 @@ var FRICTION_REDUCER = 7;
         capture: true
       }).on('drag', function () {
         disabled = true;
-      }).on('moved', function () {
+      }).on('dragged', function () {
         disabled = false;
       });
     }

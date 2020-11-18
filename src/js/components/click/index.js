@@ -43,7 +43,7 @@ export default ( Splide, Components ) => {
 			Splide
 				.on( 'click', onClick, Components.Elements.track, { capture: true } )
 				.on( 'drag', () => { disabled = true } )
-				.on( 'moved', () => { disabled = false } );
+				.on( 'dragged', () => { disabled = false } );
 		},
 	};
 

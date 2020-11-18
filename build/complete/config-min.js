@@ -1,12 +1,20 @@
-const uglify  = require( 'uglifyjs-webpack-plugin' );
-const config  = require( './config' );
+const config       = require( './config' );
+const TerserPlugin = require( 'terser-webpack-plugin' );
 
 module.exports = {
 	...config,
-	output: {
+	output      : {
 		filename: 'splide.min.js',
 	},
 	optimization: {
-		minimizer: [ new uglify() ],
+		minimize : true,
+		minimizer: [ new TerserPlugin( {
+			terserOptions: {
+				format: {
+					comments: /^\**!|@preserve|@license|@cc_on/i,
+				},
+			},
+			extractComments: false,
+		} ) ],
 	},
 };
