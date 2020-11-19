@@ -43,7 +43,10 @@ export default ( Splide, Components ) => {
 			Splide
 				.on( 'click', onClick, Components.Elements.track, { capture: true } )
 				.on( 'drag', () => { disabled = true } )
-				.on( 'dragged', () => { disabled = false } );
+				.on( 'dragged', () => {
+					// Make sure the flag is released after the click event is fired.
+					setTimeout( () => { disabled = false } );
+				} );
 		},
 	};
 

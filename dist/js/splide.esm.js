@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.4.15
+ * Version  : 2.4.16
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -4145,7 +4145,10 @@ var FRICTION_REDUCER = 7;
       }).on('drag', function () {
         disabled = true;
       }).on('dragged', function () {
-        disabled = false;
+        // Make sure the flag is released after the click event is fired.
+        setTimeout(function () {
+          disabled = false;
+        });
       });
     }
   };
