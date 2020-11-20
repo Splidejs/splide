@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.4.16
+ * Version  : 2.4.17
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -3620,13 +3620,12 @@ function createInterval(callback, interval, progress) {
     play: function play(reset) {
       start = 0;
 
+      if (reset) {
+        rate = 0;
+      }
+
       if (_pause) {
         _pause = false;
-
-        if (reset) {
-          rate = 0;
-        }
-
         requestAnimationFrame(step);
       }
     }

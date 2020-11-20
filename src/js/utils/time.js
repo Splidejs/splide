@@ -76,13 +76,12 @@ export function createInterval( callback, interval, progress ) {
 		play( reset ) {
 			start = 0;
 
+			if ( reset ) {
+				rate = 0;
+			}
+
 			if ( pause ) {
 				pause = false;
-
-				if ( reset ) {
-					rate = 0;
-				}
-
 				requestAnimationFrame( step );
 			}
 		},
