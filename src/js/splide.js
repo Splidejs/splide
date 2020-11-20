@@ -200,7 +200,7 @@ export default class Splide {
 	 * Destroy all Slide objects and clones and recreate them again.
 	 */
 	refresh() {
-		this.emit( 'refresh' ).emit( 'resize' );
+		this.emit( 'refresh:before' ).emit( 'refresh' ).emit( 'resize' );
 		return this;
 	}
 

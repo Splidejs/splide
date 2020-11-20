@@ -55,6 +55,7 @@ export default ( Splide, Components ) => {
 				init();
 
 				Splide
+					.on( 'refresh:before', () => { this.destroy() } )
 					.on( 'refresh', init )
 					.on( 'resize', () => {
 						if ( cloneCount !== getCloneCount() ) {

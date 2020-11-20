@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.4.17
+ * Version  : 2.4.18
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -1684,7 +1684,7 @@ var Splide = /*#__PURE__*/function () {
   ;
 
   _proto.refresh = function refresh() {
-    this.emit('refresh').emit('resize');
+    this.emit('refresh:before').emit('refresh').emit('resize');
     return this;
   }
   /**
@@ -3097,7 +3097,9 @@ var abs = Math.abs;
 
       if (Splide.is(LOOP)) {
         init();
-        Splide.on('refresh', init).on('resize', function () {
+        Splide.on('refresh:before', function () {
+          _this.destroy();
+        }).on('refresh', init).on('resize', function () {
           if (cloneCount !== getCloneCount()) {
             // Destroy before refresh not to collect clones by the Elements component.
             _this.destroy();
