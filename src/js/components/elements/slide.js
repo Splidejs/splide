@@ -169,14 +169,15 @@ export default ( Splide, index, realIndex, slide ) => {
 				return active;
 			}
 
+			const { ceil }  = Math;
 			const trackRect = getRect( Splide.Components.Elements.track );
 			const slideRect = getRect( slide );
 
 			if ( Splide.options.direction === TTB ) {
-				return trackRect.top <= slideRect.top && slideRect.bottom <= trackRect.bottom;
+				return trackRect.top <= slideRect.top && slideRect.bottom <= ceil( trackRect.bottom );
 			}
 
-			return trackRect.left <= slideRect.left && slideRect.right <= trackRect.right;
+			return trackRect.left <= slideRect.left && slideRect.right <= ceil( trackRect.right );
 		},
 
 		/**

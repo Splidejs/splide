@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.4.19
+ * Version  : 2.4.20
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -2063,14 +2063,15 @@ var STYLE_RESTORE_EVENTS = 'update.slide';
         return active;
       }
 
+      var ceil = Math.ceil;
       var trackRect = getRect(Splide.Components.Elements.track);
       var slideRect = getRect(slide);
 
       if (Splide.options.direction === TTB) {
-        return trackRect.top <= slideRect.top && slideRect.bottom <= trackRect.bottom;
+        return trackRect.top <= slideRect.top && slideRect.bottom <= ceil(trackRect.bottom);
       }
 
-      return trackRect.left <= slideRect.left && slideRect.right <= trackRect.right;
+      return trackRect.left <= slideRect.left && slideRect.right <= ceil(trackRect.right);
     },
 
     /**
