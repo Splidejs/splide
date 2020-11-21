@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.4.18
+ * Version  : 2.4.19
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -1931,7 +1931,7 @@ var STYLE_RESTORE_EVENTS = 'update.slide';
    * @type {string}
    */
 
-  var STATUS_UPDATE_EVENTS = 'ready.slide updated.slide resize.slide moved.slide' + (updateOnMove ? ' move.slide' : '');
+  var STATUS_UPDATE_EVENTS = 'ready.slide updated.slide resized.slide moved.slide' + (updateOnMove ? ' move.slide' : '');
   /**
    * Slide sub component object.
    *
@@ -3751,6 +3751,7 @@ function createInterval(callback, interval, progress) {
         height: Slide.container ? null : slideHeight
       });
     });
+    Splide.emit('resized');
   }
 
   return Layout;

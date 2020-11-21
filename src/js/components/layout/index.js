@@ -116,6 +116,8 @@ export default ( Splide, Components ) => {
 				height: Slide.container ? null : slideHeight,
 			} );
 		} );
+
+		Splide.emit( 'resized' );
 	}
 
 	return Layout;

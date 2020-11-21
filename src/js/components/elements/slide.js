@@ -54,7 +54,7 @@ export default ( Splide, index, realIndex, slide ) => {
 	 *
 	 * @type {string}
 	 */
-	const STATUS_UPDATE_EVENTS = 'ready.slide updated.slide resize.slide moved.slide'
+	const STATUS_UPDATE_EVENTS = 'ready.slide updated.slide resized.slide moved.slide'
 		+ ( updateOnMove ? ' move.slide' : '' );
 
 	/**
