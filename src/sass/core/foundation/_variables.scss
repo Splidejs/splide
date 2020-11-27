@@ -1,2 +1,5 @@
 // Loading spinner size.
-$spinner-size: 20px;
+$spinner-size: 20px !default;
+
+// Border spinner size.
+$spinner-border-size: 2px !default;
