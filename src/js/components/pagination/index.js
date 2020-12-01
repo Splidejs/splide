@@ -165,7 +165,7 @@ export default ( Splide, Components, name ) => {
 		const list     = create( 'ul', { class: classes.pagination } );
 
 		const items = Elements.getSlides( false )
-			.filter( Slide => options.focus !== false || Slide.index % options.perPage === 0 )
+			.filter( Slide => options.focus !== false || Slide.index % parseint(options.perPage) === 0 )
 			.map( ( Slide, page ) => {
 				const li     = create( 'li', {} );
 				const button = create( 'button', { class: classes.page, type: 'button' } );

@@ -115,7 +115,7 @@ export default ( Splide, Components ) => {
 			}
 
 			const length  = Splide.length;
-			const perPage = options.perPage;
+			const perPage = parseInt(options.perPage);
 
 			let index = page * perPage;
 			index = index - ( this.pageLength * perPage - length ) * floor( index / length );
@@ -141,7 +141,7 @@ export default ( Splide, Components ) => {
 			}
 
 			const length  = Splide.length;
-			const perPage = options.perPage;
+			const perPage = parseInt(options.perPage);
 
 			// Make the last "perPage" number of slides belong to the last page.
 			if ( length - perPage <= index && index < length ) {
