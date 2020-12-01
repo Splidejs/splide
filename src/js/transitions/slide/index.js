@@ -71,6 +71,8 @@ export default ( Splide, Components ) => {
 				transition: `transform ${ speed }ms ${ options.easing }`,
 				transform : `translate(${ coord.x }px,${ coord.y }px)`,
 			} );
+			
+			setTimeout(done, speed)
 		},
 	};
 }
