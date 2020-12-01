@@ -11,7 +11,7 @@
     width: $spinner-size;
     height: $spinner-size;
     border-radius: 50%;
-    border: 2px solid #999;
+    border: $spinner-border-size solid $spinner-border-color;
     border-left-color: transparent;
 
     animation: splide-loading 1s infinite linear;
