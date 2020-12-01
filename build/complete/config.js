@@ -4,6 +4,15 @@ module.exports = {
 	entry: './build/complete/complete.js',
 	output: {
 		filename: 'splide.js',
+		environment: {
+			arrowFunction: false,
+			bigIntLiteral: false,
+			const        : false,
+			destructuring: false,
+			dynamicImport: false,
+			forOf        : false,
+			module       : false,
+		},
 	},
 	module: {
 		rules: [

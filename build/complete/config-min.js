@@ -5,6 +5,7 @@ module.exports = {
 	...config,
 	output      : {
 		filename: 'splide.min.js',
+		environment: config.output.environment,
 	},
 	optimization: {
 		minimize : true,

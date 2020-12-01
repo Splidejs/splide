@@ -40,7 +40,7 @@ __webpack_require__.d(states_namespaceObject, {
   "MOVING": () => MOVING
 });
 
-// CONCATENATED MODULE: ./src/js/core/event.js
+;// CONCATENATED MODULE: ./src/js/core/event.js
 /**
  * The function for providing an Event object simply managing events.
  *
@@ -155,7 +155,7 @@ __webpack_require__.d(states_namespaceObject, {
 
   return Event;
 });
-// CONCATENATED MODULE: ./src/js/core/state.js
+;// CONCATENATED MODULE: ./src/js/core/state.js
 /**
  * The function providing a super simple state system.
  *
@@ -197,7 +197,7 @@ __webpack_require__.d(states_namespaceObject, {
     }
   };
 });
-// CONCATENATED MODULE: ./src/js/utils/object.js
+;// CONCATENATED MODULE: ./src/js/utils/object.js
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
 /**
@@ -287,14 +287,14 @@ function object_assign(to, from) {
   });
   return to;
 }
-// CONCATENATED MODULE: ./src/js/utils/utils.js
+;// CONCATENATED MODULE: ./src/js/utils/utils.js
 /**
  * A package of some miscellaneous utility functions.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 /**
  * Convert the given value to array.
  *
@@ -387,14 +387,14 @@ function toPixel(root, value) {
 
   return +value || 0;
 }
-// CONCATENATED MODULE: ./src/js/utils/dom.js
+;// CONCATENATED MODULE: ./src/js/utils/dom.js
 /**
  * Some utility functions related with DOM.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 
 /**
  * Find the first element matching the given selector.
@@ -649,7 +649,7 @@ function loaded(elm, callback) {
     callback();
   }
 }
-// CONCATENATED MODULE: ./src/js/constants/types.js
+;// CONCATENATED MODULE: ./src/js/constants/types.js
 /**
  * Export slider types.
  *
@@ -677,14 +677,14 @@ var LOOP = 'loop';
  */
 
 var FADE = 'fade';
-// CONCATENATED MODULE: ./src/js/transitions/slide/index.js
+;// CONCATENATED MODULE: ./src/js/transitions/slide/index.js
 /**
  * The component for general slide effect transition.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 
 /**
  * The component for general slide effect transition.
@@ -750,14 +750,14 @@ var FADE = 'fade';
     }
   };
 });
-// CONCATENATED MODULE: ./src/js/transitions/fade/index.js
+;// CONCATENATED MODULE: ./src/js/transitions/fade/index.js
 /**
  * The component for fade transition.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 
 /**
  * The component for fade transition.
@@ -816,7 +816,7 @@ var FADE = 'fade';
 
   return Fade;
 });
-// CONCATENATED MODULE: ./src/js/transitions/index.js
+;// CONCATENATED MODULE: ./src/js/transitions/index.js
 /**
  * Export transition components.
  *
@@ -825,14 +825,14 @@ var FADE = 'fade';
  */
 
 
-// CONCATENATED MODULE: ./src/js/core/composer.js
+;// CONCATENATED MODULE: ./src/js/core/composer.js
 /**
  * Provide a function for composing components.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 
 
 /**
@@ -858,7 +858,7 @@ function compose(Splide, Components, Transition) {
   components.Transition = Transition(Splide, components);
   return components;
 }
-// CONCATENATED MODULE: ./src/js/utils/error.js
+;// CONCATENATED MODULE: ./src/js/utils/error.js
 /**
  * Utility functions for outputting logs.
  *
@@ -895,7 +895,7 @@ function exist(subject, message) {
     throw new Error(message);
   }
 }
-// CONCATENATED MODULE: ./src/js/constants/classes.js
+;// CONCATENATED MODULE: ./src/js/constants/classes.js
 /**
  * Export class names.
  *
@@ -949,7 +949,7 @@ var STATUS_CLASSES = {
   visible: 'is-visible',
   loading: 'is-loading'
 };
-// CONCATENATED MODULE: ./src/js/constants/i18n.js
+;// CONCATENATED MODULE: ./src/js/constants/i18n.js
 /**
  * Export i18n texts as object.
  *
@@ -972,14 +972,14 @@ var I18N = {
   play: 'Start autoplay',
   pause: 'Pause autoplay'
 };
-// CONCATENATED MODULE: ./src/js/constants/defaults.js
+;// CONCATENATED MODULE: ./src/js/constants/defaults.js
 /**
  * Export default options.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 
 var DEFAULTS = {
   /**
@@ -1384,7 +1384,7 @@ var DEFAULTS = {
    */
   i18n: I18N
 };
-// CONCATENATED MODULE: ./src/js/constants/states.js
+;// CONCATENATED MODULE: ./src/js/constants/states.js
 /**
  * Export state constants.
  *
@@ -1426,7 +1426,7 @@ var MOVING = 4;
  */
 
 var DESTROYED = 5;
-// CONCATENATED MODULE: ./src/js/splide.js
+;// CONCATENATED MODULE: ./src/js/splide.js
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
@@ -1812,14 +1812,14 @@ var Splide = /*#__PURE__*/function () {
 }();
 
 
-// CONCATENATED MODULE: ./src/js/components/options/index.js
+;// CONCATENATED MODULE: ./src/js/components/options/index.js
 /**
  * The component for initializing options.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 
 
 /**
@@ -1858,7 +1858,7 @@ var Splide = /*#__PURE__*/function () {
     }
   };
 });
-// CONCATENATED MODULE: ./src/js/constants/directions.js
+;// CONCATENATED MODULE: ./src/js/constants/directions.js
 /**
  * Export layout modes.
  *
@@ -1886,14 +1886,14 @@ var RTL = 'rtl';
  */
 
 var TTB = 'ttb';
-// CONCATENATED MODULE: ./src/js/components/elements/slide.js
+;// CONCATENATED MODULE: ./src/js/components/elements/slide.js
 /**
  * The sub component for handling each slide.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 
 
 
@@ -2112,14 +2112,14 @@ var STYLE_RESTORE_EVENTS = 'update.slide';
 
   return Slide;
 });
-// CONCATENATED MODULE: ./src/js/components/elements/index.js
+;// CONCATENATED MODULE: ./src/js/components/elements/index.js
 /**
  * The component for main elements.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 
 
 
@@ -2394,14 +2394,14 @@ var UID_NAME = 'uid';
 
   return Elements;
 });
-// CONCATENATED MODULE: ./src/js/components/controller/index.js
+;// CONCATENATED MODULE: ./src/js/components/controller/index.js
 /**
  * The component for controlling the track.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 
 
 var floor = Math.floor;
@@ -2705,14 +2705,14 @@ var floor = Math.floor;
 
   return Controller;
 });
-// CONCATENATED MODULE: ./src/js/components/track/index.js
+;// CONCATENATED MODULE: ./src/js/components/track/index.js
 /**
  * The component for moving list in the track.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 
 
 
@@ -3042,14 +3042,14 @@ var abs = Math.abs;
 
   return Track;
 });
-// CONCATENATED MODULE: ./src/js/components/clones/index.js
+;// CONCATENATED MODULE: ./src/js/components/clones/index.js
 /**
  * The component for cloning some slides for "loop" mode of the track.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 
 
 
@@ -3231,14 +3231,14 @@ var abs = Math.abs;
 
   return Clones;
 });
-// CONCATENATED MODULE: ./src/js/components/layout/directions/horizontal.js
+;// CONCATENATED MODULE: ./src/js/components/layout/directions/horizontal.js
 /**
  * The resolver component for horizontal layout.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 
 
 /**
@@ -3390,14 +3390,14 @@ var abs = Math.abs;
 
   };
 });
-// CONCATENATED MODULE: ./src/js/components/layout/directions/vertical.js
+;// CONCATENATED MODULE: ./src/js/components/layout/directions/vertical.js
 /**
  * The resolver component for vertical layout.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 
 
 /**
@@ -3542,7 +3542,7 @@ var abs = Math.abs;
 
   };
 });
-// CONCATENATED MODULE: ./src/js/utils/time.js
+;// CONCATENATED MODULE: ./src/js/utils/time.js
 /**
  * A package of utility functions related with time.
  *
@@ -3634,14 +3634,14 @@ function createInterval(callback, interval, progress) {
     }
   };
 }
-// CONCATENATED MODULE: ./src/js/components/layout/index.js
+;// CONCATENATED MODULE: ./src/js/components/layout/index.js
 /**
  * The component for handing slide layouts and their sizes.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 
 
 
@@ -3757,14 +3757,14 @@ function createInterval(callback, interval, progress) {
 
   return Layout;
 });
-// CONCATENATED MODULE: ./src/js/components/drag/index.js
+;// CONCATENATED MODULE: ./src/js/components/drag/index.js
 /**
  * The component for supporting mouse drag and swipe.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 
 
 
@@ -4101,7 +4101,7 @@ var FRICTION_REDUCER = 7;
 
   return Drag;
 });
-// CONCATENATED MODULE: ./src/js/components/click/index.js
+;// CONCATENATED MODULE: ./src/js/components/click/index.js
 /**
  * The component for handling a click event.
  *
@@ -4171,14 +4171,14 @@ var FRICTION_REDUCER = 7;
 
   return Click;
 });
-// CONCATENATED MODULE: ./src/js/components/autoplay/index.js
+;// CONCATENATED MODULE: ./src/js/components/autoplay/index.js
 /**
  * The component for playing slides automatically.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 
 /**
  * Set of pause flags.
@@ -4358,14 +4358,14 @@ var PAUSE_FLAGS = {
 
   return Autoplay;
 });
-// CONCATENATED MODULE: ./src/js/components/cover/index.js
+;// CONCATENATED MODULE: ./src/js/components/cover/index.js
 /**
  * The component for change an img element to background image of its wrapper.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 /**
  * The component for change an img element to background image of its wrapper.
  *
@@ -4449,7 +4449,7 @@ var PAUSE_FLAGS = {
 
   return Cover;
 });
-// CONCATENATED MODULE: ./src/js/components/arrows/path.js
+;// CONCATENATED MODULE: ./src/js/components/arrows/path.js
 /**
  * Export vector path for an arrow.
  *
@@ -4477,14 +4477,14 @@ var PATH = 'm15.5 0.932-4.3 4.38 14.5 14.6-14.5 14.5 4.3 4.4 14.6-14.6 4.4-4.3-4
  */
 
 var SIZE = 40;
-// CONCATENATED MODULE: ./src/js/components/arrows/index.js
+;// CONCATENATED MODULE: ./src/js/components/arrows/index.js
 /**
  * The component for appending prev/next arrows.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 
 
 /**
@@ -4652,14 +4652,14 @@ var SIZE = 40;
 
   return Arrows;
 });
-// CONCATENATED MODULE: ./src/js/components/pagination/index.js
+;// CONCATENATED MODULE: ./src/js/components/pagination/index.js
 /**
  * The component for handling pagination
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 
 /**
  * The event name for updating some attributes of pagination nodes.
@@ -4845,14 +4845,14 @@ var UPDATE_EVENT = 'updated.page refresh.page';
 
   return Pagination;
 });
-// CONCATENATED MODULE: ./src/js/components/lazyload/index.js
+;// CONCATENATED MODULE: ./src/js/components/lazyload/index.js
 /**
  * The component for loading slider images lazily.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 
 
 /**
@@ -5056,7 +5056,7 @@ var SRCSET_DATA_NAME = 'data-splide-lazy-srcset';
 
   return Lazyload;
 });
-// CONCATENATED MODULE: ./src/js/constants/a11y.js
+;// CONCATENATED MODULE: ./src/js/constants/a11y.js
 /**
  * Export aria attribute names.
  *
@@ -5105,14 +5105,14 @@ var ARIA_HIDDEN = 'aria-hidden';
  */
 
 var TAB_INDEX = 'tabindex';
-// CONCATENATED MODULE: ./src/js/components/keyboard/index.js
+;// CONCATENATED MODULE: ./src/js/components/keyboard/index.js
 /**
  * The component for controlling slides via keyboard.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 
 /**
  * Map a key to a slide control.
@@ -5192,14 +5192,14 @@ var KEY_MAP = {
     }
   };
 });
-// CONCATENATED MODULE: ./src/js/components/a11y/index.js
+;// CONCATENATED MODULE: ./src/js/components/a11y/index.js
 /**
  * The component for enhancing accessibility.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 
 
 /**
@@ -5445,14 +5445,14 @@ var KEY_MAP = {
 
   return A11y;
 });
-// CONCATENATED MODULE: ./src/js/components/sync/index.js
+;// CONCATENATED MODULE: ./src/js/components/sync/index.js
 /**
  * The component for synchronizing a slider with another.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 
 /**
  * The event name for sync.
@@ -5610,14 +5610,14 @@ var TRIGGER_KEYS = [' ', 'Enter', 'Spacebar'];
 
   return Sync;
 });
-// CONCATENATED MODULE: ./src/js/components/breakpoints/index.js
+;// CONCATENATED MODULE: ./src/js/components/breakpoints/index.js
 /**
  * The component for updating options according to a current window width.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 
 /**
  * Interval time for throttle.
@@ -5760,14 +5760,14 @@ var THROTTLE = 50;
 
   return Breakpoints;
 });
-// CONCATENATED MODULE: ./src/js/components/index.js
+;// CONCATENATED MODULE: ./src/js/components/index.js
 /**
  * Export components.
  *
  * @author    Naotoshi Fujita
  * @copyright Naotoshi Fujita. All rights reserved.
  */
-;
+
 
 
 
@@ -5816,7 +5816,7 @@ var LIGHT = {
   Pagination: pagination,
   A11y: a11y
 };
-// CONCATENATED MODULE: ./build/module/module.js
+;// CONCATENATED MODULE: ./build/module/module.js
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
 /**
