@@ -2,7 +2,7 @@
   $root: &;
 
   &--ttb {
-    > #{$root}__track {
+    #{$root}__track {
       > #{$root}__list {
         display: block;
       }
