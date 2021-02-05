@@ -6,6 +6,7 @@
 const gulp          = require( 'gulp' );
 const rename        = require( 'gulp-rename' );
 const sass          = require( 'gulp-sass' );
+const webserver     = require( 'gulp-webserver' );
 const sassGlob      = require( 'gulp-sass-glob' );
 const postcss       = require( 'gulp-postcss' );
 const autoprefixer  = require( 'autoprefixer' );
@@ -140,3 +141,12 @@ gulp.task( 'lint', () => {
 		.pipe( eslint.format() )
 		.pipe( eslint.failAfterError() );
 } );
+
+gulp.task("serve", () => {
+    return gulp.src("dist").pipe(webserver({
+        livereload: true,
+        open: true,
+        port: 3000,
+        path: "/",
+    }))
+})
