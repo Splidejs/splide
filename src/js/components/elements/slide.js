@@ -169,7 +169,7 @@ export default ( Splide, index, realIndex, slide ) => {
 				return active;
 			}
 
-			const { ceil }  = Math;
+			const { ceil, floor }  = Math;
 			const trackRect = getRect( Splide.Components.Elements.track );
 			const slideRect = getRect( slide );
 
@@ -177,7 +177,7 @@ export default ( Splide, index, realIndex, slide ) => {
 				return trackRect.top <= slideRect.top && slideRect.bottom <= ceil( trackRect.bottom );
 			}
 
-			return trackRect.left <= slideRect.left && slideRect.right <= ceil( trackRect.right );
+			return trackRect.left <= slideRect.left && floor( slideRect.right ) <= ceil( trackRect.right );
 		},
 
 		/**
