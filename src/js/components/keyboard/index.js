@@ -78,7 +78,7 @@ export default ( Splide ) => {
 					}
 
 					Splide.on( 'keydown', e => {
-						if ( map[ e.key ] ) {
+						if ( root.contains( document.activeElement ) && map[ e.key ] ) {
 							Splide.go( map[ e.key ] );
 						}
 					}, target );
