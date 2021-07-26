@@ -19,4 +19,5 @@ export class Splide extends Core {
 }
 
 // Register the class as a global variable for non-ES6 environment.
-window.Splide = Splide;
+let _window = window || global;
+_window.Splide = Splide;

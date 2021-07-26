@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.4.20
+ * Version  : 2.4.21
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -22,6 +22,18 @@
 /******/ 		};
 /******/ 	}();
 /******/ 	
+/******/ 	/* webpack/runtime/global */
+/******/ 	!function() {
+/******/ 		__webpack_require__.g = (function() {
+/******/ 			if (typeof globalThis === 'object') return globalThis;
+/******/ 			try {
+/******/ 				return this || new Function('return this')();
+/******/ 			} catch (e) {
+/******/ 				if (typeof window === 'object') return window;
+/******/ 			}
+/******/ 		})();
+/******/ 	}();
+/******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	!function() {
 /******/ 		__webpack_require__.o = function(obj, prop) { return Object.prototype.hasOwnProperty.call(obj, prop); }
@@ -39,6 +51,7 @@
 /******/ 	}();
 /******/ 	
 /************************************************************************/
+var __webpack_exports__ = {};
 
 // UNUSED EXPORTS: Splide
 
@@ -2180,9 +2193,11 @@ var UID_NAME = 'uid';
    */
 
   if (!root.id) {
-    window.splide = window.splide || {};
-    var uid = window.splide[UID_NAME] || 0;
-    window.splide[UID_NAME] = ++uid;
+    var _window = window || __webpack_require__.g;
+
+    _window.splide = _window.splide || {};
+    var uid = _window.splide[UID_NAME] || 0;
+    _window.splide[UID_NAME] = ++uid;
     root.id = "splide" + pad(uid);
   }
   /**
@@ -5830,7 +5845,9 @@ var LIGHT = {
   A11y: a11y
 };
 ;// CONCATENATED MODULE: ./build/complete/complete.js
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 /**
  * Export "Splide" class for frontend with full components.
@@ -5854,6 +5871,8 @@ var complete_Splide = /*#__PURE__*/function (_Core) {
   return Splide;
 }(Splide); // Register the class as a global variable for non-ES6 environment.
 
-window.Splide = complete_Splide;
+var _window = window || __webpack_require__.g;
+
+_window.Splide = complete_Splide;
 /******/ })()
 ;

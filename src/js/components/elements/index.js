@@ -67,9 +67,10 @@ export default ( Splide, Components ) => {
 	 * Note that IE doesn't support padStart() to fill the uid by 0.
 	 */
 	if ( ! root.id ) {
-		window.splide = window.splide || {};
-		let uid = window.splide[ UID_NAME ] || 0;
-		window.splide[ UID_NAME ] = ++uid;
+		let _window = window || global;
+		_window.splide = _window.splide || {};
+		let uid = _window.splide[ UID_NAME ] || 0;
+		_window.splide[ UID_NAME ] = ++uid;
 		root.id = `splide${ pad( uid ) }`;
 	}
 
