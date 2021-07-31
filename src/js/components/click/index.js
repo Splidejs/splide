@@ -41,7 +41,7 @@ export default ( Splide, Components ) => {
 		 */
 		mount() {
 			Splide
-				.on( 'click', onClick, Components.Elements.track, { capture: true } )
+				.on( 'click', onClick, Components.Elements.track, { capture: true, passive: false } )
 				.on( 'drag', () => { disabled = true } )
 				.on( 'dragged', () => {
 					// Make sure the flag is released after the click event is fired.

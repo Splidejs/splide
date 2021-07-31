@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.4.20
+ * Version  : 2.4.21
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -1576,7 +1576,9 @@ var Splide = /*#__PURE__*/function () {
     }
 
     if (options === void 0) {
-      options = {};
+      options = {
+        passive: true
+      };
     }
 
     this.Event.on(events, handler, elm, options);
@@ -4144,7 +4146,8 @@ var FRICTION_REDUCER = 7;
      */
     mount: function mount() {
       Splide.on('click', onClick, Components.Elements.track, {
-        capture: true
+        capture: true,
+        passive: false
       }).on('drag', function () {
         disabled = true;
       }).on('dragged', function () {
