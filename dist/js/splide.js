@@ -10,7 +10,7 @@ function _extends() { _extends = Object.assign || function (target) { for (var i
 
 /*!
  * Splide.js
- * Version  : 2.4.23
+ * Version  : 2.4.24
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
