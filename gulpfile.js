@@ -5,7 +5,7 @@
  */
 const gulp          = require( 'gulp' );
 const rename        = require( 'gulp-rename' );
-const sass          = require( 'gulp-sass' );
+const sass          = require( 'gulp-dart-sass' );
 const sassGlob      = require( 'gulp-sass-glob' );
 const postcss       = require( 'gulp-postcss' );
 const autoprefixer  = require( 'autoprefixer' );

@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.4.20
+ * Version  : 2.4.21
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -39,6 +39,7 @@
 /******/ 	}();
 /******/ 	
 /************************************************************************/
+var __webpack_exports__ = {};
 
 // UNUSED EXPORTS: Splide
 
@@ -5830,7 +5831,9 @@ var LIGHT = {
   A11y: a11y
 };
 ;// CONCATENATED MODULE: ./build/complete/complete.js
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 /**
  * Export "Splide" class for frontend with full components.
