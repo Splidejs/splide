@@ -1,7 +1,8 @@
 const { parallel } = require( 'gulp' );
-const buildCss = require( './gulp/build-css' );
-const buildJs  = require( './gulp/build-js' );
+const { buildCss } = require( './gulp/build-css' );
+const { buildScript, buildModule } = require( './gulp/build-script' );
 
-exports[ 'build:js' ]  = buildJs;
-exports[ 'build:css' ] = buildCss;
-exports[ 'build:all' ] = parallel( buildJs, buildCss );
+exports[ 'build:js' ]     = buildScript;
+exports[ 'build:module' ] = buildModule;
+exports[ 'build:css' ]    = buildCss;
+exports[ 'build:all' ]    = parallel( buildScript, buildModule, buildCss );

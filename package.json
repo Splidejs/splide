@@ -1,6 +1,6 @@
 {
   "name": "@splidejs/splide",
-  "version": "2.4.22",
+  "version": "2.4.23",
   "description": "Splide is a lightweight and powerful slider/carousel without any dependencies.",
   "author": "Naotoshi Fujita",
   "license": "MIT",
@@ -26,6 +26,8 @@
   "devDependencies": {
     "@babel/core": "^7.15.0",
     "@babel/preset-env": "^7.15.0",
+    "@rollup/plugin-babel": "^5.3.0",
+    "@rollup/plugin-node-resolve": "^13.0.4",
     "autoprefixer": "^10.3.1",
     "babel-jest": "^27.0.6",
     "babel-loader": "^8.2.2",
@@ -39,14 +41,14 @@
     "gulp-rename": "^2.0.0",
     "gulp-rollup": "^2.17.0",
     "jest": "^27.0.6",
-    "merge-stream": "^2.0.0",
     "postcss": "^8.3.6",
-    "through2": "^4.0.2",
-    "webpack": "^5.50.0",
-    "webpack-stream": "^6.1.2"
+    "rollup": "^2.56.2",
+    "rollup-plugin-uglify": "^6.0.4",
+    "through2": "^4.0.2"
   },
   "scripts": {
-    "build:js": "gulp build:js",
+		"build:js": "gulp build:js",
+		"build:module": "gulp build:module",
     "build:css": "gulp build:css",
     "build:all": "gulp build:all",
     "jest": "jest --clearCache && jest",

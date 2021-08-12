@@ -1,4 +1,4 @@
-const info = require( '../package' );
+const info = require( '../../package.json' );
 
 module.exports = `/*!
  * Splide.js

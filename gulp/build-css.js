@@ -52,4 +52,4 @@ function copy() {
 	} );
 }
 
-module.exports = buildCss;
+exports.buildCss = buildCss;

@@ -1,3 +1,11 @@
+/*!
+ * Splide.js
+ * Version  : 2.4.23
+ * License  : MIT
+ * Copyright: 2020 Naotoshi Fujita
+ */
+'use strict';
+
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
@@ -8,13 +16,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
-/*!
- * Splide.js
- * Version  : 2.4.23
- * License  : MIT
- * Copyright: 2020 Naotoshi Fujita
- */
-
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 /**
  * The function for providing an Event object simply managing events.
  *
@@ -25,6 +29,7 @@ function _extends() { _extends = Object.assign || function (target) { for (var i
 /**
  * The function for providing an Event object simply managing events.
  */
+
 var Event = function Event() {
   /**
    * Store all event data.
@@ -5732,4 +5737,5 @@ var Splide = /*#__PURE__*/function (_Splide$) {
   return Splide;
 }(Splide$1);
 
-export { Splide, Splide as default };
+exports.Splide = Splide;
+exports['default'] = Splide;
