@@ -305,7 +305,7 @@ export interface EventObject {
 
 	emit( events: string, ...args: any ): void;
 
-	destroy();
+	destroy(): void;
 }
 
 /**
@@ -375,7 +375,7 @@ export interface EssentialComponentCollection {
  * Interface for collection of all components including extensions.
  */
 export interface ComponentCollection extends EssentialComponentCollection {
-	[ name: string ]: Component;
+	[ name: string ]: Component | undefined;
 }
 
 /**
