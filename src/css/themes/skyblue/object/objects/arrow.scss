@@ -1,0 +1,45 @@
+@use '../../variables/colors';
+
+$arrow-size: 2.5em !default;
+
+.splide {
+  &__arrow {
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    transform: translateY( -50% );
+    border: none;
+    padding: 0;
+    background: transparent;
+
+    svg {
+      width: $arrow-size;
+      height: $arrow-size;
+      fill: colors.$main;
+      transition: fill .2s linear;
+    }
+
+    &:hover {
+      cursor: pointer;
+      svg {
+        fill: colors.$main-light;
+      }
+    }
+
+    &:focus {
+      outline: none;
+    }
+
+    &--prev {
+      left: 1em;
+
+      svg {
+        transform: scaleX( -1 );
+      }
+    }
+
+    &--next {
+      right: 1em;
+    }
+  }
+}

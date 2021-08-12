@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.4.21
+ * Version  : 2.4.22
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -4642,7 +4642,7 @@ var SIZE = 40;
 
   function appendArrows() {
     var wrapper = create('div', {
-      "class": classes.arrows
+      class: classes.arrows
     });
     append(wrapper, prev);
     append(wrapper, next);
@@ -4829,14 +4829,14 @@ var UPDATE_EVENT = 'updated.page refresh.page';
     var options = Splide.options;
     var classes = Splide.classes;
     var list = create('ul', {
-      "class": classes.pagination
+      class: classes.pagination
     });
     var items = Elements.getSlides(false).filter(function (Slide) {
       return options.focus !== false || Slide.index % options.perPage === 0;
     }).map(function (Slide, page) {
       var li = create('li', {});
       var button = create('button', {
-        "class": classes.page,
+        class: classes.page,
         type: 'button'
       });
       append(li, button);
@@ -5014,7 +5014,7 @@ var SRCSET_DATA_NAME = 'data-splide-lazy-srcset';
   function load(img, Slide) {
     addClass(Slide.slide, STATUS_CLASSES.loading);
     var spinner = create('span', {
-      "class": Splide.classes.spinner
+      class: Splide.classes.spinner
     });
     append(img.parentElement, spinner);
 

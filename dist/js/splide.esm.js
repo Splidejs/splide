@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 2.4.21
+ * Version  : 2.4.22
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -14,39 +14,39 @@
 	else
 		root["Splide"] = factory();
 })(self, function() {
-return /******/ (() => { // webpackBootstrap
+return /******/ (function() { // webpackBootstrap
 /******/ 	"use strict";
 /******/ 	// The require scope
 /******/ 	var __webpack_require__ = {};
 /******/ 	
 /************************************************************************/
 /******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
+/******/ 	!function() {
 /******/ 		// define getter functions for harmony exports
-/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 		__webpack_require__.d = function(exports, definition) {
 /******/ 			for(var key in definition) {
 /******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
 /******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
 /******/ 				}
 /******/ 			}
 /******/ 		};
-/******/ 	})();
+/******/ 	}();
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
+/******/ 	!function() {
+/******/ 		__webpack_require__.o = function(obj, prop) { return Object.prototype.hasOwnProperty.call(obj, prop); }
+/******/ 	}();
 /******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
+/******/ 	!function() {
 /******/ 		// define __esModule on exports
-/******/ 		__webpack_require__.r = (exports) => {
+/******/ 		__webpack_require__.r = function(exports) {
 /******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
 /******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 /******/ 			}
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
 /******/ 		};
-/******/ 	})();
+/******/ 	}();
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
@@ -55,18 +55,18 @@ __webpack_require__.r(__webpack_exports__);
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "default": () => (/* binding */ module_Splide)
+  "default": function() { return /* binding */ module_Splide; }
 });
 
 // NAMESPACE OBJECT: ./src/js/constants/states.js
 var states_namespaceObject = {};
 __webpack_require__.r(states_namespaceObject);
 __webpack_require__.d(states_namespaceObject, {
-  "CREATED": () => (CREATED),
-  "DESTROYED": () => (DESTROYED),
-  "IDLE": () => (IDLE),
-  "MOUNTED": () => (MOUNTED),
-  "MOVING": () => (MOVING)
+  "CREATED": function() { return CREATED; },
+  "DESTROYED": function() { return DESTROYED; },
+  "IDLE": function() { return IDLE; },
+  "MOUNTED": function() { return MOUNTED; },
+  "MOVING": function() { return MOVING; }
 });
 
 ;// CONCATENATED MODULE: ./src/js/core/event.js
@@ -80,7 +80,7 @@ __webpack_require__.d(states_namespaceObject, {
 /**
  * The function for providing an Event object simply managing events.
  */
-/* harmony default export */ const core_event = (function () {
+/* harmony default export */ var core_event = (function () {
   /**
    * Store all event data.
    *
@@ -197,7 +197,7 @@ __webpack_require__.d(states_namespaceObject, {
  *
  * @param {string|number} initialState - Provide the initial state value.
  */
-/* harmony default export */ const state = (function (initialState) {
+/* harmony default export */ var state = (function (initialState) {
   /**
    * Store the current state.
    *
@@ -724,7 +724,7 @@ var FADE = 'fade';
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ const slide = (function (Splide, Components) {
+/* harmony default export */ var slide = (function (Splide, Components) {
   /**
    * Hold the list element.
    *
@@ -797,7 +797,7 @@ var FADE = 'fade';
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ const fade = (function (Splide, Components) {
+/* harmony default export */ var fade = (function (Splide, Components) {
   var Fade = {
     /**
      * Called when the component is mounted.
@@ -1859,7 +1859,7 @@ var Splide = /*#__PURE__*/function () {
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ const options = (function (Splide) {
+/* harmony default export */ var options = (function (Splide) {
   /**
    * Retrieve options from the data attribute.
    * Note that IE10 doesn't support dataset property.
@@ -1946,7 +1946,7 @@ var STYLE_RESTORE_EVENTS = 'update.slide';
  * @return {Object} - The sub component object.
  */
 
-/* harmony default export */ const elements_slide = (function (Splide, index, realIndex, slide) {
+/* harmony default export */ var elements_slide = (function (Splide, index, realIndex, slide) {
   /**
    * Whether to update "is-active" class before or after transition.
    *
@@ -2169,7 +2169,7 @@ var UID_NAME = 'uid';
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ const components_elements = (function (Splide, Components) {
+/* harmony default export */ var components_elements = (function (Splide, Components) {
   /**
    * Hold the root element.
    *
@@ -2443,7 +2443,7 @@ var floor = Math.floor;
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ const controller = (function (Splide, Components) {
+/* harmony default export */ var controller = (function (Splide, Components) {
   /**
    * Store current options.
    *
@@ -2756,7 +2756,7 @@ var abs = Math.abs;
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ const track = (function (Splide, Components) {
+/* harmony default export */ var track = (function (Splide, Components) {
   /**
    * Hold the Layout component.
    *
@@ -3091,7 +3091,7 @@ var abs = Math.abs;
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ const clones = (function (Splide, Components) {
+/* harmony default export */ var clones = (function (Splide, Components) {
   /**
    * Store information of all clones.
    *
@@ -3279,7 +3279,7 @@ var abs = Math.abs;
  * @return {Object} - The resolver object.
  */
 
-/* harmony default export */ const horizontal = (function (Splide, Components) {
+/* harmony default export */ var horizontal = (function (Splide, Components) {
   /**
    * Keep the Elements component.
    *
@@ -3438,7 +3438,7 @@ var abs = Math.abs;
  * @return {Object} - The resolver object.
  */
 
-/* harmony default export */ const vertical = (function (Splide, Components) {
+/* harmony default export */ var vertical = (function (Splide, Components) {
   /**
    * Keep the Elements component.
    *
@@ -3686,7 +3686,7 @@ function createInterval(callback, interval, progress) {
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ const layout = (function (Splide, Components) {
+/* harmony default export */ var layout = (function (Splide, Components) {
   /**
    * Keep the Elements component.
    *
@@ -3823,7 +3823,7 @@ var FRICTION_REDUCER = 7;
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ const drag = (function (Splide, Components) {
+/* harmony default export */ var drag = (function (Splide, Components) {
   /**
    * Store the Move component.
    *
@@ -4147,7 +4147,7 @@ var FRICTION_REDUCER = 7;
  *
  * @return {Object} - The component object.
  */
-/* harmony default export */ const click = (function (Splide, Components) {
+/* harmony default export */ var click = (function (Splide, Components) {
   /**
    * Whether click is disabled or not.
    *
@@ -4228,7 +4228,7 @@ var PAUSE_FLAGS = {
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ const autoplay = (function (Splide, Components, name) {
+/* harmony default export */ var autoplay = (function (Splide, Components, name) {
   /**
    * Store pause flags.
    *
@@ -4404,7 +4404,7 @@ var PAUSE_FLAGS = {
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ const cover = (function (Splide, Components) {
+/* harmony default export */ var cover = (function (Splide, Components) {
   /**
    * Hold options.
    *
@@ -4526,7 +4526,7 @@ var SIZE = 40;
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ const arrows = (function (Splide, Components, name) {
+/* harmony default export */ var arrows = (function (Splide, Components, name) {
   /**
    * Previous arrow element.
    *
@@ -4657,7 +4657,7 @@ var SIZE = 40;
 
   function appendArrows() {
     var wrapper = create('div', {
-      "class": classes.arrows
+      class: classes.arrows
     });
     append(wrapper, prev);
     append(wrapper, next);
@@ -4714,7 +4714,7 @@ var UPDATE_EVENT = 'updated.page refresh.page';
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ const pagination = (function (Splide, Components, name) {
+/* harmony default export */ var pagination = (function (Splide, Components, name) {
   /**
    * Store all data for pagination.
    * - list: A list element.
@@ -4844,14 +4844,14 @@ var UPDATE_EVENT = 'updated.page refresh.page';
     var options = Splide.options;
     var classes = Splide.classes;
     var list = create('ul', {
-      "class": classes.pagination
+      class: classes.pagination
     });
     var items = Elements.getSlides(false).filter(function (Slide) {
       return options.focus !== false || Slide.index % options.perPage === 0;
     }).map(function (Slide, page) {
       var li = create('li', {});
       var button = create('button', {
-        "class": classes.page,
+        class: classes.page,
         type: 'button'
       });
       append(li, button);
@@ -4908,7 +4908,7 @@ var SRCSET_DATA_NAME = 'data-splide-lazy-srcset';
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ const lazyload = (function (Splide, Components, name) {
+/* harmony default export */ var lazyload = (function (Splide, Components, name) {
   /**
    * Next index for sequential loading.
    *
@@ -5029,7 +5029,7 @@ var SRCSET_DATA_NAME = 'data-splide-lazy-srcset';
   function load(img, Slide) {
     addClass(Slide.slide, STATUS_CLASSES.loading);
     var spinner = create('span', {
-      "class": Splide.classes.spinner
+      class: Splide.classes.spinner
     });
     append(img.parentElement, spinner);
 
@@ -5180,7 +5180,7 @@ var KEY_MAP = {
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ const keyboard = (function (Splide) {
+/* harmony default export */ var keyboard = (function (Splide) {
   /**
    * Hold the target element.
    *
@@ -5240,7 +5240,7 @@ var KEY_MAP = {
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ const a11y = (function (Splide, Components) {
+/* harmony default export */ var a11y = (function (Splide, Components) {
   /**
    * Hold a i18n object.
    *
@@ -5511,7 +5511,7 @@ var TRIGGER_KEYS = [' ', 'Enter', 'Spacebar'];
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ const sync = (function (Splide) {
+/* harmony default export */ var sync = (function (Splide) {
   /**
    * Keep the sibling Splide instance.
    *
@@ -5663,7 +5663,7 @@ var THROTTLE = 50;
  * @return {Object} - The component object.
  */
 
-/* harmony default export */ const breakpoints = (function (Splide) {
+/* harmony default export */ var breakpoints = (function (Splide) {
   /**
    * Store breakpoints.
    *

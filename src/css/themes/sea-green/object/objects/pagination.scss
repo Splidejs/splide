@@ -1,0 +1,41 @@
+@use 'sass:math';
+@use '../../variables/colors';
+
+$indicator-width: 20px !default;
+$indicator-height: 5px !default;
+
+.splide {
+  &__pagination {
+    position: absolute;
+    z-index: 1;
+    bottom: 1em;
+    left: 50%;
+    transform: translateX( -50% );
+    padding: 0;
+
+    &__page {
+      display: inline-block;
+      width: $indicator-width;
+      height: $indicator-height;
+      background: #ccc;
+      border-radius: math.div( $indicator-height, 2 );
+      margin: 3px;
+      padding: 0;
+      transition: all .2s linear;
+      border: none;
+
+      &.is-active {
+        background: colors.$main;
+      }
+
+      &:hover {
+        cursor: pointer;
+        background: colors.$main-light;
+      }
+
+      &:focus {
+        outline: none;
+      }
+    }
+  }
+}

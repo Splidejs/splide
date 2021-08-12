@@ -1,0 +1,13 @@
+@use '../../variables/colors';
+
+$progress-bar-height: 3px !default;
+
+.splide {
+  &__progress {
+    &__bar {
+      width: 0;
+      height: $progress-bar-height;
+      background: colors.$main;
+    }
+  }
+}

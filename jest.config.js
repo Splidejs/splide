@@ -1,3 +1,4 @@
 module.exports = {
-	rootDir: './tests',
+	rootDir        : './tests',
+	testEnvironment: 'jsdom',
 };

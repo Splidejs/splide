@@ -1,0 +1,8 @@
+@use '../../variables/colors';
+
+.splide {
+  &__spinner {
+    border: 2px solid colors.$main;
+    border-left-color: transparent;
+  }
+}
