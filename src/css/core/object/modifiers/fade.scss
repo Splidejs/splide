@@ -2,21 +2,22 @@
   $root: &;
 
   &--fade {
-    > #{$root}__track {
-      > #{$root}__list {
+    > #{ $root }__slider > #{ $root }__track,
+    > #{ $root }__track {
+      > #{ $root }__list {
         display: block;
 
-        > #{$root}__slide {
+        > #{ $root }__slide {
+          left: 0;
+          opacity: 0;
           position: absolute;
           top: 0;
-          left: 0;
           z-index: 0;
-          opacity: 0;
 
           &.is-active {
+            opacity: 1;
             position: relative;
             z-index: 1;
-            opacity: 1;
           }
         }
       }

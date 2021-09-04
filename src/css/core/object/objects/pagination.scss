@@ -1,22 +1,17 @@
 .splide {
   &__pagination {
-    display: inline-flex;
     align-items: center;
-    width: 95%;
+    display: flex;
     flex-wrap: wrap;
     justify-content: center;
     margin: 0;
+    padding: 0 1em;
 
     li {
-      list-style-type: none;
       display: inline-block;
       line-height: 1;
+      list-style-type: none;
       margin: 0;
-    }
-
-    &__page {
-      &.is-active {
-      }
     }
   }
 }

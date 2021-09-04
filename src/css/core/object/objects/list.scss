@@ -2,14 +2,13 @@
   $root: &;
 
   &__list {
-    margin: 0!important;
-    padding: 0!important;
-    width: max-content;
-    will-change: transform;
+    height: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   &.is-active {
-    #{$root}__list {
+    #{ $root }__list {
       display: flex;
     }
   }

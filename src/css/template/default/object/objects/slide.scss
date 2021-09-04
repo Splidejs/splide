@@ -1,0 +1,9 @@
+$border-radius: false !default;
+
+.splide {
+  &__slide {
+    @if $border-radius {
+      border-radius: $border-radius;
+    }
+  }
+}

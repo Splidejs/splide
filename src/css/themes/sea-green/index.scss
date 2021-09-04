@@ -1,3 +1,49 @@
-@forward '../../core';
+$main: #20b2aa !default;
+$main-light: lighten( $main, 20% ) !default;
+
+@use '../../template/default/foundation/colors' with (
+  $main: $main,
+  $sub01: $main,
+  $sub02: $main,
+  $background: #ccc,
+  $background-active: $main,
+);
+
+@use '../../template/default/object/modifiers/nav' with (
+  $border-radius: 4px,
+  $opacity: .7,
+  $opacity-active: 1,
+);
+
+@use '../../template/default/object/modifiers/ttb' with (
+  $pagination-dot-width: 5px,
+  $pagination-dot-height: 20px,
+);
+
+@use '../../template/default/object/objects/arrow' with (
+  $size: 2.5em,
+  $opacity: false,
+  $opacity-hover: false,
+  $fill-hover: $main-light,
+  $transition: fill .2s linear,
+  $button-size: false,
+  $button-background: transparent,
+);
+
+@use '../../template/default/object/objects/pagination' with (
+  $bottom: 1em,
+  $dot-width: 20px,
+  $dot-height: 5px,
+  $dot-border-radius: 2.5px,
+  $dot-opacity: false,
+  $dot-transition: all .2s linear,
+  $dot-background-hover: $main-light,
+  $dot-transform-active: false,
+);
+
+@use '../../template/default/object/objects/slide' with (
+  $border-radius: 4px,
+);
+
+@forward '../../template/default';
 @forward 'object/objects';
-@forward 'object/modifiers';

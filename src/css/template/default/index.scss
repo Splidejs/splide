@@ -1,0 +1,13 @@
+@use 'foundation/colors';
+
+$spinner-size: 20px !default;
+$spinner-border: 2px solid colors.$sub02 !default;
+
+@use '../../core/object/objects' with (
+  $spinner-size: $spinner-size,
+  $spinner-border: $spinner-border,
+);
+
+@forward '../../core';
+@forward 'object/objects';
+@forward 'object/modifiers';

@@ -1,19 +1,31 @@
 const { parallel, src, dest } = require( 'gulp' );
-const rollup  = require( 'rollup' ).rollup;
-const uglify  = require( 'rollup-plugin-uglify' ).uglify;
-const babel   = require( '@rollup/plugin-babel' );
-const resolve = require( '@rollup/plugin-node-resolve' ).nodeResolve;
-const gzip    = require( 'gulp-gzip' );
-const path    = require( 'path' );
-const banner  = require( './constants/banner' );
+const rollup     = require( 'rollup' ).rollup;
+const typescript = require( 'rollup-plugin-typescript2' );
+const rename     = require( 'ts-transformer-properties-rename' ).default;
+const uglify     = require( 'rollup-plugin-uglify' ).uglify;
+const babel      = require( '@rollup/plugin-babel' );
+const resolve    = require( '@rollup/plugin-node-resolve' ).nodeResolve;
+const gzip       = require( 'gulp-gzip' );
+const path       = require( 'path' );
+const banner     = require( './constants/banner' );
 
 
 function buildScript( type, minify ) {
 	const file  = buildFilename( type, minify );
-	const input = `./src/js/build/${ type }/${ type }.js`;
+	const input = `./src/js/build/${ type }/${ type }.ts`;
 
 	const plugins = [
 		resolve(),
+		typescript( {
+      transformers: [
+        service => ( {
+          before: [
+            rename( service.getProgram(), { internalPrefix: '' } ),
+          ],
+          after : [],
+        } ),
+      ],
+    } ),
 		babel.getBabelOutputPlugin( {
 			configFile: path.resolve( __dirname, '../.babelrc' ),
 			allowAllFormats: true,
@@ -26,11 +38,11 @@ function buildScript( type, minify ) {
 				output: {
 					comments: /^!/,
 				},
-				// mangle: {
-				// 	properties: {
-				// 		regex: /^_(private)_/,
-				// 	},
-				// },
+				mangle: {
+					properties: {
+						regex: /^_(private)_/,
+					},
+				},
 			} ),
 		);
 	}
@@ -63,9 +75,10 @@ function buildFilename( type, minify ) {
 
 function buildModule( format ) {
 	return rollup( {
-		input  : './src/js/build/module/module.js',
+		input  : './src/js/index.ts',
 		plugins: [
 			resolve(),
+      typescript(),
 			babel.getBabelOutputPlugin( {
 				presets: [
 					[
@@ -87,6 +100,10 @@ function buildModule( format ) {
 			exports: 'named',
 		} );
 	} );
+}
+
+exports.buildDevCode = function buildDevCode() {
+  return buildScript( 'default' );
 }
 
 exports.buildScript = parallel(

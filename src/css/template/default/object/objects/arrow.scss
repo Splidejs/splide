@@ -1,0 +1,89 @@
+@use '../../foundation/colors';
+
+$size: 1.2em !default;
+$fill: colors.$main !default;
+$fill-hover: false !default;
+$transition: false !default;
+$button-size: 2em !default;
+$button-background: colors.$background !default;
+$button-background-hover: false !default;
+$button-border: 0 !default;
+$button-padding: 0 !default;
+$button-border-radius: 50% !default;
+$button-transition: false !default;
+$opacity: .7 !default;
+$opacity-hover: .9 !default;
+$left: 1em !default;
+$right: 1em !default;
+
+.splide {
+  &__arrow {
+    background: $button-background;
+    border: $button-border;
+    cursor: pointer;
+    padding: $button-padding;
+    position: absolute;
+    top: 50%;
+    transform: translateY( -50% );
+    z-index: 1;
+
+    @if $opacity {
+      opacity: $opacity;
+    }
+
+    @if $button-size {
+      align-items: center;
+      border-radius: $button-border-radius;
+      display: flex;
+      justify-content: center;
+      height: $button-size;
+      width: $button-size;
+    }
+
+    @if $button-transition {
+      transition: $button-transition;
+    }
+
+    svg {
+      fill: $fill;
+      height: $size;
+      width: $size;
+
+      @if $transition {
+        transition: $transition;
+      }
+    }
+
+    &:hover {
+      @if $opacity-hover {
+        opacity: $opacity-hover;
+      }
+
+      @if $button-background-hover {
+        background: $button-background-hover;
+      }
+
+      @if $fill-hover {
+        svg {
+          fill: $fill-hover;
+        }
+      }
+    }
+
+    &:focus {
+      outline: none;
+    }
+
+    &--prev {
+      left: $left;
+
+      svg {
+        transform: scaleX( -1 );
+      }
+    }
+
+    &--next {
+      right: $right;
+    }
+  }
+}

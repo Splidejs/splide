@@ -1,958 +1,4799 @@
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
 /*!
  * Splide.js
- * Version  : 2.4.24
+ * Version  : 3.0.0
  * License  : MIT
- * Copyright: 2020 Naotoshi Fujita
+ * Copyright: 2021 Naotoshi Fujita
  */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() : typeof define === 'function' && define.amd ? define(factory) : (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Splide = factory());
 })(this, function () {
   'use strict';
   /**
-   * The function for providing an Event object simply managing events.
+   * The project code.
    *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
+   * @since 3.0.0
    */
 
+  var PROJECT_CODE = 'splide';
   /**
-   * The function for providing an Event object simply managing events.
+   * The data attribute prefix.
+   *
+   * @since 3.0.0
    */
 
-  var Event = function Event() {
-    /**
-     * Store all event data.
-     *
-     * @type {Array}
-     */
-    var data = [];
-    var Event = {
-      /**
-       * Subscribe the given event(s).
-       *
-       * @param {string}   events  - An event name. Use space to separate multiple events.
-       *                             Also, namespace is accepted by dot, such as 'resize.{namespace}'.
-       * @param {function} handler - A callback function.
-       * @param {Element}  elm     - Optional. Native event will be listened to when this arg is provided.
-       * @param {Object}   options - Optional. Options for addEventListener.
-       */
-      on: function on(events, handler, elm, options) {
-        if (elm === void 0) {
-          elm = null;
-        }
+  var DATA_ATTRIBUTE = "data-" + PROJECT_CODE;
+  /**
+   * Splide has been just created.
+   */
 
-        if (options === void 0) {
-          options = {};
-        }
+  var CREATED = 1;
+  /**
+   * Splide has mounted components.
+   */
 
-        events.split(' ').forEach(function (event) {
-          if (elm) {
-            elm.addEventListener(event, handler, options);
-          }
+  var MOUNTED = 2;
+  /**
+   * Splide is ready.
+   */
 
-          data.push({
-            event: event,
-            handler: handler,
-            elm: elm,
-            options: options
-          });
-        });
-      },
+  var IDLE = 3;
+  /**
+   * Splide is moving.
+   */
 
-      /**
-       * Unsubscribe the given event(s).
-       *
-       * @param {string}  events - A event name or names split by space.
-       * @param {Element} elm    - Optional. removeEventListener() will be called when this arg is provided.
-       */
-      off: function off(events, elm) {
-        if (elm === void 0) {
-          elm = null;
-        }
+  var MOVING = 4;
+  /**
+   * Splide has been destroyed.
+   */
 
-        events.split(' ').forEach(function (event) {
-          data = data.filter(function (item) {
-            if (item && item.event === event && item.elm === elm) {
-              unsubscribe(item);
-              return false;
-            }
+  var DESTROYED = 5;
+  /**
+   * The collection of all states.
+   *
+   * @since 3.0.0
+   */
 
-            return true;
-          });
-        });
-      },
-
-      /**
-       * Emit an event.
-       * This method is only for custom events.
-       *
-       * @param {string}  event - An event name.
-       * @param {*}       args  - Any number of arguments passed to handlers.
-       */
-      emit: function emit(event) {
-        for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-          args[_key - 1] = arguments[_key];
-        }
-
-        data.forEach(function (item) {
-          if (!item.elm && item.event.split('.')[0] === event) {
-            item.handler.apply(item, args);
-          }
-        });
-      },
-
-      /**
-       * Clear event data.
-       */
-      destroy: function destroy() {
-        data.forEach(unsubscribe);
-        data = [];
-      }
-    };
-    /**
-     * Remove the registered event listener.
-     *
-     * @param {Object} item - An object containing event data.
-     */
-
-    function unsubscribe(item) {
-      if (item.elm) {
-        item.elm.removeEventListener(item.event, item.handler, item.options);
-      }
-    }
-
-    return Event;
+  var STATES = {
+    CREATED: CREATED,
+    MOUNTED: MOUNTED,
+    IDLE: IDLE,
+    MOVING: MOVING,
+    DESTROYED: DESTROYED
   };
   /**
-   * The function providing a super simple state system.
+   * Empties the array.
    *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
+   * @param array - A array to empty.
    */
 
-  /**
-   * The function providing a super simple state system.
-   *
-   * @param {string|number} initialState - Provide the initial state value.
-   */
-
-
-  var State = function State(initialState) {
-    /**
-     * Store the current state.
-     *
-     * @type {string|number}
-     */
-    var curr = initialState;
-    return {
-      /**
-       * Change state.
-       *
-       * @param {string|number} state - A new state.
-       */
-      set: function set(state) {
-        curr = state;
-      },
-
-      /**
-       * Verify if the current state is given one or not.
-       *
-       * @param {string|number} state - A state name to be verified.
-       *
-       * @return {boolean} - True if the current state is the given one.
-       */
-      is: function is(state) {
-        return state === curr;
-      }
-    };
-  };
-  /**
-   * Some utility functions related with Object, supporting IE.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-
-  var keys = Object.keys;
-  /**
-   * Iterate an object like Array.forEach.
-   * IE doesn't support forEach of HTMLCollection.
-   *
-   * @param {Object}    obj       - An object.
-   * @param {function}  callback  - A function handling each value. Arguments are value, property and index.
-   */
-
-  function each(obj, callback) {
-    keys(obj).some(function (key, index) {
-      return callback(obj[key], key, index);
-    });
+  function empty(array) {
+    array.length = 0;
   }
   /**
-   * Return values of the given object as an array.
-   * IE doesn't support Object.values.
+   * Checks if the given subject is an object or not.
    *
-   * @param {Object} obj - An object.
+   * @param subject - A subject to check.
    *
-   * @return {Array} - An array containing all values of the given object.
-   */
-
-
-  function values(obj) {
-    return keys(obj).map(function (key) {
-      return obj[key];
-    });
-  }
-  /**
-   * Check if the given subject is object or not.
-   *
-   * @param {*} subject - A subject to be verified.
-   *
-   * @return {boolean} - True if object, false otherwise.
+   * @return `true` if the subject is an object, or otherwise `false`.
    */
 
 
   function isObject(subject) {
-    return typeof subject === 'object';
+    return !isNull(subject) && typeof subject === 'object';
   }
   /**
-   * Merge two objects deeply.
+   * Checks if the given subject is an array or not.
    *
-   * @param {Object} to   - An object where "from" is merged.
-   * @param {Object} from - An object merged to "to".
+   * @param subject - A subject to check.
    *
-   * @return {Object} - A merged object.
+   * @return `true` if the subject is an array, or otherwise `false`.
    */
 
 
-  function merge(_ref, from) {
-    var to = _extends({}, _ref);
-
-    each(from, function (value, key) {
-      if (isObject(value)) {
-        if (!isObject(to[key])) {
-          to[key] = {};
-        }
-
-        to[key] = merge(to[key], value);
-      } else {
-        to[key] = value;
-      }
-    });
-    return to;
+  function isArray(subject) {
+    return Array.isArray(subject);
   }
   /**
-   * Assign all properties "from" to "to" object.
+   * Checks if the given subject is a function or not.
    *
-   * @param {Object} to   - An object where properties are assigned.
-   * @param {Object} from - An object whose properties are assigned to "to".
+   * @param subject - A subject to check.
    *
-   * @return {Object} - An assigned object.
+   * @return `true` if the subject is a function, or otherwise `false`.
    */
 
 
-  function assign(to, from) {
-    keys(from).forEach(function (key) {
-      if (!to[key]) {
-        Object.defineProperty(to, key, Object.getOwnPropertyDescriptor(from, key));
-      }
-    });
-    return to;
+  function isFunction(subject) {
+    return typeof subject === 'function';
   }
   /**
-   * A package of some miscellaneous utility functions.
+   * Checks if the given subject is a string or not.
    *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
+   * @param subject - A subject to check.
+   *
+   * @return `true` if the subject is a string, or otherwise `false`.
    */
 
+
+  function isString(subject) {
+    return typeof subject === 'string';
+  }
   /**
-   * Convert the given value to array.
+   * Checks if the given subject is `undefined` or not.
    *
-   * @param {*} value - Any value.
+   * @param subject - A subject to check.
    *
-   * @return {*[]} - Array containing the given value.
+   * @return `true` if the subject is `undefined`, or otherwise `false`.
+   */
+
+
+  function isUndefined(subject) {
+    return typeof subject === 'undefined';
+  }
+  /**
+   * Checks if the given subject is `null` or not.
+   *
+   * @param subject - A subject to check.
+   *
+   * @return `true` if the subject is `null`, or otherwise `false`.
+   */
+
+
+  function isNull(subject) {
+    return subject === null;
+  }
+  /**
+   * Checks if the given subject is an HTMLElement or not.
+   *
+   * @param subject - A subject to check.
+   *
+   * @return `true` if the subject is an HTMLElement instance, or otherwise `false`.
+   */
+
+
+  function isHTMLElement(subject) {
+    return subject instanceof HTMLElement;
+  }
+  /**
+   * Checks if the given subject is an HTMLButtonElement or not.
+   *
+   * @param subject - A subject to check.
+   *
+   * @return `true` if the subject is an HTMLButtonElement, or otherwise `false`.
+   */
+
+
+  function isHTMLButtonElement(subject) {
+    return subject instanceof HTMLButtonElement;
+  }
+  /**
+   * Push the provided value to an array if the value is not an array.
+   *
+   * @param value - A value to push.
+   *
+   * @return An array containing the value, or the value itself if it is already an array.
    */
 
 
   function toArray(value) {
-    return Array.isArray(value) ? value : [value];
+    return isArray(value) ? value : [value];
   }
   /**
-   * Check if the given value is between min and max.
-   * Min will be returned when the value is less than min or max will do when greater than max.
+   * The extended `Array#forEach` method that accepts a single value as an argument.
    *
-   * @param {number} value - A number to be checked.
-   * @param {number} m1    - Minimum or maximum number.
-   * @param {number} m2    - Maximum or minimum number.
-   *
-   * @return {number} - A value itself, min or max.
+   * @param values   - A value or values to iterate over.
+   * @param iteratee - An iteratee function.
    */
 
 
-  function between(value, m1, m2) {
-    return Math.min(Math.max(value, m1 > m2 ? m2 : m1), m1 > m2 ? m1 : m2);
+  function forEach(values, iteratee) {
+    toArray(values).forEach(iteratee);
   }
   /**
-   * The sprintf method with minimum functionality.
+   * Checks if the array includes the value or not.
+   * `Array#includes` is not supported by IE.
    *
-   * @param {string}       format       - The string format.
-   * @param {string|Array} replacements - Replacements accepting multiple arguments.
+   * @param array - An array.
+   * @param value - A value to search for.
    *
-   * @returns {string} - Converted string.
+   * @return `true` if the array includes the value, or otherwise `false`.
    */
 
 
-  function sprintf(format, replacements) {
-    var i = 0;
-    return format.replace(/%s/g, function () {
-      return toArray(replacements)[i++];
-    });
+  function includes(array, value) {
+    return array.indexOf(value) > -1;
   }
   /**
-   * Append px unit to the given subject if necessary.
+   * Extended `Array#push()` that accepts an item or an array with items.
    *
-   * @param {number|string} value - A value that may not include an unit.
+   * @param array - An array to push items.
+   * @param items - An item or items to push.
    *
-   * @return {string} - If the value is string, return itself.
-   *                    If number, do value + "px". An empty string, otherwise.
+   * @return A provided array itself.
    */
 
 
-  function unit(value) {
-    var type = typeof value;
+  function push(array, items) {
+    array.push.apply(array, toArray(items));
+    return array;
+  }
 
-    if (type === 'number' && value > 0) {
-      return parseFloat(value) + 'px';
-    }
+  var arrayProto = Array.prototype;
+  /**
+   * The slice method for an array-like object.
+   *
+   * @param arrayLike - An array-like object.
+   * @param start     - Optional. A start index.
+   * @param end       - Optional. A end index.
+   *
+   * @return An array with sliced elements.
+   */
 
-    return type === 'string' ? value : '';
+  function slice(arrayLike, start, end) {
+    return arrayProto.slice.call(arrayLike, start, end);
   }
   /**
-   * Pad start with 0.
+   * The find method for an array or array-like object, works in IE.
+   * This method is not performant for a huge array.
    *
-   * @param {number} number - A number to be filled with 0.
+   * @param arrayLike - An array-like object.
+   * @param predicate - The predicate function to test each element in the object.
    *
-   * @return {string|number} - Padded number.
+   * @return A found value if available, or otherwise `undefined`.
    */
 
 
-  function pad(number) {
-    return number < 10 ? '0' + number : number;
+  function find(arrayLike, predicate) {
+    return slice(arrayLike).filter(predicate)[0];
   }
   /**
-   * Convert the given value to pixel.
+   * Toggles the provided class or classes by following the `add` boolean.
    *
-   * @param {Element}       root  - Root element where a dummy div is appended.
-   * @param {string|number} value - CSS value to be converted, such as 10rem.
-   *
-   * @return {number} - Pixel.
+   * @param elm     - An element whose classes are toggled.
+   * @param classes - A class or class names.
+   * @param add     - Whether to add or remove a class.
    */
 
 
-  function toPixel(root, value) {
-    if (typeof value === 'string') {
-      var div = create('div', {});
-      applyStyle(div, {
-        position: 'absolute',
-        width: value
-      });
-      append(root, div);
-      value = div.clientWidth;
-
-      _remove(div);
-    }
-
-    return +value || 0;
-  }
-  /**
-   * Some utility functions related with DOM.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * Find the first element matching the given selector.
-   * Be aware that all selectors after a space are ignored.
-   *
-   * @param {Element|Node}  elm       - An ancestor element.
-   * @param {string}        selector  - DOMString.
-   *
-   * @return {Element|null} - A found element or null.
-   */
-
-
-  function find(elm, selector) {
-    return elm ? elm.querySelector(selector.split(' ')[0]) : null;
-  }
-  /**
-   * Find a first child having the given tag or class name.
-   *
-   * @param {Element} parent         - A parent element.
-   * @param {string}  tagOrClassName - A tag or class name.
-   *
-   * @return {Element|undefined} - A found element on success or undefined on failure.
-   */
-
-
-  function child(parent, tagOrClassName) {
-    return children(parent, tagOrClassName)[0];
-  }
-  /**
-   * Return chile elements that matches the provided tag or class name.
-   *
-   * @param {Element} parent         - A parent element.
-   * @param {string}  tagOrClassName - A tag or class name.
-   *
-   * @return {Element[]} - Found elements.
-   */
-
-
-  function children(parent, tagOrClassName) {
-    if (parent) {
-      return values(parent.children).filter(function (child) {
-        return hasClass(child, tagOrClassName.split(' ')[0]) || child.tagName === tagOrClassName;
-      });
-    }
-
-    return [];
-  }
-  /**
-   * Create an element with some optional attributes.
-   *
-   * @param {string} tag   - A tag name.
-   * @param {Object} attrs - An object any attribute pairs of name and value.
-   *
-   * @return {Element} - A created element.
-   */
-
-
-  function create(tag, attrs) {
-    var elm = document.createElement(tag);
-    each(attrs, function (value, key) {
-      return setAttribute(elm, key, value);
-    });
-    return elm;
-  }
-  /**
-   * Convert HTML string to DOM node.
-   *
-   * @param {string} html - HTML string.
-   *
-   * @return {Node} - A created node.
-   */
-
-
-  function domify(html) {
-    var div = create('div', {});
-    div.innerHTML = html;
-    return div.firstChild;
-  }
-  /**
-   * Remove a given element from a DOM tree.
-   *
-   * @param {Element|Element[]} elms - Element(s) to be removed.
-   */
-
-
-  function _remove(elms) {
-    toArray(elms).forEach(function (elm) {
-      if (elm) {
-        var parent = elm.parentElement;
-        parent && parent.removeChild(elm);
-      }
-    });
-  }
-  /**
-   * Append a child to a given element.
-   *
-   * @param {Element} parent - A parent element.
-   * @param {Element} child  - An element to be appended.
-   */
-
-
-  function append(parent, child) {
-    if (parent) {
-      parent.appendChild(child);
-    }
-  }
-  /**
-   * Insert an element before the reference element.
-   *
-   * @param {Element|Node} ref - A reference element.
-   * @param {Element}      elm - An element to be inserted.
-   */
-
-
-  function before(elm, ref) {
-    if (elm && ref) {
-      var parent = ref.parentElement;
-      parent && parent.insertBefore(elm, ref);
-    }
-  }
-  /**
-   * Apply styles to the given element.
-   *
-   * @param {Element} elm     - An element where styles are applied.
-   * @param {Object}  styles  - Object containing styles.
-   */
-
-
-  function applyStyle(elm, styles) {
+  function toggleClass(elm, classes, add) {
     if (elm) {
-      each(styles, function (value, prop) {
-        if (value !== null) {
-          elm.style[prop] = value;
-        }
-      });
-    }
-  }
-  /**
-   * Add or remove classes to/from the element.
-   * This function is for internal usage.
-   *
-   * @param {Element}         elm     - An element where classes are added.
-   * @param {string|string[]} classes - Class names being added.
-   * @param {boolean}         remove  - Whether to remove or add classes.
-   */
-
-
-  function addOrRemoveClasses(elm, classes, remove) {
-    if (elm) {
-      toArray(classes).forEach(function (name) {
+      forEach(classes, function (name) {
         if (name) {
-          elm.classList[remove ? 'remove' : 'add'](name);
+          elm.classList[add ? 'add' : 'remove'](name);
         }
       });
     }
   }
   /**
-   * Add classes to the element.
+   * Adds classes to the element.
    *
-   * @param {Element}          elm     - An element where classes are added.
-   * @param {string|string[]}  classes - Class names being added.
+   * @param elm     - An element to add classes to.
+   * @param classes - Classes to add.
    */
 
 
   function addClass(elm, classes) {
-    addOrRemoveClasses(elm, classes, false);
+    toggleClass(elm, classes, true);
   }
   /**
-   * Remove a class from the element.
+   * Appends children to the parent element.
    *
-   * @param {Element}         elm     - An element where classes are removed.
-   * @param {string|string[]} classes - A class name being removed.
+   * @param parent   - A parent element.
+   * @param children - A child or children to append to the parent.
    */
 
 
-  function removeClass(elm, classes) {
-    addOrRemoveClasses(elm, classes, true);
+  function append(parent, children) {
+    forEach(children, parent.appendChild.bind(parent));
   }
   /**
-   * Verify if the provided element has the class or not.
+   * Inserts a node or nodes before the specified reference node.
    *
-   * @param {Element} elm       - An element.
-   * @param {string}  className - A class name.
+   * @param nodes - A node or nodes to insert.
+   * @param ref   - A reference node.
+   */
+
+
+  function before(nodes, ref) {
+    forEach(nodes, function (node) {
+      var parent = ref.parentNode;
+
+      if (parent) {
+        parent.insertBefore(node, ref);
+      }
+    });
+  }
+  /**
+   * Checks if the element can be selected by the provided selector or not.
    *
-   * @return {boolean} - True if the element has the class or false if not.
+   * @param elm      - An element to check.
+   * @param selector - A selector to test.
+   *
+   * @return `true` if the selector matches the element, or otherwise `false`.
+   */
+
+
+  function matches(elm, selector) {
+    return (elm['msMatchesSelector'] || elm.matches).call(elm, selector);
+  }
+  /**
+   * Finds children that has the specified tag or class name.
+   *
+   * @param parent   - A parent element.
+   * @param selector - A selector to filter children.
+   *
+   * @return An array with filtered children.
+   */
+
+
+  function children(parent, selector) {
+    return parent ? slice(parent.children).filter(function (child) {
+      return matches(child, selector);
+    }) : [];
+  }
+  /**
+   * Returns a child element that matches the specified tag or class name.
+   *
+   * @param parent   - A parent element.
+   * @param selector - A selector to filter children.
+   *
+   * @return A matched child element if available, or otherwise `undefined`.
+   */
+
+
+  function child(parent, selector) {
+    return selector ? children(parent, selector)[0] : parent.firstElementChild;
+  }
+  /**
+   * Iterates over the provided object by own enumerable keys with calling the iteratee function.
+   *
+   * @param object   - An object to iterate over.
+   * @param iteratee - An iteratee function that takes the value and key as arguments.
+   *
+   * @return A provided object itself.
+   */
+
+
+  function forOwn(object, iteratee) {
+    if (object) {
+      var keys = Object.keys(object);
+
+      for (var i = 0; i < keys.length; i++) {
+        var key = keys[i];
+
+        if (key !== '__proto__') {
+          if (iteratee(object[key], key) === false) {
+            break;
+          }
+        }
+      }
+    }
+
+    return object;
+  }
+  /**
+   * Assigns all own enumerable properties of all source objects to the provided object.
+   * `undefined` in source objects will be skipped.
+   *
+   * @param object  - An object to assign properties to.
+   * @param sources - Objects to assign properties from.
+   *
+   * @return An object assigned properties of the sources to.
+   */
+
+
+  function assign(object) {
+    for (var _len = arguments.length, sources = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      sources[_key - 1] = arguments[_key];
+    }
+
+    sources.forEach(function (source) {
+      forOwn(source, function (value, key) {
+        object[key] = source[key];
+      });
+    });
+    return object;
+  }
+  /**
+   * Recursively merges source properties to the object.
+   *
+   * @param object - An object to merge properties to.
+   * @param source - A source object to merge properties from.
+   *
+   * @return A new object with merged properties.
+   */
+
+
+  function merge(object, source) {
+    forOwn(source, function (value, key) {
+      object[key] = isObject(value) ? merge(isObject(object[key]) ? object[key] : {}, value) : value;
+    });
+    return object;
+  }
+  /**
+   * Removes attributes from the element.
+   *
+   * @param elm   - An element.
+   * @param attrs - An attribute or attributes to remove.
+   */
+
+
+  function removeAttribute(elm, attrs) {
+    if (elm) {
+      forEach(attrs, function (attr) {
+        elm.removeAttribute(attr);
+      });
+    }
+  }
+
+  function setAttribute(elm, attrs, value) {
+    if (isObject(attrs)) {
+      forOwn(attrs, function (value, name) {
+        setAttribute(elm, name, value);
+      });
+    } else {
+      isNull(value) ? removeAttribute(elm, attrs) : elm.setAttribute(attrs, String(value));
+    }
+  }
+  /**
+   * Creates a HTML element.
+   *
+   * @param tag    - A tag name.
+   * @param attrs  - Optional. An object with attributes to apply the created element to, or a string with classes.
+   * @param parent - Optional. A parent element where the created element is appended.
+   */
+
+
+  function create(tag, attrs, parent) {
+    var elm = document.createElement(tag);
+
+    if (attrs) {
+      if (isString(attrs) || isArray(attrs)) {
+        addClass(elm, attrs);
+      } else {
+        setAttribute(elm, attrs);
+      }
+    }
+
+    if (parent) {
+      append(parent, elm);
+    }
+
+    return elm;
+  }
+  /**
+   * Applies inline styles to the provided element by an object literal.
+   *
+   * @param elms   - An element or elements to apply styles to.
+   * @param styles - An object literal with styles.
+   */
+
+
+  function style(elms, styles) {
+    if (isString(styles)) {
+      return isArray(elms) ? null : getComputedStyle(elms)[styles];
+    }
+
+    forOwn(styles, function (value, key) {
+      if (!isNull(value)) {
+        forEach(elms, function (elm) {
+          if (elm) {
+            elm.style[key] = "" + value;
+          }
+        });
+      }
+    });
+  }
+  /**
+   * Sets the `display` CSS value to the element.
+   *
+   * @param elm     - An element to set a new value to.
+   * @param display - A new `display` value.
+   */
+
+
+  function display(elm, display) {
+    style(elm, {
+      display: display
+    });
+  }
+  /**
+   * Returns the specified attribute value.
+   *
+   * @param elm  - An element.
+   * @param attr - An attribute to get.
+   */
+
+
+  function getAttribute(elm, attr) {
+    return elm.getAttribute(attr);
+  }
+  /**
+   * Checks if the element contains the specified class or not.
+   *
+   * @param elm       - An element to check.
+   * @param className - A class name that may be contained by the element.
+   *
+   * @return `true` if the element contains the class, or otherwise `false`.
    */
 
 
   function hasClass(elm, className) {
-    return !!elm && elm.classList.contains(className);
+    return elm && elm.classList.contains(className);
   }
   /**
-   * Set attribute to the given element.
+   * Parses the provided HTML string and returns the first element.
    *
-   * @param {Element}                 elm   - An element where an attribute is assigned.
-   * @param {string}                  name  - Attribute name.
-   * @param {string|number|boolean}   value - Attribute value.
+   * @param html - An HTML string to parse.
+   *
+   * @return An Element on success, or otherwise `undefined`.
    */
 
 
-  function setAttribute(elm, name, value) {
-    if (elm) {
-      elm.setAttribute(name, value);
+  function parseHtml(html) {
+    return child(new DOMParser().parseFromString(html, 'text/html').body);
+  }
+  /**
+   * Call the `preventDefault()` of the provided event.
+   *
+   * @param e               - An Event object.
+   * @param stopPropagation - Optional. Whether to stop the event propagation or not.
+   */
+
+
+  function prevent(e, stopPropagation) {
+    e.preventDefault();
+
+    if (stopPropagation) {
+      e.stopPropagation();
+      e.stopImmediatePropagation();
     }
   }
   /**
-   * Get attribute from the given element.
+   * Returns an element that matches the provided selector.
    *
-   * @param {Element} elm  - An element where an attribute is assigned.
-   * @param {string}  name - Attribute name.
+   * @param parent   - A parent element to start searching from.
+   * @param selector - A selector to query.
    *
-   * @return {string} - The value of the given attribute if available. An empty string if not.
+   * @return A found element or `null`.
    */
 
 
-  function getAttribute(elm, name) {
-    return elm ? elm.getAttribute(name) : '';
+  function query(parent, selector) {
+    return parent && parent.querySelector(selector);
   }
   /**
-   * Remove attribute from the given element.
+   * Returns elements that match the provided selector.
    *
-   * @param {Element|Element[]} elms  - An element where an attribute is removed.
-   * @param {string|string[]}      names - Attribute name.
+   * @param parent   - A parent element to start searching from.
+   * @param selector - A selector to query.
+   *
+   * @return An array with matched elements.
    */
 
 
-  function removeAttribute(elms, names) {
-    toArray(names).forEach(function (name) {
-      toArray(elms).forEach(function (elm) {
-        return elm && elm.removeAttribute(name);
-      });
+  function queryAll(parent, selector) {
+    return slice(parent.querySelectorAll(selector));
+  }
+  /**
+   * Returns a DOMRect object of the provided element.
+   *
+   * @param target - An element.
+   */
+
+
+  function rect(target) {
+    return target.getBoundingClientRect();
+  }
+  /**
+   * Removes the provided node from its parent.
+   *
+   * @param nodes - A node or nodes to remove.
+   */
+
+
+  function remove(nodes) {
+    forEach(nodes, function (node) {
+      if (node && node.parentNode) {
+        node.parentNode.removeChild(node);
+      }
     });
   }
   /**
-   * Return the Rect object of the provided object.
+   * Removes classes from the element.
    *
-   * @param {Element} elm - An element.
-   *
-   * @return {ClientRect|DOMRect} - A rect object.
+   * @param elm     - An element to remove classes from.
+   * @param classes - Classes to remove.
    */
 
 
-  function getRect(elm) {
-    return elm.getBoundingClientRect();
+  function removeClass(elm, classes) {
+    toggleClass(elm, classes, false);
   }
   /**
-   * Trigger the given callback after all images contained by the element are loaded.
+   * Appends `px` to the provided number.
+   * If the value is already string, just returns it.
    *
-   * @param {Element}  elm      - Element that may contain images.
-   * @param {Function} callback - Callback function fired right after all images are loaded.
+   * @param value - A value to append `px` to.
+   *
+   * @return A string with the CSS unit.
    */
 
 
-  function loaded(elm, callback) {
-    var images = elm.querySelectorAll('img');
-    var length = images.length;
+  function unit(value) {
+    return isString(value) ? value : value ? value + "px" : '';
+  }
+  /**
+   * Throws an error if the provided condition is falsy.
+   *
+   * @param condition - If falsy, an error is thrown.
+   * @param message   - Optional. A message to display.
+   */
 
-    if (length) {
-      var count = 0;
-      each(images, function (img) {
-        img.onload = img.onerror = function () {
-          if (++count === length) {
-            callback();
-          }
-        };
-      });
-    } else {
-      // Trigger the callback immediately if there is no image.
-      callback();
+
+  function assert(condition, message) {
+    if (message === void 0) {
+      message = '';
+    }
+
+    if (!condition) {
+      throw new Error("[" + PROJECT_CODE + "] " + message);
     }
   }
   /**
-   * Export slider types.
+   * Invokes the callback on the next tick.
    *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
+   * @param callback - A callback function.
+   */
+
+
+  function nextTick(callback) {
+    setTimeout(callback);
+  }
+  /**
+   * No operation.
+   */
+
+
+  var noop = function noop() {}; // eslint-disable-line no-empty-function, @typescript-eslint/no-empty-function
+
+  /**
+   * The arias of `window.requestAnimationFrame()`.
+   */
+
+
+  function raf(func) {
+    return requestAnimationFrame(func);
+  }
+  /**
+   * Checks if the subject number is between `minOrMax` and `maxOrMin`.
+   *
+   * @param number    - A subject number to check.
+   * @param minOrMax  - A min or max number.
+   * @param maxOrMin  - A max or min number.
+   * @param exclusive - Optional. Whether to exclude `x` or `y`.
+   */
+
+
+  function between(number, minOrMax, maxOrMin, exclusive) {
+    var min = Math.min(minOrMax, maxOrMin);
+    var max = Math.max(minOrMax, maxOrMin);
+    return exclusive ? min < number && number < max : min <= number && number <= max;
+  }
+
+  var max$1 = Math.max,
+      min$1 = Math.min;
+  /**
+   * Clamps a number.
+   *
+   * @param number - A subject number to check.
+   * @param x      - A min or max number.
+   * @param y      - A min or max number.
+   */
+
+  function clamp(number, x, y) {
+    var minimum = min$1(x, y);
+    var maximum = max$1(x, y);
+    return min$1(max$1(minimum, number), maximum);
+  }
+  /**
+   * Returns the sign of the provided number.
+   *
+   * @param x - A number.
+   *
+   * @return `1` for positive numbers, `-1` for negative numbers, or `0` for `0`.
+   */
+
+
+  function sign(x) {
+    return +(x > 0) - +(x < 0);
+  }
+
+  var min = Math.min,
+      max = Math.max,
+      floor = Math.floor,
+      ceil = Math.ceil,
+      abs = Math.abs,
+      round = Math.round;
+  /**
+   * The component for managing options.
+   *
+   * @since 3.0.0
+   *
+   * @param Splide     - A Splide instance.
+   * @param Components - A collection of components.
+   * @param options    - Options.
+   *
+   * @return An Options component object.
+   */
+
+  function Options(Splide, Components, options) {
+    try {
+      merge(options, JSON.parse(getAttribute(Splide.root, DATA_ATTRIBUTE)));
+    } catch (e) {
+      assert(false, e.message);
+    }
+
+    var initialOptions = merge({}, options);
+    var breakpoints = options.breakpoints;
+    /**
+     * Stores breakpoints with the MediaQueryList object.
+     */
+
+    var points;
+    /**
+     * Holds the current breakpoint.
+     */
+
+    var currPoint;
+    /**
+     * Called when the component is mounted.
+     */
+
+    function mount() {
+      if (breakpoints) {
+        points = Object.keys(breakpoints).sort(function (n, m) {
+          return +n - +m;
+        }).map(function (point) {
+          return [point, matchMedia("(" + (options.mediaQuery || 'max') + "-width:" + point + "px)")];
+        });
+        addEventListener('resize', observe);
+        observe();
+      }
+    }
+    /**
+     * Destroys the component.
+     *
+     * @param completely - Will be `true` for complete destruction.
+     */
+
+
+    function destroy(completely) {
+      if (completely) {
+        removeEventListener('resize', observe);
+      }
+    }
+    /**
+     * Observes breakpoints.
+     * The `currPoint` may be `undefined`.
+     */
+
+
+    function observe() {
+      var item = find(points, function (item) {
+        return item[1].matches;
+      }) || [];
+
+      if (item[0] !== currPoint) {
+        onMatch(currPoint = item[0]);
+      }
+    }
+    /**
+     * Called when the media query matches breakpoints.
+     *
+     * @param point - A matched point, or `undefined` that means no breakpoint matches a media query.
+     */
+
+
+    function onMatch(point) {
+      var options = breakpoints[point] || initialOptions;
+
+      if (options.destroy) {
+        Splide.options = initialOptions;
+        Splide.destroy(options.destroy === 'completely');
+      } else {
+        if (Splide.state.is(DESTROYED)) {
+          destroy(true);
+          Splide.mount();
+        }
+
+        Splide.options = options;
+      }
+    }
+
+    return {
+      mount: mount,
+      destroy: destroy
+    };
+  }
+  /**
+   * Enumerates slides from left to right.
    */
 
   /**
-   * Normal slider.
-   *
-   * @type {string}
+   * Enumerates slides from right to left.
    */
 
+
+  var RTL = 'rtl';
+  /**
+   * Enumerates slides in a col.
+   */
+
+  var TTB = 'ttb';
+  /**
+   * The translation map for directions.
+   *
+   * @since 3.0.0
+   */
+
+  var ORIENTATION_MAP = {
+    marginRight: ['marginBottom', 'marginLeft'],
+    width: ['height'],
+    autoWidth: ['autoHeight'],
+    fixedWidth: ['fixedHeight'],
+    paddingLeft: ['paddingTop', 'paddingRight'],
+    paddingRight: ['paddingBottom', 'paddingLeft'],
+    left: ['top', 'right'],
+    right: ['bottom', 'left'],
+    x: ['y'],
+    X: ['Y'],
+    pageX: ['pageY'],
+    ArrowLeft: ['ArrowUp', 'ArrowRight'],
+    ArrowRight: ['ArrowDown', 'ArrowLeft']
+  };
+  /**
+   * The component that absorbs the difference among directions.
+   *
+   * @since 3.0.0
+   *
+   * @param Splide     - A Splide instance.
+   * @param Components - A collection of components.
+   * @param options    - Options.
+   *
+   * @return A Direction component object.
+   */
+
+  function Direction(Splide, Components, options) {
+    /**
+     * Resolves the provided property name.
+     *
+     * @param prop     - A property name to translate.
+     * @param axisOnly - Optional. If `ture`, returns the same property for LTR and RTL.
+     */
+    function resolve(prop, axisOnly) {
+      var direction = options.direction;
+      var index = direction === RTL && !axisOnly ? 1 : direction === TTB ? 0 : -1;
+      return ORIENTATION_MAP[prop][index] || prop;
+    }
+    /**
+     * Orients the value towards the current direction.
+     *
+     * @param value - A value to orient.
+     *
+     * @return The oriented value.
+     */
+
+
+    function orient(value) {
+      return value * (options.direction === RTL ? 1 : -1);
+    }
+
+    return {
+      resolve: resolve,
+      orient: orient
+    };
+  }
+
+  var CLASS_ROOT = PROJECT_CODE;
+  var CLASS_SLIDER = PROJECT_CODE + "__slider";
+  var CLASS_TRACK = PROJECT_CODE + "__track";
+  var CLASS_LIST = PROJECT_CODE + "__list";
+  var CLASS_SLIDE = PROJECT_CODE + "__slide";
+  var CLASS_CLONE = CLASS_SLIDE + "--clone";
+  var CLASS_CONTAINER = CLASS_SLIDE + "__container";
+  var CLASS_ARROWS = PROJECT_CODE + "__arrows";
+  var CLASS_ARROW = PROJECT_CODE + "__arrow";
+  var CLASS_ARROW_PREV = CLASS_ARROW + "--prev";
+  var CLASS_ARROW_NEXT = CLASS_ARROW + "--next";
+  var CLASS_PAGINATION = PROJECT_CODE + "__pagination";
+  var CLASS_PAGINATION_PAGE = CLASS_PAGINATION + "__page";
+  var CLASS_PROGRESS = PROJECT_CODE + "__progress";
+  var CLASS_PROGRESS_BAR = CLASS_PROGRESS + "__bar";
+  var CLASS_AUTOPLAY = PROJECT_CODE + "__autoplay";
+  var CLASS_PLAY = PROJECT_CODE + "__play";
+  var CLASS_PAUSE = PROJECT_CODE + "__pause";
+  var CLASS_SPINNER = PROJECT_CODE + "__spinner";
+  var CLASS_INITIALIZED = 'is-initialized';
+  var CLASS_ACTIVE = 'is-active';
+  var CLASS_PREV = 'is-prev';
+  var CLASS_NEXT = 'is-next';
+  var CLASS_VISIBLE = 'is-visible';
+  var CLASS_LOADING = 'is-loading';
+  /**
+   * The array with all status classes.
+   *
+   * @since 3.0.0
+   */
+
+  var STATUS_CLASSES = [CLASS_ACTIVE, CLASS_VISIBLE, CLASS_PREV, CLASS_NEXT, CLASS_LOADING];
+  /**
+   * The collection of classes for elements that Splide dynamically creates.
+   *
+   * @since 3.0.0
+   */
+
+  var CLASSES = {
+    slide: CLASS_SLIDE,
+    clone: CLASS_CLONE,
+    arrows: CLASS_ARROWS,
+    arrow: CLASS_ARROW,
+    prev: CLASS_ARROW_PREV,
+    next: CLASS_ARROW_NEXT,
+    pagination: CLASS_PAGINATION,
+    page: CLASS_PAGINATION_PAGE,
+    spinner: CLASS_SPINNER
+  };
+  var EVENT_MOUNTED = 'mounted';
+  var EVENT_READY = 'ready';
+  var EVENT_MOVE = 'move';
+  var EVENT_MOVED = 'moved';
+  var EVENT_CLICK = 'click';
+  var EVENT_ACTIVE = 'active';
+  var EVENT_INACTIVE = 'inactive';
+  var EVENT_VISIBLE = 'visible';
+  var EVENT_HIDDEN = 'hidden';
+  var EVENT_SLIDE_KEYDOWN = 'slide:keydown';
+  var EVENT_REFRESH = 'refresh';
+  var EVENT_UPDATED = 'undated';
+  var EVENT_RESIZE = 'resize';
+  var EVENT_RESIZED = 'resized';
+  var EVENT_DRAG = 'drag';
+  var EVENT_DRAGGING = 'dragging';
+  var EVENT_DRAGGED = 'dragged';
+  var EVENT_SCROLL = 'scroll';
+  var EVENT_SCROLLED = 'scrolled';
+  var EVENT_DESTROY = 'destroy';
+  var EVENT_ARROWS_MOUNTED = 'arrows:mounted';
+  var EVENT_ARROWS_UPDATED = 'arrows:updated';
+  var EVENT_PAGINATION_MOUNTED = 'pagination:mounted';
+  var EVENT_PAGINATION_PAGE = 'pagination:page';
+  var EVENT_PAGINATION_UPDATED = 'pagination:updated';
+  var EVENT_NAVIGATION_MOUNTED = 'navigation:mounted';
+  var EVENT_AUTOPLAY_PLAY = 'autoplay:play';
+  var EVENT_AUTOPLAY_PLAYING = 'autoplay:playing';
+  var EVENT_AUTOPLAY_PAUSE = 'autoplay:pause';
+  var EVENT_LAZYLOAD_LOADED = 'lazyload:loaded';
+  /**
+   * The constructor to provided a simple event system.
+   *
+   * @since 3.0.0
+   *
+   * @return An EventBus object.
+   */
+
+  function EventBus() {
+    /**
+     * The collection of registered handlers.
+     */
+    var handlers = {};
+    /**
+     * Registers an event handler.
+     *
+     * @param events   - An event name or names separated by spaces. Use a dot(.) to add a namespace.
+     * @param callback - A callback function to register.
+     * @param key      - Optional. An object for an identifier of the handler.
+     * @param priority - Optional. A priority number for the order in which the callbacks are invoked.
+     *                   Lower numbers correspond with earlier execution. The default value is 10.
+     */
+
+    function on(events, callback, key, priority) {
+      if (priority === void 0) {
+        priority = 10;
+      }
+
+      forEachEvent(events, function (event, namespace) {
+        handlers[event] = handlers[event] || [];
+        push(handlers[event], {
+          event: event,
+          callback: callback,
+          namespace: namespace,
+          priority: priority,
+          key: key
+        }).sort(function (handler1, handler2) {
+          return handler1.priority - handler2.priority;
+        });
+      });
+    }
+    /**
+     * Removes event handlers registered by `on()`.
+     * If only the event name is provided, all handlers that associate with the event are removed.
+     * If the event name and namespace are specified, handlers that associate with the event and namespace are removed.
+     *
+     * @param events - An event name or names separated by spaces. Use a dot(.) to add a namespace.
+     * @param key    - Optional. An object for an identifier of the handler.
+     */
+
+
+    function off(events, key) {
+      forEachEvent(events, function (event, namespace) {
+        var eventHandlers = handlers[event];
+        handlers[event] = eventHandlers && eventHandlers.filter(function (handler) {
+          return handler.key ? handler.key !== key : handler.namespace !== namespace;
+        });
+      });
+    }
+    /**
+     * Removes all handlers locked by the specified key.
+     *
+     * @param key - A key.
+     */
+
+
+    function offBy(key) {
+      forOwn(handlers, function (eventHandlers, event) {
+        off(event, key);
+      });
+    }
+    /**
+     * Triggers callback functions.
+     * This accepts additional arguments and passes them to callbacks.
+     *
+     * @param event - An event name.
+     */
+
+
+    function emit(event) {
+      var _arguments = arguments;
+      (handlers[event] || []).forEach(function (handler) {
+        handler.callback.apply(handler, slice(_arguments, 1));
+      });
+    }
+    /**
+     * Removes all handlers.
+     */
+
+
+    function destroy() {
+      handlers = {};
+    }
+    /**
+     * Parses provided events and iterates over them.
+     *
+     * @param events   - An event or events.
+     * @param iteratee - An iteratee function.
+     */
+
+
+    function forEachEvent(events, iteratee) {
+      toArray(events).join(' ').split(' ').forEach(function (eventNS) {
+        var fragments = eventNS.split('.');
+        iteratee(fragments[0], fragments[1]);
+      });
+    }
+
+    return {
+      on: on,
+      off: off,
+      offBy: offBy,
+      emit: emit,
+      destroy: destroy
+    };
+  }
+  /**
+   * The function that provides interface for internal and native events.
+   *
+   * @since 3.0.0
+   *
+   * @param Splide - A Splide instance.
+   *
+   * @return A collection of interface functions.
+   */
+
+
+  function EventInterface(Splide) {
+    /**
+     * Holds the event object.
+     */
+    var event = Splide.event;
+    /**
+     * The key for events.
+     */
+
+    var key = {};
+    /**
+     * Stores all handlers that listen to native events.
+     */
+
+    var listeners = [];
+    /**
+     * Registers an event handler with an unique key.
+     * It can only be removed by `off()` method below.
+     *
+     * @param events   - An event name or names separated by spaces. Use a dot(.) to add a namespace.
+     * @param callback - A callback function to register.
+     * @param priority - Optional. A priority number for the order in which the callbacks are invoked.
+     *                   Lower numbers correspond with earlier execution. The default value is 10.
+     */
+
+    function on(events, callback, priority) {
+      event.on(events, callback, key, priority);
+    }
+    /**
+     * Removes event handlers registered by `on()`.
+     *
+     * @param events - An event name or names separated by spaces. Use a dot(.) to add a namespace.
+     */
+
+
+    function off(events) {
+      event.off(events, key);
+    }
+    /**
+     * Listens to native events.
+     * Splide#destory() will remove all registered listeners.
+     *
+     * @param targets  - A target element, the window object or the document object.
+     * @param events   - An event or events to listen to.
+     * @param callback - A callback function.
+     * @param options  - Optional. The options to pass to the `addEventListener` function.
+     */
+
+
+    function bind(targets, events, callback, options) {
+      forEachEvent(targets, events, function (target, event) {
+        listeners.push([target, event, callback, options]);
+        target.addEventListener(event, callback, options);
+      });
+    }
+    /**
+     * Removes the event handler.
+     *
+     * @param targets - A target element, the window object or the document object.
+     * @param events  - An event name or names to remove.
+     */
+
+
+    function unbind(targets, events) {
+      forEachEvent(targets, events, function (target, event) {
+        listeners = listeners.filter(function (listener) {
+          if (listener[0] === target && listener[1] === event) {
+            target.removeEventListener(event, listener[2], listener[3]);
+            return false;
+          }
+
+          return true;
+        });
+      });
+    }
+    /**
+     * Iterates over each target and event.
+     *
+     * @param targets  - A target element, the window object or the document object.
+     * @param events   - An event name or names.
+     * @param iteratee - An iteratee function.
+     */
+
+
+    function forEachEvent(targets, events, iteratee) {
+      forEach(targets, function (target) {
+        if (target) {
+          events.split(' ').forEach(iteratee.bind(null, target));
+        }
+      });
+    }
+    /**
+     * Removes all listeners.
+     */
+
+
+    function destroy() {
+      listeners = listeners.filter(function (data) {
+        return unbind(data[0], data[1]);
+      });
+      event.offBy(key);
+    }
+    /**
+     * Invokes destroy when the slider is destroyed.
+     */
+
+
+    event.on(EVENT_DESTROY, destroy, key);
+    return {
+      on: on,
+      off: off,
+      emit: event.emit,
+      bind: bind,
+      unbind: unbind,
+      destroy: destroy
+    };
+  }
+  /**
+   * Requests interval like the native `setInterval()` with using `requestAnimationFrame`.
+   *
+   * @since 3.0.0
+   *
+   * @param interval   - The interval duration in milliseconds.
+   * @param onInterval - The callback fired on every interval.
+   * @param onUpdate   - Optional. Called on every animation frame, taking the progress rate.
+   * @param limit      - Optional. Limits the number of interval.
+   */
+
+
+  function RequestInterval(interval, onInterval, onUpdate, limit) {
+    var now = Date.now;
+    /**
+     * The time when the interval starts.
+     */
+
+    var startTime;
+    /**
+     * The current progress rate.
+     */
+
+    var rate = 0;
+    /**
+     * The animation frame ID.
+     */
+
+    var id;
+    /**
+     * Indicates whether the interval is currently paused or not.
+     */
+
+    var paused = true;
+    /**
+     * The loop count. This only works when the `limit` argument is provided.
+     */
+
+    var count = 0;
+    /**
+     * The update function called on every animation frame.
+     */
+
+    function update() {
+      if (!paused) {
+        var elapsed = now() - startTime;
+
+        if (elapsed >= interval) {
+          rate = 1;
+          startTime = now();
+        } else {
+          rate = elapsed / interval;
+        }
+
+        if (onUpdate) {
+          onUpdate(rate);
+        }
+
+        if (rate === 1) {
+          onInterval();
+
+          if (limit && ++count >= limit) {
+            pause();
+            return;
+          }
+        }
+
+        raf(update);
+      }
+    }
+    /**
+     * Starts the interval.
+     *
+     * @param resume - Optional. Whether to resume the paused progress or not.
+     */
+
+
+    function start(resume) {
+      !resume && cancel();
+      startTime = now() - (resume ? rate * interval : 0);
+      paused = false;
+      raf(update);
+    }
+    /**
+     * Pauses the interval.
+     */
+
+
+    function pause() {
+      paused = true;
+    }
+    /**
+     * Rewinds the current progress.
+     */
+
+
+    function rewind() {
+      startTime = now();
+      rate = 0;
+
+      if (onUpdate) {
+        onUpdate(rate);
+      }
+    }
+    /**
+     * Cancels the interval.
+     */
+
+
+    function cancel() {
+      cancelAnimationFrame(id);
+      rate = 0;
+      id = 0;
+      paused = true;
+    }
+    /**
+     * Checks if the interval is paused or not.
+     *
+     * @return `true` if the interval is paused, or otherwise `false`.
+     */
+
+
+    function isPaused() {
+      return paused;
+    }
+
+    return {
+      start: start,
+      rewind: rewind,
+      pause: pause,
+      cancel: cancel,
+      isPaused: isPaused
+    };
+  }
+  /**
+   * The function providing a super simple state system.
+   *
+   * @param initialState - Specifies the initial state.
+   */
+
+
+  function State(initialState) {
+    /**
+     * The current state.
+     */
+    var state = initialState;
+    /**
+     * Sets a new state.
+     *
+     * @param value - A new state value.
+     */
+
+    function set(value) {
+      state = value;
+    }
+    /**
+     * Checks if the current state matches the provided one.
+     *
+     * @param states - A state to check.
+     *
+     * @return `true` if the current state is the provided one.
+     */
+
+
+    function is(states) {
+      return includes(toArray(states), state);
+    }
+
+    return {
+      set: set,
+      is: is
+    };
+  }
+  /**
+   * Returns the throttled function.
+   *
+   * @param func     - A function to throttle.
+   * @param duration - Optional. Throttle duration in milliseconds.
+   *
+   * @return A throttled function.
+   */
+
+
+  function Throttle(func, duration) {
+    var interval;
+
+    function throttled() {
+      var _arguments2 = arguments,
+          _this = this;
+
+      if (!interval) {
+        interval = RequestInterval(duration || 0, function () {
+          func.apply(_this, _arguments2);
+          interval = null;
+        }, null, 1);
+        interval.start();
+      }
+    }
+
+    return throttled;
+  }
+  /**
+   * Formats a string.
+   *
+   * @param string       - A string to format.
+   * @param replacements - A replacement or replacements.
+   *
+   * @return A formatted string.
+   */
+
+
+  function format(string, replacements) {
+    forEach(replacements, function (replacement) {
+      string = string.replace('%s', "" + replacement);
+    });
+    return string;
+  }
+  /**
+   * Pads the number with 0.
+   *
+   * @param number - A number to pad.
+   *
+   * @return string - Padded number.
+   */
+
+
+  function pad(number) {
+    return number < 10 ? "0" + number : "" + number;
+  }
+  /**
+   * Stores unique IDs.
+   *
+   * @since 3.0.0
+   */
+
+
+  var ids = {};
+  /**
+   * Returns a sequential unique ID as "{ prefix }-{ number }".
+   *
+   * @param prefix - A prefix for the ID.
+   */
+
+  function uniqueId(prefix) {
+    return "" + prefix + pad(ids[prefix] = (ids[prefix] || 0) + 1);
+  }
+  /**
+   * The component that collects and handles elements which the slider consists of.
+   *
+   * @since 3.0.0
+   *
+   * @param Splide     - A Splide instance.
+   * @param Components - A collection of components.
+   * @param options    - Options.
+   *
+   * @return An Elements component object.
+   */
+
+
+  function Elements(Splide, Components, options) {
+    var _EventInterface = EventInterface(Splide),
+        on = _EventInterface.on;
+
+    var root = Splide.root;
+    var elements = {};
+    /**
+     * Stores all slide elements.
+     */
+
+    var slides = [];
+    /**
+     * Stores all root classes.
+     */
+
+    var classes;
+    /**
+     * The slider element that may be `undefined`.
+     */
+
+    var slider;
+    /**
+     * The track element.
+     */
+
+    var track;
+    /**
+     * The list element.
+     */
+
+    var list;
+    /**
+     * Called when the component is mounted.
+     */
+
+    function mount() {
+      init();
+      identify();
+      on(EVENT_REFRESH, function () {
+        destroy();
+        init();
+      });
+      on(EVENT_UPDATED, function () {
+        removeClass(root, classes);
+        addClass(root, classes = getClasses());
+      });
+    }
+    /**
+     * Initializes the component.
+     */
+
+
+    function init() {
+      collect();
+      addClass(root, classes = getClasses());
+    }
+    /**
+     * Destroys the component.
+     */
+
+
+    function destroy() {
+      empty(slides);
+      removeClass(root, classes);
+    }
+    /**
+     * Collects elements which the slider consists of.
+     */
+
+
+    function collect() {
+      slider = child(root, "." + CLASS_SLIDER);
+      track = query(root, "." + CLASS_TRACK);
+      list = child(track, "." + CLASS_LIST);
+      assert(track && list, 'Missing a track/list element.');
+      push(slides, children(list, "." + CLASS_SLIDE + ":not(." + CLASS_CLONE + ")"));
+      var autoplay = find("." + CLASS_AUTOPLAY);
+      var arrows = find("." + CLASS_ARROWS);
+      assign(elements, {
+        root: root,
+        slider: slider,
+        track: track,
+        list: list,
+        slides: slides,
+        arrows: arrows,
+        prev: query(arrows, "." + CLASS_ARROW_PREV),
+        next: query(arrows, "." + CLASS_ARROW_NEXT),
+        bar: query(find("." + CLASS_PROGRESS), "." + CLASS_PROGRESS_BAR),
+        play: query(autoplay, "." + CLASS_PLAY),
+        pause: query(autoplay, "." + CLASS_PAUSE)
+      });
+    }
+    /**
+     * Assigns unique IDs to essential elements.
+     */
+
+
+    function identify() {
+      var id = root.id || uniqueId(PROJECT_CODE);
+      root.id = id;
+      track.id = track.id || id + "-track";
+      list.id = list.id || id + "-list";
+    }
+    /**
+     * Finds an element only in children of the root or slider element.
+     *
+     * @return {Element} - A found element or undefined.
+     */
+
+
+    function find(selector) {
+      return child(root, selector) || child(slider, selector);
+    }
+    /**
+     * Return an array with classes for the root element.
+     *
+     * @return An array with classes.
+     */
+
+
+    function getClasses() {
+      return [CLASS_ROOT + "--" + options.type, CLASS_ROOT + "--" + options.direction, options.drag && CLASS_ROOT + "--draggable", options.isNavigation && CLASS_ROOT + "--nav", CLASS_ACTIVE];
+    }
+
+    return assign(elements, {
+      mount: mount,
+      destroy: destroy
+    });
+  }
+  /**
+   * The component for managing styles of the slider.
+   *
+   * @since 3.0.0
+   *
+   * @return A Style component object.
+   */
+
+
+  function Style() {
+    /**
+     * The style element for the slider.
+     */
+    var style;
+    /**
+     * The CSSStyleSheet object of the created style element.
+     */
+
+    var sheet;
+    /**
+     * Called when the component is mounted.
+     */
+
+    function mount() {
+      style = create('style', {}, document.head);
+      sheet = style.sheet;
+    }
+    /**
+     * Destroys the component.
+     */
+
+
+    function destroy() {
+      remove(style);
+      sheet = null;
+    }
+    /**
+     * Registers the style for the selector.
+     *
+     * @param selector - A selector string.
+     * @param prop     - A CSS property, accepting the camel case.
+     * @param value    - A CSS value.
+     */
+
+
+    function rule(selector, prop, value) {
+      var _sheet = sheet,
+          cssRules = _sheet.cssRules;
+      var cssRule = find(cssRules, function (cssRule) {
+        return isCSSStyleRule(cssRule) && cssRule.selectorText === selector;
+      }) || cssRules[sheet.insertRule(selector + "{}", 0)];
+
+      if (isCSSStyleRule(cssRule)) {
+        cssRule.style[prop] = "" + value;
+      }
+    }
+    /**
+     * Registers the style by the element or the ID.
+     *
+     * @param target - A target element or ID.
+     * @param prop   - A CSS property, accepting the camel case.
+     * @param value  - A CSS value.
+     */
+
+
+    function ruleBy(target, prop, value) {
+      rule("#" + (isHTMLElement(target) ? target.id : target), prop, value);
+    }
+    /**
+     * Checks if the provided rule is a CSSStyleRule instance or not.
+     *
+     * @param cssRule - An instance to check.
+     *
+     * @return `true` if the cssRule is an instance of CSSStyleRule, or otherwise `false`.
+     */
+
+
+    function isCSSStyleRule(cssRule) {
+      return cssRule instanceof CSSStyleRule;
+    }
+
+    return {
+      mount: mount,
+      destroy: destroy,
+      rule: rule,
+      ruleBy: ruleBy
+    };
+  }
+
+  var ROLE = 'role';
+  var ARIA_CONTROLS = 'aria-controls';
+  var ARIA_CURRENT = 'aria-current';
+  var ARIA_LABEL = 'aria-label';
+  var ARIA_HIDDEN = 'aria-hidden';
+  var TAB_INDEX = 'tabindex';
+  var DISABLED = 'disabled';
+  /**
+   * The array with all attributes.
+   *
+   * @since 3.0.0
+   */
+
+  var ALL_ATTRIBUTES = [ROLE, ARIA_CONTROLS, ARIA_CURRENT, ARIA_LABEL, ARIA_HIDDEN, TAB_INDEX, DISABLED];
+  /**
+   * The type for the regular slider.
+   *
+   * @since 3.0.0
+   */
 
   var SLIDE = 'slide';
   /**
-   * Loop after the last slide and before the first one.
+   * The type for the carousel slider.
    *
-   * @type {string}
+   * @since 3.0.0
    */
 
   var LOOP = 'loop';
   /**
-   * The track doesn't move.
+   * The type for the fade slider that can not have multiple slides in a page.
    *
-   * @type {string}
+   * @since 3.0.0
    */
 
   var FADE = 'fade';
   /**
-   * The component for general slide effect transition.
+   * The sub component for managing each slide.
    *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
+   * @since 3.0.0
+   *
+   * @param Splide     - A Splide instance.
+   * @param index      - A slide index.
+   * @param slideIndex - A slide index for clones. This must be `-1` if the slide is not clone.
+   * @param slide      - A slide element.
+   *
+   * @return A Slide sub component.
    */
 
-  /**
-   * The component for general slide effect transition.
-   *
-   * @param {Splide} Splide     - A Splide instance.
-   * @param {Object} Components - An object containing components.
-   *
-   * @return {Object} - The component object.
-   */
+  function Slide$1(Splide, index, slideIndex, slide) {
+    var _EventInterface2 = EventInterface(Splide),
+        on = _EventInterface2.on,
+        emit = _EventInterface2.emit,
+        bind = _EventInterface2.bind,
+        destroyEvents = _EventInterface2.destroy;
 
-  var Slide$1 = function Slide$1(Splide, Components) {
+    var Components = Splide.Components,
+        root = Splide.root,
+        options = Splide.options;
+    var isNavigation = options.isNavigation,
+        updateOnMove = options.updateOnMove;
+    var resolve = Components.Direction.resolve;
+    var isClone = slideIndex > -1;
+    var container = child(slide, "." + CLASS_CONTAINER);
     /**
-     * Hold the list element.
-     *
-     * @type {Element}
-     */
-    var list;
-    /**
-     * Hold the onEnd callback function.
-     *
-     * @type {function}
+     * Called when the component is mounted.
      */
 
-    var endCallback;
-    return {
-      /**
-       * Called when the component is mounted.
-       */
-      mount: function mount() {
-        list = Components.Elements.list;
-        Splide.on('transitionend', function (e) {
-          if (e.target === list && endCallback) {
-            endCallback();
-          }
-        }, list);
-      },
+    function mount() {
+      var _this2 = this;
 
-      /**
-       * Start transition.
-       *
-       * @param {number}   destIndex - Destination slide index that might be clone's.
-       * @param {number}   newIndex  - New index.
-       * @param {number}   prevIndex - Previous index.
-       * @param {Object}   coord     - Destination coordinates.
-       * @param {function} done      - Callback function must be invoked when transition is completed.
-       */
-      start: function start(destIndex, newIndex, prevIndex, coord, done) {
-        var options = Splide.options;
-        var edgeIndex = Components.Controller.edgeIndex;
-        var speed = options.speed;
-        endCallback = done;
+      init();
+      bind(slide, 'click keydown', function (e) {
+        emit(e.type === 'click' ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, _this2, e);
+      });
+      on([EVENT_MOUNTED, EVENT_MOVED, EVENT_UPDATED, EVENT_RESIZED, EVENT_SCROLLED], update.bind(this));
 
-        if (Splide.is(SLIDE)) {
-          if (prevIndex === 0 && newIndex >= edgeIndex || prevIndex >= edgeIndex && newIndex === 0) {
-            speed = options.rewindSpeed || speed;
-          }
+      if (updateOnMove) {
+        on(EVENT_MOVE, onMove);
+      }
+    }
+    /**
+     * If the `updateOnMove` option is `true`, called when the slider starts moving.
+     *
+     * @param next - A next index.
+     * @param prev - A previous index.
+     * @param dest - A destination index.
+     */
+
+
+    function onMove(next, prev, dest) {
+      if (dest === index) {
+        updateActivity.call(this, true);
+      }
+
+      update.call(this);
+    }
+    /**
+     * Initializes the component.
+     */
+
+
+    function init() {
+      if (!isClone) {
+        slide.id = root.id + "-slide" + pad(index + 1);
+      }
+
+      if (isNavigation) {
+        if (!isHTMLButtonElement(slide)) {
+          setAttribute(slide, ROLE, 'button');
         }
 
-        applyStyle(list, {
-          transition: "transform " + speed + "ms " + options.easing,
-          transform: "translate(" + coord.x + "px," + coord.y + "px)"
-        });
+        var idx = isClone ? slideIndex : index;
+        var label = format(options.i18n.slideX, idx + 1);
+        var controls = Splide.splides.map(function (splide) {
+          return splide.root.id;
+        }).join(' ');
+        setAttribute(slide, ARIA_LABEL, label);
+        setAttribute(slide, ARIA_CONTROLS, controls);
       }
-    };
-  };
-  /**
-   * The component for fade transition.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * The component for fade transition.
-   *
-   * @param {Splide} Splide     - A Splide instance.
-   * @param {Object} Components - An object containing components.
-   *
-   * @return {Object} - The component object.
-   */
-
-
-  var Fade = function Fade(Splide, Components) {
-    var Fade = {
-      /**
-       * Called when the component is mounted.
-       * Apply transition style to the first slide.
-       */
-      mount: function mount() {
-        apply(Splide.index);
-      },
-
-      /**
-       * Start transition.
-       *
-       * @param {number}    destIndex - Destination slide index that might be clone's.
-       * @param {number}    newIndex  - New index.
-       * @param {number}    prevIndex - Previous index.
-       * @param {Object}    coord     - Destination coordinates.
-       * @param {function}  done      - Callback function must be invoked when transition is completed.
-       */
-      start: function start(destIndex, newIndex, prevIndex, coord, done) {
-        var track = Components.Elements.track;
-        applyStyle(track, {
-          height: unit(track.clientHeight)
-        });
-        apply(newIndex);
-        setTimeout(function () {
-          done();
-          applyStyle(track, {
-            height: ''
-          });
-        });
-      }
-    };
+    }
     /**
-     * Apply transition style to the slide specified by the given index.
-     *
-     * @param {number} index - A slide index.
+     * Destroys the component.
      */
 
-    function apply(index) {
-      var options = Splide.options;
-      applyStyle(Components.Elements.slides[index], {
-        transition: "opacity " + options.speed + "ms " + options.easing
+
+    function destroy() {
+      destroyEvents();
+      removeClass(slide, STATUS_CLASSES);
+      removeAttribute(slide, ALL_ATTRIBUTES);
+    }
+    /**
+     * Updates attribute and classes of the slide.
+     */
+
+
+    function update() {
+      if (Components.Controller) {
+        var currIndex = Splide.index;
+        updateActivity.call(this, isActive());
+        updateVisibility.call(this, isVisible());
+        toggleClass(slide, CLASS_PREV, index === currIndex - 1);
+        toggleClass(slide, CLASS_NEXT, index === currIndex + 1);
+      }
+    }
+    /**
+     * Updates the status related with activity.
+     *
+     * @param active - Set `true` if the slide is active.
+     */
+
+
+    function updateActivity(active) {
+      toggleClass(slide, CLASS_ACTIVE, active);
+
+      if (active) {
+        if (!hasClass(slide, CLASS_ACTIVE)) {
+          isNavigation && setAttribute(slide, ARIA_CURRENT, true);
+          emit(EVENT_ACTIVE, this);
+        }
+      } else {
+        if (hasClass(slide, CLASS_ACTIVE)) {
+          removeAttribute(slide, ARIA_CURRENT);
+          emit(EVENT_INACTIVE, this);
+        }
+      }
+    }
+    /**
+     * Updates the status related with visibility.
+     *
+     * @param visible - Set `true` if the slide is visible.
+     */
+
+
+    function updateVisibility(visible) {
+      toggleClass(slide, CLASS_VISIBLE, visible);
+      setAttribute(slide, ARIA_HIDDEN, !visible || null);
+      setAttribute(slide, TAB_INDEX, visible && options.slideFocus ? 0 : null);
+
+      if (visible) {
+        if (!hasClass(slide, CLASS_VISIBLE)) {
+          emit(EVENT_VISIBLE, this);
+        }
+      } else {
+        if (hasClass(slide, CLASS_VISIBLE)) {
+          emit(EVENT_HIDDEN, this);
+        }
+      }
+    }
+    /**
+     * Adds a CSS rule to the slider or the container.
+     *
+     * @param prop         - A property name.
+     * @param value        - A CSS value to add.
+     * @param useContainer - Optional. Determines whether to apply the rule to the container or not.
+     */
+
+
+    function rule(prop, value, useContainer) {
+      var selector = "#" + slide.id + (container && useContainer ? " > ." + CLASS_CONTAINER : '');
+      Components.Style.rule(selector, prop, value);
+    }
+    /**
+     * Checks if the slide is active or not.
+     *
+     * @return `true` if the slide is active.
+     */
+
+
+    function isActive() {
+      return Splide.index === index;
+    }
+    /**
+     * Checks if the slide is visible or not.
+     */
+
+
+    function isVisible() {
+      if (Splide.is(FADE)) {
+        return isActive();
+      }
+
+      var trackRect = rect(Components.Elements.track);
+      var slideRect = rect(slide);
+      var left = resolve('left');
+      var right = resolve('right');
+      return floor(trackRect[left]) <= slideRect[left] && slideRect[right] <= ceil(trackRect[right]);
+    }
+    /**
+     * Calculates how far this slide is from another slide and
+     * returns `true` if the distance is within the given number.
+     *
+     * @param from     - An index of a base slide.
+     * @param distance - `true` if the slide is within this number.
+     *
+     * @return `true` if the slide is within the `distance` from the base slide, or otherwise `false`.
+     */
+
+
+    function isWithin(from, distance) {
+      var diff = abs(from - index);
+
+      if (!Splide.is(SLIDE) && !isClone) {
+        diff = min(diff, Splide.length - diff);
+      }
+
+      return diff <= distance;
+    }
+
+    return {
+      index: index,
+      slideIndex: slideIndex,
+      slide: slide,
+      container: container,
+      isClone: isClone,
+      mount: mount,
+      destroy: destroy,
+      rule: rule,
+      isWithin: isWithin
+    };
+  }
+  /**
+   * The component for managing all slides include clones.
+   *
+   * @since 3.0.0
+   *
+   * @param Splide     - A Splide instance.
+   * @param Components - A collection of components.
+   * @param options    - Options.
+   *
+   * @return An Slides component object.
+   */
+
+
+  function Slides(Splide, Components, options) {
+    var _EventInterface3 = EventInterface(Splide),
+        on = _EventInterface3.on,
+        emit = _EventInterface3.emit,
+        bind = _EventInterface3.bind;
+
+    var _Components$Elements = Components.Elements,
+        slides = _Components$Elements.slides,
+        list = _Components$Elements.list;
+    /**
+     * Stores all SlideComponent objects.
+     */
+
+    var Slides = [];
+    /**
+     * Called when the component is mounted.
+     */
+
+    function mount() {
+      init();
+      on(EVENT_REFRESH, refresh);
+    }
+    /**
+     * Initializes the component.
+     */
+
+
+    function init() {
+      slides.forEach(function (slide, index) {
+        register(slide, index, -1);
       });
     }
-
-    return Fade;
-  };
-  /**
-   * Provide a function for composing components.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * Compose components.
-   *
-   * @param {Splide}   Splide     - Splide instance.
-   * @param {Object}   Components - Additional components.
-   * @param {function} Transition - Change component for transition.
-   *
-   * @return {Object} - An object containing all components.
-   */
+    /**
+     * Destroys the component.
+     */
 
 
-  function compose(Splide, Components, Transition) {
-    var components = {};
-    each(Components, function (Component, name) {
-      components[name] = Component(Splide, components, name.toLowerCase());
-    });
+    function destroy() {
+      forEach$1(function (Slide) {
+        Slide.destroy();
+      });
+      empty(Slides);
+    }
+    /**
+     * Discards all Slide components and regenerates them.
+     */
 
-    if (!Transition) {
-      Transition = Splide.is(FADE) ? Fade : Slide$1;
+
+    function refresh() {
+      destroy();
+      init();
+    }
+    /**
+     * Registers a slide element and creates a Slide object.
+     *
+     * @param slide      - A slide element to register.
+     * @param index      - A slide index.
+     * @param slideIndex - A slide index for clones. This must be `-1` for regular slides.
+     */
+
+
+    function register(slide, index, slideIndex) {
+      var object = Slide$1(Splide, index, slideIndex, slide);
+      object.mount();
+      Slides.push(object);
+    }
+    /**
+     * Returns all Slide objects.
+     *
+     * @param excludeClones - Optional. Determines whether to exclude clones or not.
+     *
+     * @return An array with Slide objects.
+     */
+
+
+    function get(excludeClones) {
+      return excludeClones ? filter(function (Slide) {
+        return !Slide.isClone;
+      }) : Slides;
+    }
+    /**
+     * Returns slides in the specified page.
+     *
+     * @param page - A page index.
+     *
+     * @return An array with slides that belong to the page.
+     */
+
+
+    function getIn(page) {
+      var Controller = Components.Controller;
+      var index = Controller.toIndex(page);
+      var max = Controller.hasFocus() ? 1 : options.perPage;
+      return filter(function (Slide) {
+        return between(Slide.index, index, index + max - 1);
+      });
+    }
+    /**
+     * Returns a Slide object at the specified index.
+     *
+     * @param index - A slide index.
+     *
+     * @return A Slide object if available, or otherwise `undefined`.
+     */
+
+
+    function getAt(index) {
+      return filter(index)[0];
+    }
+    /**
+     * Inserts a slide or slides at a specified index.
+     *
+     * @param items - A slide element, an HTML string or an array with them.
+     * @param index - Optional. An index to insert the slide at. If omitted, appends it to the list.
+     */
+
+
+    function add(items, index) {
+      forEach(items, function (slide) {
+        if (isString(slide)) {
+          slide = parseHtml(slide);
+        }
+
+        if (isHTMLElement(slide)) {
+          var ref = slides[index];
+          ref ? before(slide, ref) : append(list, slide);
+          addClass(slide, options.classes.slide);
+          observeImages(slide, emit.bind(null, EVENT_RESIZE));
+        }
+      });
+      emit(EVENT_REFRESH);
+    }
+    /**
+     * Removes slides that match the matcher
+     * that can be an index, an array with indices, a selector, or an iteratee function.
+     *
+     * @param matcher - An index, an array with indices, a selector string, or an iteratee function.
+     */
+
+
+    function remove$1(matcher) {
+      remove(filter(matcher).map(function (Slide) {
+        return Slide.slide;
+      }));
+      emit(EVENT_REFRESH);
+    }
+    /**
+     * Iterates over Slide objects by the iteratee function.
+     *
+     * @param iteratee      - An iteratee function that takes a Slide object, an index and an array with Slides.
+     * @param excludeClones - Optional. Determines whether to exclude clones or not.
+     */
+
+
+    function forEach$1(iteratee, excludeClones) {
+      get(excludeClones).forEach(iteratee);
+    }
+    /**
+     * Filters Slides by the matcher
+     * that can be an index, an array with indices, a selector, or an predicate function.
+     *
+     * @param matcher - An index, an array with indices, a selector string, or an predicate function.
+     *
+     * @return An array with SlideComponent objects.
+     */
+
+
+    function filter(matcher) {
+      return Slides.filter(isFunction(matcher) ? matcher : function (Slide) {
+        return isString(matcher) ? matches(Slide.slide, matcher) : includes(toArray(matcher), Slide.index);
+      });
+    }
+    /**
+     * Adds a CSS rule to all slides or containers.
+     *
+     * @param prop         - A property name.
+     * @param value        - A CSS value to add.
+     * @param useContainer - Optional. Determines whether to apply the rule to the container or not.
+     */
+
+
+    function rule(prop, value, useContainer) {
+      forEach$1(function (Slide) {
+        Slide.rule(prop, value, useContainer);
+      });
+    }
+    /**
+     * Invokes the callback after all images in the element are loaded.
+     *
+     * @param elm      - An element that may contain images.
+     * @param callback - A callback function.
+     */
+
+
+    function observeImages(elm, callback) {
+      var images = queryAll(elm, 'img');
+      var length = images.length;
+
+      if (length) {
+        images.forEach(function (img) {
+          bind(img, 'load error', function () {
+            if (! --length) {
+              callback();
+            }
+          });
+        });
+      } else {
+        callback();
+      }
+    }
+    /**
+     * Returns the length of slides.
+     *
+     * @param excludeClones - Optional. Determines whether to exclude clones or not.
+     *
+     * @return The length of slides.
+     */
+
+
+    function getLength(excludeClones) {
+      return excludeClones ? slides.length : Slides.length;
+    }
+    /**
+     * Checks if the number of slides is over than the `perPage` option, including clones.
+     *
+     * @return `true` if there are enough slides, or otherwise `false`.
+     */
+
+
+    function isEnough() {
+      return Slides.length > options.perPage;
     }
 
-    components.Transition = Transition(Splide, components);
-    return components;
+    return {
+      mount: mount,
+      destroy: destroy,
+      register: register,
+      get: get,
+      getIn: getIn,
+      getAt: getAt,
+      add: add,
+      remove: remove$1,
+      forEach: forEach$1,
+      filter: filter,
+      rule: rule,
+      getLength: getLength,
+      isEnough: isEnough
+    };
   }
   /**
-   * Utility functions for outputting logs.
+   * The component that generates clones for the loop slider.
    *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * Prefix of an error massage.
+   * @since 3.0.0
    *
-   * @type {string}
-   */
-
-
-  var MESSAGE_PREFIX = '[SPLIDE]';
-  /**
-   * Display an error message on the browser console.
+   * @param Splide     - A Splide instance.
+   * @param Components - A collection of components.
+   * @param options    - Options.
    *
-   * @param {string} message - An error message.
-   */
-
-  function error(message) {
-    console.error(MESSAGE_PREFIX + " " + message);
-  }
-  /**
-   * Check existence of the given object and throw an error if it doesn't.
-   *
-   * @throws {Error}
-   *
-   * @param {*}      subject - A subject to be confirmed.
-   * @param {string} message - An error message.
+   * @return A Clones component object.
    */
 
 
-  function exist(subject, message) {
-    if (!subject) {
-      throw new Error(message);
+  function Clones(Splide, Components, options) {
+    var _EventInterface4 = EventInterface(Splide),
+        on = _EventInterface4.on,
+        emit = _EventInterface4.emit;
+
+    var Elements = Components.Elements,
+        Slides = Components.Slides;
+    var resolve = Components.Direction.resolve;
+    var clones = [];
+    /**
+     * Keeps the current number of clones.
+     */
+
+    var cloneCount;
+    /**
+     * The index used for generating IDs.
+     */
+
+    var cloneIndex;
+    /**
+     * Called when the component is mounted.
+     */
+
+    function mount() {
+      init();
+      on(EVENT_REFRESH, refresh);
+      on([EVENT_UPDATED, EVENT_RESIZE], observe);
     }
+    /**
+     * Removes all clones if available, and generates new clones.
+     */
+
+
+    function init() {
+      if (cloneCount = computeCloneCount()) {
+        generate(cloneCount);
+      }
+    }
+    /**
+     * Destroys clones.
+     */
+
+
+    function destroy() {
+      remove(clones);
+      empty(clones);
+    }
+    /**
+     * Discards all clones and regenerates them.
+     * Must do this before the Elements component collects slide elements.
+     */
+
+
+    function refresh() {
+      destroy();
+      init();
+    }
+    /**
+     * Observes the required clone count and refreshes the slider if necessary.
+     */
+
+
+    function observe() {
+      if (cloneCount !== computeCloneCount()) {
+        emit(EVENT_REFRESH);
+      }
+    }
+    /**
+     * Generates the specified number of clones.
+     *
+     * @param count - The number of clones to generate for each side.
+     */
+
+
+    function generate(count) {
+      var slides = Slides.get().slice();
+      var length = slides.length;
+
+      if (length) {
+        cloneIndex = 0;
+
+        while (slides.length < count) {
+          push(slides, slides);
+        }
+
+        slides.slice(-count).concat(slides.slice(0, count)).forEach(function (Slide, index) {
+          var isHead = index < count;
+          var clone = cloneDeep(Slide.slide);
+          isHead ? before(clone, slides[0].slide) : append(Elements.list, clone);
+          push(clones, clone);
+          Slides.register(clone, index - count + (isHead ? 0 : length), Slide.index);
+        });
+      }
+    }
+    /**
+     * Deeply clones the provided element with removing the ID attribute.
+     *
+     * @param elm - An element to clone.
+     *
+     * @return A cloned element.
+     */
+
+
+    function cloneDeep(elm) {
+      var clone = elm.cloneNode(true);
+      addClass(clone, options.classes.clone);
+      clone.id = Splide.root.id + "-clone" + pad(++cloneIndex);
+      return clone;
+    }
+    /**
+     * Returns the number of elements to generate.
+     * This always returns 0 if the slider type is not `'loop'`.
+     *
+     * @return The number of clones.
+     */
+
+
+    function computeCloneCount() {
+      var clones = options.clones;
+
+      if (!Splide.is(LOOP)) {
+        clones = 0;
+      } else if (!clones) {
+        var fixedSize = options[resolve('fixedWidth')];
+        var fixedCount = fixedSize && ceil(rect(Elements.track)[resolve('width')] / fixedSize);
+        var baseCount = fixedCount || options[resolve('autoWidth')] && Splide.length || options.perPage;
+        clones = baseCount * (options.drag ? (options.flickMaxPages || 1) + 1 : 2);
+      }
+
+      return clones;
+    }
+
+    return {
+      mount: mount,
+      destroy: destroy
+    };
   }
   /**
-   * Export class names.
+   * The component that layouts slider components and provides methods for dimensions.
    *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
+   * @since 3.0.0
+   *
+   * @param Splide     - A Splide instance.
+   * @param Components - A collection of components.
+   * @param options    - Options.
+   *
+   * @return An Layout component object.
    */
 
+
+  function Layout(Splide, Components, options) {
+    var _EventInterface5 = EventInterface(Splide),
+        on = _EventInterface5.on,
+        bind = _EventInterface5.bind,
+        emit = _EventInterface5.emit;
+
+    var Slides = Components.Slides;
+    var ruleBy = Components.Style.ruleBy;
+    var resolve = Components.Direction.resolve;
+    var _Components$Elements2 = Components.Elements,
+        root = _Components$Elements2.root,
+        track = _Components$Elements2.track,
+        list = _Components$Elements2.list;
+    var getAt = Slides.getAt;
+    var vertical = options.direction === TTB;
+    /**
+     * Called when the component is mounted.
+     */
+
+    function mount() {
+      init();
+      bind(window, 'resize load', Throttle(emit.bind(this, EVENT_RESIZE)));
+      on([EVENT_UPDATED, EVENT_REFRESH], init);
+      on(EVENT_RESIZE, resize);
+    }
+    /**
+     * Initializes the component on `mount` or `updated`.
+     * Uses `max-width` for the root to prevent the slider from exceeding the parent element.
+     */
+
+
+    function init() {
+      ruleBy(root, 'maxWidth', unit(options.width));
+      ruleBy(track, resolve('paddingLeft'), cssPadding(false));
+      ruleBy(track, resolve('paddingRight'), cssPadding(true));
+      Slides.rule(resolve('marginRight'), unit(options.gap));
+      Slides.rule('width', cssSlideWidth());
+      setSlidesHeight();
+      resize();
+    }
+    /**
+     * Updates dimensions of some elements when the slider is resized.
+     */
+
+
+    function resize() {
+      ruleBy(track, 'height', cssTrackHeight());
+      options.heightRatio && setSlidesHeight();
+      emit(EVENT_RESIZED);
+    }
+    /**
+     * Updates the height of slides or their container elements if available.
+     */
+
+
+    function setSlidesHeight() {
+      Slides.rule('height', cssSlideHeight(), true);
+    }
+    /**
+     * Parses the padding option and returns the value for each side.
+     * This method returns `paddingTop` or `paddingBottom` for the vertical slider.
+     *
+     * @param right - Determines whether to get `paddingRight/Bottom` or `paddingLeft/Top`.
+     *
+     * @return The padding value as a CSS string.
+     */
+
+
+    function cssPadding(right) {
+      var padding = options.padding;
+      var prop = resolve(right ? 'right' : 'left', true);
+      return padding ? unit(padding[prop] || (isObject(padding) ? '0' : padding)) : '';
+    }
+    /**
+     * Returns the height of the track element as a CSS string.
+     *
+     * @return The height of the track.
+     */
+
+
+    function cssTrackHeight() {
+      var height = '';
+
+      if (vertical) {
+        height = cssHeight();
+        assert(height, '"height" or "heightRatio" is missing.');
+        var paddingTop = cssPadding(false);
+        var paddingBottom = cssPadding(true);
+
+        if (paddingTop || paddingBottom) {
+          height = "calc(" + height;
+          height += "" + (paddingTop ? " - " + paddingTop : '') + (paddingBottom ? " - " + paddingBottom : '') + ")";
+        }
+      }
+
+      return height;
+    }
+    /**
+     * Converts options related with height to a CSS string.
+     *
+     * @return The height as a CSS string if available, or otherwise an empty string.
+     */
+
+
+    function cssHeight() {
+      return unit(options.height || rect(list).width * options.heightRatio);
+    }
+    /**
+     * Returns the width of the slide as a CSS string.
+     *
+     * @return The width of the slide.
+     */
+
+
+    function cssSlideWidth() {
+      return options.autoWidth ? '' : unit(options.fixedWidth) || (vertical ? '' : cssSlideSize());
+    }
+    /**
+     * Returns the height of the slide as a CSS string.
+     *
+     * @return The height of the slide.
+     */
+
+
+    function cssSlideHeight() {
+      return unit(options.fixedHeight) || (vertical ? options.autoHeight ? '' : cssSlideSize() : cssHeight());
+    }
+    /**
+     * Returns the CSS string for slide width or height without gap.
+     *
+     * @return The CSS string for slide width or height.
+     */
+
+
+    function cssSlideSize() {
+      var gap = unit(options.gap);
+      return "calc((100%" + (gap && " + " + gap) + ")/" + (options.perPage || 1) + (gap && " - " + gap) + ")";
+    }
+    /**
+     * Returns the list width for the horizontal slider, or the height for the vertical slider.
+     *
+     * @return The size of the track element in pixel.
+     */
+
+
+    function listSize() {
+      return rect(list)[resolve('width')];
+    }
+    /**
+     * Returns the slide width for the horizontal slider, or the height for the vertical slider.
+     *
+     * @param index      - Optional. A slide index.
+     * @param withoutGap - Optional. Determines whether to exclude the gap amount or not.
+     *
+     * @return The size of the specified slide element in pixel.
+     */
+
+
+    function slideSize(index, withoutGap) {
+      var Slide = getAt(index || 0);
+      return Slide ? rect(Slide.slide)[resolve('width')] + (withoutGap ? 0 : getGap()) : 0;
+    }
+    /**
+     * Returns the total width or height of slides from 0 to the specified index.
+     *
+     * @param index      - A slide index. If omitted, uses the last index.
+     * @param withoutGap - Optional. Determines whether to exclude the last gap or not.
+     *
+     * @return The total width of slides in the horizontal slider, or the height in the vertical one.
+     */
+
+
+    function totalSize(index, withoutGap) {
+      var Slide = getAt(index);
+
+      if (Slide) {
+        var right = rect(Slide.slide)[resolve('right')];
+        var left = rect(list)[resolve('left')];
+        return abs(right - left) + (withoutGap ? 0 : getGap());
+      }
+
+      return 0;
+    }
+    /**
+     * Returns the slider size without clones.
+     *
+     * @return The slider size.
+     */
+
+
+    function sliderSize() {
+      var firstSlide = getAt(0);
+      var lastSlide = getAt(Slides.getLength(true) - 1);
+
+      if (firstSlide && lastSlide) {
+        return rect(lastSlide.slide)[resolve('right')] - rect(firstSlide.slide)[resolve('left')];
+      }
+
+      return 0;
+    }
+    /**
+     * Returns the gap value.
+     *
+     *
+     * @return The gap value in pixel.
+     */
+
+
+    function getGap() {
+      var Slide = getAt(0);
+      return Slide ? parseFloat(style(Slide.slide, resolve('marginRight'))) || 0 : 0;
+    }
+    /**
+     * Returns the padding value.
+     *
+     * @param right - Determines whether to get `paddingRight/Bottom` or `paddingLeft/Top`.
+     *
+     * @return The padding value in pixel.
+     */
+
+
+    function getPadding(right) {
+      return parseFloat(style(track, resolve("padding" + (right ? 'Right' : 'Left'), true))) || 0;
+    }
+
+    return {
+      mount: mount,
+      listSize: listSize,
+      slideSize: slideSize,
+      sliderSize: sliderSize,
+      totalSize: totalSize,
+      getPadding: getPadding
+    };
+  }
   /**
-   * A root class name.
+   * The component for moving the slider.
    *
-   * @type {string}
+   * @since 3.0.0
+   *
+   * @param Splide     - A Splide instance.
+   * @param Components - A collection of components.
+   * @param options    - Options.
+   *
+   * @return A Move component object.
    */
 
 
-  var ROOT = 'splide';
+  function Move(Splide, Components, options) {
+    var _EventInterface6 = EventInterface(Splide),
+        on = _EventInterface6.on,
+        emit = _EventInterface6.emit;
+
+    var _Components$Layout = Components.Layout,
+        slideSize = _Components$Layout.slideSize,
+        getPadding = _Components$Layout.getPadding,
+        totalSize = _Components$Layout.totalSize,
+        listSize = _Components$Layout.listSize,
+        sliderSize = _Components$Layout.sliderSize;
+    var _Components$Direction = Components.Direction,
+        resolve = _Components$Direction.resolve,
+        orient = _Components$Direction.orient;
+    var _Components$Elements3 = Components.Elements,
+        list = _Components$Elements3.list,
+        track = _Components$Elements3.track;
+    /**
+     * Indicates whether the slider is just looping or not.
+     */
+
+    var looping;
+    /**
+     * Indicates whether the component can move the slider or not.
+     */
+
+    var waiting;
+    /**
+     * Keeps the current position.
+     */
+
+    var currPosition = 0;
+    /**
+     * Keeps the rate of position to the slider width.
+     */
+
+    var positionRate = 0;
+    /**
+     * Called when the component is mounted.
+     */
+
+    function mount() {
+      on([EVENT_RESIZE, EVENT_UPDATED, EVENT_REFRESH], reposition);
+    }
+    /**
+     * Repositions the slider.
+     */
+
+
+    function reposition() {
+      if (options.drag !== 'free') {
+        jump(Splide.index);
+      } else {
+        if (!options[resolve('fixedWidth')] && !options[resolve('autoWidth')]) {
+          translate(listSize() * positionRate);
+        }
+
+        if (isExceededMax(currPosition)) {
+          translate(getLimit(true));
+        }
+      }
+    }
+    /**
+     * Goes to the slide at the specified index with the Transition component.
+     *
+     * @param dest  - A destination index to go to.
+     * @param index - A slide index.
+     * @param prev  - A previous index.
+     */
+
+
+    function move(dest, index, prev) {
+      if (!isBusy()) {
+        var position = getPosition();
+        looping = dest !== index;
+        waiting = options.waitForTransition;
+        Splide.state.set(MOVING);
+        emit(EVENT_MOVE, index, prev, dest);
+        Components.Transition.start(dest, function () {
+          onMoved(dest, index, prev, position);
+        });
+      }
+    }
+    /**
+     * Called after the transition ends.
+     *
+     * @param dest        - A destination index to go to.
+     * @param index       - A slide index.
+     * @param prev        - A previous index.
+     * @param oldPosition - An old position.
+     */
+
+
+    function onMoved(dest, index, prev, oldPosition) {
+      if (looping) {
+        jump(index);
+        looping = false;
+      }
+
+      waiting = false;
+      Splide.state.set(IDLE);
+      emit(EVENT_MOVED, index, prev, dest);
+
+      if (options.trimSpace === 'move' && dest !== prev && oldPosition === getPosition()) {
+        Components.Controller.go(dest > prev ? '>' : '<');
+      }
+    }
+    /**
+     * Jumps to the slide at the specified index.
+     *
+     * @param index - An index to jump to.
+     */
+
+
+    function jump(index) {
+      translate(toPosition(index, true));
+    }
+    /**
+     * Moves the slider to the specified position.
+     *
+     * @param position - The destination.
+     */
+
+
+    function translate(position) {
+      currPosition = loop(position);
+      positionRate = currPosition / listSize();
+      Components.Style.ruleBy(list, 'transform', "translate" + resolve('X') + "(" + currPosition + "px)");
+    }
+    /**
+     * Loops the provided position if it exceeds limits.
+     *
+     * @param position - A position to loop.
+     */
+
+
+    function loop(position) {
+      if (!looping && Splide.is(LOOP)) {
+        var diff = position - currPosition;
+        var exceededMin = isExceededMin(position);
+        var exceededMax = isExceededMax(position);
+
+        if (exceededMin && diff > 0 || exceededMax && diff < 0) {
+          position += orient(sliderSize() * (exceededMin ? 1 : -1));
+        }
+      }
+
+      return position;
+    }
+    /**
+     * Cancels transition.
+     */
+
+
+    function cancel() {
+      translate(getPosition());
+      Components.Transition.cancel();
+    }
+    /**
+     * Returns the closest index to the position.
+     *
+     * @param position - A position to convert.
+     *
+     * @return The closest index to the position.
+     */
+
+
+    function toIndex(position) {
+      var Slides = Components.Slides.get();
+      var index = 0;
+      var minDistance = Infinity;
+
+      for (var i = 0; i < Slides.length; i++) {
+        var slideIndex = Slides[i].index;
+        var distance = abs(toPosition(slideIndex) - position);
+
+        if (distance < minDistance) {
+          minDistance = distance;
+          index = slideIndex;
+        } else {
+          break;
+        }
+      }
+
+      return index;
+    }
+    /**
+     * Converts the slide index to the position.
+     *
+     * @param index    - An index to convert.
+     * @param trimming - Optional. Whether to trim edge spaces or not.
+     *
+     * @return The position corresponding with the index.
+     */
+
+
+    function toPosition(index, trimming) {
+      var position = orient(totalSize(index - 1) - offset(index));
+      return trimming ? trim(position) : position;
+    }
+    /**
+     * Returns the current position.
+     *
+     * @return The position of the list element.
+     */
+
+
+    function getPosition() {
+      var left = resolve('left');
+      return rect(list)[left] - rect(track)[left] + orient(getPadding(false));
+    }
+    /**
+     * Trims spaces on the edge of the slider.
+     *
+     * @param position - A position to trim.
+     *
+     * @return A trimmed position.
+     */
+
+
+    function trim(position) {
+      if (options.trimSpace && Splide.is(SLIDE)) {
+        position = clamp(position, 0, orient(sliderSize() - listSize()));
+      }
+
+      return position;
+    }
+    /**
+     * Returns the offset amount.
+     *
+     * @param index - An index.
+     */
+
+
+    function offset(index) {
+      var focus = options.focus;
+
+      if (focus === 'center') {
+        return (listSize() - slideSize(index, true)) / 2;
+      }
+
+      return (+focus || 0) * slideSize(index);
+    }
+    /**
+     * Returns the limit number that the slider can move to.
+     *
+     * @param max - Determines whether to return the maximum or minimum limit.
+     *
+     * @return The border number.
+     */
+
+
+    function getLimit(max) {
+      var trimming = !!options.trimSpace;
+      return max ? toPosition(Components.Controller.getEnd(), trimming) : toPosition(0, trimming);
+    }
+    /**
+     * Checks if the slider can move now or not.
+     *
+     * @return `true` if the slider can move, or otherwise `false`.
+     */
+
+
+    function isBusy() {
+      return !!(looping || waiting);
+    }
+    /**
+     * Checks if the provided position exceeds the minimum limit or not.
+     *
+     * @param position - A position to test.
+     * @param offset   - Optional. Offsets the limit in pixel.
+     *
+     * @return `true` if the position exceeds the limit, or otherwise `false`.
+     */
+
+
+    function isExceededMin(position, offset) {
+      return orient(position) + (offset || 0) < orient(getLimit(false));
+    }
+    /**
+     * Checks if the provided position exceeds the maximum limit or not.
+     *
+     * @param position - A position to test.
+     * @param offset   - Optional. Offsets the limit in pixel.
+     *
+     * @return `true` if the position exceeds the limit, or otherwise `false`.
+     */
+
+
+    function isExceededMax(position, offset) {
+      return orient(position) + (offset || 0) > orient(getLimit(true));
+    }
+    /**
+     * Checks if the slider position exceeds borders or not.
+     *
+     * @return `true` if the position is over borders, or otherwise `false`.
+     */
+
+
+    function isExceeded() {
+      return isExceededMin(currPosition) || isExceededMax(currPosition);
+    }
+
+    return {
+      mount: mount,
+      move: move,
+      jump: jump,
+      translate: translate,
+      cancel: cancel,
+      toIndex: toIndex,
+      toPosition: toPosition,
+      getPosition: getPosition,
+      getLimit: getLimit,
+      isBusy: isBusy,
+      isExceededMin: isExceededMin,
+      isExceededMax: isExceededMax,
+      isExceeded: isExceeded
+    };
+  }
   /**
-   * The definition table of all classes for elements.
-   * They might be modified by options.
+   * The component for controlling the slider.
    *
-   * @type {Object}
+   * @since 3.0.0
+   *
+   * @param Splide     - A Splide instance.
+   * @param Components - A collection of components.
+   * @param options    - Options.
+   *
+   * @return A Controller component object.
    */
 
-  var ELEMENT_CLASSES = {
-    root: ROOT,
-    slider: ROOT + "__slider",
-    track: ROOT + "__track",
-    list: ROOT + "__list",
-    slide: ROOT + "__slide",
-    container: ROOT + "__slide__container",
-    arrows: ROOT + "__arrows",
-    arrow: ROOT + "__arrow",
-    prev: ROOT + "__arrow--prev",
-    next: ROOT + "__arrow--next",
-    pagination: ROOT + "__pagination",
-    page: ROOT + "__pagination__page",
-    clone: ROOT + "__slide--clone",
-    progress: ROOT + "__progress",
-    bar: ROOT + "__progress__bar",
-    autoplay: ROOT + "__autoplay",
-    play: ROOT + "__play",
-    pause: ROOT + "__pause",
-    spinner: ROOT + "__spinner",
-    sr: ROOT + "__sr"
-  };
+
+  function Controller(Splide, Components, options) {
+    var _EventInterface7 = EventInterface(Splide),
+        on = _EventInterface7.on;
+
+    var Move = Components.Move;
+    var _Components$Slides = Components.Slides,
+        isEnough = _Components$Slides.isEnough,
+        getLength = _Components$Slides.getLength;
+    var isLoop = Splide.is(LOOP);
+    /**
+     * The current index.
+     */
+
+    var currIndex = options.start || 0;
+    /**
+     * The previous index.
+     */
+
+    var prevIndex = currIndex;
+    /**
+     * The latest number of slides.
+     */
+
+    var slideCount = getLength(true);
+    /**
+     * The latest `perMove` value.
+     */
+
+    var perMove = options.perMove;
+    /**
+     * The latest `perMove` value.
+     */
+
+    var perPage = options.perPage;
+    /**
+     * Called when the component is mounted.
+     */
+
+    function mount() {
+      Move.jump(currIndex);
+      on([EVENT_UPDATED, EVENT_REFRESH], function () {
+        slideCount = getLength(true);
+        perMove = options.perMove;
+        perPage = options.perPage;
+      });
+      on(EVENT_SCROLLED, function () {
+        setIndex(Move.toIndex(Move.getPosition()));
+      }, 0);
+    }
+    /**
+     * Moves the slider by the control pattern.
+     *
+     * @see `Splide#go()`
+     *
+     * @param control        - A control pattern.
+     * @param allowSameIndex - Optional. Determines whether to allow to go to the current index or not.
+     */
+
+
+    function go(control, allowSameIndex) {
+      var dest = parse(control);
+      var index = loop(dest);
+
+      if (!Move.isBusy() && index > -1 && (allowSameIndex || index !== currIndex)) {
+        setIndex(index);
+        Move.move(dest, index, prevIndex);
+      }
+    }
+    /**
+     * Parses the control and returns a slide index.
+     *
+     * @param control - A control pattern to parse.
+     */
+
+
+    function parse(control) {
+      var index = currIndex;
+
+      if (isString(control)) {
+        var _ref = control.match(/([+\-<>])(\d+)?/) || [],
+            indicator = _ref[1],
+            number = _ref[2];
+
+        if (indicator === '+' || indicator === '-') {
+          index = computeDestIndex(currIndex + +("" + indicator + (+number || 1)), currIndex, true);
+        } else if (indicator === '>') {
+          index = number ? toIndex(+number) : getNext(true);
+        } else if (indicator === '<') {
+          index = getPrev(true);
+        }
+      } else {
+        if (isLoop) {
+          index = clamp(control, -perPage, slideCount + perPage - 1);
+        } else {
+          index = clamp(control, 0, getEnd());
+        }
+      }
+
+      return index;
+    }
+    /**
+     * Returns a next destination index.
+     *
+     * @param destination - Optional. Determines whether to get a destination index or a slide one.
+     *
+     * @return A next index if available, or otherwise `-1`.
+     */
+
+
+    function getNext(destination) {
+      return getAdjacent(false, destination);
+    }
+    /**
+     * Returns a previous destination index.
+     *
+     * @param destination - Optional. Determines whether to get a destination index or a slide one.
+     *
+     * @return A previous index if available, or otherwise `-1`.
+     */
+
+
+    function getPrev(destination) {
+      return getAdjacent(true, destination);
+    }
+    /**
+     * Returns an adjacent destination index.
+     *
+     * @param prev        - Determines whether to return a previous or next index.
+     * @param destination - Optional. Determines whether to get a destination index or a slide one.
+     *
+     * @return An adjacent index if available, or otherwise `-1`.
+     */
+
+
+    function getAdjacent(prev, destination) {
+      var dest = computeDestIndex(currIndex + getPerMove() * (prev ? -1 : 1), currIndex);
+      return destination ? dest : loop(dest);
+    }
+    /**
+     * Converts the desired destination index to the valid one.
+     * - This may return clone indices if the editor is the loop mode,
+     *   or `-1` if there is no slide to go.
+     * - There are still slides where the slider can go if borders are between `from` and `dest`.
+     *
+     * @param dest        - The desired destination.
+     * @param from        - A base index.
+     * @param incremental - Optional. Whether the control is incremental or not.
+     *
+     * @return A converted destination index, including clones.
+     */
+
+
+    function computeDestIndex(dest, from, incremental) {
+      if (isEnough()) {
+        var end = getEnd(); // Will overrun:
+
+        if (dest < 0 || dest > end) {
+          if (between(0, dest, from, true) || between(end, from, dest, true)) {
+            dest = toIndex(toPage(dest));
+          } else {
+            if (isLoop) {
+              dest = perMove ? dest : dest < 0 ? -(slideCount % perPage || perPage) : slideCount;
+            } else if (options.rewind) {
+              dest = dest < 0 ? end : 0;
+            } else {
+              dest = -1;
+            }
+          }
+        } else {
+          if (!isLoop && !incremental && dest !== from) {
+            dest = toIndex(toPage(from) + (dest < from ? -1 : 1));
+          }
+        }
+      } else {
+        dest = -1;
+      }
+
+      return dest;
+    }
+    /**
+     * Returns the end index where the slider can go.
+     * For example, if the slider has 10 slides and the `perPage` option is 3,
+     * the slider can go to the slide 8 (the index is 7).
+     *
+     * @return An end index.
+     */
+
+
+    function getEnd() {
+      var end = slideCount - perPage;
+
+      if (hasFocus() || isLoop && perMove) {
+        end = slideCount - 1;
+      }
+
+      return max(end, 0);
+    }
+    /**
+     * Loops the provided index only in the loop mode.
+     *
+     * @param index - An index to loop.
+     *
+     * @return A looped index.
+     */
+
+
+    function loop(index) {
+      if (isLoop) {
+        return isEnough() ? index % slideCount + (index < 0 ? slideCount : 0) : -1;
+      }
+
+      return index;
+    }
+    /**
+     * Converts the page index to the slide index.
+     *
+     * @param page - A page index to convert.
+     *
+     * @return A slide index.
+     */
+
+
+    function toIndex(page) {
+      return clamp(hasFocus() ? page : perPage * page, 0, getEnd());
+    }
+    /**
+     * Converts the slide index to the page index.
+     *
+     * @param index - An index to convert.
+     */
+
+
+    function toPage(index) {
+      if (!hasFocus()) {
+        index = between(index, slideCount - perPage, slideCount - 1) ? slideCount - 1 : index;
+        index = floor(index / perPage);
+      }
+
+      return index;
+    }
+    /**
+     * Returns the number of slides to move for '>' and '<'.
+     *
+     * @return The number of slides to move.
+     */
+
+
+    function getPerMove() {
+      return perMove || hasFocus() ? 1 : perPage;
+    }
+    /**
+     * Sets a new index and retains old one.
+     *
+     * @param index - A new index to set.
+     */
+
+
+    function setIndex(index) {
+      if (index !== currIndex) {
+        prevIndex = currIndex;
+        currIndex = index;
+      }
+    }
+    /**
+     * Returns the current/previous index slide index.
+     *
+     * @param prev - Optional. Whether to return previous index or not.
+     */
+
+
+    function getIndex(prev) {
+      return prev ? prevIndex : currIndex;
+    }
+    /**
+     * Verifies if the focus option is available or not.
+     *
+     * @return `true` if the slider has the focus option.
+     */
+
+
+    function hasFocus() {
+      return !isUndefined(options.focus) || options.isNavigation;
+    }
+
+    return {
+      mount: mount,
+      go: go,
+      getNext: getNext,
+      getPrev: getPrev,
+      getEnd: getEnd,
+      getIndex: getIndex,
+      toIndex: toIndex,
+      toPage: toPage,
+      hasFocus: hasFocus
+    };
+  }
   /**
-   * Definitions of status classes.
-   *
-   * @type {Object}
+   * The namespace for SVG elements.
    */
 
-  var STATUS_CLASSES = {
-    active: 'is-active',
-    visible: 'is-visible',
-    loading: 'is-loading'
-  };
+
+  var XML_NAME_SPACE = 'http://www.w3.org/2000/svg';
   /**
-   * Export i18n texts as object.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
+   * The arrow path.
    */
 
+  var PATH = 'm15.5 0.932-4.3 4.38 14.5 14.6-14.5 14.5 4.3 4.4 14.6-14.6 4.4-4.3-4.4-4.4-14.6-14.6z';
   /**
-   * Texts for i18n.
+   * SVG width and height.
+   */
+
+  var SIZE = 40;
+  /**
+   * The component for handling previous and next arrows.
    *
-   * @type {Object}
+   * @since 3.0.0
+   *
+   * @param Splide     - A Splide instance.
+   * @param Components - A collection of components.
+   * @param options    - Options.
+   *
+   * @return An Arrows component object.
+   */
+
+  function Arrows(Splide, Components, options) {
+    var _EventInterface8 = EventInterface(Splide),
+        on = _EventInterface8.on,
+        bind = _EventInterface8.bind,
+        emit = _EventInterface8.emit;
+
+    var classes = options.classes,
+        i18n = options.i18n;
+    var Elements = Components.Elements,
+        Controller = Components.Controller;
+    var slider = Elements.slider,
+        track = Elements.track;
+    /**
+     * The wrapper element.
+     */
+
+    var wrapper = Elements.arrows;
+    /**
+     * The previous arrow element.
+     */
+
+    var prev = Elements.prev;
+    /**
+     * The next arrow element.
+     */
+
+    var next = Elements.next;
+    /**
+     * Indicates whether the component creates arrows or retrieved from the DOM.
+     */
+
+    var created;
+    /**
+     * An object with previous and next arrows.
+     */
+
+    var arrows = {};
+    /**
+     * Called when the component is mounted.
+     */
+
+    function mount() {
+      init();
+      on(EVENT_UPDATED, init);
+    }
+    /**
+     * Initializes the component.
+     */
+
+
+    function init() {
+      if (options.arrows) {
+        if (!prev || !next) {
+          createArrows();
+        }
+      }
+
+      if (prev && next) {
+        if (!arrows.prev) {
+          setAttribute(prev, ARIA_CONTROLS, track.id);
+          setAttribute(next, ARIA_CONTROLS, track.id);
+          arrows.prev = prev;
+          arrows.next = next;
+          listen();
+          emit(EVENT_ARROWS_MOUNTED, prev, next);
+        } else {
+          display(wrapper, options.arrows === false ? 'none' : '');
+        }
+      }
+    }
+    /**
+     * Destroys the component.
+     */
+
+
+    function destroy() {
+      if (created) {
+        remove(wrapper);
+      } else {
+        removeAttribute(prev, ALL_ATTRIBUTES);
+        removeAttribute(next, ALL_ATTRIBUTES);
+      }
+    }
+    /**
+     * Listens to some events.
+     */
+
+
+    function listen() {
+      var go = Controller.go;
+      on([EVENT_MOUNTED, EVENT_MOVE, EVENT_UPDATED, EVENT_REFRESH, EVENT_SCROLLED], update);
+      bind(next, 'click', function () {
+        go('>');
+      });
+      bind(prev, 'click', function () {
+        go('<');
+      });
+    }
+    /**
+     * Create arrows and append them to the slider.
+     */
+
+
+    function createArrows() {
+      var parent = options.arrows === 'slider' && slider ? slider : Splide.root;
+      wrapper = create('div', classes.arrows);
+      prev = createArrow(true);
+      next = createArrow(false);
+      created = true;
+      append(wrapper, [prev, next]);
+      before(wrapper, child(parent));
+    }
+    /**
+     * Creates an arrow button.
+     *
+     * @param prev - Determines whether to create a previous or next arrow.
+     *
+     * @return A created button element.
+     */
+
+
+    function createArrow(prev) {
+      var arrow = "<button class=\"" + classes.arrow + " " + (prev ? classes.prev : classes.next) + "\" type=\"button\">" + ("<svg xmlns=\"" + XML_NAME_SPACE + "\" viewBox=\"0 0 " + SIZE + " " + SIZE + "\" width=\"" + SIZE + "\" height=\"" + SIZE + "\">") + ("<path d=\"" + (options.arrowPath || PATH) + "\" />");
+      return parseHtml(arrow);
+    }
+    /**
+     * Updates status of arrows, such as `disabled` and `aria-label`.
+     */
+
+
+    function update() {
+      var index = Splide.index;
+      var prevIndex = Controller.getPrev();
+      var nextIndex = Controller.getNext();
+      var prevLabel = prevIndex > -1 && index < prevIndex ? i18n.last : i18n.prev;
+      var nextLabel = nextIndex > -1 && index > nextIndex ? i18n.first : i18n.next;
+      prev.disabled = prevIndex < 0;
+      next.disabled = nextIndex < 0;
+      setAttribute(prev, ARIA_LABEL, prevLabel);
+      setAttribute(next, ARIA_LABEL, nextLabel);
+      emit(EVENT_ARROWS_UPDATED, prev, next, prevIndex, nextIndex);
+    }
+
+    return {
+      arrows: arrows,
+      mount: mount,
+      destroy: destroy
+    };
+  }
+  /**
+   * The component for auto playing sliders.
+   *
+   * @since 3.0.0
+   *
+   * @param Splide     - A Splide instance.
+   * @param Components - A collection of components.
+   * @param options    - Options.
+   *
+   * @return An Autoplay component object.
+   */
+
+
+  function Autoplay(Splide, Components, options) {
+    var _EventInterface9 = EventInterface(Splide),
+        on = _EventInterface9.on,
+        bind = _EventInterface9.bind,
+        emit = _EventInterface9.emit;
+
+    var _Components$Elements4 = Components.Elements,
+        root = _Components$Elements4.root,
+        track = _Components$Elements4.track,
+        bar = _Components$Elements4.bar,
+        playButton = _Components$Elements4.play,
+        pauseButton = _Components$Elements4.pause;
+    var interval = RequestInterval(options.interval, Splide.go.bind(Splide, '>'), update);
+    var isPaused = interval.isPaused;
+    /**
+     * Indicates whether the slider is hovered or not.
+     */
+
+    var hovered;
+    /**
+     * Indicates whether one of slider elements has focus or not.
+     */
+
+    var focused;
+    /**
+     * Turns into `true` when autoplay is manually paused.
+     */
+
+    var paused;
+    /**
+     * Called when the component is mounted.
+     */
+
+    function mount() {
+      var autoplay = options.autoplay;
+
+      if (autoplay) {
+        initButton(true);
+        initButton(false);
+        listen();
+
+        if (autoplay !== 'pause') {
+          play();
+        }
+      }
+    }
+    /**
+     * Initializes a play/pause button.
+     *
+     * @param forPause - Determines whether to initialize a pause or play button.
+     */
+
+
+    function initButton(forPause) {
+      var button = forPause ? pauseButton : playButton;
+
+      if (button) {
+        if (!isHTMLButtonElement(button)) {
+          setAttribute(button, ROLE, 'button');
+        }
+
+        setAttribute(button, ARIA_CONTROLS, track.id);
+        setAttribute(button, ARIA_LABEL, options.i18n[forPause ? 'pause' : 'play']);
+        bind(button, 'click', forPause ? pause : play);
+      }
+    }
+    /**
+     * Listens to some events.
+     */
+
+
+    function listen() {
+      if (options.pauseOnHover) {
+        bind(root, 'mouseenter mouseleave', function (e) {
+          hovered = e.type === 'mouseenter';
+          autoToggle();
+        });
+      }
+
+      if (options.pauseOnFocus) {
+        bind(root, 'focusin focusout', function (e) {
+          focused = e.type === 'focusin';
+          autoToggle();
+        });
+      }
+
+      on([EVENT_MOVE, EVENT_SCROLL, EVENT_REFRESH], interval.rewind);
+    }
+    /**
+     * Starts autoplay and clears all flags.
+     */
+
+
+    function play() {
+      if (isPaused() && Components.Slides.isEnough()) {
+        interval.start(!options.resetProgress);
+        focused = false;
+        hovered = false;
+        emit(EVENT_AUTOPLAY_PLAY);
+      }
+    }
+    /**
+     * Pauses autoplay.
+     *
+     * @param manual - If `true`, autoplay keeps paused until `play()` is explicitly called.
+     */
+
+
+    function pause(manual) {
+      if (manual === void 0) {
+        manual = true;
+      }
+
+      if (!isPaused()) {
+        interval.pause();
+        emit(EVENT_AUTOPLAY_PAUSE);
+      }
+
+      paused = manual;
+    }
+    /**
+     * Toggles play/pause according to current flags.
+     * If autoplay is manually paused, this will do nothing.
+     */
+
+
+    function autoToggle() {
+      if (!paused) {
+        if (!hovered && !focused) {
+          play();
+        } else {
+          pause(false);
+        }
+      }
+    }
+    /**
+     * Called on every animation frame when auto playing.
+     *
+     * @param rate - The progress rate between 0 to 1.
+     */
+
+
+    function update(rate) {
+      emit(EVENT_AUTOPLAY_PLAYING, rate);
+
+      if (bar) {
+        style(bar, {
+          width: rate * 100 + "%"
+        });
+      }
+    }
+
+    return {
+      mount: mount,
+      destroy: interval.cancel,
+      play: play,
+      pause: pause,
+      isPaused: isPaused
+    };
+  }
+  /**
+   * The component for setting the image as the slide background.
+   *
+   * @since 3.0.0
+   *
+   * @param Splide     - A Splide instance.
+   * @param Components - A collection of components.
+   * @param options    - Options.
+   *
+   * @return A Cover component object.
+   */
+
+
+  function Cover(Splide, Components, options) {
+    var _EventInterface10 = EventInterface(Splide),
+        on = _EventInterface10.on;
+    /**
+     * Called when the component is mounted.
+     */
+
+
+    function mount() {
+      if (options.cover) {
+        on(EVENT_LAZYLOAD_LOADED, function (img, Slide) {
+          toggle(true, img, Slide);
+        });
+        on([EVENT_MOUNTED, EVENT_UPDATED, EVENT_REFRESH], apply.bind(null, true));
+      }
+    }
+    /**
+     * Destroys the component.
+     */
+
+
+    function destroy() {
+      apply(false);
+    }
+    /**
+     * Sets/removes the background image to/from all slides.
+     *
+     * @param cover - If `false`, removes the background image.
+     */
+
+
+    function apply(cover) {
+      Components.Slides.forEach(function (Slide) {
+        var img = child(Slide.container || Slide.slide, 'img');
+
+        if (img && img.src) {
+          toggle(cover, img, Slide);
+        }
+      });
+    }
+    /**
+     * Sets/removes the background image to/from the parent element.
+     *
+     * @param cover - If `false`, removes the background image.
+     * @param img   - A target image element.
+     * @param Slide - A SlideComponent object where the image belongs.
+     */
+
+
+    function toggle(cover, img, Slide) {
+      Slide.rule('background', cover ? "center/cover no-repeat url(\"" + img.src + "\")" : '', true);
+      display(img, cover ? 'none' : '');
+    }
+
+    return {
+      mount: mount,
+      destroy: destroy
+    };
+  }
+  /**
+   * Triggers the bounce effect when the diff becomes less than this value.
+   *
+   * @since 3.0.0
+   */
+
+
+  var BOUNCE_DIFF_THRESHOLD = 10;
+  /**
+   * The duration of the bounce effect.
+   *
+   * @since 3.0.0
+   */
+
+  var BOUNCE_DURATION = 600;
+  /**
+   * The friction factor.
+   *
+   * @since 3.0.0
+   */
+
+  var FRICTION_FACTOR = 0.6;
+  /**
+   * The velocity to calculate the scroll duration.
+   *
+   * @since 3.0.0
+   */
+
+  var BASE_VELOCITY = 1.2;
+  /**
+   * The minimum duration of scroll.
+   *
+   * @since 3.0.0
+   */
+
+  var MIN_DURATION = 800;
+  /**
+   * The component for scrolling the slider.
+   *
+   * @since 3.0.0
+   *
+   * @param Splide     - A Splide instance.
+   * @param Components - A collection of components.
+   * @param options    - Options.
+   *
+   * @return A Scroll component object.
+   */
+
+  function Scroll(Splide, Components, options) {
+    var _EventInterface11 = EventInterface(Splide),
+        on = _EventInterface11.on,
+        emit = _EventInterface11.emit;
+
+    var Move = Components.Move;
+    var getPosition = Move.getPosition,
+        getLimit = Move.getLimit;
+    /**
+     * Retains the active RequestInterval object.
+     */
+
+    var interval;
+    /**
+     * Called when the component is mounted.
+     */
+
+    function mount() {
+      on(EVENT_MOVE, clear);
+      on([EVENT_UPDATED, EVENT_REFRESH], cancel);
+    }
+    /**
+     * Scrolls the slider to the provided destination.
+     *
+     * @param destination        - The destination to scroll to.
+     * @param duration           - Optional. The scroll duration. If omitted, calculates it by the distance.
+     * @param suppressConstraint - Optional. Whether to suppress constraint process when the slider exceeds bounds.
+     */
+
+
+    function scroll(destination, duration, suppressConstraint) {
+      var start = getPosition();
+      var friction = 1;
+      duration = duration || computeDuration(abs(destination - start));
+      clear();
+      interval = RequestInterval(duration, onScrolled, function (rate) {
+        var position = getPosition();
+        var target = start + (destination - start) * easing(rate);
+        var diff = (target - getPosition()) * friction;
+        Move.translate(position + diff);
+
+        if (Splide.is(SLIDE) && !suppressConstraint && Move.isExceeded()) {
+          friction *= FRICTION_FACTOR;
+
+          if (abs(diff) < BOUNCE_DIFF_THRESHOLD) {
+            bounce(Move.isExceededMin(getPosition()));
+          }
+        }
+      }, 1);
+      emit(EVENT_SCROLL);
+      interval.start();
+    }
+    /**
+     * Triggers the bounce effect when the slider reaches bounds.
+     *
+     * @param backwards - The direction the slider is going towards.
+     */
+
+
+    function bounce(backwards) {
+      scroll(getLimit(!backwards), BOUNCE_DURATION, true);
+    }
+    /**
+     * Called when scroll ends or is canceled.
+     */
+
+
+    function onScrolled() {
+      emit(EVENT_SCROLLED);
+    }
+    /**
+     * Computes the scroll duration by the distance and the base velocity.
+     *
+     * @param distance - Distance in pixel.
+     *
+     * @return The duration for scroll.
+     */
+
+
+    function computeDuration(distance) {
+      return max(distance / BASE_VELOCITY, MIN_DURATION);
+    }
+    /**
+     * Clears the active interval.
+     */
+
+
+    function clear() {
+      if (interval) {
+        interval.cancel();
+      }
+    }
+    /**
+     * Cancels the active interval and emits the `scrolled` event.
+     */
+
+
+    function cancel() {
+      if (interval && !interval.isPaused()) {
+        clear();
+        onScrolled();
+      }
+    }
+    /**
+     * The easing function.
+     *
+     * @param t - A value to ease.
+     *
+     * @return An eased value.
+     */
+
+
+    function easing(t) {
+      var easingFunc = options.easingFunc;
+      return easingFunc ? easingFunc(t) : 1 - Math.pow(1 - t, 4);
+    }
+
+    return {
+      mount: mount,
+      destroy: clear,
+      scroll: scroll,
+      cancel: cancel
+    };
+  }
+  /**
+   * The power of the friction.
+   *
+   * @since 3.0.0
+   */
+
+
+  var FRICTION = 5;
+  /**
+   * If the user stops dragging for this duration with keeping the pointer down, updates the base coord and time.
+   *
+   * @since 3.0.0
+   */
+
+  var SAMPLING_INTERVAL = 50;
+  /**
+   * Start events for dragging.
+   *
+   * @since 3.0.0
+   */
+
+  var POINTER_DOWN_EVENTS = 'touchstart mousedown';
+  /**
+   * Update events for dragging.
+   *
+   * @since 3.0.0
+   */
+
+  var POINTER_MOVE_EVENTS = 'touchmove mousemove';
+  /**
+   * End events for dragging.
+   *
+   * @since 3.0.0
+   */
+
+  var POINTER_UP_EVENTS = 'touchend touchcancel mouseup mouseleave';
+  /**
+   * The component for dragging the slider.
+   *
+   * @since 3.0.0
+   *
+   * @param Splide     - A Splide instance.
+   * @param Components - A collection of components.
+   * @param options    - Options.
+   *
+   * @return A Drag component object.
+   */
+
+  function Drag(Splide, Components, options) {
+    var _EventInterface12 = EventInterface(Splide),
+        emit = _EventInterface12.emit,
+        bind = _EventInterface12.bind,
+        unbind = _EventInterface12.unbind;
+
+    var track = Components.Elements.track;
+    var _Components$Direction2 = Components.Direction,
+        resolve = _Components$Direction2.resolve,
+        orient = _Components$Direction2.orient;
+    var listSize = Components.Layout.listSize;
+    var _Components$Controlle = Components.Controller,
+        go = _Components$Controlle.go,
+        getEnd = _Components$Controlle.getEnd;
+    var Move = Components.Move,
+        Scroll = Components.Scroll;
+    var translate = Move.translate,
+        toIndex = Move.toIndex,
+        getPosition = Move.getPosition,
+        isExceeded = Move.isExceeded;
+    var isSlide = Splide.is(SLIDE);
+    var isFade = Splide.is(FADE);
+    var isFree = options.drag === 'free';
+    /**
+     * The coord where a pointer becomes active.
+     */
+
+    var startCoord;
+    /**
+     * Keeps the last time when the component detects dragging.
+     */
+
+    var lastTime;
+    /**
+     * The base slider position where the diff of coords is applied.
+     */
+
+    var basePosition;
+    /**
+     * The base coord to calculate the diff of coords.
+     */
+
+    var baseCoord;
+    /**
+     * The base time when the base position and the base coord are saved.
+     */
+
+    var baseTime;
+    /**
+     * Keeps the last TouchEvent/MouseEvent object.
+     */
+
+    var lastEvent;
+    /**
+     * Indicates whether the user is dragging the slider or not.
+     */
+
+    var moving;
+    /**
+     * Indicates whether the user drags the slider by the mouse or not.
+     */
+
+    var isMouse;
+    var target;
+    /**
+     * Indicates whether the slider exceeds borders or not.
+     */
+
+    var exceeded;
+    /**
+     * Called when the component is mounted.
+     */
+
+    function mount() {
+      if (options.drag) {
+        bind(track, POINTER_DOWN_EVENTS, onPointerDown);
+      }
+    }
+    /**
+     * Called when the user clicks or touches the slider.
+     *
+     * @param e - A TouchEvent or MouseEvent object
+     */
+
+
+    function onPointerDown(e) {
+      isMouse = e.type === 'mousedown';
+      target = isMouse ? window : track;
+
+      if (!(isMouse && e.button)) {
+        if (!Move.isBusy()) {
+          bind(target, POINTER_MOVE_EVENTS, onPointerMove);
+          bind(target, POINTER_UP_EVENTS, onPointerUp);
+          Move.cancel();
+          Scroll.cancel();
+          startCoord = getCoord(e);
+        } else {
+          prevent(e);
+        }
+      }
+    }
+    /**
+     * Called while the user moves the pointer on the slider.
+     *
+     * @param e - A TouchEvent or MouseEvent object
+     */
+
+
+    function onPointerMove(e) {
+      if (e.cancelable) {
+        var _min = options.dragMinThreshold || 15;
+
+        if (isMouse || abs(getCoord(e) - startCoord) > _min) {
+          moving = true;
+          onDrag();
+        }
+
+        if (moving) {
+          onDragging(e);
+          prevent(e, true);
+        }
+      } else {
+        onPointerUp(e);
+      }
+    }
+    /**
+     * Called when the user releases pointing devices.
+     * Be aware that the TouchEvent object provided by the `touchend` does not contain `Touch` objects,
+     * which means the last touch position is not available.
+     *
+     * @param e - A TouchEvent or MouseEvent object
+     */
+
+
+    function onPointerUp(e) {
+      unbind(target, POINTER_MOVE_EVENTS + " " + POINTER_UP_EVENTS);
+      moving = false;
+
+      if (lastEvent) {
+        onDragged(e);
+        lastEvent = null;
+      }
+    }
+    /**
+     * Called when the user starts dragging the slider.
+     */
+
+
+    function onDrag() {
+      bind(track, 'click', function (e) {
+        unbind(track, 'click');
+        prevent(e, true);
+      }, {
+        capture: true
+      });
+      emit(EVENT_DRAG);
+    }
+    /**
+     * Called while the user is dragging the slider.
+     *
+     * @param e - A TouchEvent or MouseEvent object
+     */
+
+
+    function onDragging(e) {
+      var timeStamp = e.timeStamp;
+      var expired = !lastTime || timeStamp - lastTime > SAMPLING_INTERVAL;
+
+      if (expired || isExceeded() !== exceeded) {
+        basePosition = getPosition();
+        baseCoord = getCoord(e);
+        baseTime = timeStamp;
+      }
+
+      exceeded = isExceeded();
+      lastTime = timeStamp;
+      lastEvent = e;
+
+      if (!isFade) {
+        translate(basePosition + constrain(getCoord(e) - baseCoord));
+      }
+
+      emit(EVENT_DRAGGING);
+    }
+    /**
+     * Called when the user finishes dragging.
+     *
+     * @param e - A TouchEvent or MouseEvent object
+     */
+
+
+    function onDragged(e) {
+      var velocity = computeVelocity(e);
+
+      if (isFade) {
+        go(Splide.index + orient(sign(velocity)));
+      } else {
+        var destination = computeDestination(velocity);
+
+        if (isFree) {
+          Scroll.scroll(destination);
+        } else {
+          go(computeIndex(destination), true);
+        }
+      }
+
+      lastTime = 0;
+      emit(EVENT_DRAGGED);
+    }
+    /**
+     * Computes the drag velocity.
+     *
+     * @param e - A TouchEvent or MouseEvent object
+     *
+     * @return The drag velocity.
+     */
+
+
+    function computeVelocity(e) {
+      if (Splide.is(LOOP) || !isExceeded()) {
+        var diffCoord = getCoord(lastEvent) - baseCoord;
+        var diffTime = lastEvent.timeStamp - baseTime;
+        var isFlick = e.timeStamp - lastTime < SAMPLING_INTERVAL;
+
+        if (diffTime && isFlick) {
+          return diffCoord / diffTime;
+        }
+      }
+
+      return 0;
+    }
+    /**
+     * Computes the destination by the velocity and the `flickPower` option.
+     *
+     * @param velocity - The drag velocity.
+     *
+     * @return The destination.
+     */
+
+
+    function computeDestination(velocity) {
+      var flickPower = options.flickPower || 600;
+      return getPosition() + sign(velocity) * min(abs(velocity) * flickPower, isFree ? Infinity : listSize() * (options.flickMaxPages || 1));
+    }
+    /**
+     * Converts the destination to the slide index.
+     *
+     * @param destination - The target destination.
+     *
+     * @return The destination index.
+     */
+
+
+    function computeIndex(destination) {
+      var dest = toIndex(destination);
+      return isSlide ? clamp(dest, 0, getEnd()) : dest;
+    }
+    /**
+     * Returns the `pageX` and `pageY` coordinates provided by the event.
+     * Be aware that IE does not support both TouchEvent and MouseEvent constructors.
+     *
+     * @param e - A TouchEvent or MouseEvent object.
+     *
+     * @return A pageX or pageY coordinate.
+     */
+
+
+    function getCoord(e) {
+      return (isMouse ? e : e.touches[0])[resolve('pageX')];
+    }
+    /**
+     * Reduces the distance to move by the predefined friction.
+     * This does nothing when the slider type is not `slide`, or the position is inside borders.
+     *
+     * @param diff - Diff to constrain.
+     *
+     * @return The constrained diff.
+     */
+
+
+    function constrain(diff) {
+      return diff / (exceeded && isSlide ? FRICTION : 1);
+    }
+
+    return {
+      mount: mount
+    };
+  }
+  /**
+   * The collection of arrow keys of IE.
+   *
+   * @since 3.0.0
+   */
+
+
+  var IE_ARROW_KEYS = ['Left', 'Right', 'Up', 'Down'];
+  /**
+   * The component for controlling the slider by keyboards.
+   *
+   * @since 3.0.0
+   *
+   * @param Splide     - A Splide instance.
+   * @param Components - A collection of components.
+   * @param options    - Options.
+   *
+   * @return A Keyboard component object.
+   */
+
+  function Keyboard(Splide, Components, options) {
+    var _EventInterface13 = EventInterface(Splide),
+        on = _EventInterface13.on,
+        bind = _EventInterface13.bind,
+        unbind = _EventInterface13.unbind;
+
+    var root = Components.Elements.root;
+    var resolve = Components.Direction.resolve;
+    /**
+     * The target element of the keyboard event.
+     */
+
+    var target;
+    /**
+     * Called when the component is mounted.
+     */
+
+    function mount() {
+      init();
+      on(EVENT_UPDATED, function () {
+        destroy();
+        init();
+      });
+    }
+    /**
+     * Initializes the component.
+     */
+
+
+    function init() {
+      var _options$keyboard = options.keyboard,
+          keyboard = _options$keyboard === void 0 ? 'global' : _options$keyboard;
+
+      if (keyboard) {
+        if (keyboard === 'focused') {
+          target = root;
+          setAttribute(root, TAB_INDEX, 0);
+        } else {
+          target = window;
+        }
+
+        bind(target, 'keydown', function (e) {
+          var key = normalize(e.key);
+
+          if (key === resolve('ArrowLeft')) {
+            Splide.go('<');
+          } else if (key === resolve('ArrowRight')) {
+            Splide.go('>');
+          }
+        });
+      }
+    }
+    /**
+     * Destroys the component.
+     */
+
+
+    function destroy() {
+      if (target) {
+        unbind(target, 'keydown');
+
+        if (isHTMLElement(target)) {
+          removeAttribute(target, TAB_INDEX);
+        }
+      }
+    }
+    /**
+     * Absorbs the difference of key names among browsers.
+     *
+     * @param key - A key to normalize.
+     *
+     * @return A normalized key.
+     */
+
+
+    function normalize(key) {
+      return includes(IE_ARROW_KEYS, key) ? "Arrow" + key : key;
+    }
+
+    return {
+      mount: mount,
+      destroy: destroy
+    };
+  }
+  /**
+   * The data attribute for the src value.
+   *
+   * @since 3.0.0
+   */
+
+
+  var SRC_DATA_ATTRIBUTE = DATA_ATTRIBUTE + "-lazy";
+  /**
+   * The data attribute for the srcset value.
+   *
+   * @since 3.0.0
+   */
+
+  var SRCSET_DATA_ATTRIBUTE = SRC_DATA_ATTRIBUTE + "-srcset";
+  /**
+   * The selector string for images to load.
+   *
+   * @since 3.0.0
+   */
+
+  var IMAGE_SELECTOR = "[" + SRC_DATA_ATTRIBUTE + "], [" + SRCSET_DATA_ATTRIBUTE + "]";
+  /**
+   * The component for lazily loading images.
+   *
+   * @since 3.0.0
+   *
+   * @param Splide     - A Splide instance.
+   * @param Components - A collection of components.
+   * @param options    - Options.
+   *
+   * @return An LazyLoad component object.
+   */
+
+  function LazyLoad(Splide, Components, options) {
+    var _EventInterface14 = EventInterface(Splide),
+        on = _EventInterface14.on,
+        off = _EventInterface14.off,
+        bind = _EventInterface14.bind,
+        emit = _EventInterface14.emit;
+
+    var isSequential = options.lazyLoad === 'sequential';
+    /**
+     * Stores data of images.
+     */
+
+    var images = [];
+    /**
+     * The current index of images.
+     */
+
+    var index = 0;
+    /**
+     * Called when the component is mounted.
+     */
+
+    function mount() {
+      if (options.lazyLoad) {
+        on([EVENT_MOUNTED, EVENT_REFRESH], function () {
+          destroy();
+          init();
+        });
+
+        if (!isSequential) {
+          on([EVENT_MOUNTED, EVENT_REFRESH, EVENT_MOVED], observe);
+        }
+      }
+    }
+    /**
+     * Finds images that contain specific data attributes.
+     */
+
+
+    function init() {
+      Components.Slides.forEach(function (Slide) {
+        queryAll(Slide.slide, IMAGE_SELECTOR).forEach(function (img) {
+          var src = getAttribute(img, SRC_DATA_ATTRIBUTE);
+          var srcset = getAttribute(img, SRCSET_DATA_ATTRIBUTE);
+
+          if (src !== img.src || srcset !== img.srcset) {
+            var spinner = create('span', options.classes.spinner, img.parentElement);
+            setAttribute(spinner, ROLE, 'presentation');
+            images.push({
+              img: img,
+              Slide: Slide,
+              src: src,
+              srcset: srcset,
+              spinner: spinner
+            });
+            display(img, 'none');
+          }
+        });
+      });
+
+      if (isSequential) {
+        loadNext();
+      }
+    }
+    /**
+     * Destroys the component.
+     */
+
+
+    function destroy() {
+      index = 0;
+      images = [];
+    }
+    /**
+     * Checks how close each image is from the active slide, and determines whether to start loading or not.
+     * The last `+1` is for the current page.
+     */
+
+
+    function observe() {
+      images = images.filter(function (data) {
+        if (data.Slide.isWithin(Splide.index, options.perPage * ((options.preloadPages || 1) + 1))) {
+          return load(data);
+        }
+
+        return true;
+      });
+
+      if (!images.length) {
+        off(EVENT_MOVED);
+      }
+    }
+    /**
+     * Starts loading the image in the data.
+     *
+     * @param data - A LazyLoadImagesData object.
+     */
+
+
+    function load(data) {
+      var img = data.img;
+      addClass(data.Slide.slide, CLASS_LOADING);
+      bind(img, 'load error', function (e) {
+        onLoad(data, e.type === 'error');
+      });
+      ['src', 'srcset'].forEach(function (name) {
+        if (data[name]) {
+          setAttribute(img, name, data[name]);
+          removeAttribute(img, name === 'src' ? SRC_DATA_ATTRIBUTE : SRCSET_DATA_ATTRIBUTE);
+        }
+      });
+    }
+    /**
+     * Called when the image is loaded or any error occurs.
+     *
+     * @param data  - A LazyLoadImagesData object.
+     * @param error - `true` if this method is called on error.
+     */
+
+
+    function onLoad(data, error) {
+      var Slide = data.Slide;
+      removeClass(Slide.slide, CLASS_LOADING);
+
+      if (!error) {
+        remove(data.spinner);
+        display(data.img, '');
+        emit(EVENT_LAZYLOAD_LOADED, data.img, Slide);
+        emit(EVENT_RESIZE);
+      }
+
+      if (isSequential) {
+        loadNext();
+      }
+    }
+    /**
+     * Starts loading a next image.
+     */
+
+
+    function loadNext() {
+      if (index < images.length) {
+        load(images[index++]);
+      }
+    }
+
+    return {
+      mount: mount,
+      destroy: destroy
+    };
+  }
+  /**
+   * The component for handling previous and next arrows.
+   *
+   * @since 3.0.0
+   *
+   * @param Splide     - A Splide instance.
+   * @param Components - A collection of components.
+   * @param options    - Options.
+   *
+   * @return A Arrows component object.
+   */
+
+
+  function Pagination(Splide, Components, options) {
+    var _EventInterface15 = EventInterface(Splide),
+        on = _EventInterface15.on,
+        emit = _EventInterface15.emit,
+        bind = _EventInterface15.bind,
+        unbind = _EventInterface15.unbind;
+
+    var Slides = Components.Slides;
+    var _Components$Controlle2 = Components.Controller,
+        go = _Components$Controlle2.go,
+        toPage = _Components$Controlle2.toPage,
+        hasFocus = _Components$Controlle2.hasFocus,
+        getIndex = _Components$Controlle2.getIndex;
+    /**
+     * Stores all pagination items.
+     */
+
+    var items = [];
+    /**
+     * The pagination element.
+     */
+
+    var list;
+    /**
+     * Called when the component is mounted.
+     */
+
+    function mount() {
+      init();
+      on([EVENT_UPDATED, EVENT_REFRESH], init);
+      on([EVENT_MOVE, EVENT_SCROLLED], update);
+    }
+    /**
+     * Initializes the pagination.
+     */
+
+
+    function init() {
+      destroy();
+
+      if (options.pagination && Slides.isEnough()) {
+        createPagination();
+        emit(EVENT_PAGINATION_MOUNTED, {
+          list: list,
+          items: items
+        }, getAt(Splide.index));
+        update();
+      }
+    }
+    /**
+     * Destroys the component.
+     */
+
+
+    function destroy() {
+      if (list) {
+        remove(list);
+        items.forEach(function (item) {
+          unbind(item.button, 'click');
+        });
+        empty(items);
+        list = null;
+      }
+    }
+    /**
+     * Creates the pagination element and appends it to the slider.
+     */
+
+
+    function createPagination() {
+      var length = Splide.length;
+      var classes = options.classes,
+          i18n = options.i18n,
+          perPage = options.perPage;
+      var _Components$Elements5 = Components.Elements,
+          slider = _Components$Elements5.slider,
+          root = _Components$Elements5.root;
+      var parent = options.pagination === 'slider' && slider ? slider : root;
+      var max = hasFocus() ? length : ceil(length / perPage);
+      list = create('ul', classes.pagination, parent);
+
+      var _loop = function _loop(i) {
+        var li = create('li', null, list);
+        var button = create('button', {
+          class: classes.page,
+          type: 'button'
+        }, li);
+        var controls = Slides.getIn(i).map(function (Slide) {
+          return Slide.slide.id;
+        });
+        var text = !hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
+        bind(button, 'click', function () {
+          go(">" + i);
+        });
+        setAttribute(button, ARIA_CONTROLS, controls.join(' '));
+        setAttribute(button, ARIA_LABEL, format(text, i + 1));
+        emit(EVENT_PAGINATION_PAGE, list, li, button, i);
+        items.push({
+          li: li,
+          button: button,
+          page: i
+        });
+      };
+
+      for (var i = 0; i < max; i++) {
+        _loop(i);
+      }
+    }
+    /**
+     * Returns the pagination item at the specified index.
+     *
+     * @param index - An index.
+     *
+     * @return A pagination item object if available, or otherwise `undefined`.
+     */
+
+
+    function getAt(index) {
+      return items[toPage(index)];
+    }
+    /**
+     * Updates the pagination status.
+     */
+
+
+    function update() {
+      var prev = getAt(getIndex(true));
+      var curr = getAt(getIndex());
+
+      if (prev) {
+        removeClass(prev.button, CLASS_ACTIVE);
+        removeAttribute(prev.button, ARIA_CURRENT);
+      }
+
+      if (curr) {
+        addClass(curr.button, CLASS_ACTIVE);
+        setAttribute(curr.button, ARIA_CURRENT, true);
+      }
+
+      emit(EVENT_PAGINATION_UPDATED, {
+        list: list,
+        items: items
+      }, prev, curr);
+    }
+
+    return {
+      items: items,
+      mount: mount,
+      destroy: destroy,
+      getAt: getAt
+    };
+  }
+  /**
+   * The keys for triggering the navigation slide.
+   *
+   * @since 3.0.0
+   */
+
+
+  var TRIGGER_KEYS = [' ', 'Enter', 'Spacebar'];
+  /**
+   * The component for syncing multiple sliders.
+   *
+   * @since 3.0.0
+   *
+   * @param Splide     - A Splide instance.
+   * @param Components - A collection of components.
+   * @param options    - Options.
+   *
+   * @return A Sync component object.
+   */
+
+  function Sync(Splide, Components, options) {
+    var splides = Splide.splides;
+    /**
+     * Called when the component is mounted.
+     */
+
+    function mount() {
+      if (options.isNavigation) {
+        navigate();
+      } else {
+        sync();
+      }
+    }
+    /**
+     * Syncs the current index among all slides.
+     * The `processed` array prevents recursive call of handlers.
+     */
+
+
+    function sync() {
+      var processed = [];
+      splides.concat(Splide).forEach(function (splide, index, instances) {
+        EventInterface(splide).on(EVENT_MOVE, function (index, prev, dest) {
+          instances.forEach(function (instance) {
+            if (instance !== splide && !includes(processed, splide)) {
+              processed.push(instance);
+              instance.go(instance.is(LOOP) ? dest : index);
+            }
+          });
+          empty(processed);
+        });
+      });
+    }
+    /**
+     * Makes slides clickable and moves the slider to the index of clicked slide.
+     */
+
+
+    function navigate() {
+      var _EventInterface16 = EventInterface(Splide),
+          on = _EventInterface16.on,
+          emit = _EventInterface16.emit;
+
+      on(EVENT_CLICK, function (Slide) {
+        Splide.go(Slide.index);
+      });
+      on(EVENT_SLIDE_KEYDOWN, function (Slide, e) {
+        if (includes(TRIGGER_KEYS, e.key)) {
+          Splide.go(Slide.index);
+          prevent(e);
+        }
+      });
+      emit(EVENT_NAVIGATION_MOUNTED, Splide.splides);
+    }
+
+    return {
+      mount: mount
+    };
+  }
+  /**
+   * The component for observing the mouse wheel and moving the slider.
+   *
+   * @since 3.0.0
+   *
+   * @param Splide     - A Splide instance.
+   * @param Components - A collection of components.
+   * @param options    - Options.
+   *
+   * @return A Wheel component object.
+   */
+
+
+  function Wheel(Splide, Components, options) {
+    var _EventInterface17 = EventInterface(Splide),
+        bind = _EventInterface17.bind;
+    /**
+     * Called when the component is mounted.
+     */
+
+
+    function mount() {
+      if (options.wheel) {
+        bind(Components.Elements.track, 'wheel', onWheel);
+      }
+    }
+    /**
+     * Called when the user rotates the mouse wheel.
+     *
+     * @param e - A WheelEvent object.
+     */
+
+
+    function onWheel(e) {
+      var deltaY = e.deltaY;
+
+      if (deltaY) {
+        Splide.go(deltaY < 0 ? '<' : '>');
+        prevent(e);
+      }
+    }
+
+    return {
+      mount: mount
+    };
+  }
+
+  var CoreComponents = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    Options: Options,
+    Direction: Direction,
+    Elements: Elements,
+    Style: Style,
+    Slides: Slides,
+    Clones: Clones,
+    Layout: Layout,
+    Move: Move,
+    Controller: Controller,
+    Arrows: Arrows,
+    Autoplay: Autoplay,
+    Cover: Cover,
+    Scroll: Scroll,
+    Drag: Drag,
+    Keyboard: Keyboard,
+    LazyLoad: LazyLoad,
+    Pagination: Pagination,
+    Sync: Sync,
+    Wheel: Wheel
+  });
+  /**
+   * The collection of i18n strings.
+   *
+   * @since 3.0.0
    */
 
   var I18N = {
@@ -966,4776 +4807,567 @@ function _extends() { _extends = Object.assign || function (target) { for (var i
     pause: 'Pause autoplay'
   };
   /**
-   * Export default options.
+   * The collection of default options.
+   * Note that this collection does not contain all options.
    *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
+   * @since 3.0.0
    */
 
   var DEFAULTS = {
-    /**
-     * Determine a slider type.
-     * - 'slide': Regular slider.
-     * - 'loop' : Carousel slider.
-     * - 'fade' : Change slides with fade transition. perPage, drag options are ignored.
-     *
-     * @type {string}
-     */
     type: 'slide',
-
-    /**
-     * Whether to rewind a slider before the first slide or after the last one.
-     * In "loop" mode, this option is ignored.
-     *
-     * @type {boolean}
-     */
-    rewind: false,
-
-    /**
-     * Transition speed in milliseconds.
-     *
-     * @type {number}
-     */
     speed: 400,
-
-    /**
-     * Transition speed on rewind in milliseconds.
-     *
-     * @type {number}
-     */
-    rewindSpeed: 0,
-
-    /**
-     * Whether to prevent any actions while a slider is transitioning.
-     * If false, navigation, drag and swipe work while the slider is running.
-     * Even so, it will be forced to wait for transition in some cases in the loop mode to shift a slider.
-     *
-     * @type {boolean}
-     */
     waitForTransition: true,
-
-    /**
-     * Define slider max width.
-     *
-     * @type {number}
-     */
-    width: 0,
-
-    /**
-     * Define slider height.
-     *
-     * @type {number}
-     */
-    height: 0,
-
-    /**
-     * Fix width of slides. CSS format is allowed such as 10em, 80% or 80vw.
-     * perPage number will be ignored when this option is falsy.
-     *
-     * @type {number|string}
-     */
-    fixedWidth: 0,
-
-    /**
-     * Fix height of slides. CSS format is allowed such as 10em, 80vh but % unit is not accepted.
-     * heightRatio option will be ignored when this option is falsy.
-     *
-     * @type {number|string}
-     */
-    fixedHeight: 0,
-
-    /**
-     * Determine height of slides by ratio to a slider width.
-     * This will be ignored when the fixedHeight is provided.
-     *
-     * @type {number}
-     */
-    heightRatio: 0,
-
-    /**
-     * If true, slide width will be determined by the element width itself.
-     * - perPage/perMove should be 1.
-     *
-     * @type {boolean}
-     */
-    autoWidth: false,
-
-    /**
-     * If true, slide height will be determined by the element width itself.
-     * - perPage/perMove should be 1.
-     *
-     * @type {boolean}
-     */
-    autoHeight: false,
-
-    /**
-     * Determine how many slides should be displayed per page.
-     *
-     * @type {number}
-     */
     perPage: 1,
-
-    /**
-     * Determine how many slides should be moved when a slider goes to next or perv.
-     *
-     * @type {number}
-     */
-    perMove: 0,
-
-    /**
-     * Determine manually how many clones should be generated on the left and right side.
-     * The total number of clones will be twice of this number.
-     *
-     * @type {number}
-     */
-    clones: 0,
-
-    /**
-     * Start index.
-     *
-     * @type {number}
-     */
-    start: 0,
-
-    /**
-     * Determine which slide should be focused if there are multiple slides in a page.
-     * A string "center" is acceptable for centering slides.
-     *
-     * @type {boolean|number|string}
-     */
-    focus: false,
-
-    /**
-     * Gap between slides. CSS format is allowed such as 1em.
-     *
-     * @type {number|string}
-     */
-    gap: 0,
-
-    /**
-     * Set padding-left/right in horizontal mode or padding-top/bottom in vertical one.
-     * Give a single value to set a same size for both sides or
-     * do an object for different sizes.
-     * Also, CSS format is allowed such as 1em.
-     *
-     * @example
-     * - 10: Number
-     * - '1em': CSS format.
-     * - { left: 0, right: 20 }: Object for different sizes in horizontal mode.
-     * - { top: 0, bottom: 20 }: Object for different sizes in vertical mode.
-     *
-     * @type {number|string|Object}
-     */
-    padding: 0,
-
-    /**
-     * Whether to append arrows.
-     *
-     * @type {boolean}
-     */
     arrows: true,
-
-    /**
-     * Change the arrow SVG path like 'm7.61 0.807-2.12...'.
-     *
-     * @type {string}
-     */
-    arrowPath: '',
-
-    /**
-     * Whether to append pagination(indicator dots) or not.
-     *
-     * @type {boolean}
-     */
     pagination: true,
-
-    /**
-     * Activate autoplay.
-     *
-     * @type {boolean}
-     */
-    autoplay: false,
-
-    /**
-     * Autoplay interval in milliseconds.
-     *
-     * @type {number}
-     */
     interval: 5000,
-
-    /**
-     * Whether to stop autoplay when a slider is hovered.
-     *
-     * @type {boolean}
-     */
     pauseOnHover: true,
-
-    /**
-     * Whether to stop autoplay when a slider elements are focused.
-     * True is recommended for accessibility.
-     *
-     * @type {boolean}
-     */
     pauseOnFocus: true,
-
-    /**
-     * Whether to reset progress of the autoplay timer when resumed.
-     *
-     * @type {boolean}
-     */
     resetProgress: true,
-
-    /**
-     * Loading images lazily.
-     * Image src must be provided by a data-splide-lazy attribute.
-     *
-     * - false: Do nothing.
-     * - 'nearby': Only images around an active slide will be loaded.
-     * - 'sequential': All images will be sequentially loaded.
-     *
-     * @type {boolean|string}
-     */
-    lazyLoad: false,
-
-    /**
-     * This option works only when a lazyLoad option is "nearby".
-     * Determine how many pages(not slides) around an active slide should be loaded beforehand.
-     *
-     * @type {number}
-     */
-    preloadPages: 1,
-
-    /**
-     * Easing for CSS transition. For example, linear, ease or cubic-bezier().
-     *
-     * @type {string}
-     */
     easing: 'cubic-bezier(.42,.65,.27,.99)',
-
-    /**
-     * Whether to enable keyboard shortcuts
-     * - true or 'global': Listen to keydown event of the document.
-     * - 'focused': Listen to the keydown event of the slider root element. tabindex="0" will be added to the element.
-     * - false: Disable keyboard shortcuts.
-     *
-     * @type {boolean|string}
-     */
-    keyboard: 'global',
-
-    /**
-     * Whether to allow mouse drag and touch swipe.
-     *
-     * @type {boolean}
-     */
     drag: true,
-
-    /**
-     * The angle threshold for drag.
-     * The slider starts moving only when the drag angle is less than this threshold.
-     *
-     * @type {number}
-     */
-    dragAngleThreshold: 30,
-
-    /**
-     * Distance threshold for determining if the action is "flick" or "swipe".
-     * When a drag distance is over this value, the action will be treated as "swipe", not "flick".
-     *
-     * @type {number}
-     */
-    swipeDistanceThreshold: 150,
-
-    /**
-     * Velocity threshold for determining if the action is "flick" or "swipe".
-     * Around 0.5 is recommended.
-     *
-     * @type {number}
-     */
-    flickVelocityThreshold: .6,
-
-    /**
-     * Determine power of flick. The larger number this is, the farther a slider runs by flick.
-     * Around 500 is recommended.
-     *
-     * @type {number}
-     */
-    flickPower: 600,
-
-    /**
-     * Limit a number of pages to move by flick.
-     *
-     * @type {number}
-     */
-    flickMaxPages: 1,
-
-    /**
-     * Slider direction.
-     * - 'ltr': Left to right.
-     * - 'rtl': Right to left.
-     * - 'ttb': Top to bottom.
-     *
-     * @type {string}
-     */
     direction: 'ltr',
-
-    /**
-     * Set img src to background-image of its parent element.
-     * Images with various sizes can be displayed as same dimension without cropping work.
-     * fixedHeight or heightRatio is required.
-     *
-     * @type {boolean}
-     */
-    cover: false,
-
-    /**
-     * Whether to enable accessibility(aria and screen reader texts) or not.
-     *
-     * @type {boolean}
-     */
-    accessibility: true,
-
-    /**
-     * Whether to add tabindex="0" to visible slides or not.
-     *
-     * @type {boolean}
-     */
     slideFocus: true,
-
-    /**
-     * Determine if a slider is navigation for another.
-     * Use "sync" API to synchronize two sliders.
-     *
-     * @type {boolean}
-     */
-    isNavigation: false,
-
-    /**
-     * Whether to trim spaces before the fist slide or after the last one when "focus" is not 0.
-     *
-     * @type {boolean}
-     */
     trimSpace: true,
-
-    /**
-     * The "is-active" class is added after transition as default.
-     * If true, it will be added before move.
-     *
-     * @type {boolean}
-     */
-    updateOnMove: false,
-
-    /**
-     * Throttle duration in milliseconds for the resize event.
-     *
-     * @type {number}
-     */
-    throttle: 100,
-
-    /**
-     * Whether to destroy a slider or not.
-     *
-     * @type {boolean}
-     */
-    destroy: false,
-
-    /**
-     * Options for specific breakpoints.
-     *
-     * @example
-     * {
-     *   1000: {
-     *     perPage: 3,
-     *     gap: 20
-     *   },
-     *   600: {
-     *     perPage: 1,
-     *     gap: 5,
-     *   }
-     * }
-     *
-     * @type {boolean|Object}
-     */
-    breakpoints: false,
-
-    /**
-     * Collection of class names.
-     *
-     * @see ./classes.js
-     *
-     * @type {Object}
-     */
-    classes: ELEMENT_CLASSES,
-
-    /**
-     * Collection of i18n texts.
-     *
-     * @see ./i18n.js
-     *
-     * @type {Object}
-     */
+    classes: CLASSES,
     i18n: I18N
   };
   /**
-   * Export state constants.
+   * The component for the fade transition.
    *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * Splide has been just created.
+   * @since 3.0.0
    *
-   * @type {number}
-   */
-
-  var CREATED = 1;
-  /**
-   * All components have been mounted and initialized.
+   * @param Splide     - A Splide instance.
+   * @param Components - A collection of components.
+   * @param options    - Options.
    *
-   * @type {number}
+   * @return A Transition component object.
    */
 
-  var MOUNTED = 2;
-  /**
-   * Splide is ready for transition.
-   *
-   * @type {number}
-   */
+  function Fade(Splide, Components, options) {
+    var _EventInterface18 = EventInterface(Splide),
+        on = _EventInterface18.on;
 
-  var IDLE = 3;
-  /**
-   * Splide is moving.
-   *
-   * @type {number}
-   */
-
-  var MOVING = 4;
-  /**
-   * Splide is moving.
-   *
-   * @type {number}
-   */
-
-  var DESTROYED = 5;
-  var STATES = /*#__PURE__*/Object.freeze({
-    __proto__: null,
-    CREATED: CREATED,
-    MOUNTED: MOUNTED,
-    IDLE: IDLE,
-    MOVING: MOVING,
-    DESTROYED: DESTROYED
-  });
-  /**
-   * The main class for applying Splide to an element.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * The main class for applying Splide to an element,
-   * providing some APIs to control the behavior.
-   */
-
-  var Splide$1 = /*#__PURE__*/function () {
+    var ruleBy = Components.Style.ruleBy;
     /**
-     * Splide constructor.
-     *
-     * @throws {Error} When the given root element or selector is invalid.
-     *
-     * @param {Element|string}  root       - A selector for a root element or an element itself.
-     * @param {Object}          options    - Optional. Options to change default behaviour.
-     * @param {Object}          Components - Optional. Components.
+     * Called when the component is mounted.
+     * The nextTick disables the initial fade transition of the first slide.
      */
-    function Splide$1(root, options, Components) {
-      if (options === void 0) {
-        options = {};
-      }
 
-      if (Components === void 0) {
-        Components = {};
-      }
-
-      this.root = root instanceof Element ? root : document.querySelector(root);
-      exist(this.root, 'An invalid element/selector was given.');
-      this.Components = null;
-      this.Event = Event();
-      this.State = State(CREATED);
-      this.STATES = STATES;
-      this._o = merge(DEFAULTS, options);
-      this._i = 0;
-      this._c = Components;
-      this._e = {}; // Extensions
-
-      this._t = null; // Transition
+    function mount() {
+      on([EVENT_MOUNTED, EVENT_REFRESH], function () {
+        nextTick(function () {
+          Components.Slides.forEach(function (Slide) {
+            ruleBy(Slide.slide, 'transition', "opacity " + options.speed + "ms " + options.easing);
+          });
+        });
+      });
     }
     /**
-     * Compose and mount components.
+     * Starts the transition.
+     * Explicitly sets the track height to avoid it will collapse in Safari.
      *
-     * @param {Object}   Extensions - Optional. Additional components.
-     * @param {function} Transition - Optional. Set a custom transition component.
-     *
-     * @return {Splide|undefined} - This instance or undefined if an exception occurred.
+     * @param index - A destination index.
+     * @param done  - The callback function that must be called after the transition ends.
      */
 
 
-    var _proto = Splide$1.prototype;
+    function start(index, done) {
+      var track = Components.Elements.track;
+      ruleBy(track, 'height', unit(rect(track).height));
+      nextTick(function () {
+        done();
+        ruleBy(track, 'height', '');
+      });
+    }
+
+    return {
+      mount: mount,
+      start: start,
+      cancel: noop
+    };
+  }
+  /**
+   * The component for the slide transition.
+   *
+   * @since 3.0.0
+   *
+   * @param Splide     - A Splide instance.
+   * @param Components - A collection of components.
+   * @param options    - Options.
+   *
+   * @return A Transition component object.
+   */
+
+
+  function Slide(Splide, Components, options) {
+    var _EventInterface19 = EventInterface(Splide),
+        bind = _EventInterface19.bind;
+
+    var Move = Components.Move,
+        Controller = Components.Controller;
+    var list = Components.Elements.list;
+    /**
+     * Holds the `done` callback function.
+     */
+
+    var endCallback;
+    /**
+     * Called when the component is mounted.
+     */
+
+    function mount() {
+      bind(list, 'transitionend', function (e) {
+        if (e.target === list && endCallback) {
+          cancel();
+          endCallback();
+        }
+      });
+    }
+    /**
+     * Starts the transition.
+     * The Move component calls this method just before the slider moves.
+     *
+     * @param index - A destination index.
+     * @param done  - The callback function that must be called after the transition ends.
+     */
+
+
+    function start(index, done) {
+      var destination = Move.toPosition(index, true);
+      var position = Move.getPosition();
+      var speed = getSpeed(index);
+
+      if (abs(destination - position) >= 1 && speed >= 1) {
+        apply("transform " + speed + "ms " + options.easing);
+        Move.translate(destination);
+        endCallback = done;
+      } else {
+        Move.jump(index);
+        done();
+      }
+    }
+    /**
+     * Cancels the transition.
+     */
+
+
+    function cancel() {
+      apply('');
+    }
+    /**
+     * Returns the transition speed.
+     *
+     * @param index - A destination index.
+     */
+
+
+    function getSpeed(index) {
+      var rewindSpeed = options.rewindSpeed;
+
+      if (Splide.is(SLIDE) && rewindSpeed) {
+        var prev = Controller.getIndex(true);
+        var end = Controller.getEnd();
+
+        if (prev === 0 && index >= end || prev >= end && index === 0) {
+          return rewindSpeed;
+        }
+      }
+
+      return options.speed;
+    }
+    /**
+     * Applies the transition CSS property to the list element.
+     *
+     * @param transition - A transition CSS value.
+     */
+
+
+    function apply(transition) {
+      Components.Style.ruleBy(list, 'transition', transition);
+    }
+
+    return {
+      mount: mount,
+      start: start,
+      cancel: cancel
+    };
+  }
+  /**
+   * The frontend class for the Splide slider.
+   *
+   * @since 3.0.0
+   */
+
+
+  var Splide = /*#__PURE__*/function () {
+    /**
+     * The Splide constructor.
+     *
+     * @param target  - The selector for the target element, or the element itself.
+     * @param options - Optional. An object with options.
+     */
+    function Splide(target, options) {
+      /**
+       * The EventBusObject object.
+       */
+      this.event = EventBus();
+      /**
+       * The collection of all component objects.
+       */
+
+      this.Components = {};
+      /**
+       * The StateObject object.
+       */
+
+      this.state = State(CREATED);
+      /**
+       * Splide instances to sync with.
+       */
+
+      this.splides = [];
+      /**
+       * The collection of options.
+       */
+
+      this._private_opts = {};
+      /**
+       * The collection of extensions.
+       */
+
+      this._private_Extensions = {};
+      var root = isString(target) ? query(document, target) : target;
+      assert(root, root + " is invalid.");
+      this.root = root;
+      merge(DEFAULTS, Splide.defaults);
+      merge(merge(this._private_opts, DEFAULTS), options || {});
+    }
+    /**
+     * Initializes the instance.
+     *
+     * @param Extensions - Optional. An object with extensions.
+     * @param Transition - Optional. A Transition component.
+     *
+     * @return `this`
+     */
+
+
+    var _proto = Splide.prototype;
 
     _proto.mount = function mount(Extensions, Transition) {
-      var _this = this;
+      var _this3 = this;
 
-      if (Extensions === void 0) {
-        Extensions = this._e;
-      }
-
-      if (Transition === void 0) {
-        Transition = this._t;
-      }
-
-      // Reset the state.
-      this.State.set(CREATED);
-      this._e = Extensions;
-      this._t = Transition;
-      this.Components = compose(this, merge(this._c, Extensions), Transition);
-
-      try {
-        each(this.Components, function (component, key) {
-          var required = component.required;
-
-          if (required === undefined || required) {
-            component.mount && component.mount();
-          } else {
-            delete _this.Components[key];
-          }
-        });
-      } catch (e) {
-        error(e.message);
-        return;
-      }
-
-      var State = this.State;
-      State.set(MOUNTED);
-      each(this.Components, function (component) {
+      this.state.set(CREATED);
+      this._private_Transition = Transition || this._private_Transition || (this.is(FADE) ? Fade : Slide);
+      this._private_Extensions = Extensions || this._private_Extensions;
+      var Components = assign({}, CoreComponents, this._private_Extensions, {
+        Transition: this._private_Transition
+      });
+      forOwn(Components, function (Component, key) {
+        var component = Component(_this3, _this3.Components, _this3._private_opts);
+        _this3.Components[key] = component;
+        component.mount && component.mount();
+      });
+      forOwn(this.Components, function (component) {
         component.mounted && component.mounted();
       });
-      this.emit('mounted');
-      State.set(IDLE);
-      this.emit('ready');
-      applyStyle(this.root, {
-        visibility: 'visible'
-      });
-      this.on('move drag', function () {
-        return State.set(MOVING);
-      }).on('moved dragged', function () {
-        return State.set(IDLE);
-      });
+      this.emit(EVENT_MOUNTED);
+      addClass(this.root, CLASS_INITIALIZED);
+      this.state.set(IDLE);
+      this.emit(EVENT_READY);
       return this;
     }
     /**
-     * Set sync target.
+     * Syncs the slider with the provided one.
+     * This method must be called before the `mount()`.
      *
-     * @param {Splide} splide - A Splide instance.
+     * @example
+     * ```ts
+     * var primary   = new Splide();
+     * var secondary = new Splide();
      *
-     * @return {Splide} - This instance.
+     * primary.sync( secondary );
+     * primary.mount();
+     * secondary.mount();
+     * ```
+     *
+     * @param splide - A Splide instance to sync with.
+     *
+     * @return `this`
      */
     ;
 
     _proto.sync = function sync(splide) {
-      this.sibling = splide;
+      this.splides.push(splide);
+      splide.splides.push(this);
       return this;
     }
     /**
-     * Register callback fired on the given event(s).
+     * Moves the slider with the following control pattern.
      *
-     * @param {string}   events  - An event name. Use space to separate multiple events.
-     *                             Also, namespace is accepted by dot, such as 'resize.{namespace}'.
-     * @param {function} handler - A callback function.
-     * @param {Element}  elm     - Optional. Native event will be listened to when this arg is provided.
-     * @param {Object}   options - Optional. Options for addEventListener.
+     * | Pattern | Description |
+     * |---|---|
+     * | `i` | Goes to the slide `i` |
+     * | `'+${i}'` | Increments the slide index by `i` |
+     * | `'-${i}'` | Decrements the slide index by `i` |
+     * | `'>'` | Goes to the next page |
+     * | `'<'` | Goes to the previous page |
+     * | `>${i}` | Goes to the page `i` |
      *
-     * @return {Splide} - This instance.
+     * In most cases, `'>'` and `'<'` notations are enough to control the slider
+     * because they respect `perPage` and `perMove` options.
+     *
+     * @example
+     * ```ts
+     * var splide = new Splide();
+     *
+     * // Goes to the slide 1:
+     * splide.go( 1 );
+     *
+     * // Increments the index:
+     * splide.go( '+2' );
+     *
+     * // Goes to the next page:
+     * splide.go( '>' );
+     *
+     * // Goes to the page 2:
+     * splide.go( '>2' );
+     * ```
+     *
+     * @param control
      */
     ;
 
-    _proto.on = function on(events, handler, elm, options) {
-      if (elm === void 0) {
-        elm = null;
-      }
-
-      if (options === void 0) {
-        options = {};
-      }
-
-      this.Event.on(events, handler, elm, options);
-      return this;
+    _proto.go = function go(control) {
+      this.Components.Controller.go(control);
     }
     /**
-     * Unsubscribe the given event.
+     * Registers an event handler.
      *
-     * @param {string}  events - A event name.
-     * @param {Element} elm    - Optional. removeEventListener() will be called when this arg is provided.
+     * @example
+     * ```ts
+     * var splide = new Splide();
      *
-     * @return {Splide} - This instance.
+     * // Listens to a single event:
+     * splide.on( 'move', function() {} );
+     *
+     * // Listens to multiple events:
+     * splide.on( 'move resize', function() {} );
+     *
+     * // Appends a namespace:
+     * splide.on( 'move.myNamespace resize.myNamespace', function() {} );
+     * ```
+     *
+     * @param events   - An event name or names separated by spaces. Use a dot(.) to append a namespace.
+     * @param callback - A callback function.
+     *
+     * @return `this`
      */
     ;
 
-    _proto.off = function off(events, elm) {
-      if (elm === void 0) {
-        elm = null;
-      }
-
-      this.Event.off(events, elm);
+    _proto.on = function on(events, callback) {
+      this.event.on(events, callback);
       return this;
     }
     /**
-     * Emit an event.
+     * Removes the registered all handlers for the specified event or events.
+     * If you want to only remove a particular handler, use namespace to identify it.
      *
-     * @param {string} event - An event name.
-     * @param {*}      args  - Any number of arguments passed to handlers.
+     * @example
+     * ```ts
+     * var splide = new Splide();
+     *
+     * // Removes all handlers assigned to "move":
+     * splide.off( 'move' );
+     *
+     * // Only removes handlers that belong to the specified namespace:
+     * splide.off( 'move.myNamespace' );
+     * ```
+     *
+     * @param events - An event name or names separated by spaces. Use a dot(.) to append a namespace.
+     *
+     * @return `this`
+     */
+    ;
+
+    _proto.off = function off(events) {
+      this.event.off(events);
+      return this;
+    }
+    /**
+     * Emits an event and triggers registered handlers.
+     *
+     * @param event - An event name to emit.
+     * @param args  - Optional. Any number of arguments to pass to handlers.
+     *
+     * @return `this`
      */
     ;
 
     _proto.emit = function emit(event) {
-      var _this$Event;
+      var _this$event;
 
       for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
         args[_key2 - 1] = arguments[_key2];
       }
 
-      (_this$Event = this.Event).emit.apply(_this$Event, [event].concat(args));
+      (_this$event = this.event).emit.apply(_this$event, [event].concat(args));
 
       return this;
     }
     /**
-     * Go to the slide specified by the given control.
+     * Inserts a slide at the specified position.
      *
-     * @param {string|number} control - A control pattern.
-     * @param {boolean}       wait    - Optional. Whether to wait for transition.
+     * @example
+     * ```ts
+     * var splide = new Splide();
+     * splide.mount();
+     *
+     * // Adds the slide by the HTML:
+     * splide.add( '<li></li> );
+     *
+     * // or adds the element:
+     * splide.add( document.createElement( 'li' ) );
+     * ```
+     *
+     * @param slides - A slide element, an HTML string that represents a slide, or an array with them.
+     * @param index  - Optional. An index to insert a slide at.
+     *
+     * @return `this`
      */
     ;
 
-    _proto.go = function go(control, wait) {
-      if (wait === void 0) {
-        wait = this.options.waitForTransition;
-      }
-
-      if (this.State.is(IDLE) || this.State.is(MOVING) && !wait) {
-        this.Components.Controller.go(control, false);
-      }
-
+    _proto.add = function add(slides, index) {
+      this.Components.Slides.add(slides, index);
       return this;
     }
     /**
-     * Verify whether the slider type is the given one or not.
+     * Removes slides that match the matcher
+     * that can be an index, an array with indices, a selector, or an iteratee function.
      *
-     * @param {string} type - A slider type.
+     * @param matcher - An index, an array with indices, a selector string, or an iteratee function.
+     */
+    ;
+
+    _proto.remove = function remove(matcher) {
+      this.Components.Slides.remove(matcher);
+      return this;
+    }
+    /**
+     * Checks the slider type.
      *
-     * @return {boolean} - True if the slider type is the provided type or false if not.
+     * @param type - A type to test.
+     *
+     * @return `true` if the type matches the current one, or otherwise `false`.
      */
     ;
 
     _proto.is = function is(type) {
-      return type === this._o.type;
+      return this._private_opts.type === type;
     }
     /**
-     * Insert a slide.
+     * Refreshes the slider.
      *
-     * @param {Element|string} slide - A slide element to be added.
-     * @param {number}         index - A slide will be added at the position.
-     */
-    ;
-
-    _proto.add = function add(slide, index) {
-      if (index === void 0) {
-        index = -1;
-      }
-
-      this.Components.Elements.add(slide, index, this.refresh.bind(this));
-      return this;
-    }
-    /**
-     * Remove the slide designated by the index.
-     *
-     * @param {number} index - A slide index.
-     */
-    ;
-
-    _proto.remove = function remove(index) {
-      this.Components.Elements.remove(index);
-      this.refresh();
-      return this;
-    }
-    /**
-     * Destroy all Slide objects and clones and recreate them again.
+     * @return `this`
      */
     ;
 
     _proto.refresh = function refresh() {
-      this.emit('refresh:before').emit('refresh').emit('resize');
+      this.emit(EVENT_REFRESH);
       return this;
     }
     /**
-     * Destroy the Splide.
-     * "Completely" boolean is mainly for breakpoints.
+     * Destroys the slider.
      *
-     * @param {boolean} completely - Destroy completely.
+     * @param completely - Optional. If `true`, Splide will not remount the slider by breakpoints.
+     *
+     * @return `this`
      */
     ;
 
     _proto.destroy = function destroy(completely) {
-      var _this2 = this;
+      var event = this.event,
+          state = this.state;
 
-      if (completely === void 0) {
-        completely = true;
-      }
-
-      // Postpone destroy because it should be done after mount.
-      if (this.State.is(CREATED)) {
-        this.on('ready', function () {
-          return _this2.destroy(completely);
+      if (state.is(CREATED)) {
+        // Postpones destruction requested before the slider becomes ready.
+        event.on(EVENT_READY, this.destroy.bind(this, completely), this);
+      } else {
+        forOwn(this.Components, function (component) {
+          component.destroy && component.destroy(completely);
         });
-        return;
+        event.emit(EVENT_DESTROY);
+        event.destroy();
+        empty(this.splides);
+        state.set(DESTROYED);
       }
 
-      values(this.Components).reverse().forEach(function (component) {
-        component.destroy && component.destroy(completely);
-      });
-      this.emit('destroy', completely); // Destroy all event handlers, including ones for native events.
-
-      this.Event.destroy();
-      this.State.set(DESTROYED);
       return this;
     }
     /**
-     * Return the current slide index.
+     * Returns options.
      *
-     * @return {number} - The current slide index.
-     // */
+     * @return An object with the latest options.
+     */
     ;
 
-    _createClass(Splide$1, [{
-      key: "index",
+    _createClass(Splide, [{
+      key: "options",
       get: function get() {
-        return this._i;
+        return this._private_opts;
       }
       /**
-       * Set the current slide index.
+       * Merges options to the current options and emits `updated` event.
        *
-       * @param {number|string} index - A new index.
+       * @param options - An object with new options.
        */
       ,
-      set: function set(index) {
-        this._i = parseInt(index);
+      set: function set(options) {
+        var opts = this._private_opts;
+        merge(opts, options);
+
+        if (!this.state.is(CREATED)) {
+          this.emit(EVENT_UPDATED, opts);
+        }
       }
       /**
-       * Return length of slides.
-       * This is an alias of Elements.length.
+       * Returns the number of slides without clones.
        *
-       * @return {number} - A number of slides.
+       * @return The number of slides.
        */
 
     }, {
       key: "length",
       get: function get() {
-        return this.Components.Elements.length;
+        return this.Components.Slides.getLength(true);
       }
       /**
-       * Return options.
+       * Returns the active slide index.
        *
-       * @return {Object} - Options object.
+       * @return The active slide index.
        */
 
     }, {
-      key: "options",
+      key: "index",
       get: function get() {
-        return this._o;
-      }
-      /**
-       * Set options with merging the given object to the current one.
-       *
-       * @param {Object} options - New options.
-       */
-      ,
-      set: function set(options) {
-        var created = this.State.is(CREATED);
-
-        if (!created) {
-          this.emit('update');
-        }
-
-        this._o = merge(this._o, options);
-
-        if (!created) {
-          this.emit('updated', this._o);
-        }
-      }
-      /**
-       * Return the class list.
-       * This is an alias of Splide.options.classList.
-       *
-       * @return {Object} - An object containing all class list.
-       */
-
-    }, {
-      key: "classes",
-      get: function get() {
-        return this._o.classes;
-      }
-      /**
-       * Return the i18n strings.
-       * This is an alias of Splide.options.i18n.
-       *
-       * @return {Object} - An object containing all i18n strings.
-       */
-
-    }, {
-      key: "i18n",
-      get: function get() {
-        return this._o.i18n;
+        return this.Components.Controller.getIndex();
       }
     }]);
 
-    return Splide$1;
+    return Splide;
   }();
   /**
-   * The component for initializing options.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
+   * Changes the default options for all Splide instances.
    */
 
-  /**
-   * The component for initializing options.
-   *
-   * @param {Splide} Splide - A Splide instance.
-   *
-   * @return {Object} - The component object.
-   */
-
-
-  var Options = function Options(Splide) {
-    /**
-     * Retrieve options from the data attribute.
-     * Note that IE10 doesn't support dataset property.
-     *
-     * @type {string}
-     */
-    var options = getAttribute(Splide.root, 'data-splide');
-
-    if (options) {
-      try {
-        Splide.options = JSON.parse(options);
-      } catch (e) {
-        error(e.message);
-      }
-    }
-
-    return {
-      /**
-       * Called when the component is mounted.
-       */
-      mount: function mount() {
-        if (Splide.State.is(CREATED)) {
-          Splide.index = Splide.options.start;
-        }
-      }
-    };
-  };
-  /**
-   * Export layout modes.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * Enumerate slides from right to left.
-   *
-   * @type {string}
-   */
-
-
-  var RTL = 'rtl';
-  /**
-   * Enumerate slides in a col.
-   *
-   * @type {string}
-   */
-
-  var TTB = 'ttb';
-  /**
-   * The sub component for handling each slide.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * Events for restoring original styles.
-   *
-   * @type {string}
-   */
-
-  var STYLE_RESTORE_EVENTS = 'update.slide';
-  /**
-   * The sub component for handling each slide.
-   *
-   * @param {Splide}  Splide    - A Splide instance.
-   * @param {number}  index     - An unique slide index.
-   * @param {number}  realIndex - Clones should pass a real slide index.
-   * @param {Element} slide     - A slide element.
-   *
-   * @return {Object} - The sub component object.
-   */
-
-  var Slide = function Slide(Splide, index, realIndex, slide) {
-    /**
-     * Whether to update "is-active" class before or after transition.
-     *
-     * @type {boolean}
-     */
-    var updateOnMove = Splide.options.updateOnMove;
-    /**
-     * Events when the slide status is updated.
-     * Append a namespace to remove listeners later.
-     *
-     * @type {string}
-     */
-
-    var STATUS_UPDATE_EVENTS = 'ready.slide updated.slide resized.slide moved.slide' + (updateOnMove ? ' move.slide' : '');
-    /**
-     * Slide sub component object.
-     *
-     * @type {Object}
-     */
-
-    var Slide = {
-      /**
-       * Slide element.
-       *
-       * @type {Element}
-       */
-      slide: slide,
-
-      /**
-       * Slide index.
-       *
-       * @type {number}
-       */
-      index: index,
-
-      /**
-       * Real index for clones.
-       *
-       * @type {number}
-       */
-      realIndex: realIndex,
-
-      /**
-       * Container element if available.
-       *
-       * @type {Element|undefined}
-       */
-      container: child(slide, Splide.classes.container),
-
-      /**
-       * Whether this is a cloned slide or not.
-       *
-       * @type {boolean}
-       */
-      isClone: realIndex > -1,
-
-      /**
-       * Called when the component is mounted.
-       */
-      mount: function mount() {
-        var _this3 = this;
-
-        if (!this.isClone) {
-          slide.id = Splide.root.id + "-slide" + pad(index + 1);
-        }
-
-        Splide.on(STATUS_UPDATE_EVENTS, function () {
-          return _this3.update();
-        }).on(STYLE_RESTORE_EVENTS, restoreStyles).on('click', function () {
-          return Splide.emit('click', _this3);
-        }, slide);
-        /*
-         * Add "is-active" class to a clone element temporarily
-         * and it will be removed on "moved" event.
-         */
-
-        if (updateOnMove) {
-          Splide.on('move.slide', function (newIndex) {
-            if (newIndex === realIndex) {
-              _update(true, false);
-            }
-          });
-        } // Make sure the slide is shown.
-
-
-        applyStyle(slide, {
-          display: ''
-        }); // Hold the original styles.
-
-        this.styles = getAttribute(slide, 'style') || '';
-      },
-
-      /**
-       * Destroy.
-       */
-      destroy: function destroy() {
-        Splide.off(STATUS_UPDATE_EVENTS).off(STYLE_RESTORE_EVENTS).off('click', slide);
-        removeClass(slide, values(STATUS_CLASSES));
-        restoreStyles();
-        removeAttribute(this.container, 'style');
-      },
-
-      /**
-       * Update active and visible status.
-       */
-      update: function update() {
-        _update(this.isActive(), false);
-
-        _update(this.isVisible(), true);
-      },
-
-      /**
-       * Check whether this slide is active or not.
-       *
-       * @return {boolean} - True if the slide is active or false if not.
-       */
-      isActive: function isActive() {
-        return Splide.index === index;
-      },
-
-      /**
-       * Check whether this slide is visible in the viewport or not.
-       *
-       * @return {boolean} - True if the slide is visible or false if not.
-       */
-      isVisible: function isVisible() {
-        var active = this.isActive();
-
-        if (Splide.is(FADE) || active) {
-          return active;
-        }
-
-        var ceil = Math.ceil;
-        var trackRect = getRect(Splide.Components.Elements.track);
-        var slideRect = getRect(slide);
-
-        if (Splide.options.direction === TTB) {
-          return trackRect.top <= slideRect.top && slideRect.bottom <= ceil(trackRect.bottom);
-        }
-
-        return trackRect.left <= slideRect.left && slideRect.right <= ceil(trackRect.right);
-      },
-
-      /**
-       * Calculate how far this slide is from another slide and
-       * return true if the distance is within the given number.
-       *
-       * @param {number} from   - Index of a target slide.
-       * @param {number} within - True if the slide is within this number.
-       *
-       * @return {boolean} - True if the slide is within the number or false otherwise.
-       */
-      isWithin: function isWithin(from, within) {
-        var diff = Math.abs(from - index);
-
-        if (!Splide.is(SLIDE) && !this.isClone) {
-          diff = Math.min(diff, Splide.length - diff);
-        }
-
-        return diff < within;
-      }
-    };
-    /**
-     * Update classes for activity or visibility.
-     *
-     * @param {boolean} active        - Is active/visible or not.
-     * @param {boolean} forVisibility - Toggle classes for activity or visibility.
-     */
-
-    function _update(active, forVisibility) {
-      var type = forVisibility ? 'visible' : 'active';
-      var className = STATUS_CLASSES[type];
-
-      if (active) {
-        addClass(slide, className);
-        Splide.emit("" + type, Slide);
-      } else {
-        if (hasClass(slide, className)) {
-          removeClass(slide, className);
-          Splide.emit("" + (forVisibility ? 'hidden' : 'inactive'), Slide);
-        }
-      }
-    }
-    /**
-     * Restore the original styles.
-     */
-
-
-    function restoreStyles() {
-      setAttribute(slide, 'style', Slide.styles);
-    }
-
-    return Slide;
-  };
-  /**
-   * The component for main elements.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * The property name for UID stored in a window object.
-   *
-   * @type {string}
-   */
-
-
-  var UID_NAME = 'uid';
-  /**
-   * The component for main elements.
-   *
-   * @param {Splide} Splide     - A Splide instance.
-   * @param {Object} Components - An object containing components.
-   *
-   * @return {Object} - The component object.
-   */
-
-  var Elements = function Elements(Splide, Components) {
-    /**
-     * Hold the root element.
-     *
-     * @type {Element}
-     */
-    var root = Splide.root;
-    /**
-     * Hold the class list.
-     *
-     * @type {Object}
-     */
-
-    var classes = Splide.classes;
-    /**
-     * Store Slide objects.
-     *
-     * @type {Array}
-     */
-
-    var Slides = [];
-    /*
-     * Assign unique ID to the root element if it doesn't have the one.
-     * Note that IE doesn't support padStart() to fill the uid by 0.
-     */
-
-    if (!root.id) {
-      window.splide = window.splide || {};
-      var uid = window.splide[UID_NAME] || 0;
-      window.splide[UID_NAME] = ++uid;
-      root.id = "splide" + pad(uid);
-    }
-    /**
-     * Elements component object.
-     *
-     * @type {Object}
-     */
-
-
-    var Elements = {
-      /**
-       * Called when the component is mounted.
-       * Collect main elements and store them as member properties.
-       */
-      mount: function mount() {
-        var _this4 = this;
-
-        this.init();
-        Splide.on('refresh', function () {
-          _this4.destroy();
-
-          _this4.init();
-        }).on('updated', function () {
-          removeClass(root, getClasses());
-          addClass(root, getClasses());
-        });
-      },
-
-      /**
-       * Destroy.
-       */
-      destroy: function destroy() {
-        Slides.forEach(function (Slide) {
-          Slide.destroy();
-        });
-        Slides = [];
-        removeClass(root, getClasses());
-      },
-
-      /**
-       * Initialization.
-       */
-      init: function init() {
-        var _this5 = this;
-
-        collect();
-        addClass(root, getClasses());
-        this.slides.forEach(function (slide, index) {
-          _this5.register(slide, index, -1);
-        });
-      },
-
-      /**
-       * Register a slide to create a Slide object and handle its behavior.
-       *
-       * @param {Element} slide     - A slide element.
-       * @param {number}  index     - A unique index. This can be negative.
-       * @param {number}  realIndex - A real index for clones. Set -1 for real slides.
-       */
-      register: function register(slide, index, realIndex) {
-        var SlideObject = Slide(Splide, index, realIndex, slide);
-        SlideObject.mount();
-        Slides.push(SlideObject);
-      },
-
-      /**
-       * Return the Slide object designated by the index.
-       * Note that "find" is not supported by IE.
-       *
-       * @return {Object|undefined} - A Slide object if available. Undefined if not.
-       */
-      getSlide: function getSlide(index) {
-        return Slides.filter(function (Slide) {
-          return Slide.index === index;
-        })[0];
-      },
-
-      /**
-       * Return all Slide objects.
-       *
-       * @param {boolean} includeClones - Whether to include cloned slides or not.
-       *
-       * @return {Object[]} - Slide objects.
-       */
-      getSlides: function getSlides(includeClones) {
-        return includeClones ? Slides : Slides.filter(function (Slide) {
-          return !Slide.isClone;
-        });
-      },
-
-      /**
-       * Return Slide objects belonging to the given page.
-       *
-       * @param {number} page - A page number.
-       *
-       * @return {Object[]} - An array containing Slide objects.
-       */
-      getSlidesByPage: function getSlidesByPage(page) {
-        var idx = Components.Controller.toIndex(page);
-        var options = Splide.options;
-        var max = options.focus !== false ? 1 : options.perPage;
-        return Slides.filter(function (_ref2) {
-          var index = _ref2.index;
-          return idx <= index && index < idx + max;
-        });
-      },
-
-      /**
-       * Insert a slide to a slider.
-       * Need to refresh Splide after adding a slide.
-       *
-       * @param {Node|string} slide    - A slide element to be added.
-       * @param {number}      index    - A slide will be added at the position.
-       * @param {Function}    callback - Called right after the slide is added to the DOM tree.
-       */
-      add: function add(slide, index, callback) {
-        if (typeof slide === 'string') {
-          slide = domify(slide);
-        }
-
-        if (slide instanceof Element) {
-          var ref = this.slides[index]; // This will be removed in mount() of a Slide component.
-
-          applyStyle(slide, {
-            display: 'none'
-          });
-
-          if (ref) {
-            before(slide, ref);
-            this.slides.splice(index, 0, slide);
-          } else {
-            append(this.list, slide);
-            this.slides.push(slide);
-          }
-
-          loaded(slide, function () {
-            callback && callback(slide);
-          });
-        }
-      },
-
-      /**
-       * Remove a slide from a slider.
-       * Need to refresh Splide after removing a slide.
-       *
-       * @param index - Slide index.
-       */
-      remove: function remove(index) {
-        _remove(this.slides.splice(index, 1)[0]);
-      },
-
-      /**
-       * Trigger the provided callback for each Slide object.
-       *
-       * @param {Function} callback - A callback function. The first argument will be the Slide object.
-       */
-      each: function each(callback) {
-        Slides.forEach(callback);
-      },
-
-      /**
-       * Return slides length without clones.
-       *
-       * @return {number} - Slide length.
-       */
-      get length() {
-        return this.slides.length;
-      },
-
-      /**
-       * Return "SlideObjects" length including clones.
-       *
-       * @return {number} - Slide length including clones.
-       */
-      get total() {
-        return Slides.length;
-      }
-
-    };
-    /**
-     * Collect elements.
-     */
-
-    function collect() {
-      Elements.slider = child(root, classes.slider);
-      Elements.track = find(root, "." + classes.track);
-      Elements.list = child(Elements.track, classes.list);
-      exist(Elements.track && Elements.list, 'Track or list was not found.');
-      Elements.slides = children(Elements.list, classes.slide);
-      var arrows = findParts(classes.arrows);
-      Elements.arrows = {
-        prev: find(arrows, "." + classes.prev),
-        next: find(arrows, "." + classes.next)
-      };
-      var autoplay = findParts(classes.autoplay);
-      Elements.bar = find(findParts(classes.progress), "." + classes.bar);
-      Elements.play = find(autoplay, "." + classes.play);
-      Elements.pause = find(autoplay, "." + classes.pause);
-      Elements.track.id = Elements.track.id || root.id + "-track";
-      Elements.list.id = Elements.list.id || root.id + "-list";
-    }
-    /**
-     * Return class names for the root element.
-     */
-
-
-    function getClasses() {
-      var rootClass = classes.root;
-      var options = Splide.options;
-      return [rootClass + "--" + options.type, rootClass + "--" + options.direction, options.drag ? rootClass + "--draggable" : '', options.isNavigation ? rootClass + "--nav" : '', STATUS_CLASSES.active];
-    }
-    /**
-     * Find parts only from children of the root or track.
-     *
-     * @return {Element} - A found element or undefined.
-     */
-
-
-    function findParts(className) {
-      return child(root, className) || child(Elements.slider, className);
-    }
-
-    return Elements;
-  };
-  /**
-   * The component for controlling the track.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-
-  var floor = Math.floor;
-  /**
-   * The component for controlling the track.
-   *
-   * @param {Splide} Splide     - A Splide instance.
-   * @param {Object} Components - An object containing components.
-   *
-   * @return {Object} - The component object.
-   */
-
-  var Controller = function Controller(Splide, Components) {
-    /**
-     * Store current options.
-     *
-     * @type {Object}
-     */
-    var options;
-    /**
-     * True if the slide is LOOP mode.
-     *
-     * @type {boolean}
-     */
-
-    var isLoop;
-    /**
-     * Controller component object.
-     *
-     * @type {Object}
-     */
-
-    var Controller = {
-      /**
-       * Called when the component is mounted.
-       */
-      mount: function mount() {
-        options = Splide.options;
-        isLoop = Splide.is(LOOP);
-        bind();
-      },
-
-      /**
-       * Make track run by the given control.
-       * - "+{i}" : Increment the slide index by i.
-       * - "-{i}" : Decrement the slide index by i.
-       * - "{i}"  : Go to the slide whose index is i.
-       * - ">"    : Go to next page.
-       * - "<"    : Go to prev page.
-       * - ">{i}" : Go to page i.
-       *
-       * @param {string|number} control  - A control pattern.
-       * @param {boolean}       silently - Go to the destination without event emission.
-       */
-      go: function go(control, silently) {
-        var destIndex = this.trim(this.parse(control));
-        Components.Track.go(destIndex, this.rewind(destIndex), silently);
-      },
-
-      /**
-       * Parse the given control and return the destination index for the track.
-       *
-       * @param {string} control - A control target pattern.
-       *
-       * @return {number} - A parsed target.
-       */
-      parse: function parse(control) {
-        var index = Splide.index;
-        var matches = String(control).match(/([+\-<>]+)(\d+)?/);
-        var indicator = matches ? matches[1] : '';
-        var number = matches ? parseInt(matches[2]) : 0;
-
-        switch (indicator) {
-          case '+':
-            index += number || 1;
-            break;
-
-          case '-':
-            index -= number || 1;
-            break;
-
-          case '>':
-          case '<':
-            index = parsePage(number, index, indicator === '<');
-            break;
-
-          default:
-            index = parseInt(control);
-        }
-
-        return index;
-      },
-
-      /**
-       * Compute index from the given page number.
-       *
-       * @param {number} page - Page number.
-       *
-       * @return {number} - A computed page number.
-       */
-      toIndex: function toIndex(page) {
-        if (hasFocus()) {
-          return page;
-        }
-
-        var length = Splide.length;
-        var perPage = options.perPage;
-        var index = page * perPage;
-        index = index - (this.pageLength * perPage - length) * floor(index / length); // Adjustment for the last page.
-
-        if (length - perPage <= index && index < length) {
-          index = length - perPage;
-        }
-
-        return index;
-      },
-
-      /**
-       * Compute page number from the given slide index.
-       *
-       * @param {number} index - Slide index.
-       *
-       * @return {number} - A computed page number.
-       */
-      toPage: function toPage(index) {
-        if (hasFocus()) {
-          return index;
-        }
-
-        var length = Splide.length;
-        var perPage = options.perPage; // Make the last "perPage" number of slides belong to the last page.
-
-        if (length - perPage <= index && index < length) {
-          return floor((length - 1) / perPage);
-        }
-
-        return floor(index / perPage);
-      },
-
-      /**
-       * Trim the given index according to the current mode.
-       * Index being returned could be less than 0 or greater than the length in Loop mode.
-       *
-       * @param {number} index - An index being trimmed.
-       *
-       * @return {number} - A trimmed index.
-       */
-      trim: function trim(index) {
-        if (!isLoop) {
-          index = options.rewind ? this.rewind(index) : between(index, 0, this.edgeIndex);
-        }
-
-        return index;
-      },
-
-      /**
-       * Rewind the given index if it's out of range.
-       *
-       * @param {number} index - An index.
-       *
-       * @return {number} - A rewound index.
-       */
-      rewind: function rewind(index) {
-        var edge = this.edgeIndex;
-
-        if (isLoop) {
-          while (index > edge) {
-            index -= edge + 1;
-          }
-
-          while (index < 0) {
-            index += edge + 1;
-          }
-        } else {
-          if (index > edge) {
-            index = 0;
-          } else if (index < 0) {
-            index = edge;
-          }
-        }
-
-        return index;
-      },
-
-      /**
-       * Check if the direction is "rtl" or not.
-       *
-       * @return {boolean} - True if "rtl" or false if not.
-       */
-      isRtl: function isRtl() {
-        return options.direction === RTL;
-      },
-
-      /**
-       * Return the page length.
-       *
-       * @return {number} - Max page number.
-       */
-      get pageLength() {
-        var length = Splide.length;
-        return hasFocus() ? length : Math.ceil(length / options.perPage);
-      },
-
-      /**
-       * Return the edge index.
-       *
-       * @return {number} - Edge index.
-       */
-      get edgeIndex() {
-        var length = Splide.length;
-
-        if (!length) {
-          return 0;
-        }
-
-        if (hasFocus() || options.isNavigation || isLoop) {
-          return length - 1;
-        }
-
-        return length - options.perPage;
-      },
-
-      /**
-       * Return the index of the previous slide.
-       *
-       * @return {number} - The index of the previous slide if available. -1 otherwise.
-       */
-      get prevIndex() {
-        var prev = Splide.index - 1;
-
-        if (isLoop || options.rewind) {
-          prev = this.rewind(prev);
-        }
-
-        return prev > -1 ? prev : -1;
-      },
-
-      /**
-       * Return the index of the next slide.
-       *
-       * @return {number} - The index of the next slide if available. -1 otherwise.
-       */
-      get nextIndex() {
-        var next = Splide.index + 1;
-
-        if (isLoop || options.rewind) {
-          next = this.rewind(next);
-        }
-
-        return Splide.index < next && next <= this.edgeIndex || next === 0 ? next : -1;
-      }
-
-    };
-    /**
-     * Listen to some events.
-     */
-
-    function bind() {
-      Splide.on('move', function (newIndex) {
-        Splide.index = newIndex;
-      }).on('updated refresh', function (newOptions) {
-        options = newOptions || options;
-        Splide.index = between(Splide.index, 0, Controller.edgeIndex);
-      });
-    }
-    /**
-     * Verify if the focus option is available or not.
-     *
-     * @return {boolean} - True if a slider has the focus option.
-     */
-
-
-    function hasFocus() {
-      return options.focus !== false;
-    }
-    /**
-     * Return the next or previous page index computed by the page number and current index.
-     *
-     * @param {number}  number - Specify the page number.
-     * @param {number}  index  - Current index.
-     * @param {boolean} prev   - Prev or next.
-     *
-     * @return {number} - Slide index.
-     */
-
-
-    function parsePage(number, index, prev) {
-      if (number > -1) {
-        return Controller.toIndex(number);
-      }
-
-      var perMove = options.perMove;
-      var sign = prev ? -1 : 1;
-
-      if (perMove) {
-        return index + perMove * sign;
-      }
-
-      return Controller.toIndex(Controller.toPage(index) + sign);
-    }
-
-    return Controller;
-  };
-  /**
-   * The component for moving list in the track.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-
-  var abs$1 = Math.abs;
-  /**
-   * The component for moving list in the track.
-   *
-   * @param {Splide} Splide     - A Splide instance.
-   * @param {Object} Components - An object containing components.
-   *
-   * @return {Object} - The component object.
-   */
-
-  var Track = function Track(Splide, Components) {
-    /**
-     * Hold the Layout component.
-     *
-     * @type {Object}
-     */
-    var Layout;
-    /**
-     * Hold the Layout component.
-     *
-     * @type {Object}
-     */
-
-    var Elements;
-    /**
-     * Store the list element.
-     *
-     * @type {Element}
-     */
-
-    var list;
-    /**
-     * Whether the current direction is vertical or not.
-     *
-     * @type {boolean}
-     */
-
-    var isVertical = Splide.options.direction === TTB;
-    /**
-     * Whether the slider type is FADE or not.
-     *
-     * @type {boolean}
-     */
-
-    var isFade = Splide.is(FADE);
-    /**
-     * Whether the slider direction is RTL or not.
-     *
-     * @type {boolean}
-     */
-
-    var isRTL = Splide.options.direction === RTL;
-    /**
-     * This will be true while transitioning from the last index to the first one.
-     *
-     * @type {boolean}
-     */
-
-    var isLoopPending = false;
-    /**
-     * Sign for the direction. Only RTL mode uses the positive sign.
-     *
-     * @type {number}
-     */
-
-    var sign = isRTL ? 1 : -1;
-    /**
-     * Track component object.
-     *
-     * @type {Object}
-     */
-
-    var Track = {
-      /**
-       * Make public the sign defined locally.
-       *
-       * @type {number}
-       */
-      sign: sign,
-
-      /**
-       * Called when the component is mounted.
-       */
-      mount: function mount() {
-        Elements = Components.Elements;
-        Layout = Components.Layout;
-        list = Elements.list;
-      },
-
-      /**
-       * Called after the component is mounted.
-       * The resize event must be registered after the Layout's one is done.
-       */
-      mounted: function mounted() {
-        var _this6 = this;
-
-        if (!isFade) {
-          this.jump(0);
-          Splide.on('mounted resize updated', function () {
-            _this6.jump(Splide.index);
-          });
-        }
-      },
-
-      /**
-       * Go to the given destination index.
-       * After arriving there, the track is jump to the new index without animation, mainly for loop mode.
-       *
-       * @param {number}  destIndex - A destination index.
-       *                              This can be negative or greater than slides length for reaching clones.
-       * @param {number}  newIndex  - An actual new index. They are always same in Slide and Rewind mode.
-       * @param {boolean} silently  - If true, suppress emitting events.
-       */
-      go: function go(destIndex, newIndex, silently) {
-        var newPosition = getTrimmedPosition(destIndex);
-        var prevIndex = Splide.index; // Prevent any actions while transitioning from the last index to the first one for jump.
-
-        if (Splide.State.is(MOVING) && isLoopPending) {
-          return;
-        }
-
-        isLoopPending = destIndex !== newIndex;
-
-        if (!silently) {
-          Splide.emit('move', newIndex, prevIndex, destIndex);
-        }
-
-        if (Math.abs(newPosition - this.position) >= 1 || isFade) {
-          Components.Transition.start(destIndex, newIndex, prevIndex, this.toCoord(newPosition), function () {
-            onTransitionEnd(destIndex, newIndex, prevIndex, silently);
-          });
-        } else {
-          if (destIndex !== prevIndex && Splide.options.trimSpace === 'move') {
-            Components.Controller.go(destIndex + destIndex - prevIndex, silently);
-          } else {
-            onTransitionEnd(destIndex, newIndex, prevIndex, silently);
-          }
-        }
-      },
-
-      /**
-       * Move the track to the specified index.
-       *
-       * @param {number} index - A destination index where the track jumps.
-       */
-      jump: function jump(index) {
-        this.translate(getTrimmedPosition(index));
-      },
-
-      /**
-       * Set the list position by CSS translate property.
-       *
-       * @param {number} position - A new position value.
-       */
-      translate: function translate(position) {
-        applyStyle(list, {
-          transform: "translate" + (isVertical ? 'Y' : 'X') + "(" + position + "px)"
-        });
-      },
-
-      /**
-       * Cancel the transition and set the list position.
-       * Also, loop the slider if necessary.
-       */
-      cancel: function cancel() {
-        if (Splide.is(LOOP)) {
-          this.shift();
-        } else {
-          // Ensure the current position.
-          this.translate(this.position);
-        }
-
-        applyStyle(list, {
-          transition: ''
-        });
-      },
-
-      /**
-       * Shift the slider if it exceeds borders on the edge.
-       */
-      shift: function shift() {
-        var position = abs$1(this.position);
-        var left = abs$1(this.toPosition(0));
-        var right = abs$1(this.toPosition(Splide.length));
-        var innerSize = right - left;
-
-        if (position < left) {
-          position += innerSize;
-        } else if (position > right) {
-          position -= innerSize;
-        }
-
-        this.translate(sign * position);
-      },
-
-      /**
-       * Trim redundant spaces on the left or right edge if necessary.
-       *
-       * @param {number} position - Position value to be trimmed.
-       *
-       * @return {number} - Trimmed position.
-       */
-      trim: function trim(position) {
-        if (!Splide.options.trimSpace || Splide.is(LOOP)) {
-          return position;
-        }
-
-        var edge = sign * (Layout.totalSize() - Layout.size - Layout.gap);
-        return between(position, edge, 0);
-      },
-
-      /**
-       * Calculate the closest slide index from the given position.
-       *
-       * @param {number} position - A position converted to an slide index.
-       *
-       * @return {number} - The closest slide index.
-       */
-      toIndex: function toIndex(position) {
-        var _this7 = this;
-
-        var index = 0;
-        var minDistance = Infinity;
-        Elements.getSlides(true).forEach(function (Slide) {
-          var slideIndex = Slide.index;
-          var distance = abs$1(_this7.toPosition(slideIndex) - position);
-
-          if (distance < minDistance) {
-            minDistance = distance;
-            index = slideIndex;
-          }
-        });
-        return index;
-      },
-
-      /**
-       * Return coordinates object by the given position.
-       *
-       * @param {number} position - A position value.
-       *
-       * @return {Object} - A coordinates object.
-       */
-      toCoord: function toCoord(position) {
-        return {
-          x: isVertical ? 0 : position,
-          y: isVertical ? position : 0
-        };
-      },
-
-      /**
-       * Calculate the track position by a slide index.
-       *
-       * @param {number} index - Slide index.
-       *
-       * @return {Object} - Calculated position.
-       */
-      toPosition: function toPosition(index) {
-        var position = Layout.totalSize(index) - Layout.slideSize(index) - Layout.gap;
-        return sign * (position + this.offset(index));
-      },
-
-      /**
-       * Return the current offset value, considering direction.
-       *
-       * @return {number} - Offset amount.
-       */
-      offset: function offset(index) {
-        var focus = Splide.options.focus;
-        var slideSize = Layout.slideSize(index);
-
-        if (focus === 'center') {
-          return -(Layout.size - slideSize) / 2;
-        }
-
-        return -(parseInt(focus) || 0) * (slideSize + Layout.gap);
-      },
-
-      /**
-       * Return the current position.
-       * This returns the correct position even while transitioning by CSS.
-       *
-       * @return {number} - Current position.
-       */
-      get position() {
-        var prop = isVertical ? 'top' : isRTL ? 'right' : 'left';
-        return getRect(list)[prop] - (getRect(Elements.track)[prop] - Layout.padding[prop] * sign);
-      }
-
-    };
-    /**
-     * Called whenever slides arrive at a destination.
-     *
-     * @param {number}  destIndex - A destination index.
-     * @param {number}  newIndex  - A new index.
-     * @param {number}  prevIndex - A previous index.
-     * @param {boolean} silently  - If true, suppress emitting events.
-     */
-
-    function onTransitionEnd(destIndex, newIndex, prevIndex, silently) {
-      applyStyle(list, {
-        transition: ''
-      });
-      isLoopPending = false;
-
-      if (!isFade) {
-        Track.jump(newIndex);
-      }
-
-      if (!silently) {
-        Splide.emit('moved', newIndex, prevIndex, destIndex);
-      }
-    }
-    /**
-     * Convert index to the trimmed position.
-     *
-     * @return {number} - Trimmed position.
-     */
-
-
-    function getTrimmedPosition(index) {
-      return Track.trim(Track.toPosition(index));
-    }
-
-    return Track;
-  };
-  /**
-   * The component for cloning some slides for "loop" mode of the track.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * The component for cloning some slides for "loop" mode of the track.
-   *
-   * @param {Splide} Splide     - A Splide instance.
-   * @param {Object} Components - An object containing components.
-   *
-   * @return {Object} - The component object.
-   */
-
-
-  var Clones = function Clones(Splide, Components) {
-    /**
-     * Store information of all clones.
-     *
-     * @type {Array}
-     */
-    var clones = [];
-    /**
-     * Store the current clone count on one side.
-     *
-     * @type {number}
-     */
-
-    var cloneCount = 0;
-    /**
-     * Keep Elements component.
-     *
-     * @type {Object}
-     */
-
-    var Elements = Components.Elements;
-    /**
-     * Clones component object.
-     *
-     * @type {Object}
-     */
-
-    var Clones = {
-      /**
-       * Called when the component is mounted.
-       */
-      mount: function mount() {
-        var _this8 = this;
-
-        if (Splide.is(LOOP)) {
-          init();
-          Splide.on('refresh:before', function () {
-            _this8.destroy();
-          }).on('refresh', init).on('resize', function () {
-            if (cloneCount !== getCloneCount()) {
-              // Destroy before refresh not to collect clones by the Elements component.
-              _this8.destroy();
-
-              Splide.refresh();
-            }
-          });
-        }
-      },
-
-      /**
-       * Destroy.
-       */
-      destroy: function destroy() {
-        _remove(clones);
-
-        clones = [];
-      },
-
-      /**
-       * Return all clones.
-       *
-       * @return {Element[]} - Cloned elements.
-       */
-      get clones() {
-        return clones;
-      },
-
-      /**
-       * Return clone length.
-       *
-       * @return {number} - A length of clones.
-       */
-      get length() {
-        return clones.length;
-      }
-
-    };
-    /**
-     * Initialization.
-     */
-
-    function init() {
-      Clones.destroy();
-      cloneCount = getCloneCount();
-      generateClones(cloneCount);
-    }
-    /**
-     * Generate and append/prepend clones.
-     *
-     * @param {number} count - The half number of clones.
-     */
-
-
-    function generateClones(count) {
-      var length = Elements.length,
-          register = Elements.register;
-
-      if (length) {
-        var slides = Elements.slides;
-
-        while (slides.length < count) {
-          slides = slides.concat(slides);
-        } // Clones after the last element.
-
-
-        slides.slice(0, count).forEach(function (elm, index) {
-          var clone = cloneDeeply(elm);
-          append(Elements.list, clone);
-          clones.push(clone);
-          register(clone, index + length, index % length);
-        }); // Clones before the first element.
-
-        slides.slice(-count).forEach(function (elm, index) {
-          var clone = cloneDeeply(elm);
-          before(clone, slides[0]);
-          clones.push(clone);
-          register(clone, index - count, (length + index - count % length) % length);
-        });
-      }
-    }
-    /**
-     * Return half count of clones to be generated.
-     * Clone count is determined by:
-     * - "clones" value in the options.
-     * - Number of slides that can be placed in a view in "fixed" mode.
-     * - Max pages a flick action can move.
-     * - Whether the slide length is enough for perPage.
-     *
-     * @return {number} - Count for clones.
-     */
-
-
-    function getCloneCount() {
-      var options = Splide.options;
-
-      if (options.clones) {
-        return options.clones;
-      } // Use the slide length in autoWidth mode because the number cannot be calculated.
-
-
-      var baseCount = options.autoWidth || options.autoHeight ? Elements.length : options.perPage;
-      var dimension = options.direction === TTB ? 'Height' : 'Width';
-      var fixedSize = toPixel(Splide.root, options["fixed" + dimension]);
-
-      if (fixedSize) {
-        // Roughly calculate the count. This needs not to be strict.
-        baseCount = Math.ceil(Elements.track["client" + dimension] / fixedSize);
-      }
-
-      return baseCount * (options.drag ? options.flickMaxPages + 1 : 1);
-    }
-    /**
-     * Clone deeply the given element.
-     *
-     * @param {Element} elm - An element being duplicated.
-     *
-     * @return {Node} - A cloned node(element).
-     */
-
-
-    function cloneDeeply(elm) {
-      var clone = elm.cloneNode(true);
-      addClass(clone, Splide.classes.clone); // ID should not be duplicated.
-
-      removeAttribute(clone, 'id');
-      return clone;
-    }
-
-    return Clones;
-  };
-  /**
-   * The resolver component for horizontal layout.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * The resolver component for horizontal layout.
-   *
-   * @param {Splide} Splide     - A Splide instance.
-   * @param {Object} Components - An object containing components.
-   *
-   * @return {Object} - The resolver object.
-   */
-
-
-  var Horizontal = function Horizontal(Splide, Components) {
-    /**
-     * Keep the Elements component.
-     *
-     * @type {string}
-     */
-    var Elements = Components.Elements;
-    /**
-     * Keep the root element.
-     *
-     * @type {Element}
-     */
-
-    var root = Splide.root;
-    /**
-     * Keep the track element.
-     *
-     * @type {Element}
-     */
-
-    var track;
-    /**
-     * Keep the latest options.
-     *
-     * @type {Element}
-     */
-
-    var options = Splide.options;
-    return {
-      /**
-       * Margin property name.
-       *
-       * @type {string}
-       */
-      margin: 'margin' + (options.direction === RTL ? 'Left' : 'Right'),
-
-      /**
-       * Always 0 because the height will be determined by inner contents.
-       *
-       * @type {number}
-       */
-      height: 0,
-
-      /**
-       * Initialization.
-       */
-      init: function init() {
-        this.resize();
-      },
-
-      /**
-       * Resize gap and padding.
-       * This must be called on init.
-       */
-      resize: function resize() {
-        options = Splide.options;
-        track = Elements.track;
-        this.gap = toPixel(root, options.gap);
-        var padding = options.padding;
-        var left = toPixel(root, padding.left || padding);
-        var right = toPixel(root, padding.right || padding);
-        this.padding = {
-          left: left,
-          right: right
-        };
-        applyStyle(track, {
-          paddingLeft: unit(left),
-          paddingRight: unit(right)
-        });
-      },
-
-      /**
-       * Return total width from the left of the list to the right of the slide specified by the provided index.
-       *
-       * @param {number} index - Optional. A slide index. If undefined, total width of the slider will be returned.
-       *
-       * @return {number} - Total width to the right side of the specified slide, or 0 for an invalid index.
-       */
-      totalWidth: function totalWidth(index) {
-        if (index === void 0) {
-          index = Splide.length - 1;
-        }
-
-        var Slide = Elements.getSlide(index);
-        var width = 0;
-
-        if (Slide) {
-          var slideRect = getRect(Slide.slide);
-          var listRect = getRect(Elements.list);
-
-          if (options.direction === RTL) {
-            width = listRect.right - slideRect.left;
-          } else {
-            width = slideRect.right - listRect.left;
-          }
-
-          width += this.gap;
-        }
-
-        return width;
-      },
-
-      /**
-       * Return the slide width in px.
-       *
-       * @param {number} index - Slide index.
-       *
-       * @return {number} - The slide width.
-       */
-      slideWidth: function slideWidth(index) {
-        if (options.autoWidth) {
-          var _Slide = Elements.getSlide(index);
-
-          return _Slide ? _Slide.slide.offsetWidth : 0;
-        }
-
-        var width = options.fixedWidth || (this.width + this.gap) / options.perPage - this.gap;
-        return toPixel(root, width);
-      },
-
-      /**
-       * Return the slide height in px.
-       *
-       * @return {number} - The slide height.
-       */
-      slideHeight: function slideHeight() {
-        var height = options.height || options.fixedHeight || this.width * options.heightRatio;
-        return toPixel(root, height);
-      },
-
-      /**
-       * Return slider width without padding.
-       *
-       * @return {number} - Current slider width.
-       */
-      get width() {
-        return track.clientWidth - this.padding.left - this.padding.right;
-      }
-
-    };
-  };
-  /**
-   * The resolver component for vertical layout.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * The resolver component for vertical layout.
-   *
-   * @param {Splide} Splide     - A Splide instance.
-   * @param {Object} Components - An object containing components.
-   *
-   * @return {Object} - The resolver object.
-   */
-
-
-  var Vertical = function Vertical(Splide, Components) {
-    /**
-     * Keep the Elements component.
-     *
-     * @type {string}
-     */
-    var Elements = Components.Elements;
-    /**
-     * Keep the root element.
-     *
-     * @type {Element}
-     */
-
-    var root = Splide.root;
-    /**
-     * Keep the track element.
-     *
-     * @type {Element}
-     */
-
-    var track;
-    /**
-     * Keep the latest options.
-     *
-     * @type {Element}
-     */
-
-    var options;
-    return {
-      /**
-       * Margin property name.
-       *
-       * @type {string}
-       */
-      margin: 'marginBottom',
-
-      /**
-       * Initialization.
-       */
-      init: function init() {
-        this.resize();
-      },
-
-      /**
-       * Resize gap and padding.
-       * This must be called on init.
-       */
-      resize: function resize() {
-        options = Splide.options;
-        track = Elements.track;
-        this.gap = toPixel(root, options.gap);
-        var padding = options.padding;
-        var top = toPixel(root, padding.top || padding);
-        var bottom = toPixel(root, padding.bottom || padding);
-        this.padding = {
-          top: top,
-          bottom: bottom
-        };
-        applyStyle(track, {
-          paddingTop: unit(top),
-          paddingBottom: unit(bottom)
-        });
-      },
-
-      /**
-       * Return total height from the top of the list to the bottom of the slide specified by the provided index.
-       *
-       * @param {number} index - Optional. A slide index. If undefined, total height of the slider will be returned.
-       *
-       * @return {number} - Total height to the bottom of the specified slide, or 0 for an invalid index.
-       */
-      totalHeight: function totalHeight(index) {
-        if (index === void 0) {
-          index = Splide.length - 1;
-        }
-
-        var Slide = Elements.getSlide(index);
-
-        if (Slide) {
-          return getRect(Slide.slide).bottom - getRect(Elements.list).top + this.gap;
-        }
-
-        return 0;
-      },
-
-      /**
-       * Return the slide width in px.
-       *
-       * @return {number} - The slide width.
-       */
-      slideWidth: function slideWidth() {
-        return toPixel(root, options.fixedWidth || this.width);
-      },
-
-      /**
-       * Return the slide height in px.
-       *
-       * @param {number} index - Slide index.
-       *
-       * @return {number} - The slide height.
-       */
-      slideHeight: function slideHeight(index) {
-        if (options.autoHeight) {
-          var _Slide2 = Elements.getSlide(index);
-
-          return _Slide2 ? _Slide2.slide.offsetHeight : 0;
-        }
-
-        var height = options.fixedHeight || (this.height + this.gap) / options.perPage - this.gap;
-        return toPixel(root, height);
-      },
-
-      /**
-       * Return slider width without padding.
-       *
-       * @return {number} - Current slider width.
-       */
-      get width() {
-        return track.clientWidth;
-      },
-
-      /**
-       * Return slide height without padding.
-       *
-       * @return {number} - Slider height.
-       */
-      get height() {
-        var height = options.height || this.width * options.heightRatio;
-        exist(height, '"height" or "heightRatio" is missing.');
-        return toPixel(root, height) - this.padding.top - this.padding.bottom;
-      }
-
-    };
-  };
-  /**
-   * A package of utility functions related with time.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * Simple throttle function that controls how often the given function is executed.
-   *
-   * @param {function} func - A function to be throttled.
-   * @param {number}   wait - Time in millisecond for interval of execution.
-   *
-   * @return {Function} - A debounced function.
-   */
-
-
-  function throttle(func, wait) {
-    var timeout; // Declare function by the "function" keyword to prevent "this" from being inherited.
-
-    return function () {
-      if (!timeout) {
-        timeout = setTimeout(function () {
-          func();
-          timeout = null;
-        }, wait);
-      }
-    };
-  }
-  /**
-   * Custom setInterval function that provides progress rate as callback.
-   *
-   * @param {function} callback - A callback function fired every time the interval time passes.
-   * @param {number}   interval - Interval duration in milliseconds.
-   * @param {function} progress - A callback function fired whenever the progress goes.
-   *
-   * @return {Object} - An object containing play() and pause() functions.
-   */
-
-
-  function createInterval(callback, interval, progress) {
-    var _window = window,
-        requestAnimationFrame = _window.requestAnimationFrame;
-    var start,
-        elapse,
-        rate,
-        _pause = true;
-
-    var step = function step(timestamp) {
-      if (!_pause) {
-        if (!start) {
-          start = timestamp;
-
-          if (rate && rate < 1) {
-            start -= rate * interval;
-          }
-        }
-
-        elapse = timestamp - start;
-        rate = elapse / interval;
-
-        if (elapse >= interval) {
-          start = 0;
-          rate = 1;
-          callback();
-        }
-
-        if (progress) {
-          progress(rate);
-        }
-
-        requestAnimationFrame(step);
-      }
-    };
-
-    return {
-      pause: function pause() {
-        _pause = true;
-        start = 0;
-      },
-      play: function play(reset) {
-        start = 0;
-
-        if (reset) {
-          rate = 0;
-        }
-
-        if (_pause) {
-          _pause = false;
-          requestAnimationFrame(step);
-        }
-      }
-    };
-  }
-  /**
-   * The component for handing slide layouts and their sizes.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * The component for handing slide layouts and their sizes.
-   *
-   * @param {Splide} Splide     - A Splide instance.
-   * @param {Object} Components - An object containing components.
-   *
-   * @return {Object} - The component object.
-   */
-
-
-  var Layout = function Layout(Splide, Components) {
-    /**
-     * Keep the Elements component.
-     *
-     * @type {string}
-     */
-    var Elements = Components.Elements;
-    /**
-     * Whether the slider is vertical or not.
-     *
-     * @type {boolean}
-     */
-
-    var isVertical = Splide.options.direction === TTB;
-    /**
-     * Layout component object.
-     *
-     * @type {Object}
-     */
-
-    var Layout = assign({
-      /**
-       * Called when the component is mounted.
-       */
-      mount: function mount() {
-        bind();
-        init(); // The word "size" means width for a horizontal slider and height for a vertical slider.
-
-        this.totalSize = isVertical ? this.totalHeight : this.totalWidth;
-        this.slideSize = isVertical ? this.slideHeight : this.slideWidth;
-      },
-
-      /**
-       * Destroy the component.
-       */
-      destroy: function destroy() {
-        removeAttribute([Elements.list, Elements.track], 'style');
-      },
-
-      /**
-       * Return the slider height on the vertical mode or width on the horizontal mode.
-       *
-       * @return {number}
-       */
-      get size() {
-        return isVertical ? this.height : this.width;
-      }
-
-    }, isVertical ? Vertical(Splide, Components) : Horizontal(Splide, Components));
-    /**
-     * Init slider styles according to options.
-     */
-
-    function init() {
-      Layout.init();
-      applyStyle(Splide.root, {
-        maxWidth: unit(Splide.options.width)
-      });
-      Elements.each(function (Slide) {
-        Slide.slide.style[Layout.margin] = unit(Layout.gap);
-      });
-      resize();
-    }
-    /**
-     * Listen the resize native event with throttle.
-     * Initialize when the component is mounted or options are updated.
-     */
-
-
-    function bind() {
-      Splide.on('resize load', throttle(function () {
-        Splide.emit('resize');
-      }, Splide.options.throttle), window).on('resize', resize).on('updated refresh', init);
-    }
-    /**
-     * Resize the track and slide elements.
-     */
-
-
-    function resize() {
-      var options = Splide.options;
-      Layout.resize();
-      applyStyle(Elements.track, {
-        height: unit(Layout.height)
-      });
-      var slideHeight = options.autoHeight ? null : unit(Layout.slideHeight());
-      Elements.each(function (Slide) {
-        applyStyle(Slide.container, {
-          height: slideHeight
-        });
-        applyStyle(Slide.slide, {
-          width: options.autoWidth ? null : unit(Layout.slideWidth(Slide.index)),
-          height: Slide.container ? null : slideHeight
-        });
-      });
-      Splide.emit('resized');
-    }
-
-    return Layout;
-  };
-  /**
-   * The component for supporting mouse drag and swipe.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-
-  var abs = Math.abs;
-  /**
-   * If the absolute velocity is greater thant this value,
-   * a slider always goes to a different slide after drag, not allowed to stay on a current slide.
-   */
-
-  var MIN_VELOCITY = 0.1;
-  /**
-   * Adjust how much the track can be pulled on the first or last page.
-   * The larger number this is, the farther the track moves.
-   * This should be around 5 - 9.
-   *
-   * @type {number}
-   */
-
-  var FRICTION_REDUCER = 7;
-  /**
-   * The component supporting mouse drag and swipe.
-   *
-   * @param {Splide} Splide     - A Splide instance.
-   * @param {Object} Components - An object containing components.
-   *
-   * @return {Object} - The component object.
-   */
-
-  var Drag = function Drag(Splide, Components) {
-    /**
-     * Store the Move component.
-     *
-     * @type {Object}
-     */
-    var Track = Components.Track;
-    /**
-     * Store the Controller component.
-     *
-     * @type {Object}
-     */
-
-    var Controller = Components.Controller;
-    /**
-     * Coordinate of the track on starting drag.
-     *
-     * @type {Object}
-     */
-
-    var startCoord;
-    /**
-     * Analyzed info on starting drag.
-     *
-     * @type {Object|null}
-     */
-
-    var startInfo;
-    /**
-     * Analyzed info being updated while dragging/swiping.
-     *
-     * @type {Object}
-     */
-
-    var currentInfo;
-    /**
-     * Determine whether slides are being dragged or not.
-     *
-     * @type {boolean}
-     */
-
-    var isDragging;
-    /**
-     * Whether the slider direction is vertical or not.
-     *
-     * @type {boolean}
-     */
-
-    var isVertical = Splide.options.direction === TTB;
-    /**
-     * Axis for the direction.
-     *
-     * @type {string}
-     */
-
-    var axis = isVertical ? 'y' : 'x';
-    /**
-     * Drag component object.
-     *
-     * @type {Object}
-     */
-
-    var Drag = {
-      /**
-       * Whether dragging is disabled or not.
-       *
-       * @type {boolean}
-       */
-      disabled: false,
-
-      /**
-       * Called when the component is mounted.
-       */
-      mount: function mount() {
-        var _this9 = this;
-
-        var Elements = Components.Elements;
-        var track = Elements.track;
-        Splide.on('touchstart mousedown', start, track).on('touchmove mousemove', move, track, {
-          passive: false
-        }).on('touchend touchcancel mouseleave mouseup dragend', end, track).on('mounted refresh', function () {
-          // Prevent dragging an image or anchor itself.
-          each(Elements.list.querySelectorAll('img, a'), function (elm) {
-            Splide.off('dragstart', elm).on('dragstart', function (e) {
-              e.preventDefault();
-            }, elm, {
-              passive: false
-            });
-          });
-        }).on('mounted updated', function () {
-          _this9.disabled = !Splide.options.drag;
-        });
-      }
-    };
-    /**
-     * Called when the track starts to be dragged.
-     *
-     * @param {TouchEvent|MouseEvent} e - TouchEvent or MouseEvent object.
-     */
-
-    function start(e) {
-      if (!Drag.disabled && !isDragging) {
-        // These prams are used to evaluate whether the slider should start moving.
-        init(e);
-      }
-    }
-    /**
-     * Initialize parameters.
-     *
-     * @param {TouchEvent|MouseEvent} e - TouchEvent or MouseEvent object.
-     */
-
-
-    function init(e) {
-      startCoord = Track.toCoord(Track.position);
-      startInfo = analyze(e, {});
-      currentInfo = startInfo;
-    }
-    /**
-     * Called while the track being dragged.
-     *
-     * @param {TouchEvent|MouseEvent} e - TouchEvent or MouseEvent object.
-     */
-
-
-    function move(e) {
-      if (startInfo) {
-        currentInfo = analyze(e, startInfo);
-
-        if (isDragging) {
-          if (e.cancelable) {
-            e.preventDefault();
-          }
-
-          if (!Splide.is(FADE)) {
-            var position = startCoord[axis] + currentInfo.offset[axis];
-            Track.translate(resist(position));
-          }
-        } else {
-          if (shouldMove(currentInfo)) {
-            Splide.emit('drag', startInfo);
-            isDragging = true;
-            Track.cancel(); // These params are actual drag data.
-
-            init(e);
-          }
-        }
-      }
-    }
-    /**
-     * Determine whether to start moving the track or not by drag angle.
-     *
-     * @param {Object} info - An information object.
-     *
-     * @return {boolean} - True if the track should be moved or false if not.
-     */
-
-
-    function shouldMove(_ref3) {
-      var offset = _ref3.offset;
-
-      if (Splide.State.is(MOVING) && Splide.options.waitForTransition) {
-        return false;
-      }
-
-      var angle = Math.atan(abs(offset.y) / abs(offset.x)) * 180 / Math.PI;
-
-      if (isVertical) {
-        angle = 90 - angle;
-      }
-
-      return angle < Splide.options.dragAngleThreshold;
-    }
-    /**
-     * Resist dragging the track on the first/last page because there is no more.
-     *
-     * @param {number} position - A position being applied to the track.
-     *
-     * @return {Object} - Adjusted position.
-     */
-
-
-    function resist(position) {
-      if (Splide.is(SLIDE)) {
-        var sign = Track.sign;
-
-        var _start = sign * Track.trim(Track.toPosition(0));
-
-        var _end = sign * Track.trim(Track.toPosition(Controller.edgeIndex));
-
-        position *= sign;
-
-        if (position < _start) {
-          position = _start - FRICTION_REDUCER * Math.log(_start - position);
-        } else if (position > _end) {
-          position = _end + FRICTION_REDUCER * Math.log(position - _end);
-        }
-
-        position *= sign;
-      }
-
-      return position;
-    }
-    /**
-     * Called when dragging ends.
-     */
-
-
-    function end() {
-      startInfo = null;
-
-      if (isDragging) {
-        Splide.emit('dragged', currentInfo);
-        go(currentInfo);
-        isDragging = false;
-      }
-    }
-    /**
-     * Go to the slide determined by the analyzed data.
-     *
-     * @param {Object} info - An info object.
-     */
-
-
-    function go(info) {
-      var velocity = info.velocity[axis];
-      var absV = abs(velocity);
-
-      if (absV > 0) {
-        var options = Splide.options;
-        var index = Splide.index;
-        var sign = velocity < 0 ? -1 : 1;
-        var destIndex = index;
-
-        if (!Splide.is(FADE)) {
-          var destination = Track.position;
-
-          if (absV > options.flickVelocityThreshold && abs(info.offset[axis]) < options.swipeDistanceThreshold) {
-            destination += sign * Math.min(absV * options.flickPower, Components.Layout.size * (options.flickMaxPages || 1));
-          }
-
-          destIndex = Track.toIndex(destination);
-        }
-        /*
-         * Do not allow the track to go to a previous position if there is enough velocity.
-         * Always use the adjacent index for the fade mode.
-         */
-
-
-        if (destIndex === index && absV > MIN_VELOCITY) {
-          destIndex = index + sign * Track.sign;
-        }
-
-        if (Splide.is(SLIDE)) {
-          destIndex = between(destIndex, 0, Controller.edgeIndex);
-        }
-
-        Controller.go(destIndex, options.isNavigation);
-      }
-    }
-    /**
-     * Analyze the given event object and return important information for handling swipe behavior.
-     *
-     * @param {Event}   e          - Touch or Mouse event object.
-     * @param {Object}  startInfo  - Information analyzed on start for calculating difference from the current one.
-     *
-     * @return {Object} - An object containing analyzed information, such as offset, velocity, etc.
-     */
-
-
-    function analyze(e, startInfo) {
-      var timeStamp = e.timeStamp,
-          touches = e.touches;
-
-      var _ref4 = touches ? touches[0] : e,
-          clientX = _ref4.clientX,
-          clientY = _ref4.clientY;
-
-      var _ref5 = startInfo.to || {},
-          _ref5$x = _ref5.x,
-          fromX = _ref5$x === void 0 ? clientX : _ref5$x,
-          _ref5$y = _ref5.y,
-          fromY = _ref5$y === void 0 ? clientY : _ref5$y;
-
-      var startTime = startInfo.time || 0;
-      var offset = {
-        x: clientX - fromX,
-        y: clientY - fromY
-      };
-      var duration = timeStamp - startTime;
-      var velocity = {
-        x: offset.x / duration,
-        y: offset.y / duration
-      };
-      return {
-        to: {
-          x: clientX,
-          y: clientY
-        },
-        offset: offset,
-        time: timeStamp,
-        velocity: velocity
-      };
-    }
-
-    return Drag;
-  };
-  /**
-   * The component for handling a click event.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * The component for handling a click event.
-   * Click should be disabled during drag/swipe.
-   *
-   * @param {Splide} Splide     - A Splide instance.
-   * @param {Object} Components - An object containing components.
-   *
-   * @return {Object} - The component object.
-   */
-
-
-  var Click = function Click(Splide, Components) {
-    /**
-     * Whether click is disabled or not.
-     *
-     * @type {boolean}
-     */
-    var disabled = false;
-    /**
-     * Click component object.
-     *
-     * @type {Object}
-     */
-
-    var Click = {
-      /**
-       * Mount only when the drag is activated and the slide type is not "fade".
-       *
-       * @type {boolean}
-       */
-      required: Splide.options.drag,
-
-      /**
-       * Called when the component is mounted.
-       */
-      mount: function mount() {
-        Splide.on('click', onClick, Components.Elements.track, {
-          capture: true
-        }).on('drag', function () {
-          disabled = true;
-        }).on('dragged', function () {
-          // Make sure the flag is released after the click event is fired.
-          setTimeout(function () {
-            disabled = false;
-          });
-        });
-      }
-    };
-    /**
-     * Called when a track element is clicked.
-     *
-     * @param {Event} e - A click event.
-     */
-
-    function onClick(e) {
-      if (disabled) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-      }
-    }
-
-    return Click;
-  };
-  /**
-   * The component for playing slides automatically.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * Set of pause flags.
-   */
-
-
-  var PAUSE_FLAGS = {
-    HOVER: 1,
-    FOCUS: 2,
-    MANUAL: 3
-  };
-  /**
-   * The component for playing slides automatically.
-   *
-   * @param {Splide} Splide     - A Splide instance.
-   * @param {Object} Components - An object containing components.
-   * @param {string} name       - A component name as a lowercase string.
-   *
-   * @return {Object} - The component object.
-   */
-
-  var Autoplay = function Autoplay(Splide, Components, name) {
-    /**
-     * Store pause flags.
-     *
-     * @type {Array}
-     */
-    var flags = [];
-    /**
-     * Store an interval object.
-     *
-     * @type {Object};
-     */
-
-    var interval;
-    /**
-     * Keep the Elements component.
-     *
-     * @type {string}
-     */
-
-    var Elements = Components.Elements;
-    /**
-     * Autoplay component object.
-     *
-     * @type {Object}
-     */
-
-    var Autoplay = {
-      /**
-       * Required only when the autoplay option is true.
-       *
-       * @type {boolean}
-       */
-      required: Splide.options.autoplay,
-
-      /**
-       * Called when the component is mounted.
-       * Note that autoplay starts only if there are slides over perPage number.
-       */
-      mount: function mount() {
-        var options = Splide.options;
-
-        if (Elements.slides.length > options.perPage) {
-          interval = createInterval(function () {
-            Splide.go('>');
-          }, options.interval, function (rate) {
-            Splide.emit(name + ":playing", rate);
-
-            if (Elements.bar) {
-              applyStyle(Elements.bar, {
-                width: rate * 100 + "%"
-              });
-            }
-          });
-          bind();
-          this.play();
-        }
-      },
-
-      /**
-       * Start autoplay.
-       *
-       * @param {number} flag - A pause flag to be removed.
-       */
-      play: function play(flag) {
-        if (flag === void 0) {
-          flag = 0;
-        }
-
-        flags = flags.filter(function (f) {
-          return f !== flag;
-        });
-
-        if (!flags.length) {
-          Splide.emit(name + ":play");
-          interval.play(Splide.options.resetProgress);
-        }
-      },
-
-      /**
-       * Pause autoplay.
-       * Note that Array.includes is not supported by IE.
-       *
-       * @param {number} flag - A pause flag to be added.
-       */
-      pause: function pause(flag) {
-        if (flag === void 0) {
-          flag = 0;
-        }
-
-        interval.pause();
-
-        if (flags.indexOf(flag) === -1) {
-          flags.push(flag);
-        }
-
-        if (flags.length === 1) {
-          Splide.emit(name + ":pause");
-        }
-      }
-    };
-    /**
-     * Listen some events.
-     */
-
-    function bind() {
-      var options = Splide.options;
-      var sibling = Splide.sibling;
-      var elms = [Splide.root, sibling ? sibling.root : null];
-
-      if (options.pauseOnHover) {
-        switchOn(elms, 'mouseleave', PAUSE_FLAGS.HOVER, true);
-        switchOn(elms, 'mouseenter', PAUSE_FLAGS.HOVER, false);
-      }
-
-      if (options.pauseOnFocus) {
-        switchOn(elms, 'focusout', PAUSE_FLAGS.FOCUS, true);
-        switchOn(elms, 'focusin', PAUSE_FLAGS.FOCUS, false);
-      }
-
-      if (Elements.play) {
-        Splide.on('click', function () {
-          // Need to be removed a focus flag at first.
-          Autoplay.play(PAUSE_FLAGS.FOCUS);
-          Autoplay.play(PAUSE_FLAGS.MANUAL);
-        }, Elements.play);
-      }
-
-      if (Elements.pause) {
-        switchOn([Elements.pause], 'click', PAUSE_FLAGS.MANUAL, false);
-      }
-
-      Splide.on('move refresh', function () {
-        Autoplay.play();
-      }) // Rewind the timer.
-      .on('destroy', function () {
-        Autoplay.pause();
-      });
-    }
-    /**
-     * Play or pause on the given event.
-     *
-     * @param {Element[]} elms  - Elements.
-     * @param {string}    event - An event name or names.
-     * @param {number}    flag  - A pause flag defined on the top.
-     * @param {boolean}   play  - Determine whether to play or pause.
-     */
-
-
-    function switchOn(elms, event, flag, play) {
-      elms.forEach(function (elm) {
-        Splide.on(event, function () {
-          Autoplay[play ? 'play' : 'pause'](flag);
-        }, elm);
-      });
-    }
-
-    return Autoplay;
-  };
-  /**
-   * The component for change an img element to background image of its wrapper.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * The component for change an img element to background image of its wrapper.
-   *
-   * @param {Splide} Splide     - A Splide instance.
-   * @param {Object} Components - An object containing components.
-   *
-   * @return {Object} - The component object.
-   */
-
 
-  var Cover = function Cover(Splide, Components) {
-    /**
-     * Hold options.
-     *
-     * @type {Object}
-     */
-    var options = Splide.options;
-    /**
-     * Cover component object.
-     *
-     * @type {Object}
-     */
-
-    var Cover = {
-      /**
-       * Required only when "cover" option is true.
-       *
-       * @type {boolean}
-       */
-      required: options.cover,
-
-      /**
-       * Called when the component is mounted.
-       */
-      mount: function mount() {
-        Splide.on('lazyload:loaded', function (img) {
-          cover(img, false);
-        });
-        Splide.on('mounted updated refresh', function () {
-          return apply(false);
-        });
-      },
-
-      /**
-       * Destroy.
-       */
-      destroy: function destroy() {
-        apply(true);
-      }
-    };
-    /**
-     * Apply "cover" to all slides.
-     *
-     * @param {boolean} uncover - If true, "cover" will be clear.
-     */
-
-    function apply(uncover) {
-      Components.Elements.each(function (Slide) {
-        var img = child(Slide.slide, 'IMG') || child(Slide.container, 'IMG');
-
-        if (img && img.src) {
-          cover(img, uncover);
-        }
-      });
-    }
-    /**
-     * Set background image of the parent element, using source of the given image element.
-     *
-     * @param {Element} img     - An image element.
-     * @param {boolean} uncover - Reset "cover".
-     */
-
-
-    function cover(img, uncover) {
-      applyStyle(img.parentElement, {
-        background: uncover ? '' : "center/cover no-repeat url(\"" + img.src + "\")"
-      });
-      applyStyle(img, {
-        display: uncover ? '' : 'none'
-      });
-    }
-
-    return Cover;
-  };
-  /**
-   * Export vector path for an arrow.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * Namespace definition for SVG element.
-   *
-   * @type {string}
-   */
-
-
-  var XML_NAME_SPACE = 'http://www.w3.org/2000/svg';
-  /**
-   * The arrow vector path.
-   *
-   * @type {number}
-   */
-
-  var PATH = 'm15.5 0.932-4.3 4.38 14.5 14.6-14.5 14.5 4.3 4.4 14.6-14.6 4.4-4.3-4.4-4.4-14.6-14.6z';
-  /**
-   * SVG width and height.
-   *
-   * @type {number}
-   */
-
-  var SIZE = 40;
-  /**
-   * The component for appending prev/next arrows.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * The component for appending prev/next arrows.
-   *
-   * @param {Splide} Splide     - A Splide instance.
-   * @param {Object} Components - An object containing components.
-   * @param {string} name       - A component name as a lowercase string.
-   *
-   * @return {Object} - The component object.
-   */
-
-  var Arrows = function Arrows(Splide, Components, name) {
-    /**
-     * Previous arrow element.
-     *
-     * @type {Element|undefined}
-     */
-    var prev;
-    /**
-     * Next arrow element.
-     *
-     * @type {Element|undefined}
-     */
-
-    var next;
-    /**
-     * Store the class list.
-     *
-     * @type {Object}
-     */
-
-    var classes = Splide.classes;
-    /**
-     * Hold the root element.
-     *
-     * @type {Element}
-     */
-
-    var root = Splide.root;
-    /**
-     * Whether arrows are created programmatically or not.
-     *
-     * @type {boolean}
-     */
-
-    var created;
-    /**
-     * Hold the Elements component.
-     *
-     * @type {Object}
-     */
-
-    var Elements = Components.Elements;
-    /**
-     * Arrows component object.
-     *
-     * @type {Object}
-     */
-
-    var Arrows = {
-      /**
-       * Required when the arrows option is true.
-       *
-       * @type {boolean}
-       */
-      required: Splide.options.arrows,
-
-      /**
-       * Called when the component is mounted.
-       */
-      mount: function mount() {
-        // Attempt to get arrows from HTML source.
-        prev = Elements.arrows.prev;
-        next = Elements.arrows.next; // If arrows were not found in HTML, let's generate them.
-
-        if ((!prev || !next) && Splide.options.arrows) {
-          prev = createArrow(true);
-          next = createArrow(false);
-          created = true;
-          appendArrows();
-        }
-
-        if (prev && next) {
-          bind();
-        }
-
-        this.arrows = {
-          prev: prev,
-          next: next
-        };
-      },
-
-      /**
-       * Called after all components are mounted.
-       */
-      mounted: function mounted() {
-        Splide.emit(name + ":mounted", prev, next);
-      },
-
-      /**
-       * Destroy.
-       */
-      destroy: function destroy() {
-        removeAttribute([prev, next], 'disabled');
-
-        if (created) {
-          _remove(prev.parentElement);
-        }
-      }
-    };
-    /**
-     * Listen to native and custom events.
-     */
-
-    function bind() {
-      Splide.on('click', function () {
-        Splide.go('<');
-      }, prev).on('click', function () {
-        Splide.go('>');
-      }, next).on('mounted move updated refresh', updateDisabled);
-    }
-    /**
-     * Update a disabled attribute.
-     */
-
-
-    function updateDisabled() {
-      var _Components$Controlle = Components.Controller,
-          prevIndex = _Components$Controlle.prevIndex,
-          nextIndex = _Components$Controlle.nextIndex;
-      var isEnough = Splide.length > Splide.options.perPage || Splide.is(LOOP);
-      prev.disabled = prevIndex < 0 || !isEnough;
-      next.disabled = nextIndex < 0 || !isEnough;
-      Splide.emit(name + ":updated", prev, next, prevIndex, nextIndex);
-    }
-    /**
-     * Create a wrapper element and append arrows.
-     */
-
-
-    function appendArrows() {
-      var wrapper = create('div', {
-        class: classes.arrows
-      });
-      append(wrapper, prev);
-      append(wrapper, next);
-      var slider = Elements.slider;
-      var parent = Splide.options.arrows === 'slider' && slider ? slider : root;
-      before(wrapper, parent.firstElementChild);
-    }
-    /**
-     * Create an arrow element.
-     *
-     * @param {boolean} prev - Determine to create a prev arrow or next arrow.
-     *
-     * @return {Element} - A created arrow element.
-     */
-
-
-    function createArrow(prev) {
-      var arrow = "<button class=\"" + classes.arrow + " " + (prev ? classes.prev : classes.next) + "\" type=\"button\">" + ("<svg xmlns=\"" + XML_NAME_SPACE + "\"\tviewBox=\"0 0 " + SIZE + " " + SIZE + "\"\twidth=\"" + SIZE + "\"\theight=\"" + SIZE + "\">") + ("<path d=\"" + (Splide.options.arrowPath || PATH) + "\" />");
-      return domify(arrow);
-    }
-
-    return Arrows;
-  };
-  /**
-   * The component for handling pagination
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * The event name for updating some attributes of pagination nodes.
-   *
-   * @type {string}
-   */
-
-
-  var ATTRIBUTES_UPDATE_EVENT = 'move.page';
-  /**
-   * The event name for recreating pagination.
-   *
-   * @type {string}
-   */
-
-  var UPDATE_EVENT = 'updated.page refresh.page';
-  /**
-   * The component for handling pagination
-   *
-   * @param {Splide} Splide     - A Splide instance.
-   * @param {Object} Components - An object containing components.
-   * @param {string} name       - A component name as a lowercase string.
-   *
-   * @return {Object} - The component object.
-   */
-
-  var Pagination = function Pagination(Splide, Components, name) {
-    /**
-     * Store all data for pagination.
-     * - list: A list element.
-     * - items: An array that contains objects(li, button, index, page).
-     *
-     * @type {Object}
-     */
-    var data = {};
-    /**
-     * Hold the Elements component.
-     *
-     * @type {Object}
-     */
-
-    var Elements = Components.Elements;
-    /**
-     * Pagination component object.
-     *
-     * @type {Object}
-     */
-
-    var Pagination = {
-      /**
-       * Called when the component is mounted.
-       */
-      mount: function mount() {
-        var pagination = Splide.options.pagination;
-
-        if (pagination) {
-          data = createPagination();
-          var slider = Elements.slider;
-          var parent = pagination === 'slider' && slider ? slider : Splide.root;
-          append(parent, data.list);
-          Splide.on(ATTRIBUTES_UPDATE_EVENT, updateAttributes);
-        }
-
-        Splide.off(UPDATE_EVENT).on(UPDATE_EVENT, function () {
-          Pagination.destroy();
-
-          if (Splide.options.pagination) {
-            Pagination.mount();
-            Pagination.mounted();
-          }
-        });
-      },
-
-      /**
-       * Called after all components are mounted.
-       */
-      mounted: function mounted() {
-        if (Splide.options.pagination) {
-          var index = Splide.index;
-          Splide.emit(name + ":mounted", data, this.getItem(index));
-          updateAttributes(index, -1);
-        }
-      },
-
-      /**
-       * Destroy the pagination.
-       * Be aware that node.remove() is not supported by IE.
-       */
-      destroy: function destroy() {
-        _remove(data.list);
-
-        if (data.items) {
-          data.items.forEach(function (item) {
-            Splide.off('click', item.button);
-          });
-        } // Do not remove UPDATE_EVENT to recreate pagination if needed.
-
-
-        Splide.off(ATTRIBUTES_UPDATE_EVENT);
-        data = {};
-      },
-
-      /**
-       * Return an item by index.
-       *
-       * @param {number} index - A slide index.
-       *
-       * @return {Object|undefined} - An item object on success or undefined on failure.
-       */
-      getItem: function getItem(index) {
-        return data.items[Components.Controller.toPage(index)];
-      },
-
-      /**
-       * Return object containing pagination data.
-       *
-       * @return {Object} - Pagination data including list and items.
-       */
-      get data() {
-        return data;
-      }
-
-    };
-    /**
-     * Update attributes.
-     *
-     * @param {number} index     - Active index.
-     * @param {number} prevIndex - Prev index.
-     */
-
-    function updateAttributes(index, prevIndex) {
-      var prev = Pagination.getItem(prevIndex);
-      var curr = Pagination.getItem(index);
-      var active = STATUS_CLASSES.active;
-
-      if (prev) {
-        removeClass(prev.button, active);
-      }
-
-      if (curr) {
-        addClass(curr.button, active);
-      }
-
-      Splide.emit(name + ":updated", data, prev, curr);
-    }
-    /**
-     * Create a wrapper and button elements.
-     *
-     * @return {Object} - An object contains all data.
-     */
-
-
-    function createPagination() {
-      var options = Splide.options;
-      var classes = Splide.classes;
-      var list = create('ul', {
-        class: classes.pagination
-      });
-      var items = Elements.getSlides(false).filter(function (Slide) {
-        return options.focus !== false || Slide.index % options.perPage === 0;
-      }).map(function (Slide, page) {
-        var li = create('li', {});
-        var button = create('button', {
-          class: classes.page,
-          type: 'button'
-        });
-        append(li, button);
-        append(list, li);
-        Splide.on('click', function () {
-          Splide.go(">" + page);
-        }, button);
-        return {
-          li: li,
-          button: button,
-          page: page,
-          Slides: Elements.getSlidesByPage(page)
-        };
-      });
-      return {
-        list: list,
-        items: items
-      };
-    }
-
-    return Pagination;
-  };
-  /**
-   * The component for loading slider images lazily.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * The name for a data attribute of src.
-   *
-   * @type {string}
-   */
-
-
-  var SRC_DATA_NAME = 'data-splide-lazy';
-  /**
-   * The name for a data attribute of srcset.
-   *
-   * @type {string}
-   */
-
-  var SRCSET_DATA_NAME = 'data-splide-lazy-srcset';
-  /**
-   * The component for loading slider images lazily.
-   *
-   * @param {Splide} Splide     - A Splide instance.
-   * @param {Object} Components - An object containing components.
-   * @param {string} name       - A component name as a lowercase string.
-   *
-   * @return {Object} - The component object.
-   */
-
-  var LazyLoad = function LazyLoad(Splide, Components, name) {
-    /**
-     * Next index for sequential loading.
-     *
-     * @type {number}
-     */
-    var nextIndex;
-    /**
-     * Store objects containing an img element and a Slide object.
-     *
-     * @type {Object[]}
-     */
-
-    var images;
-    /**
-     * Store the options.
-     *
-     * @type {Object}
-     */
-
-    var options = Splide.options;
-    /**
-     * Whether to load images sequentially or not.
-     *
-     * @type {boolean}
-     */
-
-    var isSequential = options.lazyLoad === 'sequential';
-    /**
-     * Lazyload component object.
-     *
-     * @type {Object}
-     */
-
-    var Lazyload = {
-      /**
-       * Mount only when the lazyload option is provided.
-       *
-       * @type {boolean}
-       */
-      required: options.lazyLoad,
-
-      /**
-       * Called when the component is mounted.
-       */
-      mount: function mount() {
-        Splide.on('mounted refresh', function () {
-          init();
-          Components.Elements.each(function (Slide) {
-            each(Slide.slide.querySelectorAll("[" + SRC_DATA_NAME + "], [" + SRCSET_DATA_NAME + "]"), function (img) {
-              if (!img.src && !img.srcset) {
-                images.push({
-                  img: img,
-                  Slide: Slide
-                });
-                applyStyle(img, {
-                  display: 'none'
-                });
-              }
-            });
-          });
-
-          if (isSequential) {
-            loadNext();
-          }
-        });
-
-        if (!isSequential) {
-          Splide.on("mounted refresh moved." + name, check);
-        }
-      },
-
-      /**
-       * Destroy.
-       */
-      destroy: init
-    };
-    /**
-     * Initialize parameters.
-     */
-
-    function init() {
-      images = [];
-      nextIndex = 0;
-    }
-    /**
-     * Check how close each image is from the active slide and
-     * determine whether to start loading or not, according to the distance.
-     *
-     * @param {number} index - Current index.
-     */
-
-
-    function check(index) {
-      index = isNaN(index) ? Splide.index : index;
-      images = images.filter(function (image) {
-        if (image.Slide.isWithin(index, options.perPage * (options.preloadPages + 1))) {
-          load(image.img, image.Slide);
-          return false;
-        }
-
-        return true;
-      }); // Unbind if all images are loaded.
-
-      if (!images[0]) {
-        Splide.off("moved." + name);
-      }
-    }
-    /**
-     * Start loading an image.
-     * Creating a clone of the image element since setting src attribute directly to it
-     * often occurs 'hitch', blocking some other processes of a browser.
-     *
-     * @param {Element} img   - An image element.
-     * @param {Object}  Slide - A Slide object.
-     */
-
-
-    function load(img, Slide) {
-      addClass(Slide.slide, STATUS_CLASSES.loading);
-      var spinner = create('span', {
-        class: Splide.classes.spinner
-      });
-      append(img.parentElement, spinner);
-
-      img.onload = function () {
-        loaded(img, spinner, Slide, false);
-      };
-
-      img.onerror = function () {
-        loaded(img, spinner, Slide, true);
-      };
-
-      setAttribute(img, 'srcset', getAttribute(img, SRCSET_DATA_NAME) || '');
-      setAttribute(img, 'src', getAttribute(img, SRC_DATA_NAME) || '');
-    }
-    /**
-     * Start loading a next image in images array.
-     */
-
-
-    function loadNext() {
-      if (nextIndex < images.length) {
-        var image = images[nextIndex];
-        load(image.img, image.Slide);
-      }
-
-      nextIndex++;
-    }
-    /**
-     * Called just after the image was loaded or loading was aborted by some error.
-     *
-     * @param {Element} img     - An image element.
-     * @param {Element} spinner - A spinner element.
-     * @param {Object}  Slide   - A Slide object.
-     * @param {boolean} error   - True if the image was loaded successfully or false on error.
-     */
-
-
-    function loaded(img, spinner, Slide, error) {
-      removeClass(Slide.slide, STATUS_CLASSES.loading);
-
-      if (!error) {
-        _remove(spinner);
-
-        applyStyle(img, {
-          display: ''
-        });
-        Splide.emit(name + ":loaded", img).emit('resize');
-      }
-
-      if (isSequential) {
-        loadNext();
-      }
-    }
-
-    return Lazyload;
-  };
-  /**
-   * Export aria attribute names.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * Attribute name for aria-current.
-   *
-   * @type {string}
-   */
-
-
-  var ARIA_CURRENRT = 'aria-current';
+  Splide.defaults = {};
   /**
-   * Attribute name for aria-control.
-   *
-   * @type {string}
+   * The collection of state numbers.
    */
-
-  var ARIA_CONTROLS = 'aria-controls';
-  /**
-   * Attribute name for aria-control.
-   *
-   * @type {string}
-   */
-
-  var ARIA_LABEL = 'aria-label';
-  /**
-   * Attribute name for aria-hidden.
-   *
-   * @type {string}
-   */
-
-  var ARIA_HIDDEN = 'aria-hidden';
-  /**
-   * Attribute name for tab-index.
-   *
-   * @type {string}
-   */
-
-  var TAB_INDEX = 'tabindex';
-  /**
-   * The component for controlling slides via keyboard.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * Map a key to a slide control.
-   *
-   * @type {Object}
-   */
-
-  var KEY_MAP = {
-    ltr: {
-      ArrowLeft: '<',
-      ArrowRight: '>',
-      // For IE.
-      Left: '<',
-      Right: '>'
-    },
-    rtl: {
-      ArrowLeft: '>',
-      ArrowRight: '<',
-      // For IE.
-      Left: '>',
-      Right: '<'
-    },
-    ttb: {
-      ArrowUp: '<',
-      ArrowDown: '>',
-      // For IE.
-      Up: '<',
-      Down: '>'
-    }
-  };
-  /**
-   * The component for controlling slides via keyboard.
-   *
-   * @param {Splide} Splide - A Splide instance.
-   *
-   * @return {Object} - The component object.
-   */
-
-  var Keyboard = function Keyboard(Splide) {
-    /**
-     * Hold the target element.
-     *
-     * @type {Element|Document|undefined}
-     */
-    var target;
-    return {
-      /**
-       * Called when the component is mounted.
-       */
-      mount: function mount() {
-        Splide.on('mounted updated', function () {
-          var options = Splide.options;
-          var root = Splide.root;
-          var map = KEY_MAP[options.direction];
-          var keyboard = options.keyboard;
-
-          if (target) {
-            Splide.off('keydown', target);
-            removeAttribute(root, TAB_INDEX);
-          }
-
-          if (keyboard) {
-            if (keyboard === 'focused') {
-              target = root;
-              setAttribute(root, TAB_INDEX, 0);
-            } else {
-              target = document;
-            }
-
-            Splide.on('keydown', function (e) {
-              if (map[e.key]) {
-                Splide.go(map[e.key]);
-              }
-            }, target);
-          }
-        });
-      }
-    };
-  };
-  /**
-   * The component for enhancing accessibility.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * The component for enhancing accessibility.
-   *
-   * @param {Splide} Splide     - A Splide instance.
-   * @param {Object} Components - An object containing components.
-   *
-   * @return {Object} - The component object.
-   */
-
-
-  var A11y = function A11y(Splide, Components) {
-    /**
-     * Hold a i18n object.
-     *
-     * @type {Object}
-     */
-    var i18n = Splide.i18n;
-    /**
-     * Hold the Elements component.
-     *
-     * @type {Object}
-     */
-
-    var Elements = Components.Elements;
-    /**
-     * All attributes related with A11y.
-     *
-     * @type {string[]}
-     */
-
-    var allAttributes = [ARIA_HIDDEN, TAB_INDEX, ARIA_CONTROLS, ARIA_LABEL, ARIA_CURRENRT, 'role'];
-    /**
-     * A11y component object.
-     *
-     * @type {Object}
-     */
-
-    var A11y = {
-      /**
-       * Required only when the accessibility option is true.
-       *
-       * @type {boolean}
-       */
-      required: Splide.options.accessibility,
-
-      /**
-       * Called when the component is mounted.
-       */
-      mount: function mount() {
-        Splide.on('visible', function (Slide) {
-          updateSlide(Slide.slide, true);
-        }).on('hidden', function (Slide) {
-          updateSlide(Slide.slide, false);
-        }).on('arrows:mounted', initArrows).on('arrows:updated', updateArrows).on('pagination:mounted', initPagination).on('pagination:updated', updatePagination).on('refresh', function () {
-          removeAttribute(Components.Clones.clones, allAttributes);
-        });
-
-        if (Splide.options.isNavigation) {
-          Splide.on('navigation:mounted navigation:updated', initNavigation).on('active', function (Slide) {
-            updateNavigation(Slide, true);
-          }).on('inactive', function (Slide) {
-            updateNavigation(Slide, false);
-          });
-        }
-
-        initAutoplay();
-      },
-
-      /**
-       * Destroy.
-       */
-      destroy: function destroy() {
-        var Arrows = Components.Arrows;
-        var arrows = Arrows ? Arrows.arrows : {};
-        removeAttribute(Elements.slides.concat([arrows.prev, arrows.next, Elements.play, Elements.pause]), allAttributes);
-      }
-    };
-    /**
-     * Update slide attributes when it gets visible or hidden.
-     *
-     * @param {Element} slide   - A slide element.
-     * @param {Boolean} visible - True when the slide gets visible, or false when hidden.
-     */
-
-    function updateSlide(slide, visible) {
-      setAttribute(slide, ARIA_HIDDEN, !visible);
-
-      if (Splide.options.slideFocus) {
-        setAttribute(slide, TAB_INDEX, visible ? 0 : -1);
-      }
-    }
-    /**
-     * Initialize arrows if they are available.
-     * Append screen reader elements and add aria-controls attribute.
-     *
-     * @param {Element} prev - Previous arrow element.
-     * @param {Element} next - Next arrow element.
-     */
-
-
-    function initArrows(prev, next) {
-      var controls = Elements.track.id;
-      setAttribute(prev, ARIA_CONTROLS, controls);
-      setAttribute(next, ARIA_CONTROLS, controls);
-    }
-    /**
-     * Update arrow attributes.
-     *
-     * @param {Element} prev      - Previous arrow element.
-     * @param {Element} next      - Next arrow element.
-     * @param {number}  prevIndex - Previous slide index or -1 when there is no precede slide.
-     * @param {number}  nextIndex - Next slide index or -1 when there is no next slide.
-     */
-
-
-    function updateArrows(prev, next, prevIndex, nextIndex) {
-      var index = Splide.index;
-      var prevLabel = prevIndex > -1 && index < prevIndex ? i18n.last : i18n.prev;
-      var nextLabel = nextIndex > -1 && index > nextIndex ? i18n.first : i18n.next;
-      setAttribute(prev, ARIA_LABEL, prevLabel);
-      setAttribute(next, ARIA_LABEL, nextLabel);
-    }
-    /**
-     * Initialize pagination if it's available.
-     * Append a screen reader element and add aria-controls/label attribute to each item.
-     *
-     * @param {Object} data       - Data object containing all items.
-     * @param {Object} activeItem - An initial active item.
-     */
-
-
-    function initPagination(data, activeItem) {
-      if (activeItem) {
-        setAttribute(activeItem.button, ARIA_CURRENRT, true);
-      }
-
-      data.items.forEach(function (item) {
-        var options = Splide.options;
-        var text = options.focus === false && options.perPage > 1 ? i18n.pageX : i18n.slideX;
-        var label = sprintf(text, item.page + 1);
-        var button = item.button;
-        var controls = item.Slides.map(function (Slide) {
-          return Slide.slide.id;
-        });
-        setAttribute(button, ARIA_CONTROLS, controls.join(' '));
-        setAttribute(button, ARIA_LABEL, label);
-      });
-    }
-    /**
-     * Update pagination attributes.
-     *
-     * @param {Object}  data - Data object containing all items.
-     * @param {Element} prev - A previous active element.
-     * @param {Element} curr - A current active element.
-     */
-
-
-    function updatePagination(data, prev, curr) {
-      if (prev) {
-        removeAttribute(prev.button, ARIA_CURRENRT);
-      }
-
-      if (curr) {
-        setAttribute(curr.button, ARIA_CURRENRT, true);
-      }
-    }
-    /**
-     * Initialize autoplay buttons.
-     */
-
-
-    function initAutoplay() {
-      ['play', 'pause'].forEach(function (name) {
-        var elm = Elements[name];
-
-        if (elm) {
-          if (!isButton(elm)) {
-            setAttribute(elm, 'role', 'button');
-          }
-
-          setAttribute(elm, ARIA_CONTROLS, Elements.track.id);
-          setAttribute(elm, ARIA_LABEL, i18n[name]);
-        }
-      });
-    }
-    /**
-     * Initialize navigation slider.
-     * Add button role, aria-label, aria-controls to slide elements and append screen reader text to them.
-     *
-     * @param {Splide} main - A main Splide instance.
-     */
-
-
-    function initNavigation(main) {
-      Elements.each(function (Slide) {
-        var slide = Slide.slide;
-        var realIndex = Slide.realIndex;
-
-        if (!isButton(slide)) {
-          setAttribute(slide, 'role', 'button');
-        }
-
-        var slideIndex = realIndex > -1 ? realIndex : Slide.index;
-        var label = sprintf(i18n.slideX, slideIndex + 1);
-        var mainSlide = main.Components.Elements.getSlide(slideIndex);
-        setAttribute(slide, ARIA_LABEL, label);
-
-        if (mainSlide) {
-          setAttribute(slide, ARIA_CONTROLS, mainSlide.slide.id);
-        }
-      });
-    }
-    /**
-     * Update navigation attributes.
-     *
-     * @param {Object}  Slide  - A target Slide object.
-     * @param {boolean} active - True if the slide is active or false if inactive.
-     */
-
-
-    function updateNavigation(_ref6, active) {
-      var slide = _ref6.slide;
-
-      if (active) {
-        setAttribute(slide, ARIA_CURRENRT, true);
-      } else {
-        removeAttribute(slide, ARIA_CURRENRT);
-      }
-    }
-    /**
-     * Check if the given element is button or not.
-     *
-     * @param {Element} elm - An element to be checked.
-     *
-     * @return {boolean} - True if the given element is button.
-     */
-
-
-    function isButton(elm) {
-      return elm.tagName === 'BUTTON';
-    }
-
-    return A11y;
-  };
-  /**
-   * The component for synchronizing a slider with another.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * The event name for sync.
-   *
-   * @type {string}
-   */
-
-
-  var SYNC_EVENT = 'move.sync';
-  /**
-   * The event names for click navigation.
-   * @type {string}
-   */
-
-  var CLICK_EVENTS = 'mouseup touchend';
-  /**
-   * The keys for triggering the navigation button.
-   *
-   * @type {String[]}
-   */
-
-  var TRIGGER_KEYS = [' ', 'Enter', 'Spacebar'];
-  /**
-   * The component for synchronizing a slider with another.
-   *
-   * @param {Splide} Splide - A Splide instance.
-   *
-   * @return {Object} - The component object.
-   */
-
-  var Sync = function Sync(Splide) {
-    /**
-     * Keep the sibling Splide instance.
-     *
-     * @type {Splide}
-     */
-    var sibling = Splide.sibling;
-    /**
-     * Whether the sibling slider is navigation or not.
-     *
-     * @type {Splide|boolean}
-     */
-
-    var isNavigation = sibling && sibling.options.isNavigation;
-    /**
-     * Layout component object.
-     *
-     * @type {Object}
-     */
-
-    var Sync = {
-      /**
-       * Required only when the sub slider is available.
-       *
-       * @type {boolean}
-       */
-      required: !!sibling,
-
-      /**
-       * Called when the component is mounted.
-       */
-      mount: function mount() {
-        syncMain();
-        syncSibling();
-
-        if (isNavigation) {
-          bind();
-          Splide.on('refresh', function () {
-            setTimeout(function () {
-              bind();
-              sibling.emit('navigation:updated', Splide);
-            });
-          });
-        }
-      },
-
-      /**
-       * Called after all components are mounted.
-       */
-      mounted: function mounted() {
-        if (isNavigation) {
-          sibling.emit('navigation:mounted', Splide);
-        }
-      }
-    };
-    /**
-     * Listen the primary slider event to move secondary one.
-     * Must unbind a handler at first to avoid infinite loop.
-     */
-
-    function syncMain() {
-      Splide.on(SYNC_EVENT, function (newIndex, prevIndex, destIndex) {
-        sibling.off(SYNC_EVENT).go(sibling.is(LOOP) ? destIndex : newIndex, false);
-        syncSibling();
-      });
-    }
-    /**
-     * Listen the secondary slider event to move primary one.
-     * Must unbind a handler at first to avoid infinite loop.
-     */
-
-
-    function syncSibling() {
-      sibling.on(SYNC_EVENT, function (newIndex, prevIndex, destIndex) {
-        Splide.off(SYNC_EVENT).go(Splide.is(LOOP) ? destIndex : newIndex, false);
-        syncMain();
-      });
-    }
-    /**
-     * Listen some events on each slide.
-     */
-
-
-    function bind() {
-      sibling.Components.Elements.each(function (_ref7) {
-        var slide = _ref7.slide,
-            index = _ref7.index;
-
-        /*
-         * Listen mouseup and touchend events to handle click.
-         */
-        Splide.off(CLICK_EVENTS, slide).on(CLICK_EVENTS, function (e) {
-          // Ignore a middle or right click.
-          if (!e.button || e.button === 0) {
-            moveSibling(index);
-          }
-        }, slide);
-        /*
-         * Subscribe keyup to handle Enter and Space key.
-         * Note that Array.includes is not supported by IE.
-         */
-
-        Splide.off('keyup', slide).on('keyup', function (e) {
-          if (TRIGGER_KEYS.indexOf(e.key) > -1) {
-            e.preventDefault();
-            moveSibling(index);
-          }
-        }, slide, {
-          passive: false
-        });
-      });
-    }
-    /**
-     * Move the sibling to the given index.
-     * Need to check "IDLE" status because slides can be moving by Drag component.
-     *
-     * @param {number} index - Target index.
-     */
-
-
-    function moveSibling(index) {
-      if (Splide.State.is(IDLE)) {
-        sibling.go(index);
-      }
-    }
-
-    return Sync;
-  };
-  /**
-   * The component for updating options according to a current window width.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-  /**
-   * Interval time for throttle.
-   *
-   * @type {number}
-   */
-
-
-  var THROTTLE = 50;
-  /**
-   * The component for updating options according to a current window width.
-   *
-   * @param {Splide} Splide - A Splide instance.
-   *
-   * @return {Object} - The component object.
-   */
-
-  var Breakpoints = function Breakpoints(Splide) {
-    /**
-     * Store breakpoints.
-     *
-     * @type {Object|boolean}
-     */
-    var breakpoints = Splide.options.breakpoints;
-    /**
-     * The check function whose frequency of call is reduced.
-     *
-     * @type {Function}
-     */
-
-    var throttledCheck = throttle(check, THROTTLE);
-    /**
-     * Keep initial options.
-     *
-     * @type {Object}
-     */
-
-    var initialOptions;
-    /**
-     * An array containing objects of point and MediaQueryList.
-     *
-     * @type {Object[]}
-     */
-
-    var map = [];
-    /**
-     * Hold the previous breakpoint.
-     *
-     * @type {number|undefined}
-     */
-
-    var prevPoint;
-    /**
-     * Breakpoints component object.
-     *
-     * @type {Object}
-     */
-
-    var Breakpoints = {
-      /**
-       * Required only when the breakpoints definition is provided and browser supports matchMedia.
-       *
-       * @type {boolean}
-       */
-      required: breakpoints && matchMedia,
-
-      /**
-       * Called when the component is mounted.
-       */
-      mount: function mount() {
-        map = Object.keys(breakpoints).sort(function (n, m) {
-          return +n - +m;
-        }).map(function (point) {
-          return {
-            point: point,
-            mql: matchMedia("(max-width:" + point + "px)")
-          };
-        });
-        /*
-         * To keep monitoring resize event after destruction without "completely",
-         * use native addEventListener instead of Splide.on.
-         */
-
-        this.destroy(true);
-        addEventListener('resize', throttledCheck); // Keep initial options to apply them when no breakpoint matches.
-
-        initialOptions = Splide.options;
-        check();
-      },
-
-      /**
-       * Destroy.
-       *
-       * @param {boolean} completely - Whether to destroy Splide completely.
-       */
-      destroy: function destroy(completely) {
-        if (completely) {
-          removeEventListener('resize', throttledCheck);
-        }
-      }
-    };
-    /**
-     * Check the breakpoint.
-     */
-
-    function check() {
-      var point = getPoint();
-
-      if (point !== prevPoint) {
-        prevPoint = point;
-        var _State = Splide.State;
-        var options = breakpoints[point] || initialOptions;
-        var destroy = options.destroy;
-
-        if (destroy) {
-          Splide.options = initialOptions;
-          Splide.destroy(destroy === 'completely');
-        } else {
-          if (_State.is(DESTROYED)) {
-            Splide.mount();
-          }
-
-          Splide.options = options;
-        }
-      }
-    }
-    /**
-     * Return the breakpoint matching current window width.
-     * Note that Array.prototype.find is not supported by IE.
-     *
-     * @return {number|string} - A breakpoint as number or string. -1 if no point matches.
-     */
-
-
-    function getPoint() {
-      var item = map.filter(function (item) {
-        return item.mql.matches;
-      })[0];
-      return item ? item.point : -1;
-    }
-
-    return Breakpoints;
-  };
-  /**
-   * Export components.
-   *
-   * @author    Naotoshi Fujita
-   * @copyright Naotoshi Fujita. All rights reserved.
-   */
-
-
-  var COMPLETE = {
-    Options: Options,
-    Breakpoints: Breakpoints,
-    Controller: Controller,
-    Elements: Elements,
-    Track: Track,
-    Clones: Clones,
-    Layout: Layout,
-    Drag: Drag,
-    Click: Click,
-    Autoplay: Autoplay,
-    Cover: Cover,
-    Arrows: Arrows,
-    Pagination: Pagination,
-    LazyLoad: LazyLoad,
-    Keyboard: Keyboard,
-    Sync: Sync,
-    A11y: A11y
-  };
-  /**
-   * Exports the Splide class with all components.
-   *
-   * @since 1.0.0
-   */
-
-  var Splide = /*#__PURE__*/function (_Splide$) {
-    _inheritsLoose(Splide, _Splide$);
-
-    function Splide(root, options) {
-      return _Splide$.call(this, root, options, COMPLETE) || this;
-    }
-
-    return Splide;
-  }(Splide$1);
 
+  Splide.STATES = STATES;
   return Splide;
 });
 //# sourceMappingURL=splide.js.map

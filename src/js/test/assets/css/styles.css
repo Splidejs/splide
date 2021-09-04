@@ -1,0 +1,23 @@
+body {
+  background : #eee;
+  height: 200vh;
+  font-family: Roboto, sans-serif;
+  line-height: 1.5;
+}
+
+img {
+  width: 100%;
+  height: auto;
+}
+
+.splide {
+  margin: 2rem auto;
+}
+
+.splide__slide.is-active {
+  border: 2px solid deepskyblue;
+}
+
+.splide__progress {
+  margin: .5rem 0;
+}

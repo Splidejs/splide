@@ -1,7 +1,7 @@
 .splide {
   &__track {
+    overflow: hidden;
     position: relative;
     z-index: 0;
-    overflow: hidden;
   }
 }
