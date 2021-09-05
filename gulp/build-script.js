@@ -1,13 +1,14 @@
 const { parallel, src, dest } = require( 'gulp' );
-const rollup     = require( 'rollup' ).rollup;
-const typescript = require( 'rollup-plugin-typescript2' );
-const rename     = require( 'ts-transformer-properties-rename' ).default;
-const uglify     = require( 'rollup-plugin-uglify' ).uglify;
-const babel      = require( '@rollup/plugin-babel' );
-const resolve    = require( '@rollup/plugin-node-resolve' ).nodeResolve;
-const gzip       = require( 'gulp-gzip' );
-const path       = require( 'path' );
-const banner     = require( './constants/banner' );
+const rollup           = require( 'rollup' ).rollup;
+const typescript       = require( 'rollup-plugin-typescript2' );
+const rename           = require( 'ts-transformer-properties-rename' ).default;
+const uglify           = require( 'rollup-plugin-uglify' ).uglify;
+const babel            = require( '@rollup/plugin-babel' );
+const resolve          = require( '@rollup/plugin-node-resolve' ).nodeResolve;
+const gzip             = require( 'gulp-gzip' );
+const path             = require( 'path' );
+const banner           = require( './constants/banner' );
+const { promises: fs } = require( 'fs' );
 
 
 function buildScript( type, minify ) {
@@ -73,33 +74,49 @@ function buildFilename( type, minify ) {
 	return `./dist/js/splide-${ type }${ minify ? '.min' : '' }.js`;
 }
 
-function buildModule( format ) {
-	return rollup( {
-		input  : './src/js/index.ts',
-		plugins: [
-			resolve(),
-      typescript(),
-			babel.getBabelOutputPlugin( {
-				presets: [
-					[
-						'@babel/preset-env',
-						{
-							modules: false,
-							loose  : true,
-						}
-					]
-				],
-				allowAllFormats: true,
-			} ),
-		]
-	} ).then( bundle => {
-		return bundle.write( {
-			banner,
-			file  : `./dist/js/splide.${ format }.js`,
-			format,
-			exports: 'named',
-		} );
-	} );
+function buildModule( format, declaration ) {
+  const declarationDir = './dist/types';
+
+  const options = declaration ? {
+    check: false,
+    useTsconfigDeclarationDir: true,
+    tsconfigOverride: {
+      compilerOptions: {
+        declarationDir,
+        declaration   : true,
+        declarationMap: true,
+      },
+    },
+  } : {};
+
+  return ( declaration ? fs.rmdir( declarationDir, { recursive: true } ) : Promise.resolve() ).then( () => {
+    return rollup( {
+      input  : './src/js/index.ts',
+      plugins: [
+        resolve(),
+        typescript( options ),
+        babel.getBabelOutputPlugin( {
+          presets: [
+            [
+              '@babel/preset-env',
+              {
+                modules: false,
+                loose  : true,
+              }
+            ]
+          ],
+          allowAllFormats: true,
+        } ),
+      ]
+    } ).then( bundle => {
+      return bundle.write( {
+        banner,
+        file  : `./dist/js/splide.${ format }.js`,
+        format,
+        exports: 'named',
+      } );
+    } );
+  } )
 }
 
 exports.buildDevCode = function buildDevCode() {
@@ -113,5 +130,5 @@ exports.buildScript = parallel(
 
 exports.buildModule = parallel(
 	function moduleCjs() { return buildModule( 'cjs' ) },
-	function moduleEsm() { return buildModule( 'esm' ) },
+	function moduleEsm() { return buildModule( 'esm', true ) },
 );

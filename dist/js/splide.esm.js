@@ -564,13 +564,11 @@ function parseHtml(html) {
 
 
 function prevent(e, stopPropagation) {
-  if (e.cancelable) {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (stopPropagation) {
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-    }
+  if (stopPropagation) {
+    e.stopPropagation();
+    e.stopImmediatePropagation();
   }
 }
 /**
@@ -4042,6 +4040,7 @@ function Drag(Splide, Components, options) {
    */
 
   var isMouse;
+  var target;
   /**
    * Indicates whether the slider exceeds borders or not.
    */
@@ -4065,14 +4064,17 @@ function Drag(Splide, Components, options) {
 
   function onPointerDown(e) {
     isMouse = e.type === 'mousedown';
+    target = isMouse ? window : track;
 
     if (!(isMouse && e.button)) {
       if (!Move.isBusy()) {
-        bind(window, POINTER_MOVE_EVENTS, onPointerMove);
-        bind(window, POINTER_UP_EVENTS, onPointerUp);
+        bind(target, POINTER_MOVE_EVENTS, onPointerMove);
+        bind(target, POINTER_UP_EVENTS, onPointerUp);
         Move.cancel();
         Scroll.cancel();
         startCoord = getCoord(e);
+      } else {
+        prevent(e);
       }
     }
   }
@@ -4110,7 +4112,7 @@ function Drag(Splide, Components, options) {
 
 
   function onPointerUp(e) {
-    unbind(window, POINTER_MOVE_EVENTS + " " + POINTER_UP_EVENTS);
+    unbind(target, POINTER_MOVE_EVENTS + " " + POINTER_UP_EVENTS);
     moving = false;
 
     if (lastEvent) {

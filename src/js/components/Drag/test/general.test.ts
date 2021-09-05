@@ -9,12 +9,12 @@ describe( 'Drag', () => {
     const track  = splide.Components.Elements.track;
 
     fireWithCoord( track, 'mousedown', { x: 0 } );
-    fireWithCoord( track, 'mousemove', { x: 0 } );
-    fireWithCoord( track, 'mousemove', { x: -100 } );
+    fireWithCoord( window, 'mousemove', { x: 0 } );
+    fireWithCoord( window, 'mousemove', { x: -100 } );
 
     expect( splide.Components.Move.getPosition() ).toBe( -100 );
 
-    fireWithCoord( track, 'mousemove', { x: -200 } );
+    fireWithCoord( window, 'mousemove', { x: -200 } );
 
     expect( splide.Components.Move.getPosition() ).toBe( -200 );
   } );
@@ -24,13 +24,13 @@ describe( 'Drag', () => {
     const track  = splide.Components.Elements.track;
 
     fireWithCoord( track, 'mousedown', { x: 0 } );
-    fireWithCoord( track, 'mousemove', { x: 0 } );
-    fireWithCoord( track, 'mouseup' );
+    fireWithCoord( window, 'mousemove', { x: 0 } );
+    fireWithCoord( window, 'mouseup' );
 
     expect( splide.Components.Move.getPosition() ).toBe( 0 );
 
-    fireWithCoord( track, 'mousemove', { x: -200 } );
-    fireWithCoord( track, 'mousemove', { x: -400 } );
+    fireWithCoord( window, 'mousemove', { x: -200 } );
+    fireWithCoord( window, 'mousemove', { x: -400 } );
 
     expect( splide.Components.Move.getPosition() ).toBe( 0 );
   } );
@@ -40,9 +40,9 @@ describe( 'Drag', () => {
     const track  = splide.Components.Elements.track;
 
     fireWithCoord( track, 'mousedown', { x: 0, timeStamp: 1 } );
-    fireWithCoord( track, 'mousemove', { x: 0, timeStamp: 1 } );
-    fireWithCoord( track, 'mousemove', { x: -20, timeStamp: 21 } ); // v = -1
-    fireWithCoord( track, 'mouseup',   { x: -20, timeStamp: 21 } );
+    fireWithCoord( window, 'mousemove', { x: 0, timeStamp: 1 } );
+    fireWithCoord( window, 'mousemove', { x: -20, timeStamp: 21 } ); // v = -1
+    fireWithCoord( window, 'mouseup',   { x: -20, timeStamp: 21 } );
 
     // The destination will be flickPower * v + (-20) = -620
     expect( splide.index ).toBe( 1 );
@@ -53,9 +53,9 @@ describe( 'Drag', () => {
     const track  = splide.Components.Elements.track;
 
     fireWithCoord( track, 'mousedown', { x: 0, timeStamp: 1 } );
-    fireWithCoord( track, 'mousemove', { x: 0, timeStamp: 1 } );
-    fireWithCoord( track, 'mousemove', { x: -20, timeStamp: 100 } );
-    fireWithCoord( track, 'mouseup',   { x: -20, timeStamp: 100 } );
+    fireWithCoord( window, 'mousemove', { x: 0, timeStamp: 1 } );
+    fireWithCoord( window, 'mousemove', { x: -20, timeStamp: 100 } );
+    fireWithCoord( window, 'mouseup',   { x: -20, timeStamp: 100 } );
 
     expect( splide.index ).toBe( 0 );
   } );
@@ -68,7 +68,7 @@ describe( 'Drag', () => {
     splide.on( EVENT_DRAG, onDrag );
 
     fire( track, 'mousedown' );
-    fireWithCoord( track, 'mousemove' );
+    fireWithCoord( window, 'mousemove' );
 
     expect( onDrag ).toHaveBeenCalledTimes( 1 );
   } );
@@ -91,11 +91,11 @@ describe( 'Drag', () => {
   } );
 } );
 
-function fireCancelable( elm: Element, event: string, data: any = {} ): void {
+function fireCancelable( elm: Element | Window, event: string, data: any = {} ): void {
   fire( elm, event, data, { cancelable: true } );
 }
 
-function fireWithCoord( elm: Element, event: string, data: any = {} ): void {
+function fireWithCoord( elm: Element | Window, event: string, data: any = {} ): void {
   const { x: pageX = 0, y: pageY = 0 } = data;
 
   fireCancelable( elm, event, assign( data, {

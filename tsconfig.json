@@ -16,9 +16,10 @@
     ],
   },
   "include": [
-    "src/js/**/*.ts"
+    "src/js/**/*.ts",
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "src/js/**/*.test.ts"
   ]
 }
