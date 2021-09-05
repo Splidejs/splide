@@ -1,5 +1,19 @@
-import { SlideComponent } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
+import { BaseComponent } from '../../types';
+/**
+ * The interface for the Slide sub component.
+ *
+ * @since 3.0.0
+ */
+export interface SlideComponent extends BaseComponent {
+    index: number;
+    slideIndex: number;
+    slide: HTMLElement;
+    container: HTMLElement;
+    isClone: boolean;
+    rule(prop: string, value: string | number, useContainer?: boolean): void;
+    isWithin(from: number, distance: number): boolean;
+}
 /**
  * The sub component for managing each slide.
  *

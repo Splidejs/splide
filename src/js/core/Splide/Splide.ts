@@ -1,20 +1,13 @@
-import {
-  Component,
-  Components,
-  EventBusCallback,
-  EventBusObject,
-  Options,
-  SlideMatcher,
-  StateObject,
-} from '@splidejs/splide';
-import * as CoreComponents from '../../components';
+import * as ComponentConstructors from '../../components';
+import { SlideMatcher } from '../../components/Slides/Slides';
 import { CLASS_INITIALIZED } from '../../constants/classes';
 import { DEFAULTS } from '../../constants/defaults';
 import { EVENT_DESTROY, EVENT_MOUNTED, EVENT_READY, EVENT_REFRESH, EVENT_UPDATED } from '../../constants/events';
 import { CREATED, DESTROYED, IDLE, STATES } from '../../constants/states';
 import { FADE } from '../../constants/types';
-import { EventBus, State } from '../../constructors';
+import { EventBus, EventBusCallback, EventBusObject, State, StateObject } from '../../constructors';
 import { Fade, Slide } from '../../transitions';
+import { ComponentConstructor, Components, Options } from '../../types';
 import { addClass, assert, assign, empty, forOwn, isString, merge, query } from '../../utils';
 
 
@@ -67,12 +60,12 @@ export class Splide {
   /**
    * The collection of extensions.
    */
-  private Extensions: Record<string, Component> = {};
+  private Extensions: Record<string, ComponentConstructor> = {};
 
   /**
    * The Transition component.
    */
-  private Transition: Component;
+  private Transition: ComponentConstructor;
 
   /**
    * The Splide constructor.
@@ -98,13 +91,13 @@ export class Splide {
    *
    * @return `this`
    */
-  mount( Extensions?: Record<string, Component>, Transition?: Component ): this {
+  mount( Extensions?: Record<string, ComponentConstructor>, Transition?: ComponentConstructor ): this {
     this.state.set( CREATED );
 
     this.Transition = Transition || this.Transition || ( this.is( FADE ) ? Fade : Slide );
     this.Extensions = Extensions || this.Extensions;
 
-    const Components = assign( {}, CoreComponents, this.Extensions, { Transition: this.Transition } );
+    const Components = assign( {}, ComponentConstructors, this.Extensions, { Transition: this.Transition } );
 
     forOwn( Components, ( Component, key ) => {
       const component = Component( this, this.Components, this.opts );

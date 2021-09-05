@@ -1,5 +1,20 @@
-import { Components, ControllerComponent, Options } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
+import { BaseComponent, Components, Options } from '../../types';
+/**
+ * The interface for the Controller component.
+ *
+ * @since 3.0.0
+ */
+export interface ControllerComponent extends BaseComponent {
+    go(control: number | string, allowSameIndex?: boolean): void;
+    getNext(destination?: boolean): number;
+    getPrev(destination?: boolean): number;
+    getEnd(): number;
+    getIndex(prev?: boolean): number;
+    toIndex(page: number): number;
+    toPage(index: number): number;
+    hasFocus(): boolean;
+}
 /**
  * The component for controlling the slider.
  *

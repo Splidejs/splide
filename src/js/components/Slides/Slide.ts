@@ -1,4 +1,3 @@
-import { SlideComponent } from '@splidejs/splide';
 import {
   ALL_ATTRIBUTES,
   ARIA_CONTROLS,
@@ -24,14 +23,16 @@ import {
   EVENT_MOUNTED,
   EVENT_MOVE,
   EVENT_MOVED,
-  EVENT_RESIZED, EVENT_SCROLLED,
+  EVENT_RESIZED,
+  EVENT_SCROLLED,
   EVENT_SLIDE_KEYDOWN,
   EVENT_UPDATED,
   EVENT_VISIBLE,
 } from '../../constants/events';
 import { FADE, SLIDE } from '../../constants/types';
-import { Splide } from '../../core/Splide/Splide';
 import { EventInterface } from '../../constructors';
+import { Splide } from '../../core/Splide/Splide';
+import { BaseComponent } from '../../types';
 import {
   abs,
   ceil,
@@ -48,6 +49,21 @@ import {
 } from '../../utils';
 import { format, pad } from '../../utils/string';
 
+
+/**
+ * The interface for the Slide sub component.
+ *
+ * @since 3.0.0
+ */
+export interface  SlideComponent extends BaseComponent {
+  index: number;
+  slideIndex: number;
+  slide: HTMLElement;
+  container: HTMLElement;
+  isClone: boolean;
+  rule( prop: string, value: string | number, useContainer?: boolean ): void
+  isWithin( from: number, distance: number ): boolean;
+}
 
 /**
  * The sub component for managing each slide.

@@ -1,15 +1,7 @@
-import {
-  AnyFunction,
-  Components,
-  Options,
-  SlideComponent,
-  SlideMatcher,
-  SlidesComponent,
-  SlidesIteratee,
-} from '@splidejs/splide';
 import { EVENT_REFRESH, EVENT_RESIZE } from '../../constants/events';
 import { Splide } from '../../core/Splide/Splide';
 import { EventInterface } from '../../constructors';
+import { AnyFunction, BaseComponent, Components, Options } from '../../types';
 import {
   addClass,
   append,
@@ -27,8 +19,48 @@ import {
   remove as removeNode,
   toArray,
 } from '../../utils';
-import { Slide } from './Slide';
+import { Slide, SlideComponent } from './Slide';
 
+
+/**
+ * The interface for the Slides component.
+ *
+ * @since 3.0.0
+ */
+export interface  SlidesComponent extends BaseComponent {
+  register( slide: HTMLElement, index: number, slideIndex: number ): void;
+  get( excludeClones?: boolean ): SlideComponent[];
+  getIn( page: number ): SlideComponent[];
+  getAt( index: number ): SlideComponent | undefined;
+  add( slide: string | Element | Array<string | Element>, index?: number, callback?: AnyFunction ): void;
+  remove( selector: SlideMatcher ): void;
+  forEach( iteratee: SlidesIteratee, excludeClones?: boolean ): void;
+  filter( matcher: SlideMatcher ): SlideComponent[];
+  rule( prop: string, value: string | number, useContainer?: boolean ): void
+  getLength( excludeClones?: boolean ): number;
+  isEnough(): boolean;
+}
+
+/**
+ * The iteratee function for Slides.
+ *
+ * @since 3.0.0
+ */
+export type SlidesIteratee = ( Slide: SlideComponent, index: number, Slides: SlideComponent[] ) => void
+
+/**
+ * The predicate function for Slides.
+ *
+ * @since 3.0.0
+ */
+export type SlidesPredicate = ( Slide: SlideComponent, index: number, Slides: SlideComponent[] ) => any
+
+/**
+ * The type for filtering SlideComponent objects.
+ *
+ * @since 3.0.0
+ */
+export type SlideMatcher = number | number[] | string | SlidesPredicate;
 
 /**
  * The component for managing all slides include clones.

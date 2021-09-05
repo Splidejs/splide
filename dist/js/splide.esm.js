@@ -232,29 +232,6 @@ function slice(arrayLike, start, end) {
   return arrayProto.slice.call(arrayLike, start, end);
 }
 /**
- * The splice method for an array-like object.
- *
- * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
- *
- * @param arrayLike   - An array-like object.
- * @param start       - A start index.
- * @param deleteCount - Optional. A number of elements to remove from the `start` index.
- * @param args        - Optional. Any number of items to add.
- *
- * @return An array with deleted items.
- */
-
-
-function splice(arrayLike, start, deleteCount) {
-  var _arrayProto$splice;
-
-  for (var _len = arguments.length, args = new Array(_len > 3 ? _len - 3 : 0), _key = 3; _key < _len; _key++) {
-    args[_key - 3] = arguments[_key];
-  }
-
-  return (_arrayProto$splice = arrayProto.splice).call.apply(_arrayProto$splice, [arrayLike, start, deleteCount].concat(args));
-}
-/**
  * The find method for an array or array-like object, works in IE.
  * This method is not performant for a huge array.
  *
@@ -405,8 +382,8 @@ function forOwn(object, iteratee) {
 
 
 function assign(object) {
-  for (var _len2 = arguments.length, sources = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-    sources[_key2 - 1] = arguments[_key2];
+  for (var _len = arguments.length, sources = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    sources[_key - 1] = arguments[_key];
   }
 
   sources.forEach(function (source) {
@@ -737,64 +714,6 @@ var min = Math.min,
     ceil = Math.ceil,
     abs = Math.abs,
     round = Math.round;
-var index = /*#__PURE__*/Object.freeze({
-  __proto__: null,
-  empty: empty,
-  forEach: forEach,
-  includes: includes,
-  push: push,
-  toArray: toArray,
-  arrayProto: arrayProto,
-  slice: slice,
-  splice: splice,
-  find: find,
-  addClass: addClass,
-  append: append,
-  before: before,
-  child: child,
-  children: children,
-  create: create,
-  display: display,
-  getAttribute: getAttribute,
-  hasClass: hasClass,
-  matches: matches,
-  parseHtml: parseHtml,
-  prevent: prevent,
-  query: query,
-  queryAll: queryAll,
-  rect: rect,
-  remove: remove,
-  removeAttribute: removeAttribute,
-  removeClass: removeClass,
-  setAttribute: setAttribute,
-  style: style,
-  toggleClass: toggleClass,
-  unit: unit,
-  assert: assert,
-  nextTick: nextTick,
-  noop: noop,
-  raf: raf,
-  between: between,
-  clamp: clamp,
-  sign: sign,
-  min: min,
-  max: max,
-  floor: floor,
-  ceil: ceil,
-  abs: abs,
-  round: round,
-  assign: assign,
-  forOwn: forOwn,
-  merge: merge,
-  isObject: isObject,
-  isArray: isArray,
-  isFunction: isFunction,
-  isString: isString,
-  isUndefined: isUndefined,
-  isNull: isNull,
-  isHTMLElement: isHTMLElement,
-  isHTMLButtonElement: isHTMLButtonElement
-});
 /**
  * The component for managing options.
  *
@@ -4845,7 +4764,7 @@ function Wheel(Splide, Components, options) {
   };
 }
 
-var CoreComponents = /*#__PURE__*/Object.freeze({
+var ComponentConstructors = /*#__PURE__*/Object.freeze({
   __proto__: null,
   Options: Options,
   Direction: Direction,
@@ -5138,7 +5057,7 @@ var Splide = /*#__PURE__*/function () {
     this.state.set(CREATED);
     this.Transition = Transition || this.Transition || (this.is(FADE) ? Fade : Slide);
     this.Extensions = Extensions || this.Extensions;
-    var Components = assign({}, CoreComponents, this.Extensions, {
+    var Components = assign({}, ComponentConstructors, this.Extensions, {
       Transition: this.Transition
     });
     forOwn(Components, function (Component, key) {
@@ -5285,8 +5204,8 @@ var Splide = /*#__PURE__*/function () {
   _proto.emit = function emit(event) {
     var _this$event;
 
-    for (var _len3 = arguments.length, args = new Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
-      args[_key3 - 1] = arguments[_key3];
+    for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+      args[_key2 - 1] = arguments[_key2];
     }
 
     (_this$event = this.event).emit.apply(_this$event, [event].concat(args));
@@ -5445,4 +5364,4 @@ Splide.defaults = {};
  */
 
 Splide.STATES = STATES;
-export { EventBus, EventInterface, RequestInterval, Splide, State, Throttle, Splide as default, index as utils };
+export { CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_AUTOPLAY, CLASS_CLONE, CLASS_CONTAINER, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PAUSE, CLASS_PLAY, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SLIDER, CLASS_SPINNER, CLASS_TRACK, CLASS_VISIBLE, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_PAGE, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, EventBus, EventInterface, RequestInterval, STATUS_CLASSES, Splide, State, Throttle, Splide as default };

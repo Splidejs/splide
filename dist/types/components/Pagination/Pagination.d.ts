@@ -1,5 +1,24 @@
-import { Components, Options, PaginationComponent } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
+import { BaseComponent, Components, Options } from '../../types';
+/**
+ * The interface for the Pagination component.
+ *
+ * @since 3.0.0
+ */
+export interface PaginationComponent extends BaseComponent {
+    items: PaginationItem[];
+    getAt(index: number): PaginationItem;
+}
+/**
+ * The interface for each pagination item.
+ *
+ * @since 3.0.0
+ */
+export interface PaginationItem {
+    li: HTMLLIElement;
+    button: HTMLButtonElement;
+    page: number;
+}
 /**
  * The component for handling previous and next arrows.
  *

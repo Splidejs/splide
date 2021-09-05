@@ -1,9 +1,18 @@
-import { Components, CoverComponent, Options, SlideComponent } from '@splidejs/splide';
 import { EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_REFRESH, EVENT_UPDATED } from '../../constants/events';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
+import { BaseComponent, Components, Options } from '../../types';
 import { child, display } from '../../utils';
+import { SlideComponent } from '../Slides/Slide';
 
+
+/**
+ * The interface for the Cover component.
+ *
+ * @since 3.0.0
+ */
+export interface CoverComponent extends BaseComponent {
+}
 
 /**
  * The component for setting the image as the slide background.

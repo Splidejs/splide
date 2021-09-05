@@ -1,5 +1,12 @@
-import { Components, Options } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
+import { BaseComponent, Components, Options } from '../../types';
+/**
+ * The interface for the Clone component.
+ *
+ * @since 3.0.0
+ */
+export interface CloneComponent extends BaseComponent {
+}
 /**
  * The component that generates clones for the loop slider.
  *
@@ -11,5 +18,5 @@ import { Splide } from '../../core/Splide/Splide';
  *
  * @return A Clones component object.
  */
-export declare function Clones(Splide: Splide, Components: Components, options: Options): any;
+export declare function Clones(Splide: Splide, Components: Components, options: Options): CloneComponent;
 //# sourceMappingURL=../../../../src/js/components/Clones/Clones.d.ts.map

@@ -1,11 +1,19 @@
-import { Components, Options } from '@splidejs/splide';
 import { EVENT_REFRESH, EVENT_RESIZE, EVENT_UPDATED } from '../../constants/events';
 import { LOOP } from '../../constants/types';
-import { Splide } from '../../core/Splide/Splide';
 import { EventInterface } from '../../constructors';
+import { Splide } from '../../core/Splide/Splide';
+import { BaseComponent, Components, Options } from '../../types';
 import { addClass, append, before, ceil, empty, push, rect, remove } from '../../utils';
 import { pad } from '../../utils/string';
 
+
+/**
+ * The interface for the Clone component.
+ *
+ * @since 3.0.0
+ */
+export interface CloneComponent extends BaseComponent {
+}
 
 /**
  * The component that generates clones for the loop slider.
@@ -18,7 +26,7 @@ import { pad } from '../../utils/string';
  *
  * @return A Clones component object.
  */
-export function Clones( Splide: Splide, Components: Components, options: Options ): any {
+export function Clones( Splide: Splide, Components: Components, options: Options ): CloneComponent {
   const { on, emit } = EventInterface( Splide );
   const { Elements, Slides } = Components;
   const { resolve } = Components.Direction;

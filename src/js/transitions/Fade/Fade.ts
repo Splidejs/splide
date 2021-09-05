@@ -1,7 +1,7 @@
-import { Components, Options, TransitionComponent } from '@splidejs/splide';
 import { EVENT_MOUNTED, EVENT_REFRESH } from '../../constants/events';
-import { Splide } from '../../core/Splide/Splide';
 import { EventInterface } from '../../constructors';
+import { Splide } from '../../core/Splide/Splide';
+import { Components, Options, TransitionComponent } from '../../types';
 import { nextTick, noop, rect, unit } from '../../utils';
 
 

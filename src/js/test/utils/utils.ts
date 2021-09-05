@@ -1,6 +1,6 @@
-import { Options } from '@splidejs/splide';
 import { CLASS_LIST, CLASS_ROOT, CLASS_SLIDE, CLASS_TRACK } from '../../constants/classes';
 import { Splide } from '../../core/Splide/Splide';
+import { Options } from '../../types';
 import { assign } from '../../utils';
 import { buildHtml, BuildHtmlArgs } from '../fixtures';
 import { SLIDER_WIDTH } from '../fixtures/constants';

@@ -1,5 +1,12 @@
-import { Components, Options, OptionsComponent } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
+import { BaseComponent, Components, Options } from '../../types';
+/**
+ * The interface for the Options component.
+ *
+ * @since 3.0.0
+ */
+export interface OptionsComponent extends BaseComponent {
+}
 /**
  * The component for managing options.
  *

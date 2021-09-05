@@ -1,5 +1,12 @@
-import { Components, Options, SyncComponent } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
+import { BaseComponent, Components, Options } from '../../types';
+/**
+ * The interface for the Sync component.
+ *
+ * @since 3.0.0
+ */
+export interface SyncComponent extends BaseComponent {
+}
 /**
  * The component for syncing multiple sliders.
  *

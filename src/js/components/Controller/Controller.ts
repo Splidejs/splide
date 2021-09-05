@@ -1,10 +1,26 @@
-import { Components, ControllerComponent, Options } from '@splidejs/splide';
 import { EVENT_REFRESH, EVENT_SCROLLED, EVENT_UPDATED } from '../../constants/events';
 import { LOOP } from '../../constants/types';
-import { Splide } from '../../core/Splide/Splide';
 import { EventInterface } from '../../constructors';
+import { Splide } from '../../core/Splide/Splide';
+import { BaseComponent, Components, Options } from '../../types';
 import { between, clamp, floor, isString, isUndefined, max } from '../../utils';
 
+
+/**
+ * The interface for the Controller component.
+ *
+ * @since 3.0.0
+ */
+export interface ControllerComponent extends BaseComponent {
+  go( control: number | string, allowSameIndex?: boolean ): void;
+  getNext( destination?: boolean ): number;
+  getPrev( destination?: boolean ): number;
+  getEnd(): number;
+  getIndex( prev?: boolean ): number;
+  toIndex( page: number ): number;
+  toPage( index: number ): number;
+  hasFocus(): boolean;
+}
 
 /**
  * The component for controlling the slider.

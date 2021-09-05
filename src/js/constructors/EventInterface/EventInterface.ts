@@ -1,8 +1,28 @@
-import { AnyFunction, EventBusCallback, EventInterfaceObject } from '@splidejs/splide';
 import { EVENT_DESTROY } from '../../constants/events';
 import { Splide } from '../../core/Splide/Splide';
+import { AnyFunction } from '../../types';
 import { forEach } from '../../utils';
+import { EventBusCallback } from '../EventBus/EventBus';
 
+
+/**
+ * The interface for the EventInterface object.
+ *
+ * @since 3.0.0
+ */
+export interface EventInterfaceObject {
+  on( events: string | string[], callback: EventBusCallback, priority?: number ): void;
+  off( events: string | string[] ): void;
+  emit( event: string, ...args: any[] ): void;
+  bind(
+    target: Element | Window | Document | Array<Element | Window | Document>,
+    events: string,
+    callback: AnyFunction,
+    options?: AddEventListenerOptions
+  ): void
+  unbind( target: Element | Window | Document | Array<Element | Window | Document>, events: string ): void;
+  destroy(): void;
+}
 
 /**
  * The type for event targets.

@@ -1,4 +1,3 @@
-import { Components, ElementCollection, ElementsComponent, Options } from '@splidejs/splide';
 import {
   CLASS_ACTIVE,
   CLASS_ARROW_NEXT,
@@ -18,11 +17,39 @@ import {
 } from '../../constants/classes';
 import { EVENT_REFRESH, EVENT_UPDATED } from '../../constants/events';
 import { PROJECT_CODE } from '../../constants/project';
-import { Splide } from '../../core/Splide/Splide';
 import { EventInterface } from '../../constructors';
+import { Splide } from '../../core/Splide/Splide';
+import { BaseComponent, Components, Options } from '../../types';
 import { addClass, assert, assign, child, children, empty, push, query, removeClass } from '../../utils';
 import { uniqueId } from '../../utils/string';
 
+
+/**
+ * The interface for elements which the slider consists of.
+ *
+ * @since 3.0.0
+ */
+export interface ElementCollection {
+  root: HTMLElement;
+  slider: HTMLElement;
+  track: HTMLElement;
+  list: HTMLElement;
+  slides: HTMLElement[];
+  arrows: HTMLElement;
+  prev: HTMLButtonElement;
+  next: HTMLButtonElement;
+  bar: HTMLElement;
+  play: HTMLElement;
+  pause: HTMLElement;
+}
+
+/**
+ * The interface for the Elements component.
+ *
+ * @since 3.0.0
+ */
+export interface ElementsComponent extends BaseComponent, ElementCollection {
+}
 
 /**
  * The component that collects and handles elements which the slider consists of.

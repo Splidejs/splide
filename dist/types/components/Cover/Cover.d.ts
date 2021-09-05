@@ -1,5 +1,12 @@
-import { Components, CoverComponent, Options } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
+import { BaseComponent, Components, Options } from '../../types';
+/**
+ * The interface for the Cover component.
+ *
+ * @since 3.0.0
+ */
+export interface CoverComponent extends BaseComponent {
+}
 /**
  * The component for setting the image as the slide background.
  *

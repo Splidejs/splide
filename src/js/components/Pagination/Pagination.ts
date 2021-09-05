@@ -1,4 +1,3 @@
-import { Components, Options, PaginationComponent, PaginationItem } from '@splidejs/splide';
 import { ARIA_CONTROLS, ARIA_CURRENT, ARIA_LABEL } from '../../constants/attributes';
 import { CLASS_ACTIVE } from '../../constants/classes';
 import {
@@ -10,9 +9,31 @@ import {
 } from '../../constants/events';
 import { Splide } from '../../core/Splide/Splide';
 import { EventInterface } from '../../constructors';
+import { BaseComponent, Components, Options } from '../../types';
 import { addClass, ceil, create, empty, remove, removeAttribute, removeClass, setAttribute } from '../../utils';
 import { format } from '../../utils/string';
 
+
+/**
+ * The interface for the Pagination component.
+ *
+ * @since 3.0.0
+ */
+export interface PaginationComponent extends BaseComponent {
+  items: PaginationItem[];
+  getAt( index: number ): PaginationItem;
+}
+
+/**
+ * The interface for each pagination item.
+ *
+ * @since 3.0.0
+ */
+export interface PaginationItem {
+  li: HTMLLIElement;
+  button: HTMLButtonElement;
+  page: number;
+}
 
 /**
  * The component for handling previous and next arrows.

@@ -1,5 +1,5 @@
-export { EventBus }        from './EventBus/EventBus';
-export { EventInterface }  from './EventInterface/EventInterface';
-export { RequestInterval } from './RequestInterval/RequestInterval';
-export { State }           from './State/State';
-export { Throttle }        from './Throttle/Throttle';
+export * from './EventBus/EventBus';
+export * from './EventInterface/EventInterface';
+export * from './RequestInterval/RequestInterval';
+export * from './State/State';
+export * from './Throttle/Throttle';

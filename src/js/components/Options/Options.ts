@@ -1,9 +1,17 @@
-import { Components, Options, OptionsComponent } from '@splidejs/splide';
 import { DATA_ATTRIBUTE } from '../../constants/project';
 import { DESTROYED } from '../../constants/states';
 import { Splide } from '../../core/Splide/Splide';
+import { BaseComponent, Components, Options } from '../../types';
 import { assert, find, getAttribute, merge } from '../../utils';
 
+
+/**
+ * The interface for the Options component.
+ *
+ * @since 3.0.0
+ */
+export interface OptionsComponent extends BaseComponent {
+}
 
 /**
  * The component for managing options.

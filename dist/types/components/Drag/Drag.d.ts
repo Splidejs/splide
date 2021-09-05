@@ -1,5 +1,12 @@
-import { Components, DragComponent, Options } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
+import { BaseComponent, Components, Options } from '../../types';
+/**
+ * The interface for the Drag component.
+ *
+ * @since 3.0.0
+ */
+export interface DragComponent extends BaseComponent {
+}
 /**
  * The component for dragging the slider.
  *

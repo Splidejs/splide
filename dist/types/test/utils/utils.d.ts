@@ -1,5 +1,5 @@
-import { Options } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
+import { Options } from '../../types';
 import { BuildHtmlArgs } from '../fixtures';
 interface InitArgs extends BuildHtmlArgs {
     mount?: boolean;

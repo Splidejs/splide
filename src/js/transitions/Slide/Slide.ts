@@ -1,7 +1,7 @@
-import { Components, Options, TransitionComponent } from '@splidejs/splide';
 import { SLIDE } from '../../constants/types';
-import { Splide } from '../../core/Splide/Splide';
 import { EventInterface } from '../../constructors';
+import { Splide } from '../../core/Splide/Splide';
+import { Components, Options, TransitionComponent } from '../../types';
 import { abs } from '../../utils';
 
 

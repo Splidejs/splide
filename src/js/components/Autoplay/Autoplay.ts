@@ -1,4 +1,3 @@
-import { AutoplayComponent, Components, Options } from '@splidejs/splide';
 import { ARIA_CONTROLS, ARIA_LABEL, ROLE } from '../../constants/attributes';
 import {
   EVENT_AUTOPLAY_PAUSE,
@@ -10,8 +9,20 @@ import {
 } from '../../constants/events';
 import { EventInterface, RequestInterval } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
+import { BaseComponent, Components, Options } from '../../types';
 import { isHTMLButtonElement, setAttribute, style } from '../../utils';
 
+
+/**
+ * The interface for the Autoplay component.
+ *
+ * @since 3.0.0
+ */
+export interface AutoplayComponent extends BaseComponent {
+  play(): void;
+  pause(): void;
+  isPaused(): boolean;
+}
 
 /**
  * The component for auto playing sliders.

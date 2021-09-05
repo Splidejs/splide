@@ -1,4 +1,6 @@
-import { Component, Components, EventBusCallback, EventBusObject, Options, SlideMatcher, StateObject } from '@splidejs/splide';
+import { SlideMatcher } from '../../components/Slides/Slides';
+import { EventBusCallback, EventBusObject, StateObject } from '../../constructors';
+import { ComponentConstructor, Components, Options } from '../../types';
 /**
  * The frontend class for the Splide slider.
  *
@@ -66,7 +68,7 @@ export declare class Splide {
      *
      * @return `this`
      */
-    mount(Extensions?: Record<string, Component>, Transition?: Component): this;
+    mount(Extensions?: Record<string, ComponentConstructor>, Transition?: ComponentConstructor): this;
     /**
      * Syncs the slider with the provided one.
      * This method must be called before the `mount()`.

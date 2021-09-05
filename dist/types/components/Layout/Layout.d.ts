@@ -1,5 +1,17 @@
-import { Components, LayoutComponent, Options } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
+import { BaseComponent, Components, Options } from '../../types';
+/**
+ * The interface for the Layout component.
+ *
+ * @since 3.0.0
+ */
+export interface LayoutComponent extends BaseComponent {
+    listSize(): number;
+    slideSize(index: number, withoutGap?: boolean): number;
+    sliderSize(): number;
+    totalSize(index?: number, withoutGap?: boolean): number;
+    getPadding(right: boolean): number;
+}
 /**
  * The component that layouts slider components and provides methods for dimensions.
  *

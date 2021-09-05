@@ -1,10 +1,18 @@
-import { Components, KeyboardComponent, Options } from '@splidejs/splide';
 import { TAB_INDEX } from '../../constants/attributes';
 import { EVENT_UPDATED } from '../../constants/events';
-import { Splide } from '../../core/Splide/Splide';
 import { EventInterface } from '../../constructors';
+import { Splide } from '../../core/Splide/Splide';
+import { BaseComponent, Components, Options } from '../../types';
 import { includes, isHTMLElement, removeAttribute, setAttribute } from '../../utils';
 
+
+/**
+ * The interface for the Keyboard component.
+ *
+ * @since 3.0.0
+ */
+export interface KeyboardComponent extends BaseComponent {
+}
 
 /**
  * The collection of arrow keys of IE.

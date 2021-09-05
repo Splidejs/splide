@@ -1,6 +1,6 @@
-import { AutoplayComponent } from '@splidejs/splide';
 import { Splide } from '../../../core/Splide/Splide';
 import { fire, init, wait } from '../../../test';
+import { AutoplayComponent } from '../Autoplay';
 
 
 describe( 'Autoplay', () => {

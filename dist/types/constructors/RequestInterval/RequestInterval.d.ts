@@ -1,4 +1,15 @@
-import { RequestIntervalInterface } from '@splidejs/splide';
+/**
+ * The interface for the returning value of the RequestInterval.
+ *
+ * @since 3.0.0
+ */
+export interface RequestIntervalInterface {
+    start(resume?: boolean): void;
+    pause(): void;
+    rewind(): void;
+    cancel(): void;
+    isPaused(): boolean;
+}
 /**
  * Requests interval like the native `setInterval()` with using `requestAnimationFrame`.
  *

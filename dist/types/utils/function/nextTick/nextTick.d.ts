@@ -1,4 +1,4 @@
-import { AnyFunction } from '@splidejs/splide';
+import { AnyFunction } from '../../../types';
 /**
  * Invokes the callback on the next tick.
  *

@@ -237,29 +237,6 @@ function slice(arrayLike, start, end) {
   return arrayProto.slice.call(arrayLike, start, end);
 }
 /**
- * The splice method for an array-like object.
- *
- * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
- *
- * @param arrayLike   - An array-like object.
- * @param start       - A start index.
- * @param deleteCount - Optional. A number of elements to remove from the `start` index.
- * @param args        - Optional. Any number of items to add.
- *
- * @return An array with deleted items.
- */
-
-
-function splice(arrayLike, start, deleteCount) {
-  var _arrayProto$splice;
-
-  for (var _len = arguments.length, args = new Array(_len > 3 ? _len - 3 : 0), _key = 3; _key < _len; _key++) {
-    args[_key - 3] = arguments[_key];
-  }
-
-  return (_arrayProto$splice = arrayProto.splice).call.apply(_arrayProto$splice, [arrayLike, start, deleteCount].concat(args));
-}
-/**
  * The find method for an array or array-like object, works in IE.
  * This method is not performant for a huge array.
  *
@@ -410,8 +387,8 @@ function forOwn(object, iteratee) {
 
 
 function assign(object) {
-  for (var _len2 = arguments.length, sources = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-    sources[_key2 - 1] = arguments[_key2];
+  for (var _len = arguments.length, sources = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    sources[_key - 1] = arguments[_key];
   }
 
   sources.forEach(function (source) {
@@ -742,64 +719,6 @@ var min = Math.min,
     ceil = Math.ceil,
     abs = Math.abs,
     round = Math.round;
-var index = /*#__PURE__*/Object.freeze({
-  __proto__: null,
-  empty: empty,
-  forEach: forEach,
-  includes: includes,
-  push: push,
-  toArray: toArray,
-  arrayProto: arrayProto,
-  slice: slice,
-  splice: splice,
-  find: find,
-  addClass: addClass,
-  append: append,
-  before: before,
-  child: child,
-  children: children,
-  create: create,
-  display: display,
-  getAttribute: getAttribute,
-  hasClass: hasClass,
-  matches: matches,
-  parseHtml: parseHtml,
-  prevent: prevent,
-  query: query,
-  queryAll: queryAll,
-  rect: rect,
-  remove: remove,
-  removeAttribute: removeAttribute,
-  removeClass: removeClass,
-  setAttribute: setAttribute,
-  style: style,
-  toggleClass: toggleClass,
-  unit: unit,
-  assert: assert,
-  nextTick: nextTick,
-  noop: noop,
-  raf: raf,
-  between: between,
-  clamp: clamp,
-  sign: sign,
-  min: min,
-  max: max,
-  floor: floor,
-  ceil: ceil,
-  abs: abs,
-  round: round,
-  assign: assign,
-  forOwn: forOwn,
-  merge: merge,
-  isObject: isObject,
-  isArray: isArray,
-  isFunction: isFunction,
-  isString: isString,
-  isUndefined: isUndefined,
-  isNull: isNull,
-  isHTMLElement: isHTMLElement,
-  isHTMLButtonElement: isHTMLButtonElement
-});
 /**
  * The component for managing options.
  *
@@ -4850,7 +4769,7 @@ function Wheel(Splide, Components, options) {
   };
 }
 
-var CoreComponents = /*#__PURE__*/Object.freeze({
+var ComponentConstructors = /*#__PURE__*/Object.freeze({
   __proto__: null,
   Options: Options,
   Direction: Direction,
@@ -5143,7 +5062,7 @@ var Splide = /*#__PURE__*/function () {
     this.state.set(CREATED);
     this.Transition = Transition || this.Transition || (this.is(FADE) ? Fade : Slide);
     this.Extensions = Extensions || this.Extensions;
-    var Components = assign({}, CoreComponents, this.Extensions, {
+    var Components = assign({}, ComponentConstructors, this.Extensions, {
       Transition: this.Transition
     });
     forOwn(Components, function (Component, key) {
@@ -5290,8 +5209,8 @@ var Splide = /*#__PURE__*/function () {
   _proto.emit = function emit(event) {
     var _this$event;
 
-    for (var _len3 = arguments.length, args = new Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
-      args[_key3 - 1] = arguments[_key3];
+    for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+      args[_key2 - 1] = arguments[_key2];
     }
 
     (_this$event = this.event).emit.apply(_this$event, [event].concat(args));
@@ -5450,11 +5369,67 @@ Splide.defaults = {};
  */
 
 Splide.STATES = STATES;
+exports.CLASSES = CLASSES;
+exports.CLASS_ACTIVE = CLASS_ACTIVE;
+exports.CLASS_ARROW = CLASS_ARROW;
+exports.CLASS_ARROWS = CLASS_ARROWS;
+exports.CLASS_ARROW_NEXT = CLASS_ARROW_NEXT;
+exports.CLASS_ARROW_PREV = CLASS_ARROW_PREV;
+exports.CLASS_AUTOPLAY = CLASS_AUTOPLAY;
+exports.CLASS_CLONE = CLASS_CLONE;
+exports.CLASS_CONTAINER = CLASS_CONTAINER;
+exports.CLASS_INITIALIZED = CLASS_INITIALIZED;
+exports.CLASS_LIST = CLASS_LIST;
+exports.CLASS_LOADING = CLASS_LOADING;
+exports.CLASS_NEXT = CLASS_NEXT;
+exports.CLASS_PAGINATION = CLASS_PAGINATION;
+exports.CLASS_PAGINATION_PAGE = CLASS_PAGINATION_PAGE;
+exports.CLASS_PAUSE = CLASS_PAUSE;
+exports.CLASS_PLAY = CLASS_PLAY;
+exports.CLASS_PREV = CLASS_PREV;
+exports.CLASS_PROGRESS = CLASS_PROGRESS;
+exports.CLASS_PROGRESS_BAR = CLASS_PROGRESS_BAR;
+exports.CLASS_ROOT = CLASS_ROOT;
+exports.CLASS_SLIDE = CLASS_SLIDE;
+exports.CLASS_SLIDER = CLASS_SLIDER;
+exports.CLASS_SPINNER = CLASS_SPINNER;
+exports.CLASS_TRACK = CLASS_TRACK;
+exports.CLASS_VISIBLE = CLASS_VISIBLE;
+exports.EVENT_ACTIVE = EVENT_ACTIVE;
+exports.EVENT_ARROWS_MOUNTED = EVENT_ARROWS_MOUNTED;
+exports.EVENT_ARROWS_UPDATED = EVENT_ARROWS_UPDATED;
+exports.EVENT_AUTOPLAY_PAUSE = EVENT_AUTOPLAY_PAUSE;
+exports.EVENT_AUTOPLAY_PLAY = EVENT_AUTOPLAY_PLAY;
+exports.EVENT_AUTOPLAY_PLAYING = EVENT_AUTOPLAY_PLAYING;
+exports.EVENT_CLICK = EVENT_CLICK;
+exports.EVENT_DESTROY = EVENT_DESTROY;
+exports.EVENT_DRAG = EVENT_DRAG;
+exports.EVENT_DRAGGED = EVENT_DRAGGED;
+exports.EVENT_DRAGGING = EVENT_DRAGGING;
+exports.EVENT_HIDDEN = EVENT_HIDDEN;
+exports.EVENT_INACTIVE = EVENT_INACTIVE;
+exports.EVENT_LAZYLOAD_LOADED = EVENT_LAZYLOAD_LOADED;
+exports.EVENT_MOUNTED = EVENT_MOUNTED;
+exports.EVENT_MOVE = EVENT_MOVE;
+exports.EVENT_MOVED = EVENT_MOVED;
+exports.EVENT_NAVIGATION_MOUNTED = EVENT_NAVIGATION_MOUNTED;
+exports.EVENT_PAGINATION_MOUNTED = EVENT_PAGINATION_MOUNTED;
+exports.EVENT_PAGINATION_PAGE = EVENT_PAGINATION_PAGE;
+exports.EVENT_PAGINATION_UPDATED = EVENT_PAGINATION_UPDATED;
+exports.EVENT_READY = EVENT_READY;
+exports.EVENT_REFRESH = EVENT_REFRESH;
+exports.EVENT_RESIZE = EVENT_RESIZE;
+exports.EVENT_RESIZED = EVENT_RESIZED;
+exports.EVENT_SCROLL = EVENT_SCROLL;
+exports.EVENT_SCROLLED = EVENT_SCROLLED;
+exports.EVENT_SLIDE_KEYDOWN = EVENT_SLIDE_KEYDOWN;
+exports.EVENT_UPDATED = EVENT_UPDATED;
+exports.EVENT_VISIBLE = EVENT_VISIBLE;
 exports.EventBus = EventBus;
 exports.EventInterface = EventInterface;
 exports.RequestInterval = RequestInterval;
+exports.STATUS_CLASSES = STATUS_CLASSES;
 exports.Splide = Splide;
 exports.State = State;
 exports.Throttle = Throttle;
 exports['default'] = Splide;
-exports.utils = index;

@@ -1,5 +1,12 @@
-import { Components, Options, WheelComponent } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
+import { BaseComponent, Components, Options } from '../../types';
+/**
+ * The interface for the Wheel component.
+ *
+ * @since 3.0.0
+ */
+export interface WheelComponent extends BaseComponent {
+}
 /**
  * The component for observing the mouse wheel and moving the slider.
  *

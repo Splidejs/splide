@@ -1,4 +1,3 @@
-import { Components, LazyLoadComponent, LazyLoadImagesData, Options } from '@splidejs/splide';
 import { ROLE } from '../../constants/attributes';
 import { CLASS_LOADING } from '../../constants/classes';
 import {
@@ -8,8 +7,9 @@ import {
   EVENT_REFRESH,
   EVENT_RESIZE,
 } from '../../constants/events';
-import { Splide } from '../../core/Splide/Splide';
 import { EventInterface } from '../../constructors';
+import { Splide } from '../../core/Splide/Splide';
+import { BaseComponent, Components, Options } from '../../types';
 import {
   addClass,
   create,
@@ -21,8 +21,30 @@ import {
   removeClass,
   setAttribute,
 } from '../../utils';
+import { SlideComponent } from '../Slides/Slide';
 import { IMAGE_SELECTOR, SRC_DATA_ATTRIBUTE, SRCSET_DATA_ATTRIBUTE } from './constants';
 
+
+/**
+ * The interface for the LazyLoad component.
+ *
+ * @since 3.0.0
+ */
+export interface LazyLoadComponent extends BaseComponent {
+}
+
+/**
+ * The interface for all components.
+ *
+ * @since 3.0.0
+ */
+export interface LazyLoadImagesData {
+  img: HTMLImageElement;
+  spinner: HTMLSpanElement;
+  Slide: SlideComponent;
+  src: string | null;
+  srcset: string | null;
+}
 
 /**
  * The component for lazily loading images.

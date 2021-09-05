@@ -1,5 +1,14 @@
-import { Components, DirectionComponent, Options } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
+import { BaseComponent, Components, Options } from '../../types';
+/**
+ * The interface for the Direction component.
+ *
+ * @since 3.0.0
+ */
+export interface DirectionComponent extends BaseComponent {
+    resolve(prop: string, axisOnly?: boolean): string;
+    orient(value: number): number;
+}
 /**
  * The translation map for directions.
  *

@@ -5,7 +5,7 @@
  *
  * @return `true` if the subject is an object, or otherwise `false`.
  */
-export function isObject( subject: any ): subject is object {
+export function isObject( subject: unknown ): subject is object {
   return ! isNull( subject ) && typeof subject === 'object';
 }
 
@@ -16,7 +16,7 @@ export function isObject( subject: any ): subject is object {
  *
  * @return `true` if the subject is an array, or otherwise `false`.
  */
-export function isArray<T>( subject: any ): subject is T[] {
+export function isArray<T>( subject: unknown ): subject is T[] {
   return Array.isArray( subject );
 }
 
@@ -27,7 +27,7 @@ export function isArray<T>( subject: any ): subject is T[] {
  *
  * @return `true` if the subject is a function, or otherwise `false`.
  */
-export function isFunction( subject: any ): subject is ( ...args: any[] ) => any {
+export function isFunction( subject: unknown ): subject is ( ...args: any[] ) => any {
   return typeof subject === 'function';
 }
 
@@ -38,7 +38,7 @@ export function isFunction( subject: any ): subject is ( ...args: any[] ) => any
  *
  * @return `true` if the subject is a string, or otherwise `false`.
  */
-export function isString( subject: any ): subject is string {
+export function isString( subject: unknown ): subject is string {
   return typeof subject === 'string';
 }
 
@@ -49,7 +49,7 @@ export function isString( subject: any ): subject is string {
  *
  * @return `true` if the subject is `undefined`, or otherwise `false`.
  */
-export function isUndefined( subject: any ): subject is undefined {
+export function isUndefined( subject: unknown ): subject is undefined {
   return typeof subject === 'undefined';
 }
 
@@ -60,7 +60,7 @@ export function isUndefined( subject: any ): subject is undefined {
  *
  * @return `true` if the subject is `null`, or otherwise `false`.
  */
-export function isNull( subject: any ): subject is null {
+export function isNull( subject: unknown ): subject is null {
   return subject === null;
 }
 
@@ -71,7 +71,7 @@ export function isNull( subject: any ): subject is null {
  *
  * @return `true` if the subject is an HTMLElement instance, or otherwise `false`.
  */
-export function isHTMLElement( subject: any ): subject is HTMLElement {
+export function isHTMLElement( subject: unknown ): subject is HTMLElement {
   return subject instanceof HTMLElement;
 }
 
@@ -82,6 +82,6 @@ export function isHTMLElement( subject: any ): subject is HTMLElement {
  *
  * @return `true` if the subject is an HTMLButtonElement, or otherwise `false`.
  */
-export function isHTMLButtonElement( subject: any ): subject is HTMLButtonElement {
+export function isHTMLButtonElement( subject: unknown ): subject is HTMLButtonElement {
   return subject instanceof HTMLButtonElement;
 }

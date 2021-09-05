@@ -17,4 +17,3 @@ export { LazyLoad }   from './LazyLoad/LazyLoad';
 export { Pagination } from './Pagination/Pagination';
 export { Sync }       from './Sync/Sync';
 export { Wheel }      from './Wheel/Wheel';
-

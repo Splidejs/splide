@@ -1,5 +1,16 @@
-import { ArrowsComponent, Components, Options } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
+import { BaseComponent, Components, Options } from '../../types';
+/**
+ * The interface for the Arrows component.
+ *
+ * @since 3.0.0
+ */
+export interface ArrowsComponent extends BaseComponent {
+    arrows: {
+        prev?: HTMLButtonElement;
+        next?: HTMLButtonElement;
+    };
+}
 /**
  * The component for handling previous and next arrows.
  *

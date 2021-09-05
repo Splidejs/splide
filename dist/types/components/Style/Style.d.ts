@@ -1,4 +1,13 @@
-import { StyleComponent } from '@splidejs/splide';
+import { BaseComponent } from '../../types';
+/**
+ * The interface for the Style component.
+ *
+ * @since 3.0.0
+ */
+export interface StyleComponent extends BaseComponent {
+    rule(selector: string, prop: string, value: string | number): void;
+    ruleBy(target: string | HTMLElement, prop: string, value: string | number): void;
+}
 /**
  * The component for managing styles of the slider.
  *

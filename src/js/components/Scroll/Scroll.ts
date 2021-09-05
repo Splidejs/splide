@@ -1,11 +1,21 @@
-import { Components, Options, RequestIntervalInterface, ScrollComponent } from '@splidejs/splide';
 import { EVENT_MOVE, EVENT_REFRESH, EVENT_SCROLL, EVENT_SCROLLED, EVENT_UPDATED } from '../../constants/events';
 import { SLIDE } from '../../constants/types';
-import { EventInterface, RequestInterval } from '../../constructors';
+import { EventInterface, RequestInterval, RequestIntervalInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
+import { BaseComponent, Components, Options } from '../../types';
 import { abs, max } from '../../utils';
 import { BASE_VELOCITY, BOUNCE_DIFF_THRESHOLD, BOUNCE_DURATION, FRICTION_FACTOR, MIN_DURATION } from './constants';
 
+
+/**
+ * The interface for the Scroll component.
+ *
+ * @since 3.0.0
+ */
+export interface ScrollComponent extends BaseComponent {
+  scroll( position: number, duration?: number ): void;
+  cancel(): void;
+}
 
 /**
  * The component for scrolling the slider.

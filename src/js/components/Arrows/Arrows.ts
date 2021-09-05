@@ -1,4 +1,3 @@
-import { ArrowsComponent, Components, Options } from '@splidejs/splide';
 import { ALL_ATTRIBUTES, ARIA_CONTROLS, ARIA_LABEL } from '../../constants/attributes';
 import {
   EVENT_ARROWS_MOUNTED,
@@ -11,9 +10,19 @@ import {
 } from '../../constants/events';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
+import { BaseComponent, Components, Options } from '../../types';
 import { append, before, child, create, display, parseHtml, remove, removeAttribute, setAttribute } from '../../utils';
 import { PATH, SIZE, XML_NAME_SPACE } from './path';
 
+
+/**
+ * The interface for the Arrows component.
+ *
+ * @since 3.0.0
+ */
+export interface ArrowsComponent extends BaseComponent {
+  arrows: { prev?: HTMLButtonElement, next?: HTMLButtonElement };
+}
 
 /**
  * The component for handling previous and next arrows.

@@ -1,11 +1,19 @@
-import { Components, DragComponent, Options } from '@splidejs/splide';
 import { EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING } from '../../constants/events';
 import { FADE, LOOP, SLIDE } from '../../constants/types';
-import { Splide } from '../../core/Splide/Splide';
 import { EventInterface } from '../../constructors';
+import { Splide } from '../../core/Splide/Splide';
+import { BaseComponent, Components, Options } from '../../types';
 import { abs, clamp, min, prevent, sign } from '../../utils';
 import { FRICTION, POINTER_DOWN_EVENTS, POINTER_MOVE_EVENTS, POINTER_UP_EVENTS, SAMPLING_INTERVAL } from './constants';
 
+
+/**
+ * The interface for the Drag component.
+ *
+ * @since 3.0.0
+ */
+export interface DragComponent extends BaseComponent {
+}
 
 /**
  * The component for dragging the slider.

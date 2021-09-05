@@ -5,7 +5,7 @@
  *
  * @return `true` if the subject is an object, or otherwise `false`.
  */
-export declare function isObject(subject: any): subject is object;
+export declare function isObject(subject: unknown): subject is object;
 /**
  * Checks if the given subject is an array or not.
  *
@@ -13,7 +13,7 @@ export declare function isObject(subject: any): subject is object;
  *
  * @return `true` if the subject is an array, or otherwise `false`.
  */
-export declare function isArray<T>(subject: any): subject is T[];
+export declare function isArray<T>(subject: unknown): subject is T[];
 /**
  * Checks if the given subject is a function or not.
  *
@@ -21,7 +21,7 @@ export declare function isArray<T>(subject: any): subject is T[];
  *
  * @return `true` if the subject is a function, or otherwise `false`.
  */
-export declare function isFunction(subject: any): subject is (...args: any[]) => any;
+export declare function isFunction(subject: unknown): subject is (...args: any[]) => any;
 /**
  * Checks if the given subject is a string or not.
  *
@@ -29,7 +29,7 @@ export declare function isFunction(subject: any): subject is (...args: any[]) =>
  *
  * @return `true` if the subject is a string, or otherwise `false`.
  */
-export declare function isString(subject: any): subject is string;
+export declare function isString(subject: unknown): subject is string;
 /**
  * Checks if the given subject is `undefined` or not.
  *
@@ -37,7 +37,7 @@ export declare function isString(subject: any): subject is string;
  *
  * @return `true` if the subject is `undefined`, or otherwise `false`.
  */
-export declare function isUndefined(subject: any): subject is undefined;
+export declare function isUndefined(subject: unknown): subject is undefined;
 /**
  * Checks if the given subject is `null` or not.
  *
@@ -45,7 +45,7 @@ export declare function isUndefined(subject: any): subject is undefined;
  *
  * @return `true` if the subject is `null`, or otherwise `false`.
  */
-export declare function isNull(subject: any): subject is null;
+export declare function isNull(subject: unknown): subject is null;
 /**
  * Checks if the given subject is an HTMLElement or not.
  *
@@ -53,7 +53,7 @@ export declare function isNull(subject: any): subject is null;
  *
  * @return `true` if the subject is an HTMLElement instance, or otherwise `false`.
  */
-export declare function isHTMLElement(subject: any): subject is HTMLElement;
+export declare function isHTMLElement(subject: unknown): subject is HTMLElement;
 /**
  * Checks if the given subject is an HTMLButtonElement or not.
  *
@@ -61,5 +61,5 @@ export declare function isHTMLElement(subject: any): subject is HTMLElement;
  *
  * @return `true` if the subject is an HTMLButtonElement, or otherwise `false`.
  */
-export declare function isHTMLButtonElement(subject: any): subject is HTMLButtonElement;
+export declare function isHTMLButtonElement(subject: unknown): subject is HTMLButtonElement;
 //# sourceMappingURL=../../../../src/js/utils/type/type.d.ts.map

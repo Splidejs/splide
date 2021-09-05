@@ -1,5 +1,14 @@
-import { Components, Options, ScrollComponent } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
+import { BaseComponent, Components, Options } from '../../types';
+/**
+ * The interface for the Scroll component.
+ *
+ * @since 3.0.0
+ */
+export interface ScrollComponent extends BaseComponent {
+    scroll(position: number, duration?: number): void;
+    cancel(): void;
+}
 /**
  * The component for scrolling the slider.
  *
