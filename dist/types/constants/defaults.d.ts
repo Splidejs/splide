@@ -1,4 +1,4 @@
-import { Options } from '@splide/splide';
+import { Options } from '@splidejs/splide';
 /**
  * The collection of default options.
  * Note that this collection does not contain all options.

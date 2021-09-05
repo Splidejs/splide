@@ -1,4 +1,4 @@
-import { RequestIntervalInterface } from '@splide/splide';
+import { RequestIntervalInterface } from '@splidejs/splide';
 /**
  * Requests interval like the native `setInterval()` with using `requestAnimationFrame`.
  *

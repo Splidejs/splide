@@ -1,4 +1,4 @@
-import { Components, LazyLoadComponent, Options } from '@splide/splide';
+import { Components, LazyLoadComponent, Options } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
 /**
  * The component for lazily loading images.

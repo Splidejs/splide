@@ -1,4 +1,4 @@
-import { Options } from '@splide/splide';
+import { Options } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
 import { BuildHtmlArgs } from '../fixtures';
 interface InitArgs extends BuildHtmlArgs {

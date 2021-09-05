@@ -1,4 +1,4 @@
-import { Component, Components, EventBusCallback, EventBusObject, Options, SlideMatcher, StateObject } from '@splide/splide';
+import { Component, Components, EventBusCallback, EventBusObject, Options, SlideMatcher, StateObject } from '@splidejs/splide';
 /**
  * The frontend class for the Splide slider.
  *

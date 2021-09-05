@@ -1,4 +1,4 @@
-import { Components, ElementCollection, ElementsComponent, Options } from '@splide/splide';
+import { Components, ElementCollection, ElementsComponent, Options } from '@splidejs/splide';
 import {
   CLASS_ACTIVE,
   CLASS_ARROW_NEXT,

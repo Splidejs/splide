@@ -1,4 +1,4 @@
-import { Components, Options, OptionsComponent } from '@splide/splide';
+import { Components, Options, OptionsComponent } from '@splidejs/splide';
 import { DATA_ATTRIBUTE } from '../../constants/project';
 import { DESTROYED } from '../../constants/states';
 import { Splide } from '../../core/Splide/Splide';

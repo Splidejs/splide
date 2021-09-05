@@ -1,4 +1,4 @@
-import { AnyFunction, ThrottleInstance } from '@splide/splide';
+import { AnyFunction, ThrottleInstance } from '@splidejs/splide';
 /**
  * Returns the throttled function.
  *

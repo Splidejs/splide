@@ -1,4 +1,4 @@
-import { StateObject } from '@splide/splide';
+import { StateObject } from '@splidejs/splide';
 /**
  * The function providing a super simple state system.
  *

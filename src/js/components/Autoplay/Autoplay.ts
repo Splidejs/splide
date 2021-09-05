@@ -1,4 +1,4 @@
-import { AutoplayComponent, Components, Options } from '@splide/splide';
+import { AutoplayComponent, Components, Options } from '@splidejs/splide';
 import { ARIA_CONTROLS, ARIA_LABEL, ROLE } from '../../constants/attributes';
 import {
   EVENT_AUTOPLAY_PAUSE,

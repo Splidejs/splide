@@ -1,4 +1,4 @@
-import { Components, Options, PaginationComponent, PaginationItem } from '@splide/splide';
+import { Components, Options, PaginationComponent, PaginationItem } from '@splidejs/splide';
 import { ARIA_CONTROLS, ARIA_CURRENT, ARIA_LABEL } from '../../constants/attributes';
 import { CLASS_ACTIVE } from '../../constants/classes';
 import {

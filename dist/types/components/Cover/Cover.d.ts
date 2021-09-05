@@ -1,4 +1,4 @@
-import { Components, CoverComponent, Options } from '@splide/splide';
+import { Components, CoverComponent, Options } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
 /**
  * The component for setting the image as the slide background.

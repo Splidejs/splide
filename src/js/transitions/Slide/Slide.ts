@@ -1,4 +1,4 @@
-import { Components, Options, TransitionComponent } from '@splide/splide';
+import { Components, Options, TransitionComponent } from '@splidejs/splide';
 import { SLIDE } from '../../constants/types';
 import { Splide } from '../../core/Splide/Splide';
 import { EventInterface } from '../../constructors';

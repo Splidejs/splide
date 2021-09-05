@@ -1,4 +1,4 @@
-import { Components, Options, SyncComponent } from '@splide/splide';
+import { Components, Options, SyncComponent } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
 /**
  * The component for syncing multiple sliders.

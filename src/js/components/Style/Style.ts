@@ -1,4 +1,4 @@
-import { StyleComponent } from '@splide/splide';
+import { StyleComponent } from '@splidejs/splide';
 import { create, find, isHTMLElement, remove } from '../../utils';
 
 

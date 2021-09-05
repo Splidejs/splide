@@ -1,4 +1,4 @@
-import { Components, Options, TransitionComponent } from '@splide/splide';
+import { Components, Options, TransitionComponent } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
 /**
  * The component for the fade transition.

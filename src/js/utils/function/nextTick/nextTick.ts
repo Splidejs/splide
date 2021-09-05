@@ -1,4 +1,4 @@
-import { AnyFunction } from '@splide/splide';
+import { AnyFunction } from '@splidejs/splide';
 
 
 /**

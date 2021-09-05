@@ -1,4 +1,4 @@
-import { Components, Options, PaginationComponent } from '@splide/splide';
+import { Components, Options, PaginationComponent } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
 /**
  * The component for handling previous and next arrows.

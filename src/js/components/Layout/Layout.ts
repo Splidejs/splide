@@ -1,4 +1,4 @@
-import { Components, LayoutComponent, Options } from '@splide/splide';
+import { Components, LayoutComponent, Options } from '@splidejs/splide';
 import { TTB } from '../../constants/directions';
 import { EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_UPDATED } from '../../constants/events';
 import { EventInterface, Throttle } from '../../constructors';

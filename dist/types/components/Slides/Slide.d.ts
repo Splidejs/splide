@@ -1,4 +1,4 @@
-import { SlideComponent } from '@splide/splide';
+import { SlideComponent } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
 /**
  * The sub component for managing each slide.

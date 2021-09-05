@@ -6,7 +6,7 @@ import {
   SlideMatcher,
   SlidesComponent,
   SlidesIteratee,
-} from '@splide/splide';
+} from '@splidejs/splide';
 import { EVENT_REFRESH, EVENT_RESIZE } from '../../constants/events';
 import { Splide } from '../../core/Splide/Splide';
 import { EventInterface } from '../../constructors';

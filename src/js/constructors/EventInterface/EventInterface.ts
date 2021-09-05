@@ -1,4 +1,4 @@
-import { AnyFunction, EventBusCallback, EventInterfaceObject } from '@splide/splide';
+import { AnyFunction, EventBusCallback, EventInterfaceObject } from '@splidejs/splide';
 import { EVENT_DESTROY } from '../../constants/events';
 import { Splide } from '../../core/Splide/Splide';
 import { forEach } from '../../utils';

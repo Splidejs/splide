@@ -1,4 +1,4 @@
-declare module '@splide/splide' {
+declare module '@splidejs/splide' {
   /**
    * The interface for the Drag component.
    *

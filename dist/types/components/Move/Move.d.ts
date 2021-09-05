@@ -1,4 +1,4 @@
-import { Components, MoveComponent, Options } from '@splide/splide';
+import { Components, MoveComponent, Options } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
 /**
  * The component for moving the slider.

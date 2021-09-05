@@ -1,4 +1,4 @@
-import { Components, MoveComponent, Options } from '@splide/splide';
+import { Components, MoveComponent, Options } from '@splidejs/splide';
 import { EVENT_MOVE, EVENT_MOVED, EVENT_REFRESH, EVENT_RESIZE, EVENT_UPDATED } from '../../constants/events';
 import { IDLE, MOVING } from '../../constants/states';
 import { LOOP, SLIDE } from '../../constants/types';

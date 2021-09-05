@@ -1,4 +1,4 @@
-import { Components, Options, WheelComponent } from '@splide/splide';
+import { Components, Options, WheelComponent } from '@splidejs/splide';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { prevent } from '../../utils';

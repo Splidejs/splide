@@ -1,4 +1,4 @@
-import { ArrowsComponent, Components, Options } from '@splide/splide';
+import { ArrowsComponent, Components, Options } from '@splidejs/splide';
 import { ALL_ATTRIBUTES, ARIA_CONTROLS, ARIA_LABEL } from '../../constants/attributes';
 import {
   EVENT_ARROWS_MOUNTED,

@@ -1,4 +1,4 @@
-import { Components, Options, RequestIntervalInterface, ScrollComponent } from '@splide/splide';
+import { Components, Options, RequestIntervalInterface, ScrollComponent } from '@splidejs/splide';
 import { EVENT_MOVE, EVENT_REFRESH, EVENT_SCROLL, EVENT_SCROLLED, EVENT_UPDATED } from '../../constants/events';
 import { SLIDE } from '../../constants/types';
 import { EventInterface, RequestInterval } from '../../constructors';

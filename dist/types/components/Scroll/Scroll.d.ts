@@ -1,4 +1,4 @@
-import { Components, Options, ScrollComponent } from '@splide/splide';
+import { Components, Options, ScrollComponent } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
 /**
  * The component for scrolling the slider.

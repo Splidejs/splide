@@ -1,4 +1,4 @@
-import { AnyFunction, RequestIntervalInterface, ThrottleInstance } from '@splide/splide';
+import { AnyFunction, RequestIntervalInterface, ThrottleInstance } from '@splidejs/splide';
 import { RequestInterval } from '../RequestInterval/RequestInterval';
 
 

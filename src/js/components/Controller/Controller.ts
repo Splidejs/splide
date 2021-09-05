@@ -1,4 +1,4 @@
-import { Components, ControllerComponent, Options } from '@splide/splide';
+import { Components, ControllerComponent, Options } from '@splidejs/splide';
 import { EVENT_REFRESH, EVENT_SCROLLED, EVENT_UPDATED } from '../../constants/events';
 import { LOOP } from '../../constants/types';
 import { Splide } from '../../core/Splide/Splide';

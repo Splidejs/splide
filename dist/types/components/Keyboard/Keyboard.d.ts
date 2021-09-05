@@ -1,4 +1,4 @@
-import { Components, KeyboardComponent, Options } from '@splide/splide';
+import { Components, KeyboardComponent, Options } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
 /**
  * The component for controlling the slider by keyboards.

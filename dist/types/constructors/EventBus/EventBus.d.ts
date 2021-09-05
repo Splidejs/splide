@@ -1,4 +1,4 @@
-import { EventBusObject } from '@splide/splide';
+import { EventBusObject } from '@splidejs/splide';
 /**
  * The constructor to provided a simple event system.
  *

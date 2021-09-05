@@ -1,4 +1,4 @@
-import { Components, DragComponent, Options } from '@splide/splide';
+import { Components, DragComponent, Options } from '@splidejs/splide';
 import { EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING } from '../../constants/events';
 import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { Splide } from '../../core/Splide/Splide';

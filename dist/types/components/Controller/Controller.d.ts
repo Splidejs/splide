@@ -1,4 +1,4 @@
-import { Components, ControllerComponent, Options } from '@splide/splide';
+import { Components, ControllerComponent, Options } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
 /**
  * The component for controlling the slider.

@@ -1,4 +1,4 @@
-import { SlideComponent } from '@splide/splide';
+import { SlideComponent } from '@splidejs/splide';
 import {
   ALL_ATTRIBUTES,
   ARIA_CONTROLS,

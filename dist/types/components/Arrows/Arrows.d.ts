@@ -1,4 +1,4 @@
-import { ArrowsComponent, Components, Options } from '@splide/splide';
+import { ArrowsComponent, Components, Options } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
 /**
  * The component for handling previous and next arrows.

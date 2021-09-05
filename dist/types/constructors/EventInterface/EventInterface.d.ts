@@ -1,4 +1,4 @@
-import { EventInterfaceObject } from '@splide/splide';
+import { EventInterfaceObject } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
 /**
  * The function that provides interface for internal and native events.

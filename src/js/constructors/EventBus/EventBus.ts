@@ -1,4 +1,4 @@
-import { EventBusCallback, EventHandler, EventBusObject } from '@splide/splide';
+import { EventBusCallback, EventHandler, EventBusObject } from '@splidejs/splide';
 import { forOwn, push, slice, toArray } from '../../utils';
 
 

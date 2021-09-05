@@ -1,4 +1,4 @@
-import { Components, LazyLoadComponent, LazyLoadImagesData, Options } from '@splide/splide';
+import { Components, LazyLoadComponent, LazyLoadImagesData, Options } from '@splidejs/splide';
 import { ROLE } from '../../constants/attributes';
 import { CLASS_LOADING } from '../../constants/classes';
 import {

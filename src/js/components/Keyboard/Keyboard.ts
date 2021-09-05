@@ -1,4 +1,4 @@
-import { Components, KeyboardComponent, Options } from '@splide/splide';
+import { Components, KeyboardComponent, Options } from '@splidejs/splide';
 import { TAB_INDEX } from '../../constants/attributes';
 import { EVENT_UPDATED } from '../../constants/events';
 import { Splide } from '../../core/Splide/Splide';

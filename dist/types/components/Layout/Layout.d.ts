@@ -1,4 +1,4 @@
-import { Components, LayoutComponent, Options } from '@splide/splide';
+import { Components, LayoutComponent, Options } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
 /**
  * The component that layouts slider components and provides methods for dimensions.

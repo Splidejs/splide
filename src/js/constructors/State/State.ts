@@ -1,4 +1,4 @@
-import { StateObject } from '@splide/splide';
+import { StateObject } from '@splidejs/splide';
 import { includes, toArray } from '../../utils';
 
 

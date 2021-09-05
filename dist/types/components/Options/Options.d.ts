@@ -1,4 +1,4 @@
-import { Components, Options, OptionsComponent } from '@splide/splide';
+import { Components, Options, OptionsComponent } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
 /**
  * The component for managing options.

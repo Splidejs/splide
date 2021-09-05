@@ -1,4 +1,4 @@
-import { Components, DirectionComponent, Options } from '@splide/splide';
+import { Components, DirectionComponent, Options } from '@splidejs/splide';
 import { RTL, TTB } from '../../constants/directions';
 import { Splide } from '../../core/Splide/Splide';
 

@@ -1,4 +1,4 @@
-import { Components, DirectionComponent, Options } from '@splide/splide';
+import { Components, DirectionComponent, Options } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
 /**
  * The translation map for directions.

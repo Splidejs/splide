@@ -1,4 +1,4 @@
-import { Options } from '@splide/splide';
+import { Options } from '@splidejs/splide';
 import { CLASS_LIST, CLASS_ROOT, CLASS_SLIDE, CLASS_TRACK } from '../../constants/classes';
 import { Splide } from '../../core/Splide/Splide';
 import { assign } from '../../utils';

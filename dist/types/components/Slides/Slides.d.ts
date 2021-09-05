@@ -1,4 +1,4 @@
-import { Components, Options, SlidesComponent } from '@splide/splide';
+import { Components, Options, SlidesComponent } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
 /**
  * The component for managing all slides include clones.

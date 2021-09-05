@@ -6,7 +6,7 @@ import {
   Options,
   SlideMatcher,
   StateObject,
-} from '@splide/splide';
+} from '@splidejs/splide';
 import * as CoreComponents from '../../components';
 import { CLASS_INITIALIZED } from '../../constants/classes';
 import { DEFAULTS } from '../../constants/defaults';

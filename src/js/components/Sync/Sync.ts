@@ -1,4 +1,4 @@
-import { Components, Options, SyncComponent } from '@splide/splide';
+import { Components, Options, SyncComponent } from '@splidejs/splide';
 import { EVENT_CLICK, EVENT_MOVE, EVENT_NAVIGATION_MOUNTED, EVENT_SLIDE_KEYDOWN } from '../../constants/events';
 import { LOOP } from '../../constants/types';
 import { Splide } from '../../core/Splide/Splide';

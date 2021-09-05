@@ -1,4 +1,4 @@
-import { StyleComponent } from '@splide/splide';
+import { StyleComponent } from '@splidejs/splide';
 /**
  * The component for managing styles of the slider.
  *

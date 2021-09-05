@@ -1,4 +1,4 @@
-import { Components, CoverComponent, Options, SlideComponent } from '@splide/splide';
+import { Components, CoverComponent, Options, SlideComponent } from '@splidejs/splide';
 import { EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_REFRESH, EVENT_UPDATED } from '../../constants/events';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';

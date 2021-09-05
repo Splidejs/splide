@@ -1,4 +1,4 @@
-import { Components, Options } from '@splide/splide';
+import { Components, Options } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
 /**
  * The component that generates clones for the loop slider.

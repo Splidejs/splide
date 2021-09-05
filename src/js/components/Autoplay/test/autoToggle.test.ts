@@ -1,4 +1,4 @@
-import { AutoplayComponent } from '@splide/splide';
+import { AutoplayComponent } from '@splidejs/splide';
 import { Splide } from '../../../core/Splide/Splide';
 import { fire, init, wait } from '../../../test';
 

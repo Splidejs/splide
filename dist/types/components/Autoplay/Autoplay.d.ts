@@ -1,4 +1,4 @@
-import { AutoplayComponent, Components, Options } from '@splide/splide';
+import { AutoplayComponent, Components, Options } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
 /**
  * The component for auto playing sliders.

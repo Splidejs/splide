@@ -1,4 +1,4 @@
-import { Options } from '@splide/splide';
+import { Options } from '@splidejs/splide';
 import { CLASSES } from './classes';
 import { I18N } from './i18n';
 

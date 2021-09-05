@@ -1,4 +1,4 @@
-import { Components, DragComponent, Options } from '@splide/splide';
+import { Components, DragComponent, Options } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
 /**
  * The component for dragging the slider.

@@ -1,4 +1,4 @@
-import { Components, Options, WheelComponent } from '@splide/splide';
+import { Components, Options, WheelComponent } from '@splidejs/splide';
 import { Splide } from '../../core/Splide/Splide';
 /**
  * The component for observing the mouse wheel and moving the slider.
