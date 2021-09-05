@@ -1,5 +1,6 @@
 declare module '@splidejs/splide' {
   import { Splide } from '../core/Splide/Splide';
+
   /**
    * The type for any function.
    *
