@@ -169,18 +169,14 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    * @param active - Set `true` if the slide is active.
    */
   function updateActivity( this: SlideComponent, active: boolean ): void {
-    toggleClass( slide, CLASS_ACTIVE, active );
+    if ( active !== hasClass( slide, CLASS_ACTIVE ) ) {
+      toggleClass( slide, CLASS_ACTIVE, active );
 
-    if ( active ) {
-      if ( ! hasClass( slide, CLASS_ACTIVE ) ) {
-        isNavigation && setAttribute( slide, ARIA_CURRENT, true );
-        emit( EVENT_ACTIVE, this );
+      if ( isNavigation ) {
+        setAttribute( slide, ARIA_CURRENT, active || null );
       }
-    } else {
-      if ( hasClass( slide, CLASS_ACTIVE ) ) {
-        removeAttribute( slide, ARIA_CURRENT );
-        emit( EVENT_INACTIVE, this );
-      }
+
+      emit( active ? EVENT_ACTIVE : EVENT_INACTIVE, this );
     }
   }
 
@@ -190,20 +186,15 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    * @param visible - Set `true` if the slide is visible.
    */
   function updateVisibility( this: SlideComponent, visible: boolean ): void {
-    toggleClass( slide, CLASS_VISIBLE, visible );
     setAttribute( slide, ARIA_HIDDEN, ! visible || null );
     setAttribute( slide, TAB_INDEX, visible && options.slideFocus ? 0 : null );
 
-    if ( visible ) {
-      if ( ! hasClass( slide, CLASS_VISIBLE ) ) {
-        emit( EVENT_VISIBLE, this );
-      }
-    } else {
-      if ( hasClass( slide, CLASS_VISIBLE ) ) {
-        emit( EVENT_HIDDEN, this );
-      }
+    if ( visible !== hasClass( slide, CLASS_VISIBLE ) ) {
+      toggleClass( slide, CLASS_VISIBLE, visible );
+      emit( visible ? EVENT_VISIBLE : EVENT_HIDDEN, this );
     }
   }
+
 
   /**
    * Adds a CSS rule to the slider or the container.

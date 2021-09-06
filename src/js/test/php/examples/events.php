@@ -38,6 +38,10 @@ $settings = get_settings();
         console.log( 'pagination:updated', data );
       } );
 
+      splide01.on( 'active', function( Slide ) {
+        console.log( 'active', Slide.index );
+      } );
+
       var splide02 = new Splide( '#splide02', {
         width       : 800,
         fixedWidth  : 100,
