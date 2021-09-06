@@ -72,10 +72,10 @@ describe( 'Sync#sync()', () => {
     primary.on( EVENT_MOVE, callback );
 
     primary.go( 1 );
-    expect( callback ).toBeCalledTimes( 1 );
+    expect( callback ).toHaveBeenCalledTimes( 1 );
 
     secondary.go( 2 );
-    expect( callback ).toBeCalledTimes( 2 );
+    expect( callback ).toHaveBeenCalledTimes( 2 );
   } );
 } );
 

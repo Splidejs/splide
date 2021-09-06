@@ -91,8 +91,6 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
   /**
    * Moves the slider by the control pattern.
    *
-   * @todo
-   *
    * @see `Splide#go()`
    *
    * @param control        - A control pattern.

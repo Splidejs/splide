@@ -3046,8 +3046,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     /**
      * Moves the slider by the control pattern.
      *
-     * @todo
-     *
      * @see `Splide#go()`
      *
      * @param control        - A control pattern.
@@ -3998,6 +3996,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
      */
 
     var isMouse;
+    /**
+     * The target element to attach listeners.
+     */
+
     var target;
     /**
      * Indicates whether the slider exceeds borders or not.

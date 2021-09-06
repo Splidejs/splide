@@ -24,6 +24,10 @@ $settings = get_settings();
         drag   : 'free',
       } );
 
+      splide.on( 'moved', () => {
+        console.log( 'moved' );
+      } );
+
       splide.mount();
     } );
   </script>

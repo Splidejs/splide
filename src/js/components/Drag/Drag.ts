@@ -78,6 +78,9 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    */
   let isMouse: boolean;
 
+  /**
+   * The target element to attach listeners.
+   */
   let target: Window | HTMLElement;
 
   /**

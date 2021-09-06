@@ -3042,20 +3042,17 @@ function Controller(Splide, Components, options) {
   /**
    * Moves the slider by the control pattern.
    *
-   * @todo
-   *
    * @see `Splide#go()`
    *
-   * @param control        - A control pattern.
-   * @param allowSameIndex - Optional. Determines whether to allow to go to the current index or not.
+   * @param control - A control pattern.
    */
 
 
-  function go(control, allowSameIndex) {
+  function go(control) {
     var dest = parse(control);
     var index = loop(dest);
 
-    if (index > -1 && !Move.isBusy() && (allowSameIndex || index !== currIndex)) {
+    if (index > -1 && !Move.isBusy()) {
       setIndex(index);
       Move.move(dest, index, prevIndex);
     }
@@ -4133,7 +4130,7 @@ function Drag(Splide, Components, options) {
       if (isFree) {
         Scroll.scroll(destination);
       } else {
-        go(computeIndex(destination), true);
+        go(computeIndex(destination));
       }
     }
 

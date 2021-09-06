@@ -6,7 +6,7 @@ import { BaseComponent, Components, Options } from '../../types';
  * @since 3.0.0
  */
 export interface ControllerComponent extends BaseComponent {
-    go(control: number | string, allowSameIndex?: boolean): void;
+    go(control: number | string): void;
     getNext(destination?: boolean): number;
     getPrev(destination?: boolean): number;
     getEnd(): number;
