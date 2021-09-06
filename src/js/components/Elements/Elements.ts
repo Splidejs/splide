@@ -93,29 +93,20 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
   let list: HTMLElement;
 
   /**
-   * Called when the component is mounted.
+   * Called when the component is constructed.
    */
-  function mount(): void {
-    init();
+  function setup(): void {
+    collect();
     identify();
-
-    on( EVENT_REFRESH, () => {
-      destroy();
-      init();
-    } );
-
-    on( EVENT_UPDATED, () => {
-      removeClass( root, classes );
-      addClass( root, ( classes = getClasses() ) );
-    } );
+    addClass( root, ( classes = getClasses() ) );
   }
 
   /**
-   * Initializes the component.
+   * Called when the component is mounted.
    */
-  function init(): void {
-    collect();
-    addClass( root, ( classes = getClasses() ) );
+  function mount(): void {
+    on( EVENT_REFRESH, refresh );
+    on( EVENT_UPDATED, update );
   }
 
   /**
@@ -124,6 +115,22 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
   function destroy(): void {
     empty( slides );
     removeClass( root, classes );
+  }
+
+  /**
+   * Recollects slide elements.
+   */
+  function refresh(): void {
+    destroy();
+    setup();
+  }
+
+  /**
+   * Updates the status of elements.
+   */
+  function update(): void {
+    removeClass( root, classes );
+    addClass( root, ( classes = getClasses() ) );
   }
 
   /**
@@ -191,6 +198,7 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
   }
 
   return assign( elements, {
+    setup,
     mount,
     destroy,
   } );

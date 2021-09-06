@@ -16,6 +16,7 @@ export interface ControllerComponent extends BaseComponent {
   getNext( destination?: boolean ): number;
   getPrev( destination?: boolean ): number;
   getEnd(): number;
+  setIndex( index: number ): void;
   getIndex( prev?: boolean ): number;
   toIndex( page: number ): number;
   toPage( index: number ): number;
@@ -52,29 +53,26 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
   /**
    * The latest number of slides.
    */
-  let slideCount = getLength( true );
+  let slideCount: number;
 
   /**
    * The latest `perMove` value.
    */
-  let perMove = options.perMove;
+  let perMove: number;
 
   /**
    * The latest `perMove` value.
    */
-  let perPage = options.perPage;
+  let perPage: number;
 
   /**
    * Called when the component is mounted.
    */
   function mount(): void {
+    init();
     Move.jump( currIndex );
 
-    on( [ EVENT_UPDATED, EVENT_REFRESH ], () => {
-      slideCount = getLength( true );
-      perMove    = options.perMove;
-      perPage    = options.perPage;
-    } );
+    on( [ EVENT_UPDATED, EVENT_REFRESH ], init );
 
     on( EVENT_SCROLLED, () => {
       setIndex( Move.toIndex( Move.getPosition() ) );
@@ -82,7 +80,18 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
   }
 
   /**
+   * Initializes the component.
+   */
+  function init(): void {
+    slideCount = getLength( true );
+    perMove    = options.perMove;
+    perPage    = options.perPage;
+  }
+
+  /**
    * Moves the slider by the control pattern.
+   *
+   * @todo
    *
    * @see `Splide#go()`
    *
@@ -93,7 +102,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
     const dest  = parse( control );
     const index = loop( dest );
 
-    if ( ! Move.isBusy() && index > -1 && ( allowSameIndex || index !== currIndex ) ) {
+    if ( index > -1 && ! Move.isBusy() && ( allowSameIndex || index !== currIndex ) ) {
       setIndex( index );
       Move.move( dest, index, prevIndex );
     }
@@ -308,6 +317,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
     getNext,
     getPrev,
     getEnd,
+    setIndex,
     getIndex,
     toIndex,
     toPage,

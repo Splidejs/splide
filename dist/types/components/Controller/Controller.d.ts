@@ -10,6 +10,7 @@ export interface ControllerComponent extends BaseComponent {
     getNext(destination?: boolean): number;
     getPrev(destination?: boolean): number;
     getEnd(): number;
+    setIndex(index: number): void;
     getIndex(prev?: boolean): number;
     toIndex(page: number): number;
     toPage(index: number): number;

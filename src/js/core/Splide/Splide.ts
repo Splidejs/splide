@@ -97,15 +97,20 @@ export class Splide {
     this.Transition = Transition || this.Transition || ( this.is( FADE ) ? Fade : Slide );
     this.Extensions = Extensions || this.Extensions;
 
-    const Components = assign( {}, ComponentConstructors, this.Extensions, { Transition: this.Transition } );
+    const Constructors = assign( {}, ComponentConstructors, this.Extensions, { Transition: this.Transition } );
+    const { Components } = this;
 
-    forOwn( Components, ( Component, key ) => {
+    forOwn( Constructors, ( Component, key ) => {
       const component = Component( this, this.Components, this.opts );
-      this.Components[ key ] = component;
+      Components[ key ] = component;
+      component.setup && component.setup();
+    } );
+
+    forOwn( Components, component => {
       component.mount && component.mount();
     } );
 
-    forOwn( this.Components, component => {
+    forOwn( Components, component => {
       component.mounted && component.mounted();
     } );
 

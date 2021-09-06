@@ -8,13 +8,13 @@ describe( 'Drag', () => {
     const splide = init();
     const track  = splide.Components.Elements.track;
 
-    fireWithCoord( track, 'mousedown', { x: 0 } );
-    fireWithCoord( window, 'mousemove', { x: 0 } );
-    fireWithCoord( window, 'mousemove', { x: -100 } );
+    fireWithCoord( track, 'mousedown', { x: 0, timeStamp: 1 } );
+    fireWithCoord( window, 'mousemove', { x: 0, timeStamp: 1 } );
+    fireWithCoord( window, 'mousemove', { x: -100, timeStamp: 2 } );
 
     expect( splide.Components.Move.getPosition() ).toBe( -100 );
 
-    fireWithCoord( window, 'mousemove', { x: -200 } );
+    fireWithCoord( window, 'mousemove', { x: -200, timeStamp: 3 } );
 
     expect( splide.Components.Move.getPosition() ).toBe( -200 );
   } );

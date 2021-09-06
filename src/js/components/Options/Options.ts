@@ -25,14 +25,10 @@ export interface OptionsComponent extends BaseComponent {
  * @return An Options component object.
  */
 export function Options( Splide: Splide, Components: Components, options: Options ): OptionsComponent {
-  try {
-    merge( options, JSON.parse( getAttribute( Splide.root, DATA_ATTRIBUTE ) ) );
-  } catch ( e ) {
-    assert( false, e.message );
-  }
-
-  const initialOptions = merge( {}, options );
-  const { breakpoints } = options;
+  /**
+   * Keeps the initial options to apply when no matched query exists.
+   */
+  let initialOptions: Options;
 
   /**
    * Stores breakpoints with the MediaQueryList object.
@@ -45,9 +41,24 @@ export function Options( Splide: Splide, Components: Components, options: Option
   let currPoint: string | undefined;
 
   /**
+   * Called when the component is constructed.
+   */
+  function setup(): void {
+    try {
+      merge( options, JSON.parse( getAttribute( Splide.root, DATA_ATTRIBUTE ) ) );
+    } catch ( e ) {
+      assert( false, e.message );
+    }
+
+    initialOptions = merge( {}, options );
+  }
+
+  /**
    * Called when the component is mounted.
    */
   function mount(): void {
+    const { breakpoints } = options;
+
     if ( breakpoints ) {
       points = Object.keys( breakpoints )
         .sort( ( n, m ) => +n - +m )
@@ -90,22 +101,23 @@ export function Options( Splide: Splide, Components: Components, options: Option
    * @param point - A matched point, or `undefined` that means no breakpoint matches a media query.
    */
   function onMatch( point: string | undefined ): void {
-    const options = breakpoints[ point ] || initialOptions;
+    const newOptions = options.breakpoints[ point ] || initialOptions;
 
-    if ( options.destroy ) {
+    if ( newOptions.destroy ) {
       Splide.options = initialOptions;
-      Splide.destroy( options.destroy === 'completely' );
+      Splide.destroy( newOptions.destroy === 'completely' );
     } else {
       if ( Splide.state.is( DESTROYED ) ) {
         destroy( true );
         Splide.mount();
       }
 
-      Splide.options = options;
+      Splide.options = newOptions;
     }
   }
 
   return {
+    setup,
     mount,
     destroy,
   };

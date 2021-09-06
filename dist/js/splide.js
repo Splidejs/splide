@@ -731,14 +731,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
    */
 
   function Options(Splide, Components, options) {
-    try {
-      merge(options, JSON.parse(getAttribute(Splide.root, DATA_ATTRIBUTE)));
-    } catch (e) {
-      assert(false, e.message);
-    }
-
-    var initialOptions = merge({}, options);
-    var breakpoints = options.breakpoints;
+    /**
+     * Keeps the initial options to apply when no matched query exists.
+     */
+    var initialOptions;
     /**
      * Stores breakpoints with the MediaQueryList object.
      */
@@ -750,10 +746,26 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     var currPoint;
     /**
+     * Called when the component is constructed.
+     */
+
+    function setup() {
+      try {
+        merge(options, JSON.parse(getAttribute(Splide.root, DATA_ATTRIBUTE)));
+      } catch (e) {
+        assert(false, e.message);
+      }
+
+      initialOptions = merge({}, options);
+    }
+    /**
      * Called when the component is mounted.
      */
 
+
     function mount() {
+      var breakpoints = options.breakpoints;
+
       if (breakpoints) {
         points = Object.keys(breakpoints).sort(function (n, m) {
           return +n - +m;
@@ -799,22 +811,23 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
     function onMatch(point) {
-      var options = breakpoints[point] || initialOptions;
+      var newOptions = options.breakpoints[point] || initialOptions;
 
-      if (options.destroy) {
+      if (newOptions.destroy) {
         Splide.options = initialOptions;
-        Splide.destroy(options.destroy === 'completely');
+        Splide.destroy(newOptions.destroy === 'completely');
       } else {
         if (Splide.state.is(DESTROYED)) {
           destroy(true);
           Splide.mount();
         }
 
-        Splide.options = options;
+        Splide.options = newOptions;
       }
     }
 
     return {
+      setup: setup,
       mount: mount,
       destroy: destroy
     };
@@ -1512,29 +1525,22 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     var list;
     /**
+     * Called when the component is constructed.
+     */
+
+    function setup() {
+      collect();
+      identify();
+      addClass(root, classes = getClasses());
+    }
+    /**
      * Called when the component is mounted.
      */
 
+
     function mount() {
-      init();
-      identify();
-      on(EVENT_REFRESH, function () {
-        destroy();
-        init();
-      });
-      on(EVENT_UPDATED, function () {
-        removeClass(root, classes);
-        addClass(root, classes = getClasses());
-      });
-    }
-    /**
-     * Initializes the component.
-     */
-
-
-    function init() {
-      collect();
-      addClass(root, classes = getClasses());
+      on(EVENT_REFRESH, refresh);
+      on(EVENT_UPDATED, update);
     }
     /**
      * Destroys the component.
@@ -1544,6 +1550,24 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function destroy() {
       empty(slides);
       removeClass(root, classes);
+    }
+    /**
+     * Recollects slide elements.
+     */
+
+
+    function refresh() {
+      destroy();
+      setup();
+    }
+    /**
+     * Updates the status of elements.
+     */
+
+
+    function update() {
+      removeClass(root, classes);
+      addClass(root, classes = getClasses());
     }
     /**
      * Collects elements which the slider consists of.
@@ -1605,6 +1629,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     return assign(elements, {
+      setup: setup,
       mount: mount,
       destroy: destroy
     });
@@ -2985,34 +3010,43 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
      * The latest number of slides.
      */
 
-    var slideCount = getLength(true);
+    var slideCount;
     /**
      * The latest `perMove` value.
      */
 
-    var perMove = options.perMove;
+    var perMove;
     /**
      * The latest `perMove` value.
      */
 
-    var perPage = options.perPage;
+    var perPage;
     /**
      * Called when the component is mounted.
      */
 
     function mount() {
+      init();
       Move.jump(currIndex);
-      on([EVENT_UPDATED, EVENT_REFRESH], function () {
-        slideCount = getLength(true);
-        perMove = options.perMove;
-        perPage = options.perPage;
-      });
+      on([EVENT_UPDATED, EVENT_REFRESH], init);
       on(EVENT_SCROLLED, function () {
         setIndex(Move.toIndex(Move.getPosition()));
       }, 0);
     }
     /**
+     * Initializes the component.
+     */
+
+
+    function init() {
+      slideCount = getLength(true);
+      perMove = options.perMove;
+      perPage = options.perPage;
+    }
+    /**
      * Moves the slider by the control pattern.
+     *
+     * @todo
      *
      * @see `Splide#go()`
      *
@@ -3025,7 +3059,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var dest = parse(control);
       var index = loop(dest);
 
-      if (!Move.isBusy() && index > -1 && (allowSameIndex || index !== currIndex)) {
+      if (index > -1 && !Move.isBusy() && (allowSameIndex || index !== currIndex)) {
         setIndex(index);
         Move.move(dest, index, prevIndex);
       }
@@ -3252,6 +3286,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       getNext: getNext,
       getPrev: getPrev,
       getEnd: getEnd,
+      setIndex: setIndex,
       getIndex: getIndex,
       toIndex: toIndex,
       toPage: toPage,
@@ -4768,7 +4803,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     };
   }
 
-  var CoreComponents = /*#__PURE__*/Object.freeze({
+  var ComponentConstructors = /*#__PURE__*/Object.freeze({
     __proto__: null,
     Options: Options,
     Direction: Direction,
@@ -5061,15 +5096,19 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       this.state.set(CREATED);
       this._private_Transition = Transition || this._private_Transition || (this.is(FADE) ? Fade : Slide);
       this._private_Extensions = Extensions || this._private_Extensions;
-      var Components = assign({}, CoreComponents, this._private_Extensions, {
+      var Constructors = assign({}, ComponentConstructors, this._private_Extensions, {
         Transition: this._private_Transition
       });
-      forOwn(Components, function (Component, key) {
+      var Components = this.Components;
+      forOwn(Constructors, function (Component, key) {
         var component = Component(_this3, _this3.Components, _this3._private_opts);
-        _this3.Components[key] = component;
+        Components[key] = component;
+        component.setup && component.setup();
+      });
+      forOwn(Components, function (component) {
         component.mount && component.mount();
       });
-      forOwn(this.Components, function (component) {
+      forOwn(Components, function (component) {
         component.mounted && component.mounted();
       });
       this.emit(EVENT_MOUNTED);
