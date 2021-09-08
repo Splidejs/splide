@@ -153,6 +153,10 @@ export interface Options extends ResponsiveOptions {
  */
 export interface ResponsiveOptions {
     /**
+     * Accepts arbitrary properties for extensions, although it's not ideal typing.
+     */
+    [key: string]: any;
+    /**
      * Determines whether to rewind the slider or not.
      */
     rewind?: boolean;

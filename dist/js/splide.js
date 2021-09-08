@@ -1797,10 +1797,21 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       bind(slide, 'click keydown', function (e) {
         emit(e.type === 'click' ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, _this2, e);
       });
-      on([EVENT_MOUNTED, EVENT_MOVED, EVENT_UPDATED, EVENT_RESIZED, EVENT_SCROLLED], update.bind(this));
+      on(EVENT_MOUNTED, onMounted.bind(this));
+    }
+    /**
+     * Called after all components are mounted.
+     * Updating the status on mount is too early to notify other components of the active slide.
+     */
+
+
+    function onMounted() {
+      var boundUpdate = update.bind(this);
+      boundUpdate();
+      on([EVENT_MOVED, EVENT_UPDATED, EVENT_RESIZED, EVENT_SCROLLED], boundUpdate);
 
       if (updateOnMove) {
-        on(EVENT_MOVE, onMove);
+        on(EVENT_MOVE, onMove.bind(this));
       }
     }
     /**
@@ -1859,13 +1870,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
     function update() {
-      if (Components.Controller) {
-        var currIndex = Splide.index;
-        updateActivity.call(this, isActive());
-        updateVisibility.call(this, isVisible());
-        toggleClass(slide, CLASS_PREV, index === currIndex - 1);
-        toggleClass(slide, CLASS_NEXT, index === currIndex + 1);
-      }
+      var currIndex = Splide.index;
+      updateActivity.call(this, isActive());
+      updateVisibility.call(this, isVisible());
+      toggleClass(slide, CLASS_PREV, index === currIndex - 1);
+      toggleClass(slide, CLASS_NEXT, index === currIndex + 1);
     }
     /**
      * Updates the status related with activity.

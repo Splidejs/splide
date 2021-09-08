@@ -59,7 +59,7 @@ export function buildHtml( args: BuildHtmlArgs = {} ): string {
  *
  * @return A built HTML.
  */
-function generateSlides(
+export function generateSlides(
   length: number,
   src?: boolean | string,
   dataSrc?: boolean | string,
@@ -90,7 +90,7 @@ function generateSlides(
   }, '' );
 }
 
-const HTML_ARROWS = `
+export const HTML_ARROWS = `
 <div class="splide__arrows">
   <button class="splide__arrow splide__arrow--prev">
     Prev
@@ -102,14 +102,14 @@ const HTML_ARROWS = `
 </div>
 `;
 
-const HTML_PROGRESS = `
+export const HTML_PROGRESS = `
 <div class="splide__progress">
   <div class="splide__progress__bar">
   </div>
 </div>
 `;
 
-const HTML_AUTOPLAY = `
+export const HTML_AUTOPLAY = `
 <div class="splide__autoplay">
   <button class="splide__play">
     Play

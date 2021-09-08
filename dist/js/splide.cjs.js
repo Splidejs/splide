@@ -1798,10 +1798,21 @@ function Slide$1(Splide, index, slideIndex, slide) {
     bind(slide, 'click keydown', function (e) {
       emit(e.type === 'click' ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, _this2, e);
     });
-    on([EVENT_MOUNTED, EVENT_MOVED, EVENT_UPDATED, EVENT_RESIZED, EVENT_SCROLLED], update.bind(this));
+    on(EVENT_MOUNTED, onMounted.bind(this));
+  }
+  /**
+   * Called after all components are mounted.
+   * Updating the status on mount is too early to notify other components of the active slide.
+   */
+
+
+  function onMounted() {
+    var boundUpdate = update.bind(this);
+    boundUpdate();
+    on([EVENT_MOVED, EVENT_UPDATED, EVENT_RESIZED, EVENT_SCROLLED], boundUpdate);
 
     if (updateOnMove) {
-      on(EVENT_MOVE, onMove);
+      on(EVENT_MOVE, onMove.bind(this));
     }
   }
   /**
@@ -1860,13 +1871,11 @@ function Slide$1(Splide, index, slideIndex, slide) {
 
 
   function update() {
-    if (Components.Controller) {
-      var currIndex = Splide.index;
-      updateActivity.call(this, isActive());
-      updateVisibility.call(this, isVisible());
-      toggleClass(slide, CLASS_PREV, index === currIndex - 1);
-      toggleClass(slide, CLASS_NEXT, index === currIndex + 1);
-    }
+    var currIndex = Splide.index;
+    updateActivity.call(this, isActive());
+    updateVisibility.call(this, isVisible());
+    toggleClass(slide, CLASS_PREV, index === currIndex - 1);
+    toggleClass(slide, CLASS_NEXT, index === currIndex + 1);
   }
   /**
    * Updates the status related with activity.
@@ -1876,18 +1885,14 @@ function Slide$1(Splide, index, slideIndex, slide) {
 
 
   function updateActivity(active) {
-    toggleClass(slide, CLASS_ACTIVE, active);
+    if (active !== hasClass(slide, CLASS_ACTIVE)) {
+      toggleClass(slide, CLASS_ACTIVE, active);
 
-    if (active) {
-      if (!hasClass(slide, CLASS_ACTIVE)) {
-        isNavigation && setAttribute(slide, ARIA_CURRENT, true);
-        emit(EVENT_ACTIVE, this);
+      if (isNavigation) {
+        setAttribute(slide, ARIA_CURRENT, active || null);
       }
-    } else {
-      if (hasClass(slide, CLASS_ACTIVE)) {
-        removeAttribute(slide, ARIA_CURRENT);
-        emit(EVENT_INACTIVE, this);
-      }
+
+      emit(active ? EVENT_ACTIVE : EVENT_INACTIVE, this);
     }
   }
   /**
@@ -1898,18 +1903,12 @@ function Slide$1(Splide, index, slideIndex, slide) {
 
 
   function updateVisibility(visible) {
-    toggleClass(slide, CLASS_VISIBLE, visible);
     setAttribute(slide, ARIA_HIDDEN, !visible || null);
     setAttribute(slide, TAB_INDEX, visible && options.slideFocus ? 0 : null);
 
-    if (visible) {
-      if (!hasClass(slide, CLASS_VISIBLE)) {
-        emit(EVENT_VISIBLE, this);
-      }
-    } else {
-      if (hasClass(slide, CLASS_VISIBLE)) {
-        emit(EVENT_HIDDEN, this);
-      }
+    if (visible !== hasClass(slide, CLASS_VISIBLE)) {
+      toggleClass(slide, CLASS_VISIBLE, visible);
+      emit(visible ? EVENT_VISIBLE : EVENT_HIDDEN, this);
     }
   }
   /**
@@ -3049,15 +3048,16 @@ function Controller(Splide, Components, options) {
    *
    * @see `Splide#go()`
    *
-   * @param control - A control pattern.
+   * @param control        - A control pattern.
+   * @param allowSameIndex - Optional. Determines whether to allow to go to the current index or not.
    */
 
 
-  function go(control) {
+  function go(control, allowSameIndex) {
     var dest = parse(control);
     var index = loop(dest);
 
-    if (index > -1 && !Move.isBusy()) {
+    if (index > -1 && !Move.isBusy() && (allowSameIndex || index !== currIndex)) {
       setIndex(index);
       Move.move(dest, index, prevIndex);
     }
@@ -3996,6 +3996,10 @@ function Drag(Splide, Components, options) {
    */
 
   var isMouse;
+  /**
+   * The target element to attach listeners.
+   */
+
   var target;
   /**
    * Indicates whether the slider exceeds borders or not.
@@ -4135,7 +4139,7 @@ function Drag(Splide, Components, options) {
       if (isFree) {
         Scroll.scroll(destination);
       } else {
-        go(computeIndex(destination));
+        go(computeIndex(destination), true);
       }
     }
 

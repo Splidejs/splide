@@ -95,10 +95,20 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
       emit( e.type === 'click' ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, this, e );
     } );
 
-    on( [ EVENT_MOUNTED, EVENT_MOVED, EVENT_UPDATED, EVENT_RESIZED, EVENT_SCROLLED ], update.bind( this ) );
+    on( EVENT_MOUNTED, onMounted.bind( this ) );
+  }
+
+  /**
+   * Called after all components are mounted.
+   * Updating the status on mount is too early to notify other components of the active slide.
+   */
+  function onMounted( this: SlideComponent ): void {
+    const boundUpdate = update.bind( this );
+    boundUpdate();
+    on( [ EVENT_MOVED, EVENT_UPDATED, EVENT_RESIZED, EVENT_SCROLLED ], boundUpdate );
 
     if ( updateOnMove ) {
-      on( EVENT_MOVE, onMove );
+      on( EVENT_MOVE, onMove.bind( this ) );
     }
   }
 
@@ -109,7 +119,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    * @param prev - A previous index.
    * @param dest - A destination index.
    */
-  function onMove( next: number, prev: number, dest: number ): void {
+  function onMove( this: SlideComponent, next: number, prev: number, dest: number ): void {
     if ( dest === index ) {
       updateActivity.call( this, true );
     }
@@ -152,15 +162,13 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    * Updates attribute and classes of the slide.
    */
   function update( this: SlideComponent ): void {
-    if ( Components.Controller ) {
-      const { index: currIndex } = Splide;
+    const { index: currIndex } = Splide;
 
-      updateActivity.call( this, isActive() );
-      updateVisibility.call( this, isVisible() );
+    updateActivity.call( this, isActive() );
+    updateVisibility.call( this, isVisible() );
 
-      toggleClass( slide, CLASS_PREV, index === currIndex - 1 );
-      toggleClass( slide, CLASS_NEXT, index === currIndex + 1 );
-    }
+    toggleClass( slide, CLASS_PREV, index === currIndex - 1 );
+    toggleClass( slide, CLASS_NEXT, index === currIndex + 1 );
   }
 
   /**
