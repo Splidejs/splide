@@ -102,6 +102,7 @@ export function EventBus(): EventBusObject {
    */
   function emit( event: string ): void {
     ( handlers[ event ] || [] ).forEach( handler => {
+      // eslint-disable-next-line prefer-rest-params, prefer-spread
       handler.callback.apply( handler, slice( arguments, 1 ) );
     } );
   }

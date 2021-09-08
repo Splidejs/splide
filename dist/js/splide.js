@@ -1072,6 +1072,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function emit(event) {
       var _arguments = arguments;
       (handlers[event] || []).forEach(function (handler) {
+        // eslint-disable-next-line prefer-rest-params, prefer-spread
         handler.callback.apply(handler, slice(_arguments, 1));
       });
     }
@@ -1426,6 +1427,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       if (!interval) {
         interval = RequestInterval(duration || 0, function () {
+          // eslint-disable-next-line prefer-rest-params
           func.apply(_this, _arguments2);
           interval = null;
         }, null, 1);
