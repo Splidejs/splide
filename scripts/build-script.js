@@ -49,7 +49,7 @@ function buildScript( compress ) {
   } );
 }
 
-Promise.all( [ buildScript(), buildScript( true ) ] ).catch( e => console.error( e ) )
+Promise.all( [ buildScript(), buildScript( true ) ] ).catch( e => console.error( e ) );
 
 exports.buildJs  = () => buildScript();
 exports.buildMin = () => buildScript( true );
