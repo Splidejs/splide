@@ -11,7 +11,7 @@ import { Splide } from '../../core/Splide/Splide';
 import { EventInterface } from '../../constructors';
 import { BaseComponent, Components, Options } from '../../types';
 import { addClass, ceil, create, empty, remove, removeAttribute, removeClass, setAttribute } from '../../utils';
-import { format } from '../../utils/string';
+import { format } from '../../utils';
 
 
 /**

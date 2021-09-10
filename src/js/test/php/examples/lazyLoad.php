@@ -12,7 +12,7 @@ $settings = get_settings();
 
   <link rel="stylesheet" href="../../../../../dist/css/themes/splide-<?php echo $settings['theme'] ?>.min.css">
   <link rel="stylesheet" href="../../assets/css/styles.css">
-  <script src="../../../../../dist/js/splide.js"></script>
+  <script src="../../../../../dist/js/splide.min.js"></script>
 
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {

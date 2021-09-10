@@ -55,17 +55,17 @@ export class Splide {
   /**
    * The collection of options.
    */
-  private readonly opts: Options = {};
+  private readonly _options: Options = {};
 
   /**
    * The collection of extensions.
    */
-  private Extensions: Record<string, ComponentConstructor> = {};
+  private _Extensions: Record<string, ComponentConstructor> = {};
 
   /**
    * The Transition component.
    */
-  private Transition: ComponentConstructor;
+  private _Transition: ComponentConstructor;
 
   /**
    * The Splide constructor.
@@ -80,7 +80,7 @@ export class Splide {
     this.root = root;
 
     merge( DEFAULTS, Splide.defaults );
-    merge( merge( this.opts, DEFAULTS ), options || {} );
+    merge( merge( this._options, DEFAULTS ), options || {} );
   }
 
   /**
@@ -94,14 +94,14 @@ export class Splide {
   mount( Extensions?: Record<string, ComponentConstructor>, Transition?: ComponentConstructor ): this {
     this.state.set( CREATED );
 
-    this.Transition = Transition || this.Transition || ( this.is( FADE ) ? Fade : Slide );
-    this.Extensions = Extensions || this.Extensions;
+    this._Transition = Transition || this._Transition || ( this.is( FADE ) ? Fade : Slide );
+    this._Extensions = Extensions || this._Extensions;
 
-    const Constructors = assign( {}, ComponentConstructors, this.Extensions, { Transition: this.Transition } );
+    const Constructors = assign( {}, ComponentConstructors, this._Extensions, { Transition: this._Transition } );
     const { Components } = this;
 
     forOwn( Constructors, ( Component, key ) => {
-      const component = Component( this, this.Components, this.opts );
+      const component = Component( this, this.Components, this._options );
       Components[ key ] = component;
       component.setup && component.setup();
     } );
@@ -294,7 +294,7 @@ export class Splide {
    * @return `true` if the type matches the current one, or otherwise `false`.
    */
   is( type: string ): boolean {
-    return this.opts.type === type;
+    return this._options.type === type;
   }
 
   /**
@@ -340,7 +340,7 @@ export class Splide {
    * @return An object with the latest options.
    */
   get options(): Options {
-    return this.opts;
+    return this._options;
   }
 
   /**
@@ -349,11 +349,11 @@ export class Splide {
    * @param options - An object with new options.
    */
   set options( options: Options ) {
-    const { opts } = this;
-    merge( opts, options );
+    const { _options } = this;
+    merge( _options, options );
 
     if ( ! this.state.is( CREATED ) ) {
-      this.emit( EVENT_UPDATED, opts );
+      this.emit( EVENT_UPDATED, _options );
     }
   }
 

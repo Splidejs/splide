@@ -7,7 +7,7 @@ import {
   EVENT_VISIBLE,
 } from '../../../constants/events';
 import { fire, init, keydown } from '../../../test';
-import { format } from '../../../utils/string';
+import { format } from '../../../utils';
 import { SlideComponent } from '../Slide';
 
 

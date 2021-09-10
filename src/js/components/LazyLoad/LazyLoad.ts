@@ -39,9 +39,9 @@ export interface LazyLoadComponent extends BaseComponent {
  * @since 3.0.0
  */
 export interface LazyLoadImagesData {
-  img: HTMLImageElement;
-  spinner: HTMLSpanElement;
-  Slide: SlideComponent;
+  _img: HTMLImageElement;
+  _spinner: HTMLSpanElement;
+  _Slide: SlideComponent;
   src: string | null;
   srcset: string | null;
 }
@@ -91,16 +91,16 @@ export function LazyLoad( Splide: Splide, Components: Components, options: Optio
    * Finds images that contain specific data attributes.
    */
   function init() {
-    Components.Slides.forEach( Slide => {
-      queryAll<HTMLImageElement>( Slide.slide, IMAGE_SELECTOR ).forEach( img => {
-        const src    = getAttribute( img, SRC_DATA_ATTRIBUTE );
-        const srcset = getAttribute( img, SRCSET_DATA_ATTRIBUTE );
+    Components.Slides.forEach( _Slide => {
+      queryAll<HTMLImageElement>( _Slide.slide, IMAGE_SELECTOR ).forEach( _img => {
+        const src    = getAttribute( _img, SRC_DATA_ATTRIBUTE );
+        const srcset = getAttribute( _img, SRCSET_DATA_ATTRIBUTE );
 
-        if ( src !== img.src || srcset !== img.srcset ) {
-          const spinner = create( 'span', options.classes.spinner, img.parentElement );
-          setAttribute( spinner, ROLE, 'presentation' );
-          images.push( { img, Slide, src, srcset, spinner } );
-          display( img, 'none' );
+        if ( src !== _img.src || srcset !== _img.srcset ) {
+          const _spinner = create( 'span', options.classes.spinner, _img.parentElement );
+          setAttribute( _spinner, ROLE, 'presentation' );
+          images.push( { _img, _Slide, src, srcset, _spinner } );
+          display( _img, 'none' );
         }
       } );
     } );
@@ -124,7 +124,7 @@ export function LazyLoad( Splide: Splide, Components: Components, options: Optio
    */
   function observe(): void {
     images = images.filter( data => {
-      if ( data.Slide.isWithin( Splide.index, options.perPage * ( ( options.preloadPages || 1 ) + 1 ) ) ) {
+      if ( data._Slide.isWithin( Splide.index, options.perPage * ( ( options.preloadPages || 1 ) + 1 ) ) ) {
         return load( data );
       }
 
@@ -142,15 +142,15 @@ export function LazyLoad( Splide: Splide, Components: Components, options: Optio
    * @param data - A LazyLoadImagesData object.
    */
   function load( data: LazyLoadImagesData ): void {
-    const { img } = data;
+    const { _img } = data;
 
-    addClass( data.Slide.slide, CLASS_LOADING );
-    bind( img, 'load error', e => { onLoad( data, e.type === 'error' ) } );
+    addClass( data._Slide.slide, CLASS_LOADING );
+    bind( _img, 'load error', e => { onLoad( data, e.type === 'error' ) } );
 
     [ 'src', 'srcset' ].forEach( name => {
       if ( data[ name ] ) {
-        setAttribute( img, name, data[ name ] );
-        removeAttribute( img, name === 'src' ? SRC_DATA_ATTRIBUTE : SRCSET_DATA_ATTRIBUTE );
+        setAttribute( _img, name, data[ name ] );
+        removeAttribute( _img, name === 'src' ? SRC_DATA_ATTRIBUTE : SRCSET_DATA_ATTRIBUTE );
       }
     } );
   }
@@ -162,14 +162,14 @@ export function LazyLoad( Splide: Splide, Components: Components, options: Optio
    * @param error - `true` if this method is called on error.
    */
   function onLoad( data: LazyLoadImagesData, error: boolean ): void {
-    const { Slide } = data;
+    const { _Slide } = data;
 
-    removeClass( Slide.slide, CLASS_LOADING );
+    removeClass( _Slide.slide, CLASS_LOADING );
 
     if ( ! error ) {
-      remove( data.spinner );
-      display( data.img, '' );
-      emit( EVENT_LAZYLOAD_LOADED, data.img, Slide );
+      remove( data._spinner );
+      display( data._img, '' );
+      emit( EVENT_LAZYLOAD_LOADED, data._img, _Slide );
       emit( EVENT_RESIZE );
     }
 

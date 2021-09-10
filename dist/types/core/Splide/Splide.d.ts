@@ -44,15 +44,15 @@ export declare class Splide {
     /**
      * The collection of options.
      */
-    private readonly opts;
+    private readonly _options;
     /**
      * The collection of extensions.
      */
-    private Extensions;
+    private _Extensions;
     /**
      * The Transition component.
      */
-    private Transition;
+    private _Transition;
     /**
      * The Splide constructor.
      *

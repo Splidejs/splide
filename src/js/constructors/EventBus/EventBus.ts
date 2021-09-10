@@ -21,11 +21,11 @@ export interface EventBusObject {
  * @since 3.0.0
  */
 export interface EventHandler {
-  event: string;
-  callback: AnyFunction;
-  namespace: string;
-  priority: number;
-  key?: object;
+  _event: string;
+  _callback: AnyFunction;
+  _namespace: string;
+  _priority: number;
+  _key?: object;
 }
 
 /**
@@ -60,8 +60,14 @@ export function EventBus(): EventBusObject {
   function on( events: string | string[], callback: EventBusCallback, key?: object, priority = 10 ): void {
     forEachEvent( events, ( event, namespace ) => {
       handlers[ event ] = handlers[ event ] || [];
-      push( handlers[ event ], { event, callback, namespace, priority, key } )
-        .sort( ( handler1, handler2 ) => handler1.priority - handler2.priority );
+
+      push( handlers[ event ], {
+        _event    : event,
+        _callback : callback,
+        _namespace: namespace,
+        _priority : priority,
+        _key      : key,
+      } ).sort( ( handler1, handler2 ) => handler1._priority - handler2._priority );
     } );
   }
 
@@ -78,7 +84,7 @@ export function EventBus(): EventBusObject {
       const eventHandlers = handlers[ event ];
 
       handlers[ event ] = eventHandlers && eventHandlers.filter( handler => {
-        return handler.key ? handler.key !== key : handler.namespace !== namespace;
+        return handler._key ? handler._key !== key : handler._namespace !== namespace;
       } );
     } );
   }
@@ -103,7 +109,7 @@ export function EventBus(): EventBusObject {
   function emit( event: string ): void {
     ( handlers[ event ] || [] ).forEach( handler => {
       // eslint-disable-next-line prefer-rest-params, prefer-spread
-      handler.callback.apply( handler, slice( arguments, 1 ) );
+      handler._callback.apply( handler, slice( arguments, 1 ) );
     } );
   }
 

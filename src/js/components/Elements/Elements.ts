@@ -20,8 +20,7 @@ import { PROJECT_CODE } from '../../constants/project';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { addClass, assert, assign, child, children, empty, push, query, removeClass } from '../../utils';
-import { uniqueId } from '../../utils/string';
+import { addClass, assert, assign, child, children, empty, push, query, removeClass, uniqueId } from '../../utils';
 
 
 /**

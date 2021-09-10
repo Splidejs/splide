@@ -14,9 +14,9 @@ export interface LazyLoadComponent extends BaseComponent {
  * @since 3.0.0
  */
 export interface LazyLoadImagesData {
-    img: HTMLImageElement;
-    spinner: HTMLSpanElement;
-    Slide: SlideComponent;
+    _img: HTMLImageElement;
+    _spinner: HTMLSpanElement;
+    _Slide: SlideComponent;
     src: string | null;
     srcset: string | null;
 }

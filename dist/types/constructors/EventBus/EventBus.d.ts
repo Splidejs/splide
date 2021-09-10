@@ -17,11 +17,11 @@ export interface EventBusObject {
  * @since 3.0.0
  */
 export interface EventHandler {
-    event: string;
-    callback: AnyFunction;
-    namespace: string;
-    priority: number;
-    key?: object;
+    _event: string;
+    _callback: AnyFunction;
+    _namespace: string;
+    _priority: number;
+    _key?: object;
 }
 /**
  * The type for a callback function of the EventBus.

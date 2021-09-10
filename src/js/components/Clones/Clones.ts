@@ -3,8 +3,7 @@ import { LOOP } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { addClass, append, before, ceil, empty, push, rect, remove } from '../../utils';
-import { pad } from '../../utils/string';
+import { addClass, append, before, ceil, empty, pad, push, rect, remove } from '../../utils';
 
 
 /**

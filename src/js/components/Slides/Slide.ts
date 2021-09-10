@@ -38,16 +38,17 @@ import {
   ceil,
   child,
   floor,
+  format,
   hasClass,
   isHTMLButtonElement,
   min,
+  pad,
   rect,
   removeAttribute,
   removeClass,
   setAttribute,
   toggleClass,
 } from '../../utils';
-import { format, pad } from '../../utils/string';
 
 
 /**
