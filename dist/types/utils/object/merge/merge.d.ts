@@ -12,6 +12,7 @@ export declare type Merge<T extends object, U extends object> = Omit<T, keyof U>
 declare type Cast<T, U> = T extends U ? T : U;
 /**
  * Recursively merges source properties to the object.
+ * Be aware that this method does not merge arrays. They are just duplicated by `slice()`.
  *
  * @param object - An object to merge properties to.
  * @param source - A source object to merge properties from.

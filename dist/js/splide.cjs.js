@@ -145,7 +145,13 @@ function assign(object, ...sources) {
 
 function merge(object, source) {
   forOwn(source, (value, key) => {
-    object[key] = isObject(value) ? merge(isObject(object[key]) ? object[key] : {}, value) : value;
+    if (isArray(value)) {
+      object[key] = value.slice();
+    } else if (isObject(value)) {
+      object[key] = merge(isObject(object[key]) ? object[key] : {}, value);
+    } else {
+      object[key] = value;
+    }
   });
   return object;
 }

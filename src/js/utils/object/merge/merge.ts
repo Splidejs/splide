@@ -1,4 +1,4 @@
-import { isObject } from '../../type/type';
+import { isArray, isObject } from '../../type/type';
 import { forOwn } from '../forOwn/forOwn';
 
 
@@ -26,6 +26,7 @@ type Cast<T, U> = T extends U ? T : U;
 
 /**
  * Recursively merges source properties to the object.
+ * Be aware that this method does not merge arrays. They are just duplicated by `slice()`.
  *
  * @param object - An object to merge properties to.
  * @param source - A source object to merge properties from.
@@ -34,7 +35,13 @@ type Cast<T, U> = T extends U ? T : U;
  */
 export function merge<T extends object, U extends object>( object: T, source: U ): Merge<T, U> {
   forOwn( source, ( value, key ) => {
-    object[ key ] = isObject( value ) ? merge( isObject( object[ key ] ) ? object[ key ] : {}, value ) : value;
+    if ( isArray( value ) ) {
+      object[ key ] = value.slice();
+    } else if ( isObject( value ) ) {
+      object[ key ] = merge( isObject( object[ key ] ) ? object[ key ] : {}, value );
+    } else {
+      object[ key ] = value;
+    }
   } );
 
   return object as Merge<T, U>;
