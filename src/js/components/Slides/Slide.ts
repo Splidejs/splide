@@ -20,16 +20,15 @@ import {
   EVENT_CLICK,
   EVENT_HIDDEN,
   EVENT_INACTIVE,
-  EVENT_MOUNTED,
   EVENT_MOVE,
   EVENT_MOVED,
+  EVENT_REFRESH,
   EVENT_RESIZED,
   EVENT_SCROLLED,
   EVENT_SLIDE_KEYDOWN,
   EVENT_UPDATED,
   EVENT_VISIBLE,
 } from '../../constants/events';
-import { CREATED } from '../../constants/states';
 import { FADE, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
@@ -88,6 +87,11 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   const container = child( slide, `.${ CLASS_CONTAINER }` );
 
   /**
+   * Turns into `true` when the component is destroyed.
+   */
+  let destroyed: boolean;
+
+  /**
    * Called when the component is mounted.
    */
   function mount( this: SlideComponent ): void {
@@ -97,12 +101,13 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
       emit( e.type === 'click' ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, this, e );
     } );
 
-    on( [ EVENT_MOUNTED, EVENT_MOVED, EVENT_UPDATED, EVENT_SCROLLED ], update.bind( this ) );
-    on( EVENT_RESIZED, onResized.bind( this ) );
+    on( [ EVENT_RESIZED, EVENT_MOVED, EVENT_UPDATED, EVENT_REFRESH, EVENT_SCROLLED ], update.bind( this ) );
 
     if ( updateOnMove ) {
       on( EVENT_MOVE, onMove.bind( this ) );
     }
+
+    update.call( this );
   }
 
   /**
@@ -131,20 +136,10 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    * Destroys the component.
    */
   function destroy(): void {
+    destroyed = true;
     destroyEvents();
     removeClass( slide, STATUS_CLASSES );
     removeAttribute( slide, ALL_ATTRIBUTES );
-  }
-
-  /**
-   * Called when the Layout component resizes the slider.
-   * Needs to check the `created` state because this is also called on initialization of the component,
-   * and it's too early to notify others of the active slide.
-   */
-  function onResized( this: SlideComponent ): void {
-    if ( ! Splide.state.is( CREATED ) ) {
-      update.call( this );
-    }
   }
 
   /**
@@ -155,24 +150,28 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    * @param dest - A destination index.
    */
   function onMove( this: SlideComponent, next: number, prev: number, dest: number ): void {
-    if ( dest === index ) {
-      updateActivity.call( this, true );
-    }
+    if ( ! destroyed ) {
+      if ( dest === index ) {
+        updateActivity.call( this, true );
+      }
 
-    update.call( this );
+      update.call( this );
+    }
   }
 
   /**
    * Updates attribute and classes of the slide.
    */
   function update( this: SlideComponent ): void {
-    const { index: currIndex } = Splide;
+    if ( ! destroyed ) {
+      const { index: currIndex } = Splide;
 
-    updateActivity.call( this, isActive() );
-    updateVisibility.call( this, isVisible() );
+      updateActivity.call( this, isActive() );
+      updateVisibility.call( this, isVisible() );
 
-    toggleClass( slide, CLASS_PREV, index === currIndex - 1 );
-    toggleClass( slide, CLASS_NEXT, index === currIndex + 1 );
+      toggleClass( slide, CLASS_PREV, index === currIndex - 1 );
+      toggleClass( slide, CLASS_NEXT, index === currIndex + 1 );
+    }
   }
 
   /**
@@ -242,7 +241,8 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
     const left      = resolve( 'left' );
     const right     = resolve( 'right' );
 
-    return floor( trackRect[ left ] ) <= slideRect[ left ] && slideRect[ right ] <= ceil( trackRect[ right ] );
+    return floor( trackRect[ left ] ) <= ceil( slideRect[ left ] )
+      && floor( slideRect[ right ] ) <= ceil( trackRect[ right ] );
   }
 
   /**

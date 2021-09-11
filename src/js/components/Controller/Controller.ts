@@ -71,21 +71,29 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
   function mount(): void {
     init();
     Move.jump( currIndex );
-
     on( [ EVENT_UPDATED, EVENT_REFRESH ], init );
-
-    on( EVENT_SCROLLED, () => {
-      setIndex( Move.toIndex( Move.getPosition() ) );
-    }, 0 );
+    on( EVENT_SCROLLED, reindex, 0 );
   }
 
   /**
-   * Initializes the component.
+   * Initializes some parameters.
+   * Needs to check the slides length since the current index may be out of the range after refresh.
    */
   function init(): void {
     slideCount = getLength( true );
     perMove    = options.perMove;
     perPage    = options.perPage;
+
+    if ( currIndex >= slideCount ) {
+      Move.jump( ( currIndex = slideCount - 1 ) );
+    }
+  }
+
+  /**
+   * Calculates the index by the current position and updates the current index.
+   */
+  function reindex(): void {
+    setIndex( Move.toIndex( Move.getPosition() ) );
   }
 
   /**

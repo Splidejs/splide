@@ -464,9 +464,12 @@ const EVENT_AUTOPLAY_PLAYING = "autoplay:playing";
 const EVENT_AUTOPLAY_PAUSE = "autoplay:pause";
 const EVENT_LAZYLOAD_LOADED = "lazyload:loaded";
 
+const DEFAULT_EVENT_PRIORITY = 10;
+const DEFAULT_USER_EVENT_PRIORITY = 20;
+
 function EventBus() {
   let handlers = {};
-  function on(events, callback, key, priority = 10) {
+  function on(events, callback, key, priority = DEFAULT_EVENT_PRIORITY) {
     forEachEvent(events, (event, namespace) => {
       handlers[event] = handlers[event] || [];
       push(handlers[event], {
@@ -788,24 +791,15 @@ function Slide$1(Splide2, index, slideIndex, slide) {
   const { resolve } = Components.Direction;
   const isClone = slideIndex > -1;
   const container = child(slide, `.${CLASS_CONTAINER}`);
+  let destroyed;
   function mount() {
     init();
     bind(slide, "click keydown", (e) => {
       emit(e.type === "click" ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, this, e);
     });
-    on(EVENT_MOUNTED, onMounted.bind(this));
-  }
-  function onMounted() {
-    const boundUpdate = update.bind(this);
-    boundUpdate();
-    on([EVENT_MOVED, EVENT_UPDATED, EVENT_RESIZED, EVENT_SCROLLED], boundUpdate);
+    on([EVENT_RESIZED, EVENT_MOVED, EVENT_UPDATED, EVENT_REFRESH, EVENT_SCROLLED], update.bind(this));
     if (updateOnMove) {
       on(EVENT_MOVE, onMove.bind(this));
-    }
-  }
-  function onMove(next, prev, dest) {
-    if (dest === index) {
-      updateActivity.call(this, true);
     }
     update.call(this);
   }
@@ -825,16 +819,27 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     }
   }
   function destroy() {
+    destroyed = true;
     destroyEvents();
     removeClass(slide, STATUS_CLASSES);
     removeAttribute(slide, ALL_ATTRIBUTES);
   }
+  function onMove(next, prev, dest) {
+    if (!destroyed) {
+      if (dest === index) {
+        updateActivity.call(this, true);
+      }
+      update.call(this);
+    }
+  }
   function update() {
-    const { index: currIndex } = Splide2;
-    updateActivity.call(this, isActive());
-    updateVisibility.call(this, isVisible());
-    toggleClass(slide, CLASS_PREV, index === currIndex - 1);
-    toggleClass(slide, CLASS_NEXT, index === currIndex + 1);
+    if (!destroyed) {
+      const { index: currIndex } = Splide2;
+      updateActivity.call(this, isActive());
+      updateVisibility.call(this, isVisible());
+      toggleClass(slide, CLASS_PREV, index === currIndex - 1);
+      toggleClass(slide, CLASS_NEXT, index === currIndex + 1);
+    }
   }
   function updateActivity(active) {
     if (active !== hasClass(slide, CLASS_ACTIVE)) {
@@ -1221,6 +1226,9 @@ function Move(Splide2, Components2, options) {
     }
   }
   function jump(index) {
+    waiting = false;
+    looping = false;
+    Components2.Transition.cancel();
     translate(toPosition(index, true));
   }
   function translate(position) {
@@ -1327,14 +1335,18 @@ function Controller(Splide2, Components2, options) {
     init();
     Move.jump(currIndex);
     on([EVENT_UPDATED, EVENT_REFRESH], init);
-    on(EVENT_SCROLLED, () => {
-      setIndex(Move.toIndex(Move.getPosition()));
-    }, 0);
+    on(EVENT_SCROLLED, reindex, 0);
   }
   function init() {
     slideCount = getLength(true);
     perMove = options.perMove;
     perPage = options.perPage;
+    if (currIndex >= slideCount) {
+      Move.jump(currIndex = slideCount - 1);
+    }
+  }
+  function reindex() {
+    setIndex(Move.toIndex(Move.getPosition()));
   }
   function go(control, allowSameIndex) {
     const dest = parse(control);
@@ -2308,7 +2320,7 @@ const _Splide = class {
     this.Components.Controller.go(control);
   }
   on(events, callback) {
-    this.event.on(events, callback);
+    this.event.on(events, callback, null, DEFAULT_USER_EVENT_PRIORITY);
     return this;
   }
   off(events) {

@@ -243,7 +243,7 @@ describe( 'Slide', () => {
 
     const component = ( Splide: Splide ) => {
       return {
-        mount() {
+        setup() {
           Splide.on( EVENT_ACTIVE, Slide => {
             expect( Slide.index ).toBe( 1 );
             callback();

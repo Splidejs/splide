@@ -115,7 +115,7 @@ export function parseTransform( elm: HTMLElement ): { left: number, top: number 
   const rule     = findRuleBy( elm );
   const position = { left: 0, top: 0 };
 
-  if ( rule ) {
+  if ( rule && rule.style.transform ) {
     const { transform } = rule.style;
 
     if ( transform.includes( 'translateX' ) ) {

@@ -3,6 +3,7 @@ import { SlideMatcher } from '../../components/Slides/Slides';
 import { CLASS_INITIALIZED } from '../../constants/classes';
 import { DEFAULTS } from '../../constants/defaults';
 import { EVENT_DESTROY, EVENT_MOUNTED, EVENT_READY, EVENT_REFRESH, EVENT_UPDATED } from '../../constants/events';
+import { DEFAULT_USER_EVENT_PRIORITY } from '../../constants/priority';
 import { CREATED, DESTROYED, IDLE, STATES } from '../../constants/states';
 import { FADE } from '../../constants/types';
 import { EventBus, EventBusCallback, EventBusObject, State, StateObject } from '../../constructors';
@@ -110,6 +111,7 @@ export class Splide {
       component.mount && component.mount();
     } );
 
+    // todo unnecessary anymore
     forOwn( Components, component => {
       component.mounted && component.mounted();
     } );
@@ -209,7 +211,7 @@ export class Splide {
    * @return `this`
    */
   on( events: string, callback: EventBusCallback ): this {
-    this.event.on( events, callback );
+    this.event.on( events, callback, null, DEFAULT_USER_EVENT_PRIORITY );
     return this;
   }
 

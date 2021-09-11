@@ -14,14 +14,15 @@ $settings = get_settings();
 
   <link rel="stylesheet" href="../../../../../dist/css/themes/splide-<?php echo $settings['theme'] ?>.min.css">
   <link rel="stylesheet" href="../../assets/css/styles.css">
-  <script type="text/javascript" src="../../../../../dist/js/splide.min.js"></script>
+  <script type="text/javascript" src="../../../../../dist/js/splide.js"></script>
 
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
-        perPage: 2,
+        perPage: 1,
         gap    : '1rem',
         drag   : 'free',
+        // speed  : 0,
       } );
 
       splide.on( 'moved', () => {

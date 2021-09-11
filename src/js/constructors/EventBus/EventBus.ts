@@ -1,3 +1,4 @@
+import { DEFAULT_EVENT_PRIORITY } from '../../constants/priority';
 import { AnyFunction } from '../../types';
 import { forOwn, push, slice, toArray } from '../../utils';
 
@@ -57,7 +58,12 @@ export function EventBus(): EventBusObject {
    * @param priority - Optional. A priority number for the order in which the callbacks are invoked.
    *                   Lower numbers correspond with earlier execution. The default value is 10.
    */
-  function on( events: string | string[], callback: EventBusCallback, key?: object, priority = 10 ): void {
+  function on(
+    events: string | string[],
+    callback: EventBusCallback,
+    key?: object,
+    priority = DEFAULT_EVENT_PRIORITY
+  ): void {
     forEachEvent( events, ( event, namespace ) => {
       handlers[ event ] = handlers[ event ] || [];
 

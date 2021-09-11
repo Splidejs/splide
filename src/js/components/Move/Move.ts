@@ -1,10 +1,19 @@
-import { EVENT_MOVE, EVENT_MOVED, EVENT_REFRESH, EVENT_RESIZE, EVENT_UPDATED } from '../../constants/events';
+import {
+  EVENT_MOVE,
+  EVENT_MOVED,
+  EVENT_REFRESH,
+  EVENT_RESIZE,
+  EVENT_RESIZED,
+  EVENT_UPDATED,
+} from '../../constants/events';
+import { DEFAULT_EVENT_PRIORITY } from '../../constants/priority';
 import { IDLE, MOVING } from '../../constants/states';
 import { LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import { abs, clamp, rect } from '../../utils';
+import { SNAP_THRESHOLD } from './constants';
 
 
 /**
@@ -68,11 +77,12 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * Called when the component is mounted.
    */
   function mount(): void {
-    on( [ EVENT_RESIZE, EVENT_UPDATED, EVENT_REFRESH ], reposition );
+    on( [ EVENT_RESIZE, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH ], reposition, DEFAULT_EVENT_PRIORITY - 1 );
   }
 
   /**
    * Repositions the slider.
+   * This must be called before the Slide component checks the visibility.
    */
   function reposition(): void {
     if ( options.drag !== 'free' ) {
@@ -84,7 +94,23 @@ export function Move( Splide: Splide, Components: Components, options: Options )
 
       if ( isExceededMax( currPosition ) ) {
         translate( getLimit( true ) );
+      } else {
+        snap( SNAP_THRESHOLD );
       }
+    }
+  }
+
+  /**
+   * Snaps the slider position to the closest slide if the difference between them is less than the threshold.
+   *
+   * @param threshold - The threshold value.
+   */
+  function snap( threshold: number ): void {
+    const position = getPosition();
+    const index    = toIndex( position );
+
+    if ( abs( position - toPosition( index ) ) < threshold ) {
+      jump( index );
     }
   }
 
@@ -122,7 +148,6 @@ export function Move( Splide: Splide, Components: Components, options: Options )
   function onMoved( dest: number, index: number, prev: number, oldPosition: number ) {
     if ( looping ) {
       jump( index );
-      looping = false;
     }
 
     waiting = false;
@@ -140,6 +165,9 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * @param index - An index to jump to.
    */
   function jump( index: number ): void {
+    waiting = false;
+    looping = false;
+    Components.Transition.cancel();
     translate( toPosition( index, true ) );
   }
 

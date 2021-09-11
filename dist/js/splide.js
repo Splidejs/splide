@@ -517,13 +517,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var EVENT_AUTOPLAY_PLAYING = "autoplay:playing";
   var EVENT_AUTOPLAY_PAUSE = "autoplay:pause";
   var EVENT_LAZYLOAD_LOADED = "lazyload:loaded";
+  var DEFAULT_EVENT_PRIORITY = 10;
+  var DEFAULT_USER_EVENT_PRIORITY = 20;
 
   function EventBus() {
     var handlers = {};
 
     function on(events, callback, key, priority) {
       if (priority === void 0) {
-        priority = 10;
+        priority = DEFAULT_EVENT_PRIORITY;
       }
 
       forEachEvent(events, function (event, namespace) {
@@ -905,6 +907,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var resolve = Components.Direction.resolve;
     var isClone = slideIndex > -1;
     var container = child(slide, "." + CLASS_CONTAINER);
+    var destroyed;
 
     function mount() {
       var _this2 = this;
@@ -913,12 +916,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       bind(slide, "click keydown", function (e) {
         emit(e.type === "click" ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, _this2, e);
       });
-      on([EVENT_MOUNTED, EVENT_MOVED, EVENT_UPDATED, EVENT_SCROLLED], update.bind(this));
-      on(EVENT_RESIZED, onResized.bind(this));
+      on([EVENT_RESIZED, EVENT_MOVED, EVENT_UPDATED, EVENT_REFRESH, EVENT_SCROLLED], update.bind(this));
 
       if (updateOnMove) {
         on(EVENT_MOVE, onMove.bind(this));
       }
+
+      update.call(this);
     }
 
     function init() {
@@ -942,31 +946,30 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function destroy() {
+      destroyed = true;
       destroyEvents();
       removeClass(slide, STATUS_CLASSES);
       removeAttribute(slide, ALL_ATTRIBUTES);
     }
 
-    function onResized() {
-      if (!Splide2.state.is(CREATED)) {
+    function onMove(next, prev, dest) {
+      if (!destroyed) {
+        if (dest === index) {
+          updateActivity.call(this, true);
+        }
+
         update.call(this);
       }
     }
 
-    function onMove(next, prev, dest) {
-      if (dest === index) {
-        updateActivity.call(this, true);
-      }
-
-      update.call(this);
-    }
-
     function update() {
-      var currIndex = Splide2.index;
-      updateActivity.call(this, isActive());
-      updateVisibility.call(this, isVisible());
-      toggleClass(slide, CLASS_PREV, index === currIndex - 1);
-      toggleClass(slide, CLASS_NEXT, index === currIndex + 1);
+      if (!destroyed) {
+        var currIndex = Splide2.index;
+        updateActivity.call(this, isActive());
+        updateVisibility.call(this, isVisible());
+        toggleClass(slide, CLASS_PREV, index === currIndex - 1);
+        toggleClass(slide, CLASS_NEXT, index === currIndex + 1);
+      }
     }
 
     function updateActivity(active) {
@@ -1009,7 +1012,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var slideRect = rect(slide);
       var left = resolve("left");
       var right = resolve("right");
-      return floor(trackRect[left]) <= slideRect[left] && slideRect[right] <= ceil(trackRect[right]);
+      return floor(trackRect[left]) <= ceil(slideRect[left]) && floor(slideRect[right]) <= ceil(trackRect[right]);
     }
 
     function isWithin(from, distance) {
@@ -1399,6 +1402,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     };
   }
 
+  var SNAP_THRESHOLD = 10;
+
   function Move(Splide2, Components2, options) {
     var _EventInterface6 = EventInterface(Splide2),
         on = _EventInterface6.on,
@@ -1422,7 +1427,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var positionRate = 0;
 
     function mount() {
-      on([EVENT_RESIZE, EVENT_UPDATED, EVENT_REFRESH], reposition);
+      on([EVENT_RESIZE, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition, DEFAULT_EVENT_PRIORITY - 1);
     }
 
     function reposition() {
@@ -1435,7 +1440,18 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
         if (isExceededMax(currPosition)) {
           translate(getLimit(true));
+        } else {
+          snap(SNAP_THRESHOLD);
         }
+      }
+    }
+
+    function snap(threshold) {
+      var position = getPosition();
+      var index = toIndex(position);
+
+      if (abs(position - toPosition(index)) < threshold) {
+        jump(index);
       }
     }
 
@@ -1455,7 +1471,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function onMoved(dest, index, prev, oldPosition) {
       if (looping) {
         jump(index);
-        looping = false;
       }
 
       waiting = false;
@@ -1468,6 +1483,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function jump(index) {
+      waiting = false;
+      looping = false;
+      Components2.Transition.cancel();
       translate(toPosition(index, true));
     }
 
@@ -1601,15 +1619,21 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       init();
       Move.jump(currIndex);
       on([EVENT_UPDATED, EVENT_REFRESH], init);
-      on(EVENT_SCROLLED, function () {
-        setIndex(Move.toIndex(Move.getPosition()));
-      }, 0);
+      on(EVENT_SCROLLED, reindex, 0);
     }
 
     function init() {
       slideCount = getLength(true);
       perMove = options.perMove;
       perPage = options.perPage;
+
+      if (currIndex >= slideCount) {
+        Move.jump(currIndex = slideCount - 1);
+      }
+    }
+
+    function reindex() {
+      setIndex(Move.toIndex(Move.getPosition()));
     }
 
     function go(control, allowSameIndex) {
@@ -2844,7 +2868,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     };
 
     _proto.on = function on(events, callback) {
-      this.event.on(events, callback);
+      this.event.on(events, callback, null, DEFAULT_USER_EVENT_PRIORITY);
       return this;
     };
 
