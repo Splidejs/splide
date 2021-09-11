@@ -29,6 +29,7 @@ import {
   EVENT_UPDATED,
   EVENT_VISIBLE,
 } from '../../constants/events';
+import { CREATED } from '../../constants/states';
 import { FADE, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
@@ -96,36 +97,12 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
       emit( e.type === 'click' ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, this, e );
     } );
 
-    on( EVENT_MOUNTED, onMounted.bind( this ) );
-  }
-
-  /**
-   * Called after all components are mounted.
-   * Updating the status on mount is too early to notify other components of the active slide.
-   */
-  function onMounted( this: SlideComponent ): void {
-    const boundUpdate = update.bind( this );
-    boundUpdate();
-    on( [ EVENT_MOVED, EVENT_UPDATED, EVENT_RESIZED, EVENT_SCROLLED ], boundUpdate );
+    on( [ EVENT_MOUNTED, EVENT_MOVED, EVENT_UPDATED, EVENT_SCROLLED ], update.bind( this ) );
+    on( EVENT_RESIZED, onResized.bind( this ) );
 
     if ( updateOnMove ) {
       on( EVENT_MOVE, onMove.bind( this ) );
     }
-  }
-
-  /**
-   * If the `updateOnMove` option is `true`, called when the slider starts moving.
-   *
-   * @param next - A next index.
-   * @param prev - A previous index.
-   * @param dest - A destination index.
-   */
-  function onMove( this: SlideComponent, next: number, prev: number, dest: number ): void {
-    if ( dest === index ) {
-      updateActivity.call( this, true );
-    }
-
-    update.call( this );
   }
 
   /**
@@ -157,6 +134,32 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
     destroyEvents();
     removeClass( slide, STATUS_CLASSES );
     removeAttribute( slide, ALL_ATTRIBUTES );
+  }
+
+  /**
+   * Called when the Layout component resizes the slider.
+   * Needs to check the `created` state because this is also called on initialization of the component,
+   * and it's too early to notify others of the active slide.
+   */
+  function onResized( this: SlideComponent ): void {
+    if ( ! Splide.state.is( CREATED ) ) {
+      update.call( this );
+    }
+  }
+
+  /**
+   * If the `updateOnMove` option is `true`, called when the slider starts moving.
+   *
+   * @param next - A next index.
+   * @param prev - A previous index.
+   * @param dest - A destination index.
+   */
+  function onMove( this: SlideComponent, next: number, prev: number, dest: number ): void {
+    if ( dest === index ) {
+      updateActivity.call( this, true );
+    }
+
+    update.call( this );
   }
 
   /**

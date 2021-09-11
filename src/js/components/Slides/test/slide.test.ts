@@ -6,6 +6,7 @@ import {
   EVENT_SLIDE_KEYDOWN,
   EVENT_VISIBLE,
 } from '../../../constants/events';
+import { Splide } from '../../../core/Splide/Splide';
 import { fire, init, keydown } from '../../../test';
 import { format } from '../../../utils';
 import { SlideComponent } from '../Slide';
@@ -234,5 +235,24 @@ describe( 'Slide', () => {
     expect( slide.classList.contains( CLASS_VISIBLE ) ).toBe( false );
     expect( slide.getAttribute( 'role' ) ).toBe( null );
     expect( slide.getAttribute( 'aria-label' ) ).toBe( null );
+  } );
+
+  test( 'can notify the active slide of other components on initialization.', () => {
+    const splide   = init( { start: 1 }, { mount: false } );
+    const callback = jest.fn();
+
+    const component = ( Splide: Splide ) => {
+      return {
+        mount() {
+          Splide.on( EVENT_ACTIVE, Slide => {
+            expect( Slide.index ).toBe( 1 );
+            callback();
+          } );
+        }
+      }
+    }
+
+    splide.mount( { component } );
+    expect( callback ).toHaveBeenCalled();
   } );
 } );

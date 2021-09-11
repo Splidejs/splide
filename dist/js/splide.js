@@ -913,25 +913,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       bind(slide, "click keydown", function (e) {
         emit(e.type === "click" ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, _this2, e);
       });
-      on(EVENT_MOUNTED, onMounted.bind(this));
-    }
-
-    function onMounted() {
-      var boundUpdate = update.bind(this);
-      boundUpdate();
-      on([EVENT_MOVED, EVENT_UPDATED, EVENT_RESIZED, EVENT_SCROLLED], boundUpdate);
+      on([EVENT_MOUNTED, EVENT_MOVED, EVENT_UPDATED, EVENT_SCROLLED], update.bind(this));
+      on(EVENT_RESIZED, onResized.bind(this));
 
       if (updateOnMove) {
         on(EVENT_MOVE, onMove.bind(this));
       }
-    }
-
-    function onMove(next, prev, dest) {
-      if (dest === index) {
-        updateActivity.call(this, true);
-      }
-
-      update.call(this);
     }
 
     function init() {
@@ -958,6 +945,20 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       destroyEvents();
       removeClass(slide, STATUS_CLASSES);
       removeAttribute(slide, ALL_ATTRIBUTES);
+    }
+
+    function onResized() {
+      if (!Splide2.state.is(CREATED)) {
+        update.call(this);
+      }
+    }
+
+    function onMove(next, prev, dest) {
+      if (dest === index) {
+        updateActivity.call(this, true);
+      }
+
+      update.call(this);
     }
 
     function update() {
