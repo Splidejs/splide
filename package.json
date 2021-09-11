@@ -34,10 +34,10 @@
     "autoprefixer": "^10.3.4",
     "babel-jest": "^27.1.1",
     "babel-loader": "^8.2.2",
+    "chokidar": "^3.5.2",
     "cssnano": "^5.0.8",
     "esbuild": "^0.12.26",
     "eslint": "^7.32.0",
-    "glob-watcher": "^5.0.5",
     "jest": "^27.1.1",
     "postcss": "^8.3.6",
     "rollup": "^2.56.3",
@@ -66,5 +66,6 @@
   "browserslist": [
     "> 5%",
     "ie 10"
-  ]
+  ],
+  "dependencies": {}
 }
