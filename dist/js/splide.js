@@ -1387,7 +1387,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function getGap() {
       var Slide = getAt(0);
-      return Slide ? parseFloat(style(Slide.slide, resolve("marginRight"))) || 0 : 0;
+      return Slide && parseFloat(style(Slide.slide, resolve("marginRight"))) || 0;
     }
 
     function getPadding(right) {
@@ -1793,8 +1793,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         i18n = options.i18n;
     var Elements = Components2.Elements,
         Controller = Components2.Controller;
-    var slider = Elements.slider,
-        track = Elements.track;
     var wrapper = Elements.arrows;
     var prev = Elements.prev;
     var next = Elements.next;
@@ -1815,8 +1813,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       if (prev && next) {
         if (!arrows.prev) {
-          setAttribute(prev, ARIA_CONTROLS, track.id);
-          setAttribute(next, ARIA_CONTROLS, track.id);
+          var id = Elements.track.id;
+          setAttribute(prev, ARIA_CONTROLS, id);
+          setAttribute(next, ARIA_CONTROLS, id);
           arrows.prev = prev;
           arrows.next = next;
           listen();
@@ -1848,13 +1847,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function createArrows() {
-      var parent = options.arrows === "slider" && slider ? slider : Splide2.root;
       wrapper = create("div", classes.arrows);
       prev = createArrow(true);
       next = createArrow(false);
       created = true;
       append(wrapper, [prev, next]);
-      before(wrapper, child(parent));
+      before(wrapper, child(options.arrows === "slider" && Elements.slider || Splide2.root));
     }
 
     function createArrow(prev2) {
@@ -1888,12 +1886,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         bind = _EventInterface9.bind,
         emit = _EventInterface9.emit;
 
-    var _Components2$Elements4 = Components2.Elements,
-        root = _Components2$Elements4.root,
-        track = _Components2$Elements4.track,
-        bar = _Components2$Elements4.bar,
-        playButton = _Components2$Elements4.play,
-        pauseButton = _Components2$Elements4.pause;
+    var Elements = Components2.Elements;
     var interval = RequestInterval(options.interval, Splide2.go.bind(Splide2, ">"), update);
     var isPaused = interval.isPaused;
     var hovered;
@@ -1915,20 +1908,23 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function initButton(forPause) {
-      var button = forPause ? pauseButton : playButton;
+      var prop = forPause ? "pause" : "play";
+      var button = Elements[prop];
 
       if (button) {
         if (!isHTMLButtonElement(button)) {
           setAttribute(button, ROLE, "button");
         }
 
-        setAttribute(button, ARIA_CONTROLS, track.id);
-        setAttribute(button, ARIA_LABEL, options.i18n[forPause ? "pause" : "play"]);
+        setAttribute(button, ARIA_CONTROLS, Elements.track.id);
+        setAttribute(button, ARIA_LABEL, options.i18n[prop]);
         bind(button, "click", forPause ? pause : play);
       }
     }
 
     function listen() {
+      var root = Elements.root;
+
       if (options.pauseOnHover) {
         bind(root, "mouseenter mouseleave", function (e) {
           hovered = e.type === "mouseenter";
@@ -1979,13 +1975,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function update(rate) {
-      emit(EVENT_AUTOPLAY_PLAYING, rate);
+      var bar = Elements.bar;
 
       if (bar) {
         style(bar, {
           width: rate * 100 + "%"
         });
       }
+
+      emit(EVENT_AUTOPLAY_PLAYING, rate);
     }
 
     return {
@@ -2500,7 +2498,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         bind = _EventInterface15.bind,
         unbind = _EventInterface15.unbind;
 
-    var Slides = Components2.Slides;
+    var Slides = Components2.Slides,
+        Elements = Components2.Elements;
     var _Components2$Controll = Components2.Controller,
         go = _Components2$Controll.go,
         toPage = _Components2$Controll.toPage,
@@ -2544,10 +2543,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var classes = options.classes,
           i18n = options.i18n,
           perPage = options.perPage;
-      var _Components2$Elements5 = Components2.Elements,
-          slider = _Components2$Elements5.slider,
-          root = _Components2$Elements5.root;
-      var parent = options.pagination === "slider" && slider ? slider : root;
+      var parent = options.pagination === "slider" && Elements.slider || Elements.root;
       var max = hasFocus() ? length : ceil(length / perPage);
       list = create("ul", classes.pagination, parent);
 

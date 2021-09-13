@@ -19,13 +19,11 @@ $settings = get_settings();
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
+        type   : 'loop',
         perPage: 1,
         gap    : '1rem',
         drag   : 'free',
         height : 200,
-        pagination: false,
-        arrows: false,
-        slideFocus: false,
       } );
 
       splide.on( 'moved', () => {
@@ -37,13 +35,6 @@ $settings = get_settings();
       } );
 
       splide.mount();
-
-
-      const pre = document.getElementById( 'message' );
-
-      console.log = ( string ) => {
-        pre.textContent = string + '\n' + pre.textContent;
-      }
     } );
   </script>
 
@@ -54,10 +45,8 @@ $settings = get_settings();
   </style>
 </head>
 <body>
-45
-<?php render( 'splide01', 10, true ); ?>
 
-<pre id="message"></pre>
+<?php render( 'splide01', 10 ); ?>
 
 </body>
 </html>

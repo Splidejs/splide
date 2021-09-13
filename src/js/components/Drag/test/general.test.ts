@@ -1,4 +1,4 @@
-import { EVENT_DRAG } from '../../../constants/events';
+import { EVENT_DRAG, EVENT_DRAGGING } from '../../../constants/events';
 import { fire, init } from '../../../test';
 import { assign } from '../../../utils';
 
@@ -73,21 +73,22 @@ describe( 'Drag', () => {
     expect( onDrag ).toHaveBeenCalledTimes( 1 );
   } );
 
-  test( 'should start moving the slider only when the swipe distance becomes greater than the threshold.', () => {
-    const splide = init( { dragMinThreshold: 20 } );
-    const onDrag = jest.fn();
-    const track  = splide.Components.Elements.track;
+  test( 'should start moving the slider only when the drag distance becomes greater than the threshold.', () => {
+    const splide     = init( { dragMinThreshold: 20 } );
+    const onDragging = jest.fn();
+    const track      = splide.Components.Elements.track;
 
-    splide.on( EVENT_DRAG, onDrag );
+    splide.on( EVENT_DRAGGING, onDragging );
 
     fireWithCoord( track, 'touchstart', { x: 0 } );
     fireWithCoord( track, 'touchmove', { x: -10 } );
 
-    expect( onDrag ).not.toHaveBeenCalled();
+    expect( onDragging ).not.toHaveBeenCalled();
 
-    fireWithCoord( track, 'touchmove', { x: -30 } );
+    fireWithCoord( track, 'touchmove', { x: -30 } ); // isDragging becomes true
+    fireWithCoord( track, 'touchmove', { x: -31 } );
 
-    expect( onDrag ).toHaveBeenCalled();
+    expect( onDragging ).toHaveBeenCalled();
   } );
 } );
 

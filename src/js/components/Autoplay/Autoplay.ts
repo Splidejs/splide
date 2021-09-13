@@ -37,7 +37,7 @@ export interface AutoplayComponent extends BaseComponent {
  */
 export function Autoplay( Splide: Splide, Components: Components, options: Options ): AutoplayComponent {
   const { on, bind, emit } = EventInterface( Splide );
-  const { root, track, bar, play: playButton, pause: pauseButton } = Components.Elements;
+  const { Elements } = Components;
   const interval = RequestInterval( options.interval, Splide.go.bind( Splide, '>' ), update );
   const { isPaused } = interval;
 
@@ -79,15 +79,16 @@ export function Autoplay( Splide: Splide, Components: Components, options: Optio
    * @param forPause - Determines whether to initialize a pause or play button.
    */
   function initButton( forPause: boolean ): void {
-    const button = forPause ? pauseButton : playButton;
+    const prop   = forPause ? 'pause' : 'play';
+    const button = Elements[ prop ];
 
     if ( button ) {
       if ( ! isHTMLButtonElement( button ) ) {
         setAttribute( button, ROLE, 'button' );
       }
 
-      setAttribute( button, ARIA_CONTROLS, track.id );
-      setAttribute( button, ARIA_LABEL, options.i18n[ forPause ? 'pause' : 'play' ] );
+      setAttribute( button, ARIA_CONTROLS, Elements.track.id );
+      setAttribute( button, ARIA_LABEL, options.i18n[ prop ] );
 
       bind( button, 'click', forPause ? pause : play );
     }
@@ -97,6 +98,8 @@ export function Autoplay( Splide: Splide, Components: Components, options: Optio
    * Listens to some events.
    */
   function listen(): void {
+    const { root } = Elements;
+
     if ( options.pauseOnHover ) {
       bind( root, 'mouseenter mouseleave', e => {
         hovered = e.type === 'mouseenter';
@@ -160,11 +163,13 @@ export function Autoplay( Splide: Splide, Components: Components, options: Optio
    * @param rate - The progress rate between 0 to 1.
    */
   function update( rate: number ): void {
-    emit( EVENT_AUTOPLAY_PLAYING, rate );
+    const { bar } = Elements;
 
     if ( bar ) {
       style( bar, { width: `${ rate * 100 }%` } );
     }
+
+    emit( EVENT_AUTOPLAY_PLAYING, rate );
   }
 
   return {

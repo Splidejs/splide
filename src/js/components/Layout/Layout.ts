@@ -226,7 +226,7 @@ export function Layout( Splide: Splide, Components: Components, options: Options
    */
   function getGap(): number {
     const Slide = getAt( 0 );
-    return Slide ? parseFloat( style( Slide.slide, resolve( 'marginRight' ) ) ) || 0 : 0;
+    return Slide && parseFloat( style( Slide.slide, resolve( 'marginRight' ) ) ) || 0;
   }
 
   /**

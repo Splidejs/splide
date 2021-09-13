@@ -39,7 +39,6 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
   const { on, bind, emit } = EventInterface( Splide );
   const { classes, i18n } = options;
   const { Elements, Controller } = Components;
-  const { slider, track } = Elements;
 
   /**
    * The wrapper element.
@@ -86,8 +85,10 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
 
     if ( prev && next ) {
       if ( ! arrows.prev ) {
-        setAttribute( prev, ARIA_CONTROLS, track.id );
-        setAttribute( next, ARIA_CONTROLS, track.id );
+        const { id } = Elements.track;
+
+        setAttribute( prev, ARIA_CONTROLS, id );
+        setAttribute( next, ARIA_CONTROLS, id );
 
         arrows.prev = prev;
         arrows.next = next;
@@ -127,15 +128,13 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
    * Create arrows and append them to the slider.
    */
   function createArrows(): void {
-    const parent = options.arrows === 'slider' && slider ? slider : Splide.root;
-
     wrapper = create( 'div', classes.arrows );
     prev    = createArrow( true );
     next    = createArrow( false );
     created = true;
 
     append( wrapper, [ prev, next ] );
-    before( wrapper, child( parent ) );
+    before( wrapper, child( options.arrows === 'slider' && Elements.slider || Splide.root ) );
   }
 
   /**

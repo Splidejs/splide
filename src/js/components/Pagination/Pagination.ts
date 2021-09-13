@@ -48,7 +48,7 @@ export interface PaginationItem {
  */
 export function Pagination( Splide: Splide, Components: Components, options: Options ): PaginationComponent {
   const { on, emit, bind, unbind } = EventInterface( Splide );
-  const { Slides } = Components;
+  const { Slides, Elements } = Components;
   const { go, toPage, hasFocus, getIndex } = Components.Controller;
 
   /**
@@ -101,8 +101,7 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
   function createPagination(): void {
     const { length } = Splide;
     const { classes, i18n, perPage } = options;
-    const { slider, root } = Components.Elements;
-    const parent = options.pagination === 'slider' && slider ? slider : root;
+    const parent = options.pagination === 'slider' && Elements.slider || Elements.root;
     const max    = hasFocus() ? length : ceil( length / perPage );
 
     list = create( 'ul', classes.pagination, parent );
