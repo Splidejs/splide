@@ -6,6 +6,7 @@ import { BaseComponent, Components, Options } from '../../types';
  * @since 3.0.0
  */
 export interface DragComponent extends BaseComponent {
+    disable(disabled: boolean): void;
 }
 /**
  * The component for dragging the slider.

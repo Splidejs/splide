@@ -10,10 +10,10 @@ const zlib     = require( 'zlib' );
 const name     = 'splide';
 
 
-function buildScript( compress ) {
+async function buildScript( compress ) {
   const file = `./dist/js/${ name }${ compress ? '.min' : '' }.js`;
 
-  return rollup( {
+  const bundle = await rollup( {
     input: './src/js/build/default.ts',
     plugins: [
       resolve(),
@@ -24,31 +24,29 @@ function buildScript( compress ) {
       } ),
       compress ? minify() : false,
     ]
-  } ).then( bundle => {
-    return bundle.write( {
-      banner,
-      file,
-      format   : 'umd',
-      name     : 'Splide',
-      sourcemap: ! compress,
-    } );
-  } ).then( () => {
-    if ( compress ) {
-      return fs.readFile( file ).then( content => {
-        return new Promise( ( resolve, reject ) => {
-          zlib.gzip( content, ( err, binary ) => {
-            if ( err ) {
-              return reject( err );
-            }
+  } );
 
-            fs.writeFile( `${ file }.gz`, binary ).then( resolve, reject );
-          } );
+  await bundle.write( {
+    banner,
+    file,
+    format   : 'umd',
+    name     : 'Splide',
+    sourcemap: ! compress,
+  } );
+
+  if ( compress ) {
+    await fs.readFile( file ).then( content => {
+      return new Promise( ( resolve, reject ) => {
+        zlib.gzip( content, ( err, binary ) => {
+          if ( err ) {
+            return reject( err );
+          }
+
+          fs.writeFile( `${ file }.gz`, binary ).then( resolve, reject );
         } );
       } );
-    }
-  } ).catch( e => {
-    console.error( e );
-  } );
+    } );
+  }
 }
 
 Promise.all( [ buildScript(), buildScript( true ) ] ).catch( e => console.error( e ) );

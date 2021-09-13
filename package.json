@@ -59,6 +59,7 @@
     "build:types": "tsc --emitDeclarationOnly",
     "build:css": "node scripts/build-css.js",
     "build:all": "npm run build:js && npm run build:module && npm run build:css && npm run build:types",
+    "check:types": "tsc --noEmit",
     "jest": "jest --clearCache && jest",
     "eslint": "eslint src",
     "stylelint": "npx stylelint --fix ./src/css/**/*.scss"

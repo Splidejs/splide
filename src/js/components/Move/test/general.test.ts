@@ -91,15 +91,35 @@ describe( 'Move', () => {
   } );
 
   test( 'can check the position exceeds bounds or not.', () => {
-    const splide    = init( { width: 200, height: 100 } );
-    const totalSize = 200 * splide.length;
+    const width     = 200;
+    const splide    = init( { width, height: 100 } );
+    const totalSize = width * splide.length;
     const { Move }  = splide.Components;
 
-    expect( Move.isExceededMin( -10 ) ).toBe( false );
-    expect( Move.isExceededMin( 10 ) ).toBe( true );
+    expect( Move.exceededLimit( false, -10 ) ).toBe( false );
+    expect( Move.exceededLimit( false, 10 ) ).toBe( true );
 
-    expect( Move.isExceededMax( - ( totalSize - 200 ) + 10 ) ).toBe( false );
-    expect( Move.isExceededMax( - ( totalSize - 200 ) - 10 ) ).toBe( true );
+    expect( Move.exceededLimit( true, - ( totalSize - width ) + 10 ) ).toBe( false );
+    expect( Move.exceededLimit( true, - ( totalSize - width ) - 10 ) ).toBe( true );
+
+    Move.translate( 10 );
+
+    expect( Move.exceededLimit() ).toBe( true );
+
+    splide.destroy();
+  } );
+
+  test( 'can loop the slider when the position exceeds bounds.', () => {
+    const width     = 200;
+    const splide    = init( { type: 'loop', width, height: 100 } );
+    const totalSize = width * splide.length;
+    const { Move }  = splide.Components;
+
+    Move.translate( 10 );
+    expect( Move.getPosition() ).toBe( - ( totalSize - 10 ) );
+
+    Move.translate( - totalSize - 10 );
+    expect( Move.getPosition() ).toBe( -10 );
 
     splide.destroy();
   } );

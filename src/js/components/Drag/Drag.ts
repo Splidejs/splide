@@ -32,7 +32,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
   const { Move, Scroll, Controller } = Components;
   const { track } = Components.Elements;
   const { resolve, orient } = Components.Direction;
-  const { getPosition, isExceeded } = Move;
+  const { getPosition, exceededLimit } = Move;
   const isSlide = Splide.is( SLIDE );
   const isFade  = Splide.is( FADE );
 
@@ -154,7 +154,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
 
     if ( isDragging ) {
       const expired  = timeOf( e ) - timeOf( baseEvent ) > LOG_INTERVAL;
-      const exceeded = hasExceeded !== ( hasExceeded = isExceeded() );
+      const exceeded = hasExceeded !== ( hasExceeded = exceededLimit() );
 
       if ( expired || exceeded ) {
         save( e );

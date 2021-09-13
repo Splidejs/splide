@@ -174,7 +174,8 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    * @return An adjacent index if available, or otherwise `-1`.
    */
   function getAdjacent( prev: boolean, destination?: boolean ): number {
-    const dest = computeDestIndex( currIndex + getPerMove() * ( prev ? -1 : 1 ), currIndex );
+    const number = perMove || hasFocus() ? 1 : perPage;
+    const dest   = computeDestIndex( currIndex + number * ( prev ? -1 : 1 ), currIndex );
     return destination ? dest : loop( dest );
   }
 
@@ -276,15 +277,6 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
     }
 
     return index;
-  }
-
-  /**
-   * Returns the number of slides to move for '>' and '<'.
-   *
-   * @return The number of slides to move.
-   */
-  function getPerMove(): number {
-    return perMove || hasFocus() ? 1 : perPage;
   }
 
   /**

@@ -31,9 +31,7 @@ export interface MoveComponent extends BaseComponent {
   getPosition(): number;
   getLimit( max: boolean ): number;
   isBusy(): boolean;
-  isExceeded(): boolean;
-  isExceededMin( position: number, offset?: number ): boolean;
-  isExceededMax( position: number, offset?: number ): boolean;
+  exceededLimit( max?: boolean | undefined, position?: number ): boolean;
 }
 
 /**
@@ -92,7 +90,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
         translate( listSize() * positionRate );
       }
 
-      if ( isExceededMax( currPosition ) ) {
+      if ( exceededLimit( true ) ) {
         translate( getLimit( true ) );
       } else {
         snap( SNAP_THRESHOLD );
@@ -190,8 +188,8 @@ export function Move( Splide: Splide, Components: Components, options: Options )
   function loop( position: number ): number {
     if ( ! looping && Splide.is( LOOP ) ) {
       const diff        = position - currPosition;
-      const exceededMin = isExceededMin( position );
-      const exceededMax = isExceededMax( position );
+      const exceededMin = exceededLimit( false, position );
+      const exceededMax = exceededLimit( true, position );
 
       if ( ( exceededMin && diff > 0 ) || ( exceededMax && diff < 0 ) ) {
         position += orient( sliderSize() * ( exceededMin ? 1 : -1 ) );
@@ -312,37 +310,49 @@ export function Move( Splide: Splide, Components: Components, options: Options )
   }
 
   /**
-   * Checks if the provided position exceeds the minimum limit or not.
+   * Checks if the provided position exceeds the minimum or maximum limit or not.
    *
-   * @param position - A position to test.
-   * @param offset   - Optional. Offsets the limit in pixel.
-   *
-   * @return `true` if the position exceeds the limit, or otherwise `false`.
-   */
-  function isExceededMin( position: number, offset?: number ): boolean {
-    return orient( position ) + ( offset || 0 ) < orient( getLimit( false ) );
-  }
-
-  /**
-   * Checks if the provided position exceeds the maximum limit or not.
-   *
-   * @param position - A position to test.
-   * @param offset   - Optional. Offsets the limit in pixel.
+   * @param max      - Optional. `true` for testing max, `false` for min, and `undefined` for both.
+   * @param position - Optional. A position to test. If omitted, tests the current position.
    *
    * @return `true` if the position exceeds the limit, or otherwise `false`.
    */
-  function isExceededMax( position: number, offset?: number ): boolean {
-    return orient( position ) + ( offset || 0 ) > orient( getLimit( true ) );
+  function exceededLimit( max?: boolean | undefined, position = currPosition ): boolean {
+    const exceededMin = max !== true && orient( position ) < orient( getLimit( false ) );
+    const exceededMax = max !== false && orient( position ) > orient( getLimit( true ) );
+    return exceededMin || exceededMax;
   }
 
-  /**
-   * Checks if the slider position exceeds borders or not.
-   *
-   * @return `true` if the position is over borders, or otherwise `false`.
-   */
-  function isExceeded(): boolean {
-    return isExceededMin( currPosition ) || isExceededMax( currPosition );
-  }
+  // /**
+  //  * Checks if the provided position exceeds the minimum limit or not.
+  //  *
+  //  * @param position - A position to test.
+  //  *
+  //  * @return `true` if the position exceeds the limit, or otherwise `false`.
+  //  */
+  // function isExceededMin( position: number ): boolean {
+  //   return orient( position ) < orient( getLimit( false ) );
+  // }
+  //
+  // /**
+  //  * Checks if the provided position exceeds the maximum limit or not.
+  //  *
+  //  * @param position - A position to test.
+  //  *
+  //  * @return `true` if the position exceeds the limit, or otherwise `false`.
+  //  */
+  // function isExceededMax( position: number ): boolean {
+  //   return orient( position ) > orient( getLimit( true ) );
+  // }
+  //
+  // /**
+  //  * Checks if the slider position exceeds borders or not.
+  //  *
+  //  * @return `true` if the position is over borders, or otherwise `false`.
+  //  */
+  // function isExceeded(): boolean {
+  //   return isExceededMin( currPosition ) || isExceededMax( currPosition );
+  // }
 
   return {
     mount,
@@ -355,8 +365,9 @@ export function Move( Splide: Splide, Components: Components, options: Options )
     getPosition,
     getLimit,
     isBusy,
-    isExceededMin,
-    isExceededMax,
-    isExceeded,
+    exceededLimit,
+    // isExceededMin,
+    // isExceededMax,
+    // isExceeded,
   };
 }

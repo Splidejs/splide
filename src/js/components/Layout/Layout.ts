@@ -35,7 +35,7 @@ export function Layout( Splide: Splide, Components: Components, options: Options
   const { Slides } = Components;
   const { ruleBy } = Components.Style;
   const { resolve } = Components.Direction;
-  const { root, track, list } = Components.Elements;
+  const { track, list } = Components.Elements;
   const { getAt } = Slides;
   const vertical = options.direction === TTB;
 
@@ -55,7 +55,7 @@ export function Layout( Splide: Splide, Components: Components, options: Options
    * Uses `max-width` for the root to prevent the slider from exceeding the parent element.
    */
   function init(): void {
-    ruleBy( root, 'maxWidth', unit( options.width ) );
+    ruleBy( Splide.root, 'maxWidth', unit( options.width ) );
     ruleBy( track, resolve( 'paddingLeft' ), cssPadding( false ) );
     ruleBy( track, resolve( 'paddingRight' ), cssPadding( true ) );
 

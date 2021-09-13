@@ -248,9 +248,9 @@ describe( 'Slide', () => {
             expect( Slide.index ).toBe( 1 );
             callback();
           } );
-        }
-      }
-    }
+        },
+      };
+    };
 
     splide.mount( { component } );
     expect( callback ).toHaveBeenCalled();

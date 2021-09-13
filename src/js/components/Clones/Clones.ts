@@ -29,17 +29,16 @@ export function Clones( Splide: Splide, Components: Components, options: Options
   const { on, emit } = EventInterface( Splide );
   const { Elements, Slides } = Components;
   const { resolve } = Components.Direction;
+
+  /**
+   * Stores all cloned elements.
+   */
   const clones: HTMLElement[] = [];
 
   /**
    * Keeps the current number of clones.
    */
   let cloneCount: number;
-
-  /**
-   * The index used for generating IDs.
-   */
-  let cloneIndex: number;
 
   /**
    * Called when the component is mounted.
@@ -95,15 +94,13 @@ export function Clones( Splide: Splide, Components: Components, options: Options
     const { length } = slides;
 
     if ( length ) {
-      cloneIndex = 0;
-
       while ( slides.length < count ) {
         push( slides, slides );
       }
 
-      slides.slice( -count ).concat( slides.slice( 0, count ) ).forEach( ( Slide, index ) => {
+      push( slides.slice( -count ), slides.slice( 0, count ) ).forEach( ( Slide, index ) => {
         const isHead = index < count;
-        const clone  = cloneDeep( Slide.slide );
+        const clone  = cloneDeep( Slide.slide, index );
         isHead ? before( clone, slides[ 0 ].slide ) : append( Elements.list, clone );
         push( clones, clone );
         Slides.register( clone, index - count + ( isHead ? 0 : length ), Slide.index );
@@ -114,14 +111,15 @@ export function Clones( Splide: Splide, Components: Components, options: Options
   /**
    * Deeply clones the provided element with removing the ID attribute.
    *
-   * @param elm - An element to clone.
+   * @param elm   - An element to clone.
+   * @param index - An index of the clone.
    *
    * @return A cloned element.
    */
-  function cloneDeep( elm: HTMLElement ): HTMLElement {
+  function cloneDeep( elm: HTMLElement, index: number ): HTMLElement {
     const clone = elm.cloneNode( true ) as HTMLElement;
     addClass( clone, options.classes.clone );
-    clone.id = `${ Splide.root.id }-clone${ pad( ++cloneIndex ) }`;
+    clone.id = `${ Splide.root.id }-clone${ pad( index + 1 ) }`;
     return clone;
   }
 

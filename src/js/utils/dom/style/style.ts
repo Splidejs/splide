@@ -35,7 +35,7 @@ export function style(
 export function style<K extends CSSStyleProperties>(
   elms: HTMLElement | HTMLElement[],
   styles: Record<string, string | number> | K
-): CSSStyleDeclaration[ K ] | void {
+): CSSStyleDeclaration[ K ] | string | void {
   if ( isString( styles ) ) {
     return isArray( elms ) ? null : getComputedStyle( elms )[ styles ];
   }

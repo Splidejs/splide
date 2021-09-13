@@ -25,7 +25,7 @@ export declare const ORIENTATION_MAP: {
     right: string[];
     x: string[];
     X: string[];
-    pageX: string[];
+    Y: string[];
     ArrowLeft: string[];
     ArrowRight: string[];
 };

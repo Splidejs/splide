@@ -21,7 +21,6 @@ export declare type ComponentConstructor = (Splide: Splide, Components: Componen
 export interface BaseComponent {
     setup?(): void;
     mount?(): void;
-    mounted?(): void;
     destroy?(completely?: boolean): void;
 }
 /**

@@ -31,7 +31,7 @@ export interface ScrollComponent extends BaseComponent {
 export function Scroll( Splide: Splide, Components: Components, options: Options ): ScrollComponent {
   const { on, emit } = EventInterface( Splide );
   const { Move } = Components;
-  const { getPosition, getLimit } = Move;
+  const { getPosition, getLimit, exceededLimit } = Move;
 
   /**
    * Retains the active RequestInterval object.
@@ -67,11 +67,11 @@ export function Scroll( Splide: Splide, Components: Components, options: Options
 
       Move.translate( position + diff );
 
-      if ( Splide.is( SLIDE ) && ! suppressConstraint && Move.isExceeded() ) {
+      if ( Splide.is( SLIDE ) && ! suppressConstraint && exceededLimit() ) {
         friction *= FRICTION_FACTOR;
 
         if ( abs( diff ) < BOUNCE_DIFF_THRESHOLD ) {
-          bounce( Move.isExceededMin( getPosition() ) );
+          bounce( exceededLimit( false ) );
         }
       }
     }, 1 );

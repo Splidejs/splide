@@ -598,7 +598,7 @@ const ORIENTATION_MAP = {
   right: ["bottom", "left"],
   x: ["y"],
   X: ["Y"],
-  pageX: ["pageY"],
+  Y: ["X"],
   ArrowLeft: ["ArrowUp", "ArrowRight"],
   ArrowRight: ["ArrowDown", "ArrowLeft"]
 };
@@ -852,8 +852,9 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     }
   }
   function updateVisibility(visible) {
-    setAttribute(slide, ARIA_HIDDEN, !visible || null);
-    setAttribute(slide, TAB_INDEX, visible && options.slideFocus ? 0 : null);
+    const ariaHidden = !visible && !isActive();
+    setAttribute(slide, ARIA_HIDDEN, ariaHidden || null);
+    setAttribute(slide, TAB_INDEX, !ariaHidden && options.slideFocus ? 0 : null);
     if (visible !== hasClass(slide, CLASS_VISIBLE)) {
       toggleClass(slide, CLASS_VISIBLE, visible);
       emit(visible ? EVENT_VISIBLE : EVENT_HIDDEN, this);
@@ -1009,7 +1010,6 @@ function Clones(Splide2, Components2, options) {
   const { resolve } = Components2.Direction;
   const clones = [];
   let cloneCount;
-  let cloneIndex;
   function mount() {
     init();
     on(EVENT_REFRESH, refresh);
@@ -1037,23 +1037,22 @@ function Clones(Splide2, Components2, options) {
     const slides = Slides.get().slice();
     const { length } = slides;
     if (length) {
-      cloneIndex = 0;
       while (slides.length < count) {
         push(slides, slides);
       }
-      slides.slice(-count).concat(slides.slice(0, count)).forEach((Slide, index) => {
+      push(slides.slice(-count), slides.slice(0, count)).forEach((Slide, index) => {
         const isHead = index < count;
-        const clone = cloneDeep(Slide.slide);
+        const clone = cloneDeep(Slide.slide, index);
         isHead ? before(clone, slides[0].slide) : append(Elements.list, clone);
         push(clones, clone);
         Slides.register(clone, index - count + (isHead ? 0 : length), Slide.index);
       });
     }
   }
-  function cloneDeep(elm) {
+  function cloneDeep(elm, index) {
     const clone = elm.cloneNode(true);
     addClass(clone, options.classes.clone);
-    clone.id = `${Splide2.root.id}-clone${pad(++cloneIndex)}`;
+    clone.id = `${Splide2.root.id}-clone${pad(index + 1)}`;
     return clone;
   }
   function computeCloneCount() {
@@ -1079,7 +1078,7 @@ function Layout(Splide2, Components2, options) {
   const { Slides } = Components2;
   const { ruleBy } = Components2.Style;
   const { resolve } = Components2.Direction;
-  const { root, track, list } = Components2.Elements;
+  const { track, list } = Components2.Elements;
   const { getAt } = Slides;
   const vertical = options.direction === TTB;
   function mount() {
@@ -1089,7 +1088,7 @@ function Layout(Splide2, Components2, options) {
     on(EVENT_RESIZE, resize);
   }
   function init() {
-    ruleBy(root, "maxWidth", unit(options.width));
+    ruleBy(Splide2.root, "maxWidth", unit(options.width));
     ruleBy(track, resolve("paddingLeft"), cssPadding(false));
     ruleBy(track, resolve("paddingRight"), cssPadding(true));
     Slides.rule(resolve("marginRight"), unit(options.gap));
@@ -1163,7 +1162,7 @@ function Layout(Splide2, Components2, options) {
   }
   function getGap() {
     const Slide = getAt(0);
-    return Slide ? parseFloat(style(Slide.slide, resolve("marginRight"))) || 0 : 0;
+    return Slide && parseFloat(style(Slide.slide, resolve("marginRight"))) || 0;
   }
   function getPadding(right) {
     return parseFloat(style(track, resolve(`padding${right ? "Right" : "Left"}`, true))) || 0;
@@ -1199,7 +1198,7 @@ function Move(Splide2, Components2, options) {
       if (!options[resolve("fixedWidth")] && !options[resolve("autoWidth")]) {
         translate(listSize() * positionRate);
       }
-      if (isExceededMax(currPosition)) {
+      if (exceededLimit(true)) {
         translate(getLimit(true));
       } else {
         snap(SNAP_THRESHOLD);
@@ -1250,8 +1249,8 @@ function Move(Splide2, Components2, options) {
   function loop(position) {
     if (!looping && Splide2.is(LOOP)) {
       const diff = position - currPosition;
-      const exceededMin = isExceededMin(position);
-      const exceededMax = isExceededMax(position);
+      const exceededMin = exceededLimit(false, position);
+      const exceededMax = exceededLimit(true, position);
       if (exceededMin && diff > 0 || exceededMax && diff < 0) {
         position += orient(sliderSize() * (exceededMin ? 1 : -1));
       }
@@ -1306,14 +1305,10 @@ function Move(Splide2, Components2, options) {
   function isBusy() {
     return !!(looping || waiting);
   }
-  function isExceededMin(position, offset2) {
-    return orient(position) + (offset2 || 0) < orient(getLimit(false));
-  }
-  function isExceededMax(position, offset2) {
-    return orient(position) + (offset2 || 0) > orient(getLimit(true));
-  }
-  function isExceeded() {
-    return isExceededMin(currPosition) || isExceededMax(currPosition);
+  function exceededLimit(max, position = currPosition) {
+    const exceededMin = max !== true && orient(position) < orient(getLimit(false));
+    const exceededMax = max !== false && orient(position) > orient(getLimit(true));
+    return exceededMin || exceededMax;
   }
   return {
     mount,
@@ -1326,9 +1321,7 @@ function Move(Splide2, Components2, options) {
     getPosition,
     getLimit,
     isBusy,
-    isExceededMin,
-    isExceededMax,
-    isExceeded
+    exceededLimit
   };
 }
 
@@ -1394,7 +1387,8 @@ function Controller(Splide2, Components2, options) {
     return getAdjacent(true, destination);
   }
   function getAdjacent(prev, destination) {
-    const dest = computeDestIndex(currIndex + getPerMove() * (prev ? -1 : 1), currIndex);
+    const number = perMove || hasFocus() ? 1 : perPage;
+    const dest = computeDestIndex(currIndex + number * (prev ? -1 : 1), currIndex);
     return destination ? dest : loop(dest);
   }
   function computeDestIndex(dest, from, incremental) {
@@ -1445,9 +1439,6 @@ function Controller(Splide2, Components2, options) {
     }
     return index;
   }
-  function getPerMove() {
-    return perMove || hasFocus() ? 1 : perPage;
-  }
   function setIndex(index) {
     if (index !== currIndex) {
       prevIndex = currIndex;
@@ -1482,7 +1473,6 @@ function Arrows(Splide2, Components2, options) {
   const { on, bind, emit } = EventInterface(Splide2);
   const { classes, i18n } = options;
   const { Elements, Controller } = Components2;
-  const { slider, track } = Elements;
   let wrapper = Elements.arrows;
   let prev = Elements.prev;
   let next = Elements.next;
@@ -1500,8 +1490,9 @@ function Arrows(Splide2, Components2, options) {
     }
     if (prev && next) {
       if (!arrows.prev) {
-        setAttribute(prev, ARIA_CONTROLS, track.id);
-        setAttribute(next, ARIA_CONTROLS, track.id);
+        const { id } = Elements.track;
+        setAttribute(prev, ARIA_CONTROLS, id);
+        setAttribute(next, ARIA_CONTROLS, id);
         arrows.prev = prev;
         arrows.next = next;
         listen();
@@ -1530,13 +1521,12 @@ function Arrows(Splide2, Components2, options) {
     });
   }
   function createArrows() {
-    const parent = options.arrows === "slider" && slider ? slider : Splide2.root;
     wrapper = create("div", classes.arrows);
     prev = createArrow(true);
     next = createArrow(false);
     created = true;
     append(wrapper, [prev, next]);
-    before(wrapper, child(parent));
+    before(wrapper, child(options.arrows === "slider" && Elements.slider || Splide2.root));
   }
   function createArrow(prev2) {
     const arrow = `<button class="${classes.arrow} ${prev2 ? classes.prev : classes.next}" type="button"><svg xmlns="${XML_NAME_SPACE}" viewBox="0 0 ${SIZE} ${SIZE}" width="${SIZE}" height="${SIZE}"><path d="${options.arrowPath || PATH}" />`;
@@ -1563,7 +1553,7 @@ function Arrows(Splide2, Components2, options) {
 
 function Autoplay(Splide2, Components2, options) {
   const { on, bind, emit } = EventInterface(Splide2);
-  const { root, track, bar, play: playButton, pause: pauseButton } = Components2.Elements;
+  const { Elements } = Components2;
   const interval = RequestInterval(options.interval, Splide2.go.bind(Splide2, ">"), update);
   const { isPaused } = interval;
   let hovered;
@@ -1581,17 +1571,19 @@ function Autoplay(Splide2, Components2, options) {
     }
   }
   function initButton(forPause) {
-    const button = forPause ? pauseButton : playButton;
+    const prop = forPause ? "pause" : "play";
+    const button = Elements[prop];
     if (button) {
       if (!isHTMLButtonElement(button)) {
         setAttribute(button, ROLE, "button");
       }
-      setAttribute(button, ARIA_CONTROLS, track.id);
-      setAttribute(button, ARIA_LABEL, options.i18n[forPause ? "pause" : "play"]);
+      setAttribute(button, ARIA_CONTROLS, Elements.track.id);
+      setAttribute(button, ARIA_LABEL, options.i18n[prop]);
       bind(button, "click", forPause ? pause : play);
     }
   }
   function listen() {
+    const { root } = Elements;
     if (options.pauseOnHover) {
       bind(root, "mouseenter mouseleave", (e) => {
         hovered = e.type === "mouseenter";
@@ -1631,10 +1623,11 @@ function Autoplay(Splide2, Components2, options) {
     }
   }
   function update(rate) {
-    emit(EVENT_AUTOPLAY_PLAYING, rate);
+    const { bar } = Elements;
     if (bar) {
       style(bar, { width: `${rate * 100}%` });
     }
+    emit(EVENT_AUTOPLAY_PLAYING, rate);
   }
   return {
     mount,
@@ -1685,7 +1678,7 @@ const MIN_DURATION = 800;
 function Scroll(Splide2, Components2, options) {
   const { on, emit } = EventInterface(Splide2);
   const { Move } = Components2;
-  const { getPosition, getLimit } = Move;
+  const { getPosition, getLimit, exceededLimit } = Move;
   let interval;
   function mount() {
     on(EVENT_MOVE, clear);
@@ -1701,10 +1694,10 @@ function Scroll(Splide2, Components2, options) {
       const target = start + (destination - start) * easing(rate);
       const diff = (target - getPosition()) * friction;
       Move.translate(position + diff);
-      if (Splide2.is(SLIDE) && !suppressConstraint && Move.isExceeded()) {
+      if (Splide2.is(SLIDE) && !suppressConstraint && exceededLimit()) {
         friction *= FRICTION_FACTOR;
         if (abs(diff) < BOUNCE_DIFF_THRESHOLD) {
-          bounce(Move.isExceededMin(getPosition()));
+          bounce(exceededLimit(false));
         }
       }
     }, 1);
@@ -1744,119 +1737,124 @@ function Scroll(Splide2, Components2, options) {
 }
 
 const FRICTION = 5;
-const SAMPLING_INTERVAL = 50;
+const LOG_INTERVAL = 50;
 const POINTER_DOWN_EVENTS = "touchstart mousedown";
 const POINTER_MOVE_EVENTS = "touchmove mousemove";
 const POINTER_UP_EVENTS = "touchend touchcancel mouseup mouseleave";
 
 function Drag(Splide2, Components2, options) {
-  const { emit, bind, unbind } = EventInterface(Splide2);
+  const { on, emit, bind, unbind } = EventInterface(Splide2);
+  const { Move, Scroll, Controller } = Components2;
   const { track } = Components2.Elements;
   const { resolve, orient } = Components2.Direction;
-  const { listSize } = Components2.Layout;
-  const { go, getEnd } = Components2.Controller;
-  const { Move, Scroll } = Components2;
-  const { translate, toIndex, getPosition, isExceeded } = Move;
+  const { getPosition, exceededLimit } = Move;
   const isSlide = Splide2.is(SLIDE);
   const isFade = Splide2.is(FADE);
-  const isFree = options.drag === "free";
-  let startCoord;
-  let lastTime;
   let basePosition;
-  let baseCoord;
-  let baseTime;
+  let baseEvent;
+  let prevBaseEvent;
   let lastEvent;
-  let moving;
+  let isFree;
+  let isDragging;
   let isMouse;
+  let hasExceeded = false;
+  let clickPrevented;
+  let disabled;
   let target;
-  let exceeded;
   function mount() {
-    if (options.drag) {
-      bind(track, POINTER_DOWN_EVENTS, onPointerDown);
-      bind(track, "click", (e) => {
-        prevent(e, true);
-      });
-    }
+    bind(track, POINTER_DOWN_EVENTS, onPointerDown);
+    bind(track, "click", onClick, { capture: true });
+    on([EVENT_MOUNTED, EVENT_UPDATED], init);
+  }
+  function init() {
+    const { drag } = options;
+    disable(!drag);
+    isFree = drag === "free";
   }
   function onPointerDown(e) {
-    isMouse = e.type === "mousedown";
-    target = isMouse ? window : track;
-    if (!(isMouse && e.button)) {
-      bind(target, POINTER_MOVE_EVENTS, onPointerMove);
-      bind(target, POINTER_UP_EVENTS, onPointerUp);
-      Move.cancel();
-      Scroll.cancel();
-      startCoord = getCoord(e);
+    if (!disabled) {
+      isMouse = e.type === "mousedown";
+      if (!Move.isBusy() && (!isMouse || !e.button)) {
+        target = isMouse ? window : track;
+        prevBaseEvent = null;
+        lastEvent = null;
+        clickPrevented = false;
+        bind(target, POINTER_MOVE_EVENTS, onPointerMove);
+        bind(target, POINTER_UP_EVENTS, onPointerUp);
+        Move.cancel();
+        Scroll.cancel();
+        save(e);
+      }
     }
   }
   function onPointerMove(e) {
-    console.log(`${Date.now()}: ${e.cancelable}`);
-    if (e.cancelable) {
-      const min2 = options.dragMinThreshold || 2;
-      if (isMouse || abs(getCoord(e) - startCoord) > min2) {
-        moving = true;
-        onDrag();
+    if (!lastEvent) {
+      clickPrevented = true;
+      emit(EVENT_DRAG);
+    }
+    lastEvent = e;
+    if (!e.cancelable) {
+      return;
+    }
+    if (isDragging) {
+      const expired = timeOf(e) - timeOf(baseEvent) > LOG_INTERVAL;
+      const exceeded = hasExceeded !== (hasExceeded = exceededLimit());
+      if (expired || exceeded) {
+        save(e);
       }
-      if (moving) {
-        onDragging(e);
+      if (!isFade) {
+        Move.translate(basePosition + constrain(coordOf(e) - coordOf(baseEvent)));
       }
-      prevent(e, true);
+      emit(EVENT_DRAGGING);
+      prevent(e);
     } else {
-      onPointerUp(e);
+      const threshold = options.dragMinThreshold || 15;
+      isDragging = isMouse || abs(coordOf(e) - coordOf(baseEvent)) > threshold;
+      if (isSliderDirection()) {
+        prevent(e);
+      }
     }
   }
   function onPointerUp(e) {
     unbind(target, `${POINTER_MOVE_EVENTS} ${POINTER_UP_EVENTS}`);
-    moving = false;
     if (lastEvent) {
-      onDragged(e);
-      lastEvent = null;
-    }
-  }
-  function onDrag() {
-    bind(track, "click", (e) => {
-      unbind(track, "click");
-      prevent(e, true);
-    }, { capture: true });
-    emit(EVENT_DRAG);
-  }
-  function onDragging(e) {
-    const { timeStamp } = e;
-    const expired = !lastTime || timeStamp - lastTime > SAMPLING_INTERVAL;
-    if (expired || isExceeded() !== exceeded) {
-      basePosition = getPosition();
-      baseCoord = getCoord(e);
-      baseTime = timeStamp;
-    }
-    exceeded = isExceeded();
-    lastTime = timeStamp;
-    lastEvent = e;
-    if (!isFade) {
-      translate(basePosition + constrain(getCoord(e) - baseCoord));
-    }
-    emit(EVENT_DRAGGING);
-  }
-  function onDragged(e) {
-    const velocity = computeVelocity(e);
-    if (isFade) {
-      go(Splide2.index + orient(sign(velocity)));
-    } else {
-      const destination = computeDestination(velocity);
-      if (isFree) {
-        Scroll.scroll(destination);
-        console.log(velocity);
-      } else {
-        go(computeIndex(destination), true);
+      if (isDragging || e.cancelable && isSliderDirection()) {
+        const velocity = computeVelocity(e);
+        const destination = computeDestination(velocity);
+        if (isFree) {
+          Scroll.scroll(destination);
+        } else if (isFade) {
+          Controller.go(Splide2.index + orient(sign(velocity)));
+        } else {
+          Controller.go(computeIndex(destination), true);
+        }
+        prevent(e);
       }
+      emit(EVENT_DRAGGED);
     }
-    lastTime = 0;
-    emit(EVENT_DRAGGED);
+    isDragging = false;
+  }
+  function save(e) {
+    prevBaseEvent = baseEvent;
+    baseEvent = e;
+    basePosition = getPosition();
+  }
+  function onClick(e) {
+    if (!disabled && clickPrevented) {
+      prevent(e, true);
+    }
+  }
+  function isSliderDirection() {
+    const diffX = abs(coordOf(lastEvent) - coordOf(baseEvent));
+    const diffY = abs(coordOf(lastEvent, true) - coordOf(baseEvent, true));
+    return diffX > diffY;
   }
   function computeVelocity(e) {
-    if (Splide2.is(LOOP) || !isExceeded()) {
-      const diffCoord = getCoord(lastEvent) - baseCoord;
-      const diffTime = lastEvent.timeStamp - baseTime;
-      const isFlick = e.timeStamp - lastTime < SAMPLING_INTERVAL;
+    if (Splide2.is(LOOP) || !hasExceeded) {
+      const base = baseEvent === lastEvent && prevBaseEvent || baseEvent;
+      const diffCoord = coordOf(lastEvent) - coordOf(base);
+      const diffTime = timeOf(e) - timeOf(base);
+      const isFlick = timeOf(e) - timeOf(lastEvent) < LOG_INTERVAL;
       if (diffTime && isFlick) {
         return diffCoord / diffTime;
       }
@@ -1864,21 +1862,28 @@ function Drag(Splide2, Components2, options) {
     return 0;
   }
   function computeDestination(velocity) {
-    const flickPower = options.flickPower || 600;
-    return getPosition() + sign(velocity) * min(abs(velocity) * flickPower, isFree ? Infinity : listSize() * (options.flickMaxPages || 1));
+    return getPosition() + sign(velocity) * min(abs(velocity) * (options.flickPower || 600), isFree ? Infinity : Components2.Layout.listSize() * (options.flickMaxPages || 1));
   }
   function computeIndex(destination) {
-    const dest = toIndex(destination);
-    return isSlide ? clamp(dest, 0, getEnd()) : dest;
+    const dest = Move.toIndex(destination);
+    return isSlide ? clamp(dest, 0, Controller.getEnd()) : dest;
   }
-  function getCoord(e) {
-    return (isMouse ? e : e.touches[0])[resolve("pageX")];
+  function coordOf(e, orthogonal) {
+    const prop = `page${resolve(orthogonal ? "Y" : "X")}`;
+    return (isMouse ? e : e.touches[0])[prop];
+  }
+  function timeOf(e) {
+    return e.timeStamp;
   }
   function constrain(diff) {
-    return diff / (exceeded && isSlide ? FRICTION : 1);
+    return diff / (hasExceeded && isSlide ? FRICTION : 1);
+  }
+  function disable(value) {
+    disabled = value;
   }
   return {
-    mount
+    mount,
+    disable
   };
 }
 
@@ -2023,7 +2028,7 @@ function LazyLoad(Splide2, Components2, options) {
 
 function Pagination(Splide2, Components2, options) {
   const { on, emit, bind, unbind } = EventInterface(Splide2);
-  const { Slides } = Components2;
+  const { Slides, Elements } = Components2;
   const { go, toPage, hasFocus, getIndex } = Components2.Controller;
   const items = [];
   let list;
@@ -2053,8 +2058,7 @@ function Pagination(Splide2, Components2, options) {
   function createPagination() {
     const { length } = Splide2;
     const { classes, i18n, perPage } = options;
-    const { slider, root } = Components2.Elements;
-    const parent = options.pagination === "slider" && slider ? slider : root;
+    const parent = options.pagination === "slider" && Elements.slider || Elements.root;
     const max = hasFocus() ? length : ceil(length / perPage);
     list = create("ul", classes.pagination, parent);
     for (let i = 0; i < max; i++) {
@@ -2302,25 +2306,24 @@ const _Splide = class {
     merge(merge(this._options, DEFAULTS), options || {});
   }
   mount(Extensions, Transition) {
-    this.state.set(CREATED);
+    const { state, Components: Components2 } = this;
+    assert(state.is([CREATED, DESTROYED]), "Already mounted.");
+    state.set(CREATED);
+    this._Components = Components2;
     this._Transition = Transition || this._Transition || (this.is(FADE) ? Fade : Slide);
     this._Extensions = Extensions || this._Extensions;
     const Constructors = assign({}, ComponentConstructors, this._Extensions, { Transition: this._Transition });
-    const { Components: Components2 } = this;
     forOwn(Constructors, (Component, key) => {
-      const component = Component(this, this.Components, this._options);
+      const component = Component(this, Components2, this._options);
       Components2[key] = component;
       component.setup && component.setup();
     });
     forOwn(Components2, (component) => {
       component.mount && component.mount();
     });
-    forOwn(Components2, (component) => {
-      component.mounted && component.mounted();
-    });
     this.emit(EVENT_MOUNTED);
     addClass(this.root, CLASS_INITIALIZED);
-    this.state.set(IDLE);
+    state.set(IDLE);
     this.emit(EVENT_READY);
     return this;
   }
@@ -2330,7 +2333,7 @@ const _Splide = class {
     return this;
   }
   go(control) {
-    this.Components.Controller.go(control);
+    this._Components.Controller.go(control);
   }
   on(events, callback) {
     this.event.on(events, callback, null, DEFAULT_USER_EVENT_PRIORITY);
@@ -2345,11 +2348,11 @@ const _Splide = class {
     return this;
   }
   add(slides, index) {
-    this.Components.Slides.add(slides, index);
+    this._Components.Slides.add(slides, index);
     return this;
   }
   remove(matcher) {
-    this.Components.Slides.remove(matcher);
+    this._Components.Slides.remove(matcher);
     return this;
   }
   is(type) {
@@ -2364,7 +2367,7 @@ const _Splide = class {
     if (state.is(CREATED)) {
       event.on(EVENT_READY, this.destroy.bind(this, completely), this);
     } else {
-      forOwn(this.Components, (component) => {
+      forOwn(this._Components, (component) => {
         component.destroy && component.destroy(completely);
       });
       event.emit(EVENT_DESTROY);
@@ -2385,10 +2388,10 @@ const _Splide = class {
     }
   }
   get length() {
-    return this.Components.Slides.getLength(true);
+    return this._Components.Slides.getLength(true);
   }
   get index() {
-    return this.Components.Controller.getIndex();
+    return this._Components.Controller.getIndex();
   }
 };
 let Splide = _Splide;

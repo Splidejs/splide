@@ -15,9 +15,7 @@ export interface MoveComponent extends BaseComponent {
     getPosition(): number;
     getLimit(max: boolean): number;
     isBusy(): boolean;
-    isExceeded(): boolean;
-    isExceededMin(position: number, offset?: number): boolean;
-    isExceededMax(position: number, offset?: number): boolean;
+    exceededLimit(max?: boolean | undefined, position?: number): boolean;
 }
 /**
  * The component for moving the slider.

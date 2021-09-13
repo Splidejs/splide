@@ -59,6 +59,11 @@ export class Splide {
   private readonly _options: Options = {};
 
   /**
+   * The collection of all components.
+   */
+  private _Components: Components;
+
+  /**
    * The collection of extensions.
    */
   private _Extensions: Record<string, ComponentConstructor> = {};
@@ -93,16 +98,19 @@ export class Splide {
    * @return `this`
    */
   mount( Extensions?: Record<string, ComponentConstructor>, Transition?: ComponentConstructor ): this {
-    this.state.set( CREATED );
+    const { state, Components } = this;
+    assert( state.is( [ CREATED, DESTROYED ] ), 'Already mounted.' );
 
+    state.set( CREATED );
+
+    this._Components = Components;
     this._Transition = Transition || this._Transition || ( this.is( FADE ) ? Fade : Slide );
     this._Extensions = Extensions || this._Extensions;
 
     const Constructors = assign( {}, ComponentConstructors, this._Extensions, { Transition: this._Transition } );
-    const { Components } = this;
 
     forOwn( Constructors, ( Component, key ) => {
-      const component = Component( this, this.Components, this._options );
+      const component = Component( this, Components, this._options );
       Components[ key ] = component;
       component.setup && component.setup();
     } );
@@ -111,16 +119,11 @@ export class Splide {
       component.mount && component.mount();
     } );
 
-    // todo unnecessary anymore
-    forOwn( Components, component => {
-      component.mounted && component.mounted();
-    } );
-
     this.emit( EVENT_MOUNTED );
 
     addClass( this.root, CLASS_INITIALIZED );
 
-    this.state.set( IDLE );
+    state.set( IDLE );
     this.emit( EVENT_READY );
 
     return this;
@@ -185,7 +188,7 @@ export class Splide {
    * @param control
    */
   go( control: number | string ): void {
-    this.Components.Controller.go( control );
+    this._Components.Controller.go( control );
   }
 
   /**
@@ -273,7 +276,7 @@ export class Splide {
    * @return `this`
    */
   add( slides: string | HTMLElement | Array<string | HTMLElement>, index?: number ): this {
-    this.Components.Slides.add( slides, index );
+    this._Components.Slides.add( slides, index );
     return this;
   }
 
@@ -284,7 +287,7 @@ export class Splide {
    * @param matcher - An index, an array with indices, a selector string, or an iteratee function.
    */
   remove( matcher: SlideMatcher ): this {
-    this.Components.Slides.remove( matcher );
+    this._Components.Slides.remove( matcher );
     return this;
   }
 
@@ -323,7 +326,7 @@ export class Splide {
       // Postpones destruction requested before the slider becomes ready.
       event.on( EVENT_READY, this.destroy.bind( this, completely ), this );
     } else {
-      forOwn( this.Components, component => {
+      forOwn( this._Components, component => {
         component.destroy && component.destroy( completely );
       } );
 
@@ -365,7 +368,7 @@ export class Splide {
    * @return The number of slides.
    */
   get length(): number {
-    return this.Components.Slides.getLength( true );
+    return this._Components.Slides.getLength( true );
   }
 
   /**
@@ -374,7 +377,7 @@ export class Splide {
    * @return The active slide index.
    */
   get index(): number {
-    return this.Components.Controller.getIndex();
+    return this._Components.Controller.getIndex();
   }
 }
 

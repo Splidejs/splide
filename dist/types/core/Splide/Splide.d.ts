@@ -46,6 +46,10 @@ export declare class Splide {
      */
     private readonly _options;
     /**
+     * The collection of all components.
+     */
+    private _Components;
+    /**
      * The collection of extensions.
      */
     private _Extensions;

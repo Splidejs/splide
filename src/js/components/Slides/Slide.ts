@@ -197,8 +197,10 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    * @param visible - Set `true` if the slide is visible.
    */
   function updateVisibility( this: SlideComponent, visible: boolean ): void {
-    setAttribute( slide, ARIA_HIDDEN, ! visible || null );
-    setAttribute( slide, TAB_INDEX, visible && options.slideFocus ? 0 : null );
+    const ariaHidden = ! visible && ! isActive();
+
+    setAttribute( slide, ARIA_HIDDEN, ariaHidden || null );
+    setAttribute( slide, TAB_INDEX, ! ariaHidden && options.slideFocus ? 0 : null );
 
     if ( visible !== hasClass( slide, CLASS_VISIBLE ) ) {
       toggleClass( slide, CLASS_VISIBLE, visible );
