@@ -46,6 +46,8 @@ function buildScript( compress ) {
         } );
       } );
     }
+  } ).catch( e => {
+    console.error( e );
   } );
 }
 

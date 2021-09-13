@@ -1,5 +1,6 @@
 import { DATA_ATTRIBUTE } from '../../constants/project';
 import { DESTROYED } from '../../constants/states';
+import { Throttle } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import { assert, find, getAttribute, merge } from '../../utils';
@@ -25,6 +26,11 @@ export interface OptionsComponent extends BaseComponent {
  * @return An Options component object.
  */
 export function Options( Splide: Splide, Components: Components, options: Options ): OptionsComponent {
+  /**
+   * The throttled `observe` function.
+   */
+  const throttledObserve = Throttle( observe );
+
   /**
    * Keeps the initial options to apply when no matched query exists.
    */
@@ -67,7 +73,7 @@ export function Options( Splide: Splide, Components: Components, options: Option
           matchMedia( `(${ options.mediaQuery || 'max' }-width:${ point }px)` ),
         ] );
 
-      addEventListener( 'resize', observe );
+      addEventListener( 'resize', throttledObserve );
       observe();
     }
   }
@@ -79,7 +85,7 @@ export function Options( Splide: Splide, Components: Components, options: Option
    */
   function destroy( completely: boolean ): void {
     if ( completely ) {
-      removeEventListener( 'resize', observe );
+      removeEventListener( 'resize', throttledObserve );
     }
   }
 

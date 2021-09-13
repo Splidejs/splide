@@ -10,7 +10,7 @@ export const FRICTION = 5;
  *
  * @since 3.0.0
  */
-export const SAMPLING_INTERVAL = 50;
+export const LOG_INTERVAL = 50;
 
 /**
  * Start events for dragging.

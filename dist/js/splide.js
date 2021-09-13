@@ -27,6 +27,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     MOVING: MOVING,
     DESTROYED: DESTROYED
   };
+  var DEFAULT_EVENT_PRIORITY = 10;
+  var DEFAULT_USER_EVENT_PRIORITY = 20;
 
   function empty(array) {
     array.length = 0;
@@ -347,179 +349,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     return "" + prefix + pad(ids[prefix] = (ids[prefix] || 0) + 1);
   }
 
-  function Options(Splide2, Components2, options) {
-    var initialOptions;
-    var points;
-    var currPoint;
-
-    function setup() {
-      try {
-        merge(options, JSON.parse(getAttribute(Splide2.root, DATA_ATTRIBUTE)));
-      } catch (e) {
-        assert(false, e.message);
-      }
-
-      initialOptions = merge({}, options);
-    }
-
-    function mount() {
-      var breakpoints = options.breakpoints;
-
-      if (breakpoints) {
-        points = Object.keys(breakpoints).sort(function (n, m) {
-          return +n - +m;
-        }).map(function (point) {
-          return [point, matchMedia("(" + (options.mediaQuery || "max") + "-width:" + point + "px)")];
-        });
-        addEventListener("resize", observe);
-        observe();
-      }
-    }
-
-    function destroy(completely) {
-      if (completely) {
-        removeEventListener("resize", observe);
-      }
-    }
-
-    function observe() {
-      var item = find(points, function (item2) {
-        return item2[1].matches;
-      }) || [];
-
-      if (item[0] !== currPoint) {
-        onMatch(currPoint = item[0]);
-      }
-    }
-
-    function onMatch(point) {
-      var newOptions = options.breakpoints[point] || initialOptions;
-
-      if (newOptions.destroy) {
-        Splide2.options = initialOptions;
-        Splide2.destroy(newOptions.destroy === "completely");
-      } else {
-        if (Splide2.state.is(DESTROYED)) {
-          destroy(true);
-          Splide2.mount();
-        }
-
-        Splide2.options = newOptions;
-      }
-    }
-
-    return {
-      setup: setup,
-      mount: mount,
-      destroy: destroy
-    };
-  }
-
-  var RTL = "rtl";
-  var TTB = "ttb";
-  var ORIENTATION_MAP = {
-    marginRight: ["marginBottom", "marginLeft"],
-    width: ["height"],
-    autoWidth: ["autoHeight"],
-    fixedWidth: ["fixedHeight"],
-    paddingLeft: ["paddingTop", "paddingRight"],
-    paddingRight: ["paddingBottom", "paddingLeft"],
-    left: ["top", "right"],
-    right: ["bottom", "left"],
-    x: ["y"],
-    X: ["Y"],
-    pageX: ["pageY"],
-    ArrowLeft: ["ArrowUp", "ArrowRight"],
-    ArrowRight: ["ArrowDown", "ArrowLeft"]
-  };
-
-  function Direction(Splide2, Components2, options) {
-    function resolve(prop, axisOnly) {
-      var direction = options.direction;
-      var index = direction === RTL && !axisOnly ? 1 : direction === TTB ? 0 : -1;
-      return ORIENTATION_MAP[prop][index] || prop;
-    }
-
-    function orient(value) {
-      return value * (options.direction === RTL ? 1 : -1);
-    }
-
-    return {
-      resolve: resolve,
-      orient: orient
-    };
-  }
-
-  var CLASS_ROOT = PROJECT_CODE;
-  var CLASS_SLIDER = PROJECT_CODE + "__slider";
-  var CLASS_TRACK = PROJECT_CODE + "__track";
-  var CLASS_LIST = PROJECT_CODE + "__list";
-  var CLASS_SLIDE = PROJECT_CODE + "__slide";
-  var CLASS_CLONE = CLASS_SLIDE + "--clone";
-  var CLASS_CONTAINER = CLASS_SLIDE + "__container";
-  var CLASS_ARROWS = PROJECT_CODE + "__arrows";
-  var CLASS_ARROW = PROJECT_CODE + "__arrow";
-  var CLASS_ARROW_PREV = CLASS_ARROW + "--prev";
-  var CLASS_ARROW_NEXT = CLASS_ARROW + "--next";
-  var CLASS_PAGINATION = PROJECT_CODE + "__pagination";
-  var CLASS_PAGINATION_PAGE = CLASS_PAGINATION + "__page";
-  var CLASS_PROGRESS = PROJECT_CODE + "__progress";
-  var CLASS_PROGRESS_BAR = CLASS_PROGRESS + "__bar";
-  var CLASS_AUTOPLAY = PROJECT_CODE + "__autoplay";
-  var CLASS_PLAY = PROJECT_CODE + "__play";
-  var CLASS_PAUSE = PROJECT_CODE + "__pause";
-  var CLASS_SPINNER = PROJECT_CODE + "__spinner";
-  var CLASS_INITIALIZED = "is-initialized";
-  var CLASS_ACTIVE = "is-active";
-  var CLASS_PREV = "is-prev";
-  var CLASS_NEXT = "is-next";
-  var CLASS_VISIBLE = "is-visible";
-  var CLASS_LOADING = "is-loading";
-  var STATUS_CLASSES = [CLASS_ACTIVE, CLASS_VISIBLE, CLASS_PREV, CLASS_NEXT, CLASS_LOADING];
-  var CLASSES = {
-    slide: CLASS_SLIDE,
-    clone: CLASS_CLONE,
-    arrows: CLASS_ARROWS,
-    arrow: CLASS_ARROW,
-    prev: CLASS_ARROW_PREV,
-    next: CLASS_ARROW_NEXT,
-    pagination: CLASS_PAGINATION,
-    page: CLASS_PAGINATION_PAGE,
-    spinner: CLASS_SPINNER
-  };
-  var EVENT_MOUNTED = "mounted";
-  var EVENT_READY = "ready";
-  var EVENT_MOVE = "move";
-  var EVENT_MOVED = "moved";
-  var EVENT_CLICK = "click";
-  var EVENT_ACTIVE = "active";
-  var EVENT_INACTIVE = "inactive";
-  var EVENT_VISIBLE = "visible";
-  var EVENT_HIDDEN = "hidden";
-  var EVENT_SLIDE_KEYDOWN = "slide:keydown";
-  var EVENT_REFRESH = "refresh";
-  var EVENT_UPDATED = "undated";
-  var EVENT_RESIZE = "resize";
-  var EVENT_RESIZED = "resized";
-  var EVENT_DRAG = "drag";
-  var EVENT_DRAGGING = "dragging";
-  var EVENT_DRAGGED = "dragged";
-  var EVENT_SCROLL = "scroll";
-  var EVENT_SCROLLED = "scrolled";
-  var EVENT_DESTROY = "destroy";
-  var EVENT_ARROWS_MOUNTED = "arrows:mounted";
-  var EVENT_ARROWS_UPDATED = "arrows:updated";
-  var EVENT_PAGINATION_MOUNTED = "pagination:mounted";
-  var EVENT_PAGINATION_PAGE = "pagination:page";
-  var EVENT_PAGINATION_UPDATED = "pagination:updated";
-  var EVENT_NAVIGATION_MOUNTED = "navigation:mounted";
-  var EVENT_AUTOPLAY_PLAY = "autoplay:play";
-  var EVENT_AUTOPLAY_PLAYING = "autoplay:playing";
-  var EVENT_AUTOPLAY_PAUSE = "autoplay:pause";
-  var EVENT_LAZYLOAD_LOADED = "lazyload:loaded";
-  var DEFAULT_EVENT_PRIORITY = 10;
-  var DEFAULT_USER_EVENT_PRIORITY = 20;
-
   function EventBus() {
     var handlers = {};
 
@@ -583,6 +412,37 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       destroy: destroy
     };
   }
+
+  var EVENT_MOUNTED = "mounted";
+  var EVENT_READY = "ready";
+  var EVENT_MOVE = "move";
+  var EVENT_MOVED = "moved";
+  var EVENT_CLICK = "click";
+  var EVENT_ACTIVE = "active";
+  var EVENT_INACTIVE = "inactive";
+  var EVENT_VISIBLE = "visible";
+  var EVENT_HIDDEN = "hidden";
+  var EVENT_SLIDE_KEYDOWN = "slide:keydown";
+  var EVENT_REFRESH = "refresh";
+  var EVENT_UPDATED = "undated";
+  var EVENT_RESIZE = "resize";
+  var EVENT_RESIZED = "resized";
+  var EVENT_DRAG = "drag";
+  var EVENT_DRAGGING = "dragging";
+  var EVENT_DRAGGED = "dragged";
+  var EVENT_SCROLL = "scroll";
+  var EVENT_SCROLLED = "scrolled";
+  var EVENT_DESTROY = "destroy";
+  var EVENT_ARROWS_MOUNTED = "arrows:mounted";
+  var EVENT_ARROWS_UPDATED = "arrows:updated";
+  var EVENT_PAGINATION_MOUNTED = "pagination:mounted";
+  var EVENT_PAGINATION_PAGE = "pagination:page";
+  var EVENT_PAGINATION_UPDATED = "pagination:updated";
+  var EVENT_NAVIGATION_MOUNTED = "navigation:mounted";
+  var EVENT_AUTOPLAY_PLAY = "autoplay:play";
+  var EVENT_AUTOPLAY_PLAYING = "autoplay:playing";
+  var EVENT_AUTOPLAY_PAUSE = "autoplay:pause";
+  var EVENT_LAZYLOAD_LOADED = "lazyload:loaded";
 
   function EventInterface(Splide2) {
     var event = Splide2.event;
@@ -754,6 +614,148 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     return throttled;
   }
+
+  function Options(Splide2, Components2, options) {
+    var throttledObserve = Throttle(observe);
+    var initialOptions;
+    var points;
+    var currPoint;
+
+    function setup() {
+      try {
+        merge(options, JSON.parse(getAttribute(Splide2.root, DATA_ATTRIBUTE)));
+      } catch (e) {
+        assert(false, e.message);
+      }
+
+      initialOptions = merge({}, options);
+    }
+
+    function mount() {
+      var breakpoints = options.breakpoints;
+
+      if (breakpoints) {
+        points = Object.keys(breakpoints).sort(function (n, m) {
+          return +n - +m;
+        }).map(function (point) {
+          return [point, matchMedia("(" + (options.mediaQuery || "max") + "-width:" + point + "px)")];
+        });
+        addEventListener("resize", throttledObserve);
+        observe();
+      }
+    }
+
+    function destroy(completely) {
+      if (completely) {
+        removeEventListener("resize", throttledObserve);
+      }
+    }
+
+    function observe() {
+      var item = find(points, function (item2) {
+        return item2[1].matches;
+      }) || [];
+
+      if (item[0] !== currPoint) {
+        onMatch(currPoint = item[0]);
+      }
+    }
+
+    function onMatch(point) {
+      var newOptions = options.breakpoints[point] || initialOptions;
+
+      if (newOptions.destroy) {
+        Splide2.options = initialOptions;
+        Splide2.destroy(newOptions.destroy === "completely");
+      } else {
+        if (Splide2.state.is(DESTROYED)) {
+          destroy(true);
+          Splide2.mount();
+        }
+
+        Splide2.options = newOptions;
+      }
+    }
+
+    return {
+      setup: setup,
+      mount: mount,
+      destroy: destroy
+    };
+  }
+
+  var RTL = "rtl";
+  var TTB = "ttb";
+  var ORIENTATION_MAP = {
+    marginRight: ["marginBottom", "marginLeft"],
+    width: ["height"],
+    autoWidth: ["autoHeight"],
+    fixedWidth: ["fixedHeight"],
+    paddingLeft: ["paddingTop", "paddingRight"],
+    paddingRight: ["paddingBottom", "paddingLeft"],
+    left: ["top", "right"],
+    right: ["bottom", "left"],
+    x: ["y"],
+    X: ["Y"],
+    Y: ["X"],
+    ArrowLeft: ["ArrowUp", "ArrowRight"],
+    ArrowRight: ["ArrowDown", "ArrowLeft"]
+  };
+
+  function Direction(Splide2, Components2, options) {
+    function resolve(prop, axisOnly) {
+      var direction = options.direction;
+      var index = direction === RTL && !axisOnly ? 1 : direction === TTB ? 0 : -1;
+      return ORIENTATION_MAP[prop][index] || prop;
+    }
+
+    function orient(value) {
+      return value * (options.direction === RTL ? 1 : -1);
+    }
+
+    return {
+      resolve: resolve,
+      orient: orient
+    };
+  }
+
+  var CLASS_ROOT = PROJECT_CODE;
+  var CLASS_SLIDER = PROJECT_CODE + "__slider";
+  var CLASS_TRACK = PROJECT_CODE + "__track";
+  var CLASS_LIST = PROJECT_CODE + "__list";
+  var CLASS_SLIDE = PROJECT_CODE + "__slide";
+  var CLASS_CLONE = CLASS_SLIDE + "--clone";
+  var CLASS_CONTAINER = CLASS_SLIDE + "__container";
+  var CLASS_ARROWS = PROJECT_CODE + "__arrows";
+  var CLASS_ARROW = PROJECT_CODE + "__arrow";
+  var CLASS_ARROW_PREV = CLASS_ARROW + "--prev";
+  var CLASS_ARROW_NEXT = CLASS_ARROW + "--next";
+  var CLASS_PAGINATION = PROJECT_CODE + "__pagination";
+  var CLASS_PAGINATION_PAGE = CLASS_PAGINATION + "__page";
+  var CLASS_PROGRESS = PROJECT_CODE + "__progress";
+  var CLASS_PROGRESS_BAR = CLASS_PROGRESS + "__bar";
+  var CLASS_AUTOPLAY = PROJECT_CODE + "__autoplay";
+  var CLASS_PLAY = PROJECT_CODE + "__play";
+  var CLASS_PAUSE = PROJECT_CODE + "__pause";
+  var CLASS_SPINNER = PROJECT_CODE + "__spinner";
+  var CLASS_INITIALIZED = "is-initialized";
+  var CLASS_ACTIVE = "is-active";
+  var CLASS_PREV = "is-prev";
+  var CLASS_NEXT = "is-next";
+  var CLASS_VISIBLE = "is-visible";
+  var CLASS_LOADING = "is-loading";
+  var STATUS_CLASSES = [CLASS_ACTIVE, CLASS_VISIBLE, CLASS_PREV, CLASS_NEXT, CLASS_LOADING];
+  var CLASSES = {
+    slide: CLASS_SLIDE,
+    clone: CLASS_CLONE,
+    arrows: CLASS_ARROWS,
+    arrow: CLASS_ARROW,
+    prev: CLASS_ARROW_PREV,
+    next: CLASS_ARROW_NEXT,
+    pagination: CLASS_PAGINATION,
+    page: CLASS_PAGINATION_PAGE,
+    spinner: CLASS_SPINNER
+  };
 
   function Elements(Splide2, Components2, options) {
     var _EventInterface = EventInterface(Splide2),
@@ -2116,151 +2118,158 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   var FRICTION = 5;
-  var SAMPLING_INTERVAL = 50;
+  var LOG_INTERVAL = 50;
   var POINTER_DOWN_EVENTS = "touchstart mousedown";
   var POINTER_MOVE_EVENTS = "touchmove mousemove";
   var POINTER_UP_EVENTS = "touchend touchcancel mouseup mouseleave";
 
   function Drag(Splide2, Components2, options) {
     var _EventInterface12 = EventInterface(Splide2),
+        on = _EventInterface12.on,
         emit = _EventInterface12.emit,
         bind = _EventInterface12.bind,
         unbind = _EventInterface12.unbind;
 
+    var Move = Components2.Move,
+        Scroll = Components2.Scroll,
+        Controller = Components2.Controller;
     var track = Components2.Elements.track;
     var _Components2$Directio2 = Components2.Direction,
         resolve = _Components2$Directio2.resolve,
         orient = _Components2$Directio2.orient;
-    var listSize = Components2.Layout.listSize;
-    var _Components2$Controll = Components2.Controller,
-        go = _Components2$Controll.go,
-        getEnd = _Components2$Controll.getEnd;
-    var Move = Components2.Move,
-        Scroll = Components2.Scroll;
-    var translate = Move.translate,
-        toIndex = Move.toIndex,
-        getPosition = Move.getPosition,
+    var getPosition = Move.getPosition,
         isExceeded = Move.isExceeded;
     var isSlide = Splide2.is(SLIDE);
     var isFade = Splide2.is(FADE);
-    var isFree = options.drag === "free";
-    var startCoord;
-    var lastTime;
     var basePosition;
-    var baseCoord;
-    var baseTime;
+    var baseEvent;
+    var prevBaseEvent;
     var lastEvent;
-    var moving;
+    var isFree;
+    var isDragging;
     var isMouse;
+    var hasExceeded = false;
+    var clickPrevented;
+    var disabled;
     var target;
-    var exceeded;
 
     function mount() {
-      if (options.drag) {
-        bind(track, POINTER_DOWN_EVENTS, onPointerDown);
-      }
+      bind(track, POINTER_DOWN_EVENTS, onPointerDown);
+      bind(track, "click", onClick, {
+        capture: true
+      });
+      on([EVENT_MOUNTED, EVENT_UPDATED], init);
+    }
+
+    function init() {
+      var drag = options.drag;
+      disable(!drag);
+      isFree = drag === "free";
     }
 
     function onPointerDown(e) {
-      isMouse = e.type === "mousedown";
-      target = isMouse ? window : track;
+      if (!disabled) {
+        isMouse = e.type === "mousedown";
 
-      if (!(isMouse && e.button)) {
-        if (!Move.isBusy()) {
+        if (!Move.isBusy() && (!isMouse || !e.button)) {
+          target = isMouse ? window : track;
+          prevBaseEvent = null;
+          lastEvent = null;
+          clickPrevented = false;
           bind(target, POINTER_MOVE_EVENTS, onPointerMove);
           bind(target, POINTER_UP_EVENTS, onPointerUp);
           Move.cancel();
           Scroll.cancel();
-          startCoord = getCoord(e);
-        } else {
-          prevent(e);
+          save(e);
         }
       }
     }
 
     function onPointerMove(e) {
-      if (e.cancelable) {
-        var min2 = options.dragMinThreshold || 15;
+      if (!lastEvent) {
+        clickPrevented = true;
+        emit(EVENT_DRAG);
+      }
 
-        if (isMouse || abs(getCoord(e) - startCoord) > min2) {
-          moving = true;
-          onDrag();
+      lastEvent = e;
+
+      if (!e.cancelable) {
+        return;
+      }
+
+      if (isDragging) {
+        var expired = timeOf(e) - timeOf(baseEvent) > LOG_INTERVAL;
+        var exceeded = hasExceeded !== (hasExceeded = isExceeded());
+
+        if (expired || exceeded) {
+          save(e);
         }
 
-        if (moving) {
-          onDragging(e);
-          prevent(e, true);
+        if (!isFade) {
+          Move.translate(basePosition + constrain(coordOf(e) - coordOf(baseEvent)));
         }
+
+        emit(EVENT_DRAGGING);
+        prevent(e);
       } else {
-        onPointerUp(e);
+        var threshold = options.dragMinThreshold || 15;
+        isDragging = isMouse || abs(coordOf(e) - coordOf(baseEvent)) > threshold;
+
+        if (isSliderDirection()) {
+          prevent(e);
+        }
       }
     }
 
     function onPointerUp(e) {
       unbind(target, POINTER_MOVE_EVENTS + " " + POINTER_UP_EVENTS);
-      moving = false;
 
       if (lastEvent) {
-        onDragged(e);
-        lastEvent = null;
-      }
-    }
+        if (isDragging || e.cancelable && isSliderDirection()) {
+          var velocity = computeVelocity(e);
+          var destination = computeDestination(velocity);
 
-    function onDrag() {
-      bind(track, "click", function (e) {
-        unbind(track, "click");
-        prevent(e, true);
-      }, {
-        capture: true
-      });
-      emit(EVENT_DRAG);
-    }
+          if (isFree) {
+            Scroll.scroll(destination);
+          } else if (isFade) {
+            Controller.go(Splide2.index + orient(sign(velocity)));
+          } else {
+            Controller.go(computeIndex(destination), true);
+          }
 
-    function onDragging(e) {
-      var timeStamp = e.timeStamp;
-      var expired = !lastTime || timeStamp - lastTime > SAMPLING_INTERVAL;
-
-      if (expired || isExceeded() !== exceeded) {
-        basePosition = getPosition();
-        baseCoord = getCoord(e);
-        baseTime = timeStamp;
-      }
-
-      exceeded = isExceeded();
-      lastTime = timeStamp;
-      lastEvent = e;
-
-      if (!isFade) {
-        translate(basePosition + constrain(getCoord(e) - baseCoord));
-      }
-
-      emit(EVENT_DRAGGING);
-    }
-
-    function onDragged(e) {
-      var velocity = computeVelocity(e);
-
-      if (isFade) {
-        go(Splide2.index + orient(sign(velocity)));
-      } else {
-        var destination = computeDestination(velocity);
-
-        if (isFree) {
-          Scroll.scroll(destination);
-        } else {
-          go(computeIndex(destination), true);
+          prevent(e);
         }
+
+        emit(EVENT_DRAGGED);
       }
 
-      lastTime = 0;
-      emit(EVENT_DRAGGED);
+      isDragging = false;
+    }
+
+    function save(e) {
+      prevBaseEvent = baseEvent;
+      baseEvent = e;
+      basePosition = getPosition();
+    }
+
+    function onClick(e) {
+      if (!disabled && clickPrevented) {
+        prevent(e, true);
+      }
+    }
+
+    function isSliderDirection() {
+      var diffX = abs(coordOf(lastEvent) - coordOf(baseEvent));
+      var diffY = abs(coordOf(lastEvent, true) - coordOf(baseEvent, true));
+      return diffX > diffY;
     }
 
     function computeVelocity(e) {
-      if (Splide2.is(LOOP) || !isExceeded()) {
-        var diffCoord = getCoord(lastEvent) - baseCoord;
-        var diffTime = lastEvent.timeStamp - baseTime;
-        var isFlick = e.timeStamp - lastTime < SAMPLING_INTERVAL;
+      if (Splide2.is(LOOP) || !hasExceeded) {
+        var base = baseEvent === lastEvent && prevBaseEvent || baseEvent;
+        var diffCoord = coordOf(lastEvent) - coordOf(base);
+        var diffTime = timeOf(e) - timeOf(base);
+        var isFlick = timeOf(e) - timeOf(lastEvent) < LOG_INTERVAL;
 
         if (diffTime && isFlick) {
           return diffCoord / diffTime;
@@ -2271,25 +2280,34 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function computeDestination(velocity) {
-      var flickPower = options.flickPower || 600;
-      return getPosition() + sign(velocity) * min(abs(velocity) * flickPower, isFree ? Infinity : listSize() * (options.flickMaxPages || 1));
+      return getPosition() + sign(velocity) * min(abs(velocity) * (options.flickPower || 600), isFree ? Infinity : Components2.Layout.listSize() * (options.flickMaxPages || 1));
     }
 
     function computeIndex(destination) {
-      var dest = toIndex(destination);
-      return isSlide ? clamp(dest, 0, getEnd()) : dest;
+      var dest = Move.toIndex(destination);
+      return isSlide ? clamp(dest, 0, Controller.getEnd()) : dest;
     }
 
-    function getCoord(e) {
-      return (isMouse ? e : e.touches[0])[resolve("pageX")];
+    function coordOf(e, orthogonal) {
+      var prop = "page" + resolve(orthogonal ? "Y" : "X");
+      return (isMouse ? e : e.touches[0])[prop];
+    }
+
+    function timeOf(e) {
+      return e.timeStamp;
     }
 
     function constrain(diff) {
-      return diff / (exceeded && isSlide ? FRICTION : 1);
+      return diff / (hasExceeded && isSlide ? FRICTION : 1);
+    }
+
+    function disable(value) {
+      disabled = value;
     }
 
     return {
-      mount: mount
+      mount: mount,
+      disable: disable
     };
   }
 
@@ -2325,15 +2343,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           target = window;
         }
 
-        bind(target, "keydown", function (e) {
-          var key = normalize(e.key);
-
-          if (key === resolve("ArrowLeft")) {
-            Splide2.go("<");
-          } else if (key === resolve("ArrowRight")) {
-            Splide2.go(">");
-          }
-        });
+        bind(target, "keydown", onKeydown);
       }
     }
 
@@ -2344,6 +2354,16 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         if (isHTMLElement(target)) {
           removeAttribute(target, TAB_INDEX);
         }
+      }
+    }
+
+    function onKeydown(e) {
+      var key = normalize(e.key);
+
+      if (key === resolve("ArrowLeft")) {
+        Splide2.go("<");
+      } else if (key === resolve("ArrowRight")) {
+        Splide2.go(">");
       }
     }
 
@@ -2481,11 +2501,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         unbind = _EventInterface15.unbind;
 
     var Slides = Components2.Slides;
-    var _Components2$Controll2 = Components2.Controller,
-        go = _Components2$Controll2.go,
-        toPage = _Components2$Controll2.toPage,
-        hasFocus = _Components2$Controll2.hasFocus,
-        getIndex = _Components2$Controll2.getIndex;
+    var _Components2$Controll = Components2.Controller,
+        go = _Components2$Controll.go,
+        toPage = _Components2$Controll.toPage,
+        hasFocus = _Components2$Controll.hasFocus,
+        getIndex = _Components2$Controll.getIndex;
     var items = [];
     var list;
 

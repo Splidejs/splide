@@ -1,0 +1,10 @@
+.splide {
+  $root: &;
+
+  &--draggable {
+    > #{ $root }__slider > #{ $root }__track,
+    > #{ $root }__track {
+      user-select: none;
+    }
+  }
+}

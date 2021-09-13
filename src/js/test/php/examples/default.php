@@ -9,7 +9,7 @@ $settings = get_settings();
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Default</title>
 
   <link rel="stylesheet" href="../../../../../dist/css/themes/splide-<?php echo $settings['theme'] ?>.min.css">
@@ -22,20 +22,42 @@ $settings = get_settings();
         perPage: 1,
         gap    : '1rem',
         drag   : 'free',
-        // speed  : 0,
+        height : 200,
+        pagination: false,
+        arrows: false,
+        slideFocus: false,
       } );
 
       splide.on( 'moved', () => {
         console.log( 'moved' );
       } );
 
+      splide.on( 'click', () => {
+        console.log( 'click' );
+      } );
+
       splide.mount();
+
+
+      const pre = document.getElementById( 'message' );
+
+      console.log = ( string ) => {
+        pre.textContent = string + '\n' + pre.textContent;
+      }
     } );
   </script>
+
+  <style>
+    body {
+      margin: 50em 0;
+    }
+  </style>
 </head>
 <body>
+45
+<?php render( 'splide01', 10, true ); ?>
 
-<?php render(); ?>
+<pre id="message"></pre>
 
 </body>
 </html>

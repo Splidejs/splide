@@ -29,7 +29,7 @@ export const ORIENTATION_MAP = {
   right       : [ 'bottom', 'left' ],
   x           : [ 'y' ],
   X           : [ 'Y' ],
-  pageX       : [ 'pageY' ],
+  Y           : [ 'X' ],
   ArrowLeft   : [ 'ArrowUp', 'ArrowRight' ],
   ArrowRight  : [ 'ArrowDown', 'ArrowLeft' ],
 };

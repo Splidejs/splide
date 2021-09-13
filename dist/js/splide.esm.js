@@ -20,6 +20,9 @@ const STATES = {
   DESTROYED
 };
 
+const DEFAULT_EVENT_PRIORITY = 10;
+const DEFAULT_USER_EVENT_PRIORITY = 20;
+
 function empty(array) {
   array.length = 0;
 }
@@ -304,165 +307,6 @@ function uniqueId(prefix) {
   return `${prefix}${pad(ids[prefix] = (ids[prefix] || 0) + 1)}`;
 }
 
-function Options(Splide2, Components2, options) {
-  let initialOptions;
-  let points;
-  let currPoint;
-  function setup() {
-    try {
-      merge(options, JSON.parse(getAttribute(Splide2.root, DATA_ATTRIBUTE)));
-    } catch (e) {
-      assert(false, e.message);
-    }
-    initialOptions = merge({}, options);
-  }
-  function mount() {
-    const { breakpoints } = options;
-    if (breakpoints) {
-      points = Object.keys(breakpoints).sort((n, m) => +n - +m).map((point) => [
-        point,
-        matchMedia(`(${options.mediaQuery || "max"}-width:${point}px)`)
-      ]);
-      addEventListener("resize", observe);
-      observe();
-    }
-  }
-  function destroy(completely) {
-    if (completely) {
-      removeEventListener("resize", observe);
-    }
-  }
-  function observe() {
-    const item = find(points, (item2) => item2[1].matches) || [];
-    if (item[0] !== currPoint) {
-      onMatch(currPoint = item[0]);
-    }
-  }
-  function onMatch(point) {
-    const newOptions = options.breakpoints[point] || initialOptions;
-    if (newOptions.destroy) {
-      Splide2.options = initialOptions;
-      Splide2.destroy(newOptions.destroy === "completely");
-    } else {
-      if (Splide2.state.is(DESTROYED)) {
-        destroy(true);
-        Splide2.mount();
-      }
-      Splide2.options = newOptions;
-    }
-  }
-  return {
-    setup,
-    mount,
-    destroy
-  };
-}
-
-const RTL = "rtl";
-const TTB = "ttb";
-
-const ORIENTATION_MAP = {
-  marginRight: ["marginBottom", "marginLeft"],
-  width: ["height"],
-  autoWidth: ["autoHeight"],
-  fixedWidth: ["fixedHeight"],
-  paddingLeft: ["paddingTop", "paddingRight"],
-  paddingRight: ["paddingBottom", "paddingLeft"],
-  left: ["top", "right"],
-  right: ["bottom", "left"],
-  x: ["y"],
-  X: ["Y"],
-  pageX: ["pageY"],
-  ArrowLeft: ["ArrowUp", "ArrowRight"],
-  ArrowRight: ["ArrowDown", "ArrowLeft"]
-};
-function Direction(Splide2, Components2, options) {
-  function resolve(prop, axisOnly) {
-    const { direction } = options;
-    const index = direction === RTL && !axisOnly ? 1 : direction === TTB ? 0 : -1;
-    return ORIENTATION_MAP[prop][index] || prop;
-  }
-  function orient(value) {
-    return value * (options.direction === RTL ? 1 : -1);
-  }
-  return {
-    resolve,
-    orient
-  };
-}
-
-const CLASS_ROOT = PROJECT_CODE;
-const CLASS_SLIDER = `${PROJECT_CODE}__slider`;
-const CLASS_TRACK = `${PROJECT_CODE}__track`;
-const CLASS_LIST = `${PROJECT_CODE}__list`;
-const CLASS_SLIDE = `${PROJECT_CODE}__slide`;
-const CLASS_CLONE = `${CLASS_SLIDE}--clone`;
-const CLASS_CONTAINER = `${CLASS_SLIDE}__container`;
-const CLASS_ARROWS = `${PROJECT_CODE}__arrows`;
-const CLASS_ARROW = `${PROJECT_CODE}__arrow`;
-const CLASS_ARROW_PREV = `${CLASS_ARROW}--prev`;
-const CLASS_ARROW_NEXT = `${CLASS_ARROW}--next`;
-const CLASS_PAGINATION = `${PROJECT_CODE}__pagination`;
-const CLASS_PAGINATION_PAGE = `${CLASS_PAGINATION}__page`;
-const CLASS_PROGRESS = `${PROJECT_CODE}__progress`;
-const CLASS_PROGRESS_BAR = `${CLASS_PROGRESS}__bar`;
-const CLASS_AUTOPLAY = `${PROJECT_CODE}__autoplay`;
-const CLASS_PLAY = `${PROJECT_CODE}__play`;
-const CLASS_PAUSE = `${PROJECT_CODE}__pause`;
-const CLASS_SPINNER = `${PROJECT_CODE}__spinner`;
-const CLASS_INITIALIZED = "is-initialized";
-const CLASS_ACTIVE = "is-active";
-const CLASS_PREV = "is-prev";
-const CLASS_NEXT = "is-next";
-const CLASS_VISIBLE = "is-visible";
-const CLASS_LOADING = "is-loading";
-const STATUS_CLASSES = [CLASS_ACTIVE, CLASS_VISIBLE, CLASS_PREV, CLASS_NEXT, CLASS_LOADING];
-const CLASSES = {
-  slide: CLASS_SLIDE,
-  clone: CLASS_CLONE,
-  arrows: CLASS_ARROWS,
-  arrow: CLASS_ARROW,
-  prev: CLASS_ARROW_PREV,
-  next: CLASS_ARROW_NEXT,
-  pagination: CLASS_PAGINATION,
-  page: CLASS_PAGINATION_PAGE,
-  spinner: CLASS_SPINNER
-};
-
-const EVENT_MOUNTED = "mounted";
-const EVENT_READY = "ready";
-const EVENT_MOVE = "move";
-const EVENT_MOVED = "moved";
-const EVENT_CLICK = "click";
-const EVENT_ACTIVE = "active";
-const EVENT_INACTIVE = "inactive";
-const EVENT_VISIBLE = "visible";
-const EVENT_HIDDEN = "hidden";
-const EVENT_SLIDE_KEYDOWN = "slide:keydown";
-const EVENT_REFRESH = "refresh";
-const EVENT_UPDATED = "undated";
-const EVENT_RESIZE = "resize";
-const EVENT_RESIZED = "resized";
-const EVENT_DRAG = "drag";
-const EVENT_DRAGGING = "dragging";
-const EVENT_DRAGGED = "dragged";
-const EVENT_SCROLL = "scroll";
-const EVENT_SCROLLED = "scrolled";
-const EVENT_DESTROY = "destroy";
-const EVENT_ARROWS_MOUNTED = "arrows:mounted";
-const EVENT_ARROWS_UPDATED = "arrows:updated";
-const EVENT_PAGINATION_MOUNTED = "pagination:mounted";
-const EVENT_PAGINATION_PAGE = "pagination:page";
-const EVENT_PAGINATION_UPDATED = "pagination:updated";
-const EVENT_NAVIGATION_MOUNTED = "navigation:mounted";
-const EVENT_AUTOPLAY_PLAY = "autoplay:play";
-const EVENT_AUTOPLAY_PLAYING = "autoplay:playing";
-const EVENT_AUTOPLAY_PAUSE = "autoplay:pause";
-const EVENT_LAZYLOAD_LOADED = "lazyload:loaded";
-
-const DEFAULT_EVENT_PRIORITY = 10;
-const DEFAULT_USER_EVENT_PRIORITY = 20;
-
 function EventBus() {
   let handlers = {};
   function on(events, callback, key, priority = DEFAULT_EVENT_PRIORITY) {
@@ -512,6 +356,37 @@ function EventBus() {
     destroy
   };
 }
+
+const EVENT_MOUNTED = "mounted";
+const EVENT_READY = "ready";
+const EVENT_MOVE = "move";
+const EVENT_MOVED = "moved";
+const EVENT_CLICK = "click";
+const EVENT_ACTIVE = "active";
+const EVENT_INACTIVE = "inactive";
+const EVENT_VISIBLE = "visible";
+const EVENT_HIDDEN = "hidden";
+const EVENT_SLIDE_KEYDOWN = "slide:keydown";
+const EVENT_REFRESH = "refresh";
+const EVENT_UPDATED = "undated";
+const EVENT_RESIZE = "resize";
+const EVENT_RESIZED = "resized";
+const EVENT_DRAG = "drag";
+const EVENT_DRAGGING = "dragging";
+const EVENT_DRAGGED = "dragged";
+const EVENT_SCROLL = "scroll";
+const EVENT_SCROLLED = "scrolled";
+const EVENT_DESTROY = "destroy";
+const EVENT_ARROWS_MOUNTED = "arrows:mounted";
+const EVENT_ARROWS_UPDATED = "arrows:updated";
+const EVENT_PAGINATION_MOUNTED = "pagination:mounted";
+const EVENT_PAGINATION_PAGE = "pagination:page";
+const EVENT_PAGINATION_UPDATED = "pagination:updated";
+const EVENT_NAVIGATION_MOUNTED = "navigation:mounted";
+const EVENT_AUTOPLAY_PLAY = "autoplay:play";
+const EVENT_AUTOPLAY_PLAYING = "autoplay:playing";
+const EVENT_AUTOPLAY_PAUSE = "autoplay:pause";
+const EVENT_LAZYLOAD_LOADED = "lazyload:loaded";
 
 function EventInterface(Splide2) {
   const { event } = Splide2;
@@ -649,6 +524,132 @@ function Throttle(func, duration) {
   }
   return throttled;
 }
+
+function Options(Splide2, Components2, options) {
+  const throttledObserve = Throttle(observe);
+  let initialOptions;
+  let points;
+  let currPoint;
+  function setup() {
+    try {
+      merge(options, JSON.parse(getAttribute(Splide2.root, DATA_ATTRIBUTE)));
+    } catch (e) {
+      assert(false, e.message);
+    }
+    initialOptions = merge({}, options);
+  }
+  function mount() {
+    const { breakpoints } = options;
+    if (breakpoints) {
+      points = Object.keys(breakpoints).sort((n, m) => +n - +m).map((point) => [
+        point,
+        matchMedia(`(${options.mediaQuery || "max"}-width:${point}px)`)
+      ]);
+      addEventListener("resize", throttledObserve);
+      observe();
+    }
+  }
+  function destroy(completely) {
+    if (completely) {
+      removeEventListener("resize", throttledObserve);
+    }
+  }
+  function observe() {
+    const item = find(points, (item2) => item2[1].matches) || [];
+    if (item[0] !== currPoint) {
+      onMatch(currPoint = item[0]);
+    }
+  }
+  function onMatch(point) {
+    const newOptions = options.breakpoints[point] || initialOptions;
+    if (newOptions.destroy) {
+      Splide2.options = initialOptions;
+      Splide2.destroy(newOptions.destroy === "completely");
+    } else {
+      if (Splide2.state.is(DESTROYED)) {
+        destroy(true);
+        Splide2.mount();
+      }
+      Splide2.options = newOptions;
+    }
+  }
+  return {
+    setup,
+    mount,
+    destroy
+  };
+}
+
+const RTL = "rtl";
+const TTB = "ttb";
+
+const ORIENTATION_MAP = {
+  marginRight: ["marginBottom", "marginLeft"],
+  width: ["height"],
+  autoWidth: ["autoHeight"],
+  fixedWidth: ["fixedHeight"],
+  paddingLeft: ["paddingTop", "paddingRight"],
+  paddingRight: ["paddingBottom", "paddingLeft"],
+  left: ["top", "right"],
+  right: ["bottom", "left"],
+  x: ["y"],
+  X: ["Y"],
+  pageX: ["pageY"],
+  ArrowLeft: ["ArrowUp", "ArrowRight"],
+  ArrowRight: ["ArrowDown", "ArrowLeft"]
+};
+function Direction(Splide2, Components2, options) {
+  function resolve(prop, axisOnly) {
+    const { direction } = options;
+    const index = direction === RTL && !axisOnly ? 1 : direction === TTB ? 0 : -1;
+    return ORIENTATION_MAP[prop][index] || prop;
+  }
+  function orient(value) {
+    return value * (options.direction === RTL ? 1 : -1);
+  }
+  return {
+    resolve,
+    orient
+  };
+}
+
+const CLASS_ROOT = PROJECT_CODE;
+const CLASS_SLIDER = `${PROJECT_CODE}__slider`;
+const CLASS_TRACK = `${PROJECT_CODE}__track`;
+const CLASS_LIST = `${PROJECT_CODE}__list`;
+const CLASS_SLIDE = `${PROJECT_CODE}__slide`;
+const CLASS_CLONE = `${CLASS_SLIDE}--clone`;
+const CLASS_CONTAINER = `${CLASS_SLIDE}__container`;
+const CLASS_ARROWS = `${PROJECT_CODE}__arrows`;
+const CLASS_ARROW = `${PROJECT_CODE}__arrow`;
+const CLASS_ARROW_PREV = `${CLASS_ARROW}--prev`;
+const CLASS_ARROW_NEXT = `${CLASS_ARROW}--next`;
+const CLASS_PAGINATION = `${PROJECT_CODE}__pagination`;
+const CLASS_PAGINATION_PAGE = `${CLASS_PAGINATION}__page`;
+const CLASS_PROGRESS = `${PROJECT_CODE}__progress`;
+const CLASS_PROGRESS_BAR = `${CLASS_PROGRESS}__bar`;
+const CLASS_AUTOPLAY = `${PROJECT_CODE}__autoplay`;
+const CLASS_PLAY = `${PROJECT_CODE}__play`;
+const CLASS_PAUSE = `${PROJECT_CODE}__pause`;
+const CLASS_SPINNER = `${PROJECT_CODE}__spinner`;
+const CLASS_INITIALIZED = "is-initialized";
+const CLASS_ACTIVE = "is-active";
+const CLASS_PREV = "is-prev";
+const CLASS_NEXT = "is-next";
+const CLASS_VISIBLE = "is-visible";
+const CLASS_LOADING = "is-loading";
+const STATUS_CLASSES = [CLASS_ACTIVE, CLASS_VISIBLE, CLASS_PREV, CLASS_NEXT, CLASS_LOADING];
+const CLASSES = {
+  slide: CLASS_SLIDE,
+  clone: CLASS_CLONE,
+  arrows: CLASS_ARROWS,
+  arrow: CLASS_ARROW,
+  prev: CLASS_ARROW_PREV,
+  next: CLASS_ARROW_NEXT,
+  pagination: CLASS_PAGINATION,
+  page: CLASS_PAGINATION_PAGE,
+  spinner: CLASS_SPINNER
+};
 
 function Elements(Splide2, Components2, options) {
   const { on } = EventInterface(Splide2);
@@ -869,7 +870,7 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     const slideRect = rect(slide);
     const left = resolve("left");
     const right = resolve("right");
-    return floor(trackRect[left]) <= slideRect[left] && slideRect[right] <= ceil(trackRect[right]);
+    return floor(trackRect[left]) <= ceil(slideRect[left]) && floor(slideRect[right]) <= ceil(trackRect[right]);
   }
   function isWithin(from, distance) {
     let diff = abs(from - index);
@@ -1173,6 +1174,8 @@ function Layout(Splide2, Components2, options) {
   };
 }
 
+const SNAP_THRESHOLD = 10;
+
 function Move(Splide2, Components2, options) {
   const { on, emit } = EventInterface(Splide2);
   const { slideSize, getPadding, totalSize, listSize, sliderSize } = Components2.Layout;
@@ -1183,7 +1186,7 @@ function Move(Splide2, Components2, options) {
   let currPosition = 0;
   let positionRate = 0;
   function mount() {
-    on([EVENT_RESIZE, EVENT_UPDATED, EVENT_REFRESH], reposition);
+    on([EVENT_RESIZE, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition, DEFAULT_EVENT_PRIORITY - 1);
   }
   function reposition() {
     if (options.drag !== "free") {
@@ -1194,7 +1197,16 @@ function Move(Splide2, Components2, options) {
       }
       if (isExceededMax(currPosition)) {
         translate(getLimit(true));
+      } else {
+        snap(SNAP_THRESHOLD);
       }
+    }
+  }
+  function snap(threshold) {
+    const position = getPosition();
+    const index = toIndex(position);
+    if (abs(position - toPosition(index)) < threshold) {
+      jump(index);
     }
   }
   function move(dest, index, prev) {
@@ -1212,7 +1224,6 @@ function Move(Splide2, Components2, options) {
   function onMoved(dest, index, prev, oldPosition) {
     if (looping) {
       jump(index);
-      looping = false;
     }
     waiting = false;
     Splide2.state.set(IDLE);
@@ -1758,34 +1769,34 @@ function Drag(Splide2, Components2, options) {
   function mount() {
     if (options.drag) {
       bind(track, POINTER_DOWN_EVENTS, onPointerDown);
+      bind(track, "click", (e) => {
+        prevent(e, true);
+      });
     }
   }
   function onPointerDown(e) {
     isMouse = e.type === "mousedown";
     target = isMouse ? window : track;
     if (!(isMouse && e.button)) {
-      if (!Move.isBusy()) {
-        bind(target, POINTER_MOVE_EVENTS, onPointerMove);
-        bind(target, POINTER_UP_EVENTS, onPointerUp);
-        Move.cancel();
-        Scroll.cancel();
-        startCoord = getCoord(e);
-      } else {
-        prevent(e);
-      }
+      bind(target, POINTER_MOVE_EVENTS, onPointerMove);
+      bind(target, POINTER_UP_EVENTS, onPointerUp);
+      Move.cancel();
+      Scroll.cancel();
+      startCoord = getCoord(e);
     }
   }
   function onPointerMove(e) {
+    console.log(`${Date.now()}: ${e.cancelable}`);
     if (e.cancelable) {
-      const min2 = options.dragMinThreshold || 15;
+      const min2 = options.dragMinThreshold || 2;
       if (isMouse || abs(getCoord(e) - startCoord) > min2) {
         moving = true;
         onDrag();
       }
       if (moving) {
         onDragging(e);
-        prevent(e, true);
       }
+      prevent(e, true);
     } else {
       onPointerUp(e);
     }
@@ -1829,6 +1840,7 @@ function Drag(Splide2, Components2, options) {
       const destination = computeDestination(velocity);
       if (isFree) {
         Scroll.scroll(destination);
+        console.log(velocity);
       } else {
         go(computeIndex(destination), true);
       }
@@ -1888,14 +1900,7 @@ function Keyboard(Splide2, Components2, options) {
       } else {
         target = window;
       }
-      bind(target, "keydown", (e) => {
-        const key = normalize(e.key);
-        if (key === resolve("ArrowLeft")) {
-          Splide2.go("<");
-        } else if (key === resolve("ArrowRight")) {
-          Splide2.go(">");
-        }
-      });
+      bind(target, "keydown", onKeydown);
     }
   }
   function destroy() {
@@ -1904,6 +1909,14 @@ function Keyboard(Splide2, Components2, options) {
       if (isHTMLElement(target)) {
         removeAttribute(target, TAB_INDEX);
       }
+    }
+  }
+  function onKeydown(e) {
+    const key = normalize(e.key);
+    if (key === resolve("ArrowLeft")) {
+      Splide2.go("<");
+    } else if (key === resolve("ArrowRight")) {
+      Splide2.go(">");
     }
   }
   function normalize(key) {

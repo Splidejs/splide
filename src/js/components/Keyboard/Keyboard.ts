@@ -68,15 +68,7 @@ export function Keyboard( Splide: Splide, Components: Components, options: Optio
         target = window;
       }
 
-      bind( target, 'keydown', e => {
-        const key = normalize( e.key );
-
-        if ( key === resolve( 'ArrowLeft' ) ) {
-          Splide.go( '<' );
-        } else if ( key === resolve( 'ArrowRight' ) ) {
-          Splide.go( '>' );
-        }
-      } );
+      bind( target, 'keydown', onKeydown );
     }
   }
 
@@ -90,6 +82,21 @@ export function Keyboard( Splide: Splide, Components: Components, options: Optio
       if ( isHTMLElement( target ) ) {
         removeAttribute( target, TAB_INDEX );
       }
+    }
+  }
+
+  /**
+   * Called when any key is pressed on the target.
+   *
+   * @param e - A KeyboardEvent object.
+   */
+  function onKeydown( e: KeyboardEvent ): void {
+    const key = normalize( e.key );
+
+    if ( key === resolve( 'ArrowLeft' ) ) {
+      Splide.go( '<' );
+    } else if ( key === resolve( 'ArrowRight' ) ) {
+      Splide.go( '>' );
     }
   }
 
