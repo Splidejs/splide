@@ -112,6 +112,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
 
   /**
    * Called when the user clicks or touches the slider.
+   * Needs to prevent the default behaviour when the slider is busy to deny any action, such as dragging images.
    * Note that IE does not support MouseEvent and TouchEvent constructors.
    *
    * @param e - A TouchEvent or MouseEvent object
@@ -120,17 +121,21 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
     if ( ! disabled ) {
       isMouse = e.type === 'mousedown';
 
-      if ( ! Move.isBusy() && ( ! isMouse || ! ( e as MouseEvent ).button ) ) {
-        target         = isMouse ? window : track;
-        prevBaseEvent  = null;
-        lastEvent      = null;
-        clickPrevented = false;
+      if ( ! isMouse || ! ( e as MouseEvent ).button ) {
+        if ( ! Move.isBusy() ) {
+          target         = isMouse ? window : track;
+          prevBaseEvent  = null;
+          lastEvent      = null;
+          clickPrevented = false;
 
-        bind( target, POINTER_MOVE_EVENTS, onPointerMove );
-        bind( target, POINTER_UP_EVENTS, onPointerUp );
-        Move.cancel();
-        Scroll.cancel();
-        save( e );
+          bind( target, POINTER_MOVE_EVENTS, onPointerMove );
+          bind( target, POINTER_UP_EVENTS, onPointerUp );
+          Move.cancel();
+          Scroll.cancel();
+          save( e );
+        } else {
+          prevent( e, true );
+        }
       }
     }
   }

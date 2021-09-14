@@ -45,19 +45,9 @@ export function Move( Splide: Splide, Components: Components, options: Options )
   const { list, track } = Components.Elements;
 
   /**
-   * Indicates whether the slider is just looping or not.
-   */
-  let looping: boolean;
-
-  /**
    * Indicates whether the component can move the slider or not.
    */
   let waiting: boolean;
-
-  /**
-   * Keeps the current position.
-   */
-  let currPosition = 0;
 
   /**
    * Indicates whether the the slider should snap the position to the specific slide or not.
@@ -92,39 +82,24 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    */
   function move( dest: number, index: number, prev: number ): void {
     if ( ! isBusy() ) {
+      const { set } = Splide.state;
       const position = getPosition();
+      const looping  = dest !== index;
 
-      looping = dest !== index; // todo
-      waiting = options.waitForTransition;
-
-      Splide.state.set( MOVING );
+      waiting = looping || options.waitForTransition;
+      set( MOVING );
       emit( EVENT_MOVE, index, prev, dest );
 
       Components.Transition.start( dest, () => {
-        onMoved( dest, index, prev, position );
+        looping && jump( index );
+        waiting = false;
+        set( IDLE );
+        emit( EVENT_MOVED, index, prev, dest );
+
+        if ( options.trimSpace === 'move' && dest !== prev && position === getPosition() ) {
+          Components.Controller.go( dest > prev ? '>' : '<' );
+        }
       } );
-    }
-  }
-
-  /**
-   * Called after the transition ends.
-   *
-   * @param dest        - A destination index to go to.
-   * @param index       - A slide index.
-   * @param prev        - A previous index.
-   * @param oldPosition - An old position.
-   */
-  function onMoved( dest: number, index: number, prev: number, oldPosition: number ) {
-    if ( looping ) {
-      jump( index );
-    }
-
-    waiting = false;
-    Splide.state.set( IDLE );
-    emit( EVENT_MOVED, index, prev, dest );
-
-    if ( options.trimSpace === 'move' && dest !== prev && oldPosition === getPosition() ) {
-      Components.Controller.go( dest > prev ? '>' : '<' );
     }
   }
 
@@ -135,7 +110,6 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    */
   function jump( index: number ): void {
     waiting = false;
-    looping = false;
     Components.Transition.cancel();
     translate( toPosition( index, true ) );
   }
@@ -146,13 +120,13 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * @param position - The destination.
    */
   function translate( position: number ): void {
-    currPosition = loop( position );
-    shouldSnap   = canSnap( currPosition );
+    position   = loop( position );
+    shouldSnap = canSnap( position );
 
     Components.Style.ruleBy(
       list,
       'transform',
-      `translate${ resolve( 'X' ) }(${ 100 * currPosition / listSize() }%)`
+      `translate${ resolve( 'X' ) }(${ 100 * position / listSize() }%)`
     );
   }
 
@@ -162,8 +136,8 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * @param position - A position to loop.
    */
   function loop( position: number ): number {
-    if ( ! looping && Splide.is( LOOP ) ) {
-      const diff        = position - currPosition;
+    if ( ! waiting && Splide.is( LOOP ) ) {
+      const diff        = position - getPosition();
       const exceededMin = exceededLimit( false, position );
       const exceededMax = exceededLimit( true, position );
 
@@ -294,7 +268,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * @return `true` if the slider can move, or otherwise `false`.
    */
   function isBusy(): boolean {
-    return !! ( looping || waiting );
+    return waiting;
   }
 
   /**
@@ -305,7 +279,8 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    *
    * @return `true` if the position exceeds the limit, or otherwise `false`.
    */
-  function exceededLimit( max?: boolean | undefined, position = currPosition ): boolean {
+  function exceededLimit( max?: boolean | undefined, position?: number ): boolean {
+    position = isUndefined( position ) ? getPosition() : position;
     const exceededMin = max !== true && orient( position ) < orient( getLimit( false ) );
     const exceededMax = max !== false && orient( position ) > orient( getLimit( true ) );
     return exceededMin || exceededMax;

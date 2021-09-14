@@ -1417,9 +1417,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var _Components2$Elements3 = Components2.Elements,
         list = _Components2$Elements3.list,
         track = _Components2$Elements3.track;
-    var looping;
     var waiting;
-    var currPosition = 0;
     var shouldSnap = true;
 
     function mount() {
@@ -1436,47 +1434,40 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function move(dest, index, prev) {
       if (!isBusy()) {
+        var set = Splide2.state.set;
         var position = getPosition();
-        looping = dest !== index;
-        waiting = options.waitForTransition;
-        Splide2.state.set(MOVING);
+        var looping = dest !== index;
+        waiting = looping || options.waitForTransition;
+        set(MOVING);
         emit(EVENT_MOVE, index, prev, dest);
         Components2.Transition.start(dest, function () {
-          onMoved(dest, index, prev, position);
+          looping && jump(index);
+          waiting = false;
+          set(IDLE);
+          emit(EVENT_MOVED, index, prev, dest);
+
+          if (options.trimSpace === "move" && dest !== prev && position === getPosition()) {
+            Components2.Controller.go(dest > prev ? ">" : "<");
+          }
         });
-      }
-    }
-
-    function onMoved(dest, index, prev, oldPosition) {
-      if (looping) {
-        jump(index);
-      }
-
-      waiting = false;
-      Splide2.state.set(IDLE);
-      emit(EVENT_MOVED, index, prev, dest);
-
-      if (options.trimSpace === "move" && dest !== prev && oldPosition === getPosition()) {
-        Components2.Controller.go(dest > prev ? ">" : "<");
       }
     }
 
     function jump(index) {
       waiting = false;
-      looping = false;
       Components2.Transition.cancel();
       translate(toPosition(index, true));
     }
 
     function translate(position) {
-      currPosition = loop(position);
-      shouldSnap = canSnap(currPosition);
-      Components2.Style.ruleBy(list, "transform", "translate" + resolve("X") + "(" + 100 * currPosition / listSize() + "%)");
+      position = loop(position);
+      shouldSnap = canSnap(position);
+      Components2.Style.ruleBy(list, "transform", "translate" + resolve("X") + "(" + 100 * position / listSize() + "%)");
     }
 
     function loop(position) {
-      if (!looping && Splide2.is(LOOP)) {
-        var diff = position - currPosition;
+      if (!waiting && Splide2.is(LOOP)) {
+        var diff = position - getPosition();
         var exceededMin = exceededLimit(false, position);
         var exceededMax = exceededLimit(true, position);
 
@@ -1552,14 +1543,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function isBusy() {
-      return !!(looping || waiting);
+      return waiting;
     }
 
     function exceededLimit(max, position) {
-      if (position === void 0) {
-        position = currPosition;
-      }
-
+      position = isUndefined(position) ? getPosition() : position;
       var exceededMin = max !== true && orient(position) < orient(getLimit(false));
       var exceededMax = max !== false && orient(position) > orient(getLimit(true));
       return exceededMin || exceededMax;
@@ -2160,16 +2148,20 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       if (!disabled) {
         isMouse = e.type === "mousedown";
 
-        if (!Move.isBusy() && (!isMouse || !e.button)) {
-          target = isMouse ? window : track;
-          prevBaseEvent = null;
-          lastEvent = null;
-          clickPrevented = false;
-          bind(target, POINTER_MOVE_EVENTS, onPointerMove);
-          bind(target, POINTER_UP_EVENTS, onPointerUp);
-          Move.cancel();
-          Scroll.cancel();
-          save(e);
+        if (!isMouse || !e.button) {
+          if (!Move.isBusy()) {
+            target = isMouse ? window : track;
+            prevBaseEvent = null;
+            lastEvent = null;
+            clickPrevented = false;
+            bind(target, POINTER_MOVE_EVENTS, onPointerMove);
+            bind(target, POINTER_UP_EVENTS, onPointerUp);
+            Move.cancel();
+            Scroll.cancel();
+            save(e);
+          } else {
+            prevent(e, true);
+          }
         }
       }
     }
