@@ -1,18 +1,11 @@
-import {
-  EVENT_MOVE,
-  EVENT_MOVED,
-  EVENT_REFRESH,
-  EVENT_RESIZE,
-  EVENT_RESIZED,
-  EVENT_UPDATED,
-} from '../../constants/events';
+import { EVENT_MOVE, EVENT_MOVED, EVENT_REFRESH, EVENT_RESIZED, EVENT_UPDATED } from '../../constants/events';
 import { DEFAULT_EVENT_PRIORITY } from '../../constants/priority';
 import { IDLE, MOVING } from '../../constants/states';
 import { LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { abs, clamp, rect } from '../../utils';
+import { abs, clamp, isUndefined, rect } from '../../utils';
 import { SNAP_THRESHOLD } from './constants';
 
 
@@ -75,7 +68,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * Called when the component is mounted.
    */
   function mount(): void {
-    on( [ EVENT_RESIZE, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH ], reposition, DEFAULT_EVENT_PRIORITY - 1 );
+    on( [ EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH ], reposition, DEFAULT_EVENT_PRIORITY - 1 );
   }
 
   /**
@@ -83,20 +76,11 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * This must be called before the Slide component checks the visibility.
    */
   function reposition(): void {
-    if ( shouldSnap || ( shouldSnap = canSnap( getPosition() ) ) ) {
+    if ( exceededLimit( true ) ) {
+      translate( getLimit( true ) );
+    } else if ( shouldSnap || ( shouldSnap = canSnap() ) ) {
       jump( Splide.index );
     }
-  }
-
-  /**
-   * Checks if the provided position is enough close to some slide to snap or not.
-   *
-   * @param position - A position to test.
-   *
-   * @return `true` if found the slide to snap, or otherwise `false`.
-   */
-  function canSnap( position: number ): boolean {
-    return abs( position - toPosition( toIndex( position ), true ) ) < SNAP_THRESHOLD;
   }
 
   /**
@@ -163,7 +147,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    */
   function translate( position: number ): void {
     currPosition = loop( position );
-    shouldSnap   = canSnap( position );
+    shouldSnap   = canSnap( currPosition );
 
     Components.Style.ruleBy(
       list,
@@ -214,7 +198,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
 
     for ( let i = 0; i < Slides.length; i++ ) {
       const slideIndex = Slides[ i ].index;
-      const distance   = abs( toPosition( slideIndex ) - position );
+      const distance   = abs( toPosition( slideIndex, true ) - position );
 
       if ( distance < minDistance ) {
         minDistance = distance;
@@ -290,6 +274,18 @@ export function Move( Splide: Splide, Components: Components, options: Options )
   function getLimit( max: boolean ): number {
     const trimming = !! options.trimSpace;
     return max ? toPosition( Components.Controller.getEnd(), trimming ) : toPosition( 0, trimming );
+  }
+
+  /**
+   * Checks if the provided position is enough close to some slide to snap or not.
+   *
+   * @param position - A position to test.
+   *
+   * @return `true` if found the slide to snap, or otherwise `false`.
+   */
+  function canSnap( position?: number ): boolean {
+    position = isUndefined( position ) ? getPosition() : position;
+    return abs( position - toPosition( toIndex( position ), true ) ) < SNAP_THRESHOLD;
   }
 
   /**

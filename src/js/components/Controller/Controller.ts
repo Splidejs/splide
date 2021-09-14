@@ -1,9 +1,9 @@
 import { EVENT_REFRESH, EVENT_SCROLLED, EVENT_UPDATED } from '../../constants/events';
-import { LOOP } from '../../constants/types';
+import { LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { between, clamp, floor, isString, isUndefined, max } from '../../utils';
+import { approximatelyEqual, between, clamp, floor, isString, isUndefined, max } from '../../utils';
 
 
 /**
@@ -176,6 +176,21 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
   function getAdjacent( prev: boolean, destination?: boolean ): number {
     const number = perMove || hasFocus() ? 1 : perPage;
     const dest   = computeDestIndex( currIndex + number * ( prev ? -1 : 1 ), currIndex );
+
+    if ( dest === -1 && Splide.is( SLIDE ) ) {
+      const position = Move.getPosition();
+
+      if ( prev ) {
+        if ( ! approximatelyEqual( position, 0, 1 ) ) {
+          return 0;
+        }
+      } else {
+        if ( ! approximatelyEqual( position, Move.getLimit( true ), 1 ) ) {
+          return getEnd();
+        }
+      }
+    }
+
     return destination ? dest : loop( dest );
   }
 

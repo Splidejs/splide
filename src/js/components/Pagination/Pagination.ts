@@ -112,7 +112,7 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
       const controls = Slides.getIn( i ).map( Slide => Slide.slide.id );
       const text     = ! hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
 
-      bind( button, 'click', () => { go( `>${ i }` ) } );
+      bind( button, 'click', () => { go( `>${ i }`, true ) } );
 
       setAttribute( button, ARIA_CONTROLS, controls.join( ' ' ) );
       setAttribute( button, ARIA_LABEL, format( text, i + 1 ) );

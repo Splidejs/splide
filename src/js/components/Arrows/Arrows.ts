@@ -3,7 +3,7 @@ import {
   EVENT_ARROWS_MOUNTED,
   EVENT_ARROWS_UPDATED,
   EVENT_MOUNTED,
-  EVENT_MOVE,
+  EVENT_MOVE, EVENT_MOVED,
   EVENT_REFRESH,
   EVENT_SCROLLED,
   EVENT_UPDATED,
@@ -119,9 +119,9 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
    */
   function listen(): void {
     const { go } = Controller;
-    on( [ EVENT_MOUNTED, EVENT_MOVE, EVENT_UPDATED, EVENT_REFRESH, EVENT_SCROLLED ], update );
-    bind( next, 'click', () => { go( '>' ) } );
-    bind( prev, 'click', () => { go( '<' ) } );
+    on( [ EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_UPDATED, EVENT_REFRESH, EVENT_SCROLLED ], update );
+    bind( next, 'click', () => { go( '>', true ) } );
+    bind( prev, 'click', () => { go( '<', true ) } );
   }
 
   /**

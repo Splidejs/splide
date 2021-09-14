@@ -14,8 +14,20 @@ img {
   margin: 2rem auto;
 }
 
+.splide__slide.is-visible {
+  border: 2px solid darkgray;
+}
+
 .splide__slide.is-active {
   border: 2px solid deepskyblue;
+}
+
+.splide__pagination__page.is-active {
+  background: deepskyblue;
+}
+
+.splide__arrow:disabled {
+  background: darkorchid;
 }
 
 .splide__progress {

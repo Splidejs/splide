@@ -81,7 +81,7 @@ export function init( options: Options = {}, args: InitArgs = {} ): Splide {
   list.getBoundingClientRect = (): DOMRect => {
     return assign( {}, domRect, {
       width: +width,
-      ...parseTransform( list as HTMLElement, +width, +height )
+      ...parseTransform( list as HTMLElement, +width, +height ),
     } );
   };
 

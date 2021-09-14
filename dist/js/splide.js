@@ -306,6 +306,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     return requestAnimationFrame(func);
   }
 
+  function approximatelyEqual(x, y, epsilon) {
+    return Math.abs(x - y) < epsilon;
+  }
+
   function between(number, minOrMax, maxOrMin, exclusive) {
     var min = Math.min(minOrMax, maxOrMin);
     var max = Math.max(minOrMax, maxOrMin);
@@ -1419,17 +1423,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var shouldSnap = true;
 
     function mount() {
-      on([EVENT_RESIZE, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition, DEFAULT_EVENT_PRIORITY - 1);
+      on([EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition, DEFAULT_EVENT_PRIORITY - 1);
     }
 
     function reposition() {
-      if (shouldSnap || (shouldSnap = canSnap(getPosition()))) {
+      if (exceededLimit(true)) {
+        translate(getLimit(true));
+      } else if (shouldSnap || (shouldSnap = canSnap())) {
         jump(Splide2.index);
       }
-    }
-
-    function canSnap(position) {
-      return abs(position - toPosition(toIndex(position), true)) < SNAP_THRESHOLD;
     }
 
     function move(dest, index, prev) {
@@ -1468,7 +1470,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function translate(position) {
       currPosition = loop(position);
-      shouldSnap = canSnap(position);
+      shouldSnap = canSnap(currPosition);
       Components2.Style.ruleBy(list, "transform", "translate" + resolve("X") + "(" + 100 * currPosition / listSize() + "%)");
     }
 
@@ -1498,7 +1500,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       for (var i = 0; i < Slides.length; i++) {
         var slideIndex = Slides[i].index;
-        var distance = abs(toPosition(slideIndex) - position);
+        var distance = abs(toPosition(slideIndex, true) - position);
 
         if (distance < minDistance) {
           minDistance = distance;
@@ -1542,6 +1544,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function getLimit(max) {
       var trimming = !!options.trimSpace;
       return max ? toPosition(Components2.Controller.getEnd(), trimming) : toPosition(0, trimming);
+    }
+
+    function canSnap(position) {
+      position = isUndefined(position) ? getPosition() : position;
+      return abs(position - toPosition(toIndex(position), true)) < SNAP_THRESHOLD;
     }
 
     function isBusy() {
@@ -1656,6 +1663,21 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function getAdjacent(prev, destination) {
       var number = perMove || hasFocus() ? 1 : perPage;
       var dest = computeDestIndex(currIndex + number * (prev ? -1 : 1), currIndex);
+
+      if (dest === -1 && Splide2.is(SLIDE)) {
+        var position = Move.getPosition();
+
+        if (prev) {
+          if (!approximatelyEqual(position, 0, 1)) {
+            return 0;
+          }
+        } else {
+          if (!approximatelyEqual(position, Move.getLimit(true), 1)) {
+            return getEnd();
+          }
+        }
+      }
+
       return destination ? dest : loop(dest);
     }
 
@@ -1805,12 +1827,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function listen() {
       var go = Controller.go;
-      on([EVENT_MOUNTED, EVENT_MOVE, EVENT_UPDATED, EVENT_REFRESH, EVENT_SCROLLED], update);
+      on([EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_UPDATED, EVENT_REFRESH, EVENT_SCROLLED], update);
       bind(next, "click", function () {
-        go(">");
+        go(">", true);
       });
       bind(prev, "click", function () {
-        go("<");
+        go("<", true);
       });
     }
 
@@ -2527,7 +2549,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         });
         var text = !hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
         bind(button, "click", function () {
-          go(">" + i);
+          go(">" + i, true);
         });
         setAttribute(button, ARIA_CONTROLS, controls.join(" "));
         setAttribute(button, ARIA_LABEL, format(text, i + 1));

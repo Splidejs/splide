@@ -26,6 +26,8 @@ $settings = get_settings();
 
       splide01.mount();
 
+      return;
+
       var splide02 = new Splide( '#splide02', {
         // width     : 1000,
         autoWidth : true,
