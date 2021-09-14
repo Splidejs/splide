@@ -24,7 +24,7 @@ export const FRICTION_FACTOR = 0.6;
  *
  * @since 3.0.0
  */
-export const BASE_VELOCITY = 1.2;
+export const BASE_VELOCITY = 1.5;
 
 /**
  * The minimum duration of scroll.

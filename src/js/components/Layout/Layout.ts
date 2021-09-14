@@ -183,7 +183,8 @@ export function Layout( Splide: Splide, Components: Components, options: Options
   }
 
   /**
-   * Returns the total width or height of slides from 0 to the specified index.
+   * Returns the total width or height of slides from the head of the slider to the specified index.
+   * This includes sizes of clones before the first slide.
    *
    * @param index      - A slide index. If omitted, uses the last index.
    * @param withoutGap - Optional. Determines whether to exclude the last gap or not.
@@ -203,19 +204,12 @@ export function Layout( Splide: Splide, Components: Components, options: Options
   }
 
   /**
-   * Returns the slider size without clones.
+   * Returns the slider size without clones before the first slide.
    *
-   * @return The slider size.
+   * @return The width or height of the slider without clones.
    */
   function sliderSize(): number {
-    const firstSlide = getAt( 0 );
-    const lastSlide  = getAt( Slides.getLength( true ) - 1 );
-
-    if ( firstSlide && lastSlide ) {
-      return rect( lastSlide.slide )[ resolve( 'right' ) ] - rect( firstSlide.slide )[ resolve( 'left' ) ];
-    }
-
-    return 0;
+    return totalSize( Splide.length - 1, true ) - totalSize( -1, true );
   }
 
   /**

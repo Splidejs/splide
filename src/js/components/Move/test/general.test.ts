@@ -9,10 +9,10 @@ describe( 'Move', () => {
     const rule = findRuleBy( list );
 
     Move.jump( 2 );
-    expect( rule.style.transform ).toBe( 'translateX(-400px)' );
+    expect( rule.style.transform ).toBe( 'translateX(-200%)' );
 
     Move.jump( 4 );
-    expect( rule.style.transform ).toBe( 'translateX(-800px)' );
+    expect( rule.style.transform ).toBe( 'translateX(-400%)' );
 
     splide.destroy();
   } );
@@ -24,27 +24,30 @@ describe( 'Move', () => {
     const rule = findRuleBy( list );
 
     Move.translate( 100 );
-    expect( rule.style.transform ).toBe( 'translateX(100px)' );
+    expect( rule.style.transform ).toBe( 'translateX(50%)' );
 
     Move.translate( 500 );
-    expect( rule.style.transform ).toBe( 'translateX(500px)' );
+    expect( rule.style.transform ).toBe( 'translateX(250%)' );
 
     splide.destroy();
   } );
 
   test( 'can loop the slider if it exceeds bounds.', () => {
     // Note: All clones do not have dimensions.
-    const splide    = init( { type: 'loop', width: 200, height: 100 } );
-    const totalSize = 200 * splide.length;
+    const width     = 200;
+    const splide    = init( { type: 'loop', width, height: 100 } );
+    const totalSize = width * splide.length;
     const { Move }  = splide.Components;
     const { list }  = splide.Components.Elements;
     const rule = findRuleBy( list );
 
-    Move.translate( 50 );
-    expect( rule.style.transform ).toBe( `translateX(${ 50 - totalSize }px)` );
+    Move.translate( width );
+    expect( rule.style.transform ).toBe( `translateX(${ -100 * ( splide.length - 1 ) }%)` );
 
-    Move.translate( - totalSize - 50 );
-    expect( rule.style.transform ).toBe( `translateX(-50px)` );
+    Move.translate( 0 );
+
+    Move.translate( - totalSize );
+    expect( rule.style.transform ).toBe( `translateX(-100%)` ); // 1 slide
 
     splide.destroy();
   } );
@@ -105,21 +108,6 @@ describe( 'Move', () => {
     Move.translate( 10 );
 
     expect( Move.exceededLimit() ).toBe( true );
-
-    splide.destroy();
-  } );
-
-  test( 'can loop the slider when the position exceeds bounds.', () => {
-    const width     = 200;
-    const splide    = init( { type: 'loop', width, height: 100 } );
-    const totalSize = width * splide.length;
-    const { Move }  = splide.Components;
-
-    Move.translate( 10 );
-    expect( Move.getPosition() ).toBe( - ( totalSize - 10 ) );
-
-    Move.translate( - totalSize - 10 );
-    expect( Move.getPosition() ).toBe( -10 );
 
     splide.destroy();
   } );

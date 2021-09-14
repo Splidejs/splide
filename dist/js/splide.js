@@ -1372,14 +1372,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function sliderSize() {
-      var firstSlide = getAt(0);
-      var lastSlide = getAt(Slides.getLength(true) - 1);
-
-      if (firstSlide && lastSlide) {
-        return rect(lastSlide.slide)[resolve("right")] - rect(firstSlide.slide)[resolve("left")];
-      }
-
-      return 0;
+      return totalSize(Splide2.length - 1, true) - totalSize(-1, true);
     }
 
     function getGap() {
@@ -1423,35 +1416,20 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var looping;
     var waiting;
     var currPosition = 0;
-    var positionRate = 0;
+    var shouldSnap = true;
 
     function mount() {
       on([EVENT_RESIZE, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition, DEFAULT_EVENT_PRIORITY - 1);
     }
 
     function reposition() {
-      if (options.drag !== "free") {
+      if (shouldSnap || (shouldSnap = canSnap(getPosition()))) {
         jump(Splide2.index);
-      } else {
-        if (!options[resolve("fixedWidth")] && !options[resolve("autoWidth")]) {
-          translate(listSize() * positionRate);
-        }
-
-        if (exceededLimit(true)) {
-          translate(getLimit(true));
-        } else {
-          snap(SNAP_THRESHOLD);
-        }
       }
     }
 
-    function snap(threshold) {
-      var position = getPosition();
-      var index = toIndex(position);
-
-      if (abs(position - toPosition(index)) < threshold) {
-        jump(index);
-      }
+    function canSnap(position) {
+      return abs(position - toPosition(toIndex(position), true)) < SNAP_THRESHOLD;
     }
 
     function move(dest, index, prev) {
@@ -1490,8 +1468,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function translate(position) {
       currPosition = loop(position);
-      positionRate = currPosition / listSize();
-      Components2.Style.ruleBy(list, "transform", "translate" + resolve("X") + "(" + currPosition + "px)");
+      shouldSnap = canSnap(position);
+      Components2.Style.ruleBy(list, "transform", "translate" + resolve("X") + "(" + 100 * currPosition / listSize() + "%)");
     }
 
     function loop(position) {
@@ -1558,7 +1536,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         return (listSize() - slideSize(index, true)) / 2;
       }
 
-      return (+focus || 0) * slideSize(index);
+      return +focus * slideSize(index) || 0;
     }
 
     function getLimit(max) {
@@ -2026,7 +2004,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var BOUNCE_DIFF_THRESHOLD = 10;
   var BOUNCE_DURATION = 600;
   var FRICTION_FACTOR = 0.6;
-  var BASE_VELOCITY = 1.2;
+  var BASE_VELOCITY = 1.5;
   var MIN_DURATION = 800;
 
   function Scroll(Splide2, Components2, options) {

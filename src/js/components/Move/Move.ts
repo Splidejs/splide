@@ -67,9 +67,9 @@ export function Move( Splide: Splide, Components: Components, options: Options )
   let currPosition = 0;
 
   /**
-   * Keeps the rate of position to the slider width.
+   * Indicates whether the the slider should snap the position to the specific slide or not.
    */
-  let positionRate = 0;
+  let shouldSnap = true;
 
   /**
    * Called when the component is mounted.
@@ -83,33 +83,20 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * This must be called before the Slide component checks the visibility.
    */
   function reposition(): void {
-    if ( options.drag !== 'free' ) {
+    if ( shouldSnap || ( shouldSnap = canSnap( getPosition() ) ) ) {
       jump( Splide.index );
-    } else {
-      if ( ! options[ resolve( 'fixedWidth' ) ] && ! options[ resolve( 'autoWidth' ) ] ) {
-        translate( listSize() * positionRate );
-      }
-
-      if ( exceededLimit( true ) ) {
-        translate( getLimit( true ) );
-      } else {
-        snap( SNAP_THRESHOLD );
-      }
     }
   }
 
   /**
-   * Snaps the slider position to the closest slide if the difference between them is less than the threshold.
+   * Checks if the provided position is enough close to some slide to snap or not.
    *
-   * @param threshold - The threshold value.
+   * @param position - A position to test.
+   *
+   * @return `true` if found the slide to snap, or otherwise `false`.
    */
-  function snap( threshold: number ): void {
-    const position = getPosition();
-    const index    = toIndex( position );
-
-    if ( abs( position - toPosition( index ) ) < threshold ) {
-      jump( index );
-    }
+  function canSnap( position: number ): boolean {
+    return abs( position - toPosition( toIndex( position ), true ) ) < SNAP_THRESHOLD;
   }
 
   /**
@@ -123,7 +110,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
     if ( ! isBusy() ) {
       const position = getPosition();
 
-      looping = dest !== index;
+      looping = dest !== index; // todo
       waiting = options.waitForTransition;
 
       Splide.state.set( MOVING );
@@ -176,8 +163,13 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    */
   function translate( position: number ): void {
     currPosition = loop( position );
-    positionRate = currPosition / listSize();
-    Components.Style.ruleBy( list, 'transform', `translate${ resolve( 'X' ) }(${ currPosition }px)` );
+    shouldSnap   = canSnap( position );
+
+    Components.Style.ruleBy(
+      list,
+      'transform',
+      `translate${ resolve( 'X' ) }(${ 100 * currPosition / listSize() }%)`
+    );
   }
 
   /**
@@ -285,7 +277,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
       return ( listSize() - slideSize( index, true ) ) / 2;
     }
 
-    return ( +focus || 0 ) * slideSize( index );
+    return +focus * slideSize( index ) || 0;
   }
 
   /**
@@ -323,37 +315,6 @@ export function Move( Splide: Splide, Components: Components, options: Options )
     return exceededMin || exceededMax;
   }
 
-  // /**
-  //  * Checks if the provided position exceeds the minimum limit or not.
-  //  *
-  //  * @param position - A position to test.
-  //  *
-  //  * @return `true` if the position exceeds the limit, or otherwise `false`.
-  //  */
-  // function isExceededMin( position: number ): boolean {
-  //   return orient( position ) < orient( getLimit( false ) );
-  // }
-  //
-  // /**
-  //  * Checks if the provided position exceeds the maximum limit or not.
-  //  *
-  //  * @param position - A position to test.
-  //  *
-  //  * @return `true` if the position exceeds the limit, or otherwise `false`.
-  //  */
-  // function isExceededMax( position: number ): boolean {
-  //   return orient( position ) > orient( getLimit( true ) );
-  // }
-  //
-  // /**
-  //  * Checks if the slider position exceeds borders or not.
-  //  *
-  //  * @return `true` if the position is over borders, or otherwise `false`.
-  //  */
-  // function isExceeded(): boolean {
-  //   return isExceededMin( currPosition ) || isExceededMax( currPosition );
-  // }
-
   return {
     mount,
     move,
@@ -366,8 +327,5 @@ export function Move( Splide: Splide, Components: Components, options: Options )
     getLimit,
     isBusy,
     exceededLimit,
-    // isExceededMin,
-    // isExceededMax,
-    // isExceeded,
   };
 }

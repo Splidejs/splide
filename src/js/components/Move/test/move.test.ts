@@ -12,11 +12,11 @@ describe( 'Move#move()', () => {
 
     Move.move( 1, 1, -1 );
     fire( list, 'transitionend' );
-    expect( rule.style.transform ).toBe( 'translateX(-200px)' );
+    expect( rule.style.transform ).toBe( 'translateX(-100%)' );
 
     Move.move( 2, 2, -1 );
     fire( list, 'transitionend' );
-    expect( rule.style.transform ).toBe( 'translateX(-400px)' );
+    expect( rule.style.transform ).toBe( 'translateX(-200%)' );
   } );
 
   test( 'can change the state.', () => {

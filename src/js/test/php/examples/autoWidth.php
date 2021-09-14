@@ -17,16 +17,17 @@ $settings = get_settings();
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide01 = new Splide( '#splide01', {
-        width     : 1000,
+        // width     : 1000,
         autoWidth : true,
         gap       : '1rem',
         trimSpace : 'move',
+        drag      : 'free',
       } );
 
       splide01.mount();
 
       var splide02 = new Splide( '#splide02', {
-        width     : 1000,
+        // width     : 1000,
         autoWidth : true,
         gap       : '1rem',
         focus     : 'center',

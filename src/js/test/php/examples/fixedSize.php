@@ -1,5 +1,5 @@
 <?php
-require_once '../settings.php';
+require_once '../parts.php';
 require_once '../settings.php';
 
 $settings = get_settings();
@@ -18,19 +18,27 @@ $settings = get_settings();
 
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
-      var splide = new Splide( '#splide01', {
+      var splide01 = new Splide( '#splide01', {
         type       : 'loop',
         fixedWidth : 100,
         gap        : 10,
       } );
 
-      splide.mount();
+      splide01.mount();
+
+      var splide02 = new Splide( '#splide02', {
+        fixedWidth : 200,
+        gap        : '1rem',
+      } );
+
+      splide02.mount();
     } );
   </script>
 </head>
 <body>
 
-<?php render(); ?>
+<?php render( 'splide01' ); ?>
+<?php render( 'splide02' ); ?>
 
 </body>
 </html>

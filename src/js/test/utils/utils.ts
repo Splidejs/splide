@@ -79,12 +79,15 @@ export function init( options: Options = {}, args: InitArgs = {} ): Splide {
   };
 
   list.getBoundingClientRect = (): DOMRect => {
-    return assign( {}, domRect, { width: +width, ...parseTransform( list as HTMLElement ) } );
+    return assign( {}, domRect, {
+      width: +width,
+      ...parseTransform( list as HTMLElement, +width, +height )
+    } );
   };
 
   slides.forEach( ( slide, index ) => {
     slide.getBoundingClientRect = (): DOMRect => {
-      const offsets = parseTransform( list as HTMLElement );
+      const offsets = parseTransform( list as HTMLElement, +width, +height );
 
       return assign( {}, domRect, {
         width : slideWidth,
@@ -107,11 +110,17 @@ export function init( options: Options = {}, args: InitArgs = {} ): Splide {
 /**
  * Converts translate values to positions.
  *
- * @param elm - An element to parse.
+ * @param elm        - An element to parse.
+ * @param baseWidth  - The width of the element.
+ * @param baseHeight - The height of the element.
  *
  * @return An object with left and top offsets.
  */
-export function parseTransform( elm: HTMLElement ): { left: number, top: number } {
+export function parseTransform(
+  elm: HTMLElement,
+  baseWidth: number,
+  baseHeight: number
+): { left: number, top: number } {
   const rule     = findRuleBy( elm );
   const position = { left: 0, top: 0 };
 
@@ -119,11 +128,13 @@ export function parseTransform( elm: HTMLElement ): { left: number, top: number 
     const { transform } = rule.style;
 
     if ( transform.includes( 'translateX' ) ) {
-      position.left = parseFloat( transform.replace( /translateX\(|\)/g, '' ) ) || 0;
+      const percent = parseFloat( transform.replace( /translateX\(|\)/g, '' ) ) || 0;
+      position.left = baseWidth * percent / 100;
     }
 
     if ( transform.includes( 'translateY' ) ) {
-      position.top = parseFloat( transform.replace( /translateY\(|\)/g, '' ) ) || 0;
+      const percent = parseFloat( transform.replace( /translateY\(|\)/g, '' ) ) || 0;
+      position.top = baseHeight * percent / 100;
     }
   }
 
