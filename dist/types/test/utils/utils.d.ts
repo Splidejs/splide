@@ -18,11 +18,13 @@ export declare function init(options?: Options, args?: InitArgs): Splide;
 /**
  * Converts translate values to positions.
  *
- * @param elm - An element to parse.
+ * @param elm        - An element to parse.
+ * @param baseWidth  - The width of the element.
+ * @param baseHeight - The height of the element.
  *
  * @return An object with left and top offsets.
  */
-export declare function parseTransform(elm: HTMLElement): {
+export declare function parseTransform(elm: HTMLElement, baseWidth: number, baseHeight: number): {
     left: number;
     top: number;
 };

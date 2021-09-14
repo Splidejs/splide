@@ -74,9 +74,9 @@ export function Move( Splide: Splide, Components: Components, options: Options )
   }
 
   /**
-   * Goes to the slide at the specified index with the Transition component.
+   * Moves the slider to the dest index with the Transition component.
    *
-   * @param dest  - A destination index to go to.
+   * @param dest  - A destination index to go to, including clones'.
    * @param index - A slide index.
    * @param prev  - A previous index.
    */
@@ -115,9 +115,9 @@ export function Move( Splide: Splide, Components: Components, options: Options )
   }
 
   /**
-   * Moves the slider to the specified position.
+   * Moves the slider to the provided position.
    *
-   * @param position - The destination.
+   * @param position - The position to move to.
    */
   function translate( position: number ): void {
     position   = loop( position );
@@ -131,7 +131,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
   }
 
   /**
-   * Loops the provided position if it exceeds limits.
+   * Loops the provided position if it exceeds bounds.
    *
    * @param position - A position to loop.
    */
@@ -230,12 +230,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    */
   function offset( index: number ): number {
     const { focus } = options;
-
-    if ( focus === 'center' ) {
-      return ( listSize() - slideSize( index, true ) ) / 2;
-    }
-
-    return +focus * slideSize( index ) || 0;
+    return focus === 'center' ? ( listSize() - slideSize( index, true ) ) / 2 : +focus * slideSize( index ) || 0;
   }
 
   /**
@@ -246,8 +241,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * @return The border number.
    */
   function getLimit( max: boolean ): number {
-    const trimming = !! options.trimSpace;
-    return max ? toPosition( Components.Controller.getEnd(), trimming ) : toPosition( 0, trimming );
+    return toPosition( max ? Components.Controller.getEnd() : 0, !! options.trimSpace );
   }
 
   /**

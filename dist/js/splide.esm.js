@@ -272,6 +272,10 @@ function raf(func) {
   return requestAnimationFrame(func);
 }
 
+function approximatelyEqual(x, y, epsilon) {
+  return Math.abs(x - y) < epsilon;
+}
+
 function between(number, minOrMax, maxOrMin, exclusive) {
   const min = Math.min(minOrMax, maxOrMin);
   const max = Math.max(minOrMax, maxOrMin);
@@ -1149,12 +1153,7 @@ function Layout(Splide2, Components2, options) {
     return 0;
   }
   function sliderSize() {
-    const firstSlide = getAt(0);
-    const lastSlide = getAt(Slides.getLength(true) - 1);
-    if (firstSlide && lastSlide) {
-      return rect(lastSlide.slide)[resolve("right")] - rect(firstSlide.slide)[resolve("left")];
-    }
-    return 0;
+    return totalSize(Splide2.length - 1, true) - totalSize(-1, true);
   }
   function getGap() {
     const Slide = getAt(0);
@@ -1180,71 +1179,50 @@ function Move(Splide2, Components2, options) {
   const { slideSize, getPadding, totalSize, listSize, sliderSize } = Components2.Layout;
   const { resolve, orient } = Components2.Direction;
   const { list, track } = Components2.Elements;
-  let looping;
   let waiting;
-  let currPosition = 0;
-  let positionRate = 0;
+  let shouldSnap = true;
   function mount() {
-    on([EVENT_RESIZE, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition, DEFAULT_EVENT_PRIORITY - 1);
+    on([EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition, DEFAULT_EVENT_PRIORITY - 1);
   }
   function reposition() {
-    if (options.drag !== "free") {
+    if (exceededLimit(true)) {
+      translate(getLimit(true));
+    } else if (shouldSnap || (shouldSnap = canSnap())) {
       jump(Splide2.index);
-    } else {
-      if (!options[resolve("fixedWidth")] && !options[resolve("autoWidth")]) {
-        translate(listSize() * positionRate);
-      }
-      if (exceededLimit(true)) {
-        translate(getLimit(true));
-      } else {
-        snap(SNAP_THRESHOLD);
-      }
-    }
-  }
-  function snap(threshold) {
-    const position = getPosition();
-    const index = toIndex(position);
-    if (abs(position - toPosition(index)) < threshold) {
-      jump(index);
     }
   }
   function move(dest, index, prev) {
     if (!isBusy()) {
+      const { set } = Splide2.state;
       const position = getPosition();
-      looping = dest !== index;
-      waiting = options.waitForTransition;
-      Splide2.state.set(MOVING);
+      const looping = dest !== index;
+      waiting = looping || options.waitForTransition;
+      set(MOVING);
       emit(EVENT_MOVE, index, prev, dest);
       Components2.Transition.start(dest, () => {
-        onMoved(dest, index, prev, position);
+        looping && jump(index);
+        waiting = false;
+        set(IDLE);
+        emit(EVENT_MOVED, index, prev, dest);
+        if (options.trimSpace === "move" && dest !== prev && position === getPosition()) {
+          Components2.Controller.go(dest > prev ? ">" : "<");
+        }
       });
-    }
-  }
-  function onMoved(dest, index, prev, oldPosition) {
-    if (looping) {
-      jump(index);
-    }
-    waiting = false;
-    Splide2.state.set(IDLE);
-    emit(EVENT_MOVED, index, prev, dest);
-    if (options.trimSpace === "move" && dest !== prev && oldPosition === getPosition()) {
-      Components2.Controller.go(dest > prev ? ">" : "<");
     }
   }
   function jump(index) {
     waiting = false;
-    looping = false;
     Components2.Transition.cancel();
     translate(toPosition(index, true));
   }
   function translate(position) {
-    currPosition = loop(position);
-    positionRate = currPosition / listSize();
-    Components2.Style.ruleBy(list, "transform", `translate${resolve("X")}(${currPosition}px)`);
+    position = loop(position);
+    shouldSnap = canSnap(position);
+    Components2.Style.ruleBy(list, "transform", `translate${resolve("X")}(${100 * position / listSize()}%)`);
   }
   function loop(position) {
-    if (!looping && Splide2.is(LOOP)) {
-      const diff = position - currPosition;
+    if (!waiting && Splide2.is(LOOP)) {
+      const diff = position - getPosition();
       const exceededMin = exceededLimit(false, position);
       const exceededMax = exceededLimit(true, position);
       if (exceededMin && diff > 0 || exceededMax && diff < 0) {
@@ -1263,7 +1241,7 @@ function Move(Splide2, Components2, options) {
     let minDistance = Infinity;
     for (let i = 0; i < Slides.length; i++) {
       const slideIndex = Slides[i].index;
-      const distance = abs(toPosition(slideIndex) - position);
+      const distance = abs(toPosition(slideIndex, true) - position);
       if (distance < minDistance) {
         minDistance = distance;
         index = slideIndex;
@@ -1289,19 +1267,20 @@ function Move(Splide2, Components2, options) {
   }
   function offset(index) {
     const { focus } = options;
-    if (focus === "center") {
-      return (listSize() - slideSize(index, true)) / 2;
-    }
-    return (+focus || 0) * slideSize(index);
+    return focus === "center" ? (listSize() - slideSize(index, true)) / 2 : +focus * slideSize(index) || 0;
   }
   function getLimit(max) {
-    const trimming = !!options.trimSpace;
-    return max ? toPosition(Components2.Controller.getEnd(), trimming) : toPosition(0, trimming);
+    return toPosition(max ? Components2.Controller.getEnd() : 0, !!options.trimSpace);
+  }
+  function canSnap(position) {
+    position = isUndefined(position) ? getPosition() : position;
+    return abs(position - toPosition(toIndex(position), true)) < SNAP_THRESHOLD;
   }
   function isBusy() {
-    return !!(looping || waiting);
+    return waiting;
   }
-  function exceededLimit(max, position = currPosition) {
+  function exceededLimit(max, position) {
+    position = isUndefined(position) ? getPosition() : position;
     const exceededMin = max !== true && orient(position) < orient(getLimit(false));
     const exceededMax = max !== false && orient(position) > orient(getLimit(true));
     return exceededMin || exceededMax;
@@ -1385,6 +1364,18 @@ function Controller(Splide2, Components2, options) {
   function getAdjacent(prev, destination) {
     const number = perMove || hasFocus() ? 1 : perPage;
     const dest = computeDestIndex(currIndex + number * (prev ? -1 : 1), currIndex);
+    if (dest === -1 && Splide2.is(SLIDE)) {
+      const position = Move.getPosition();
+      if (prev) {
+        if (!approximatelyEqual(position, 0, 1)) {
+          return 0;
+        }
+      } else {
+        if (!approximatelyEqual(position, Move.getLimit(true), 1)) {
+          return getEnd();
+        }
+      }
+    }
     return destination ? dest : loop(dest);
   }
   function computeDestIndex(dest, from, incremental) {
@@ -1508,12 +1499,12 @@ function Arrows(Splide2, Components2, options) {
   }
   function listen() {
     const { go } = Controller;
-    on([EVENT_MOUNTED, EVENT_MOVE, EVENT_UPDATED, EVENT_REFRESH, EVENT_SCROLLED], update);
+    on([EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_UPDATED, EVENT_REFRESH, EVENT_SCROLLED], update);
     bind(next, "click", () => {
-      go(">");
+      go(">", true);
     });
     bind(prev, "click", () => {
-      go("<");
+      go("<", true);
     });
   }
   function createArrows() {
@@ -1668,7 +1659,7 @@ function Cover(Splide2, Components2, options) {
 const BOUNCE_DIFF_THRESHOLD = 10;
 const BOUNCE_DURATION = 600;
 const FRICTION_FACTOR = 0.6;
-const BASE_VELOCITY = 1.2;
+const BASE_VELOCITY = 1.5;
 const MIN_DURATION = 800;
 
 function Scroll(Splide2, Components2, options) {
@@ -1770,16 +1761,20 @@ function Drag(Splide2, Components2, options) {
   function onPointerDown(e) {
     if (!disabled) {
       isMouse = e.type === "mousedown";
-      if (!Move.isBusy() && (!isMouse || !e.button)) {
-        target = isMouse ? window : track;
-        prevBaseEvent = null;
-        lastEvent = null;
-        clickPrevented = false;
-        bind(target, POINTER_MOVE_EVENTS, onPointerMove);
-        bind(target, POINTER_UP_EVENTS, onPointerUp);
-        Move.cancel();
-        Scroll.cancel();
-        save(e);
+      if (!isMouse || !e.button) {
+        if (!Move.isBusy()) {
+          target = isMouse ? window : track;
+          prevBaseEvent = null;
+          lastEvent = null;
+          clickPrevented = false;
+          bind(target, POINTER_MOVE_EVENTS, onPointerMove);
+          bind(target, POINTER_UP_EVENTS, onPointerUp);
+          Move.cancel();
+          Scroll.cancel();
+          save(e);
+        } else {
+          prevent(e, true);
+        }
       }
     }
   }
@@ -2063,7 +2058,7 @@ function Pagination(Splide2, Components2, options) {
       const controls = Slides.getIn(i).map((Slide) => Slide.slide.id);
       const text = !hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
       bind(button, "click", () => {
-        go(`>${i}`);
+        go(`>${i}`, true);
       });
       setAttribute(button, ARIA_CONTROLS, controls.join(" "));
       setAttribute(button, ARIA_LABEL, format(text, i + 1));

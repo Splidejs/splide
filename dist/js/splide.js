@@ -1524,17 +1524,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function offset(index) {
       var focus = options.focus;
-
-      if (focus === "center") {
-        return (listSize() - slideSize(index, true)) / 2;
-      }
-
-      return +focus * slideSize(index) || 0;
+      return focus === "center" ? (listSize() - slideSize(index, true)) / 2 : +focus * slideSize(index) || 0;
     }
 
     function getLimit(max) {
-      var trimming = !!options.trimSpace;
-      return max ? toPosition(Components2.Controller.getEnd(), trimming) : toPosition(0, trimming);
+      return toPosition(max ? Components2.Controller.getEnd() : 0, !!options.trimSpace);
     }
 
     function canSnap(position) {
