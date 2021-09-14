@@ -10,25 +10,45 @@
 * [Demo](https://splidejs.com/)
 * [Documents](https://splidejs.com/category/users-guide/)
 
-## News
-* Transform Splidejs to the organization.
-* Add `slideFocus` and `waitForTransition` options.
-* Add [type definitions](https://github.com/Splidejs/splide/blob/master/src/js/splide.d.ts) for typescript.
-* [React Splide](https://splidejs.com/integration-react-splide/) is released.
-* [Vue Splide](https://splidejs.com/integration-vue-splide/) is released.
-* Add `resetProgress` and `throttle` options.
-* Breakpoints accept `drag` and `pagination`.
-* Add some [themes](https://splidejs.com/themes/).
-* [Grid](https://splidejs.com/extension-grid/) extension is released.
-* [Auto Width](https://splidejs.com/auto-width/) is implemented. Each slide can have its own width.
-* [Breakpoints](https://splidejs.com/options/#breakpoints) accept 'destroy' option.
-* Merge Slides component to Elements.
-* Splide can be destroyed.
-* Add or remove slides dynamically.
-* [Video](https://splidejs.com/extension-video/) extension is released.
-* [URL Hash Navigation](https://splidejs.com/extension-url-hash-navigation/) extension is released.
+## 🚨 Splide v3.0.0 Is Coming
+Splide is planning to release the major version update soon (hopefully in the end of this month). I'm carefully building it with trying not to break sliders with old versions, but you should **lock the version** just in case.
 
-## Features
+I didn't expect so many people pick my library, but now it hits more than 240M per month in jsDelivr.
+Thank you guys! 😄
+
+### What's The Difference?
+* Rewrite all scripts by TypeScript
+* Reduce the code size (29KB -> around 26KB), keeping all features of the v2
+* Add 300+ test cases to make the library more stable
+* Implement the free drag mode
+* Implement the simple mouse wheel navigation for a vertical slider
+* Support sync with multiple sliders
+* Support a placeholder image for lazy loading
+* Support the `min-width` media query for breakpoints
+* Remove the passive event listeners where Lighthouse complains
+* Solve the `window` reference error for SSR
+* And more
+
+If you are interested in the new version, check out the v3 branch 😎.
+
+### Road Map
+1. ✔️Rewrite Splide
+2. ✔️Rewrite Video Extension
+3. ✔️Rewrite URL Hash Extension
+4. ✔️Rewrite Grid Extension
+5. Test and debug (I'm here)
+6. Update the website and documents
+7. Release
+8. Rewrite React component
+9. Rewrite Vue component
+10. All done 🎉
+
+### Caveats
+* Methods of components will be drastically changed
+* Some minor options will be removed
+* All issues and PRs will be closed after the release
+
+## v2 Features
 * Pure JavaScript without any dependencies
 * Small size, less than 29kB(11kB gzipped)
 * Flexible and extensible
