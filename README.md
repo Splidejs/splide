@@ -11,7 +11,7 @@
 * [Documents](https://splidejs.com/category/users-guide/)
 
 ## 🚨 Splide v3.0.0 Is Coming
-Splide is planning to release the major version update soon (hopefully in the end of this month). I'm carefully building it with trying not to break sliders with old versions, but you should **lock the version** just in case.
+Splide is planning to release the major version update soon (hopefully in the end of this month). I'm carefully building it with trying not to break sliders using old versions, but you should **lock the version** just in case.
 
 I didn't expect so many people pick my library, but now it hits more than 240M per month in jsDelivr.
 Thank you guys! 😄
@@ -31,7 +31,7 @@ Thank you guys! 😄
 
 If you are interested in the new version, check out the v3 branch 😎.
 
-### Road Map
+### Roadmap
 1. ✔️Rewrite Splide
 2. ✔️Rewrite Video Extension
 3. ✔️Rewrite URL Hash Extension
