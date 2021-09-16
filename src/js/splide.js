@@ -120,7 +120,7 @@ export default class Splide {
 	 *
 	 * @return {Splide} - This instance.
 	 */
-	on( events, handler, elm = null, options = {} ) {
+	on( events, handler, elm = null, options = { passive: true } ) {
 		this.Event.on( events, handler, elm, options );
 		return this;
 	}

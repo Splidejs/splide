@@ -1559,7 +1559,9 @@ var Splide$1 = /*#__PURE__*/function () {
     }
 
     if (options === void 0) {
-      options = {};
+      options = {
+        passive: true
+      };
     }
 
     this.Event.on(events, handler, elm, options);
@@ -4090,7 +4092,8 @@ var Click = function Click(Splide, Components) {
      */
     mount: function mount() {
       Splide.on('click', onClick, Components.Elements.track, {
-        capture: true
+        capture: true,
+        passive: false
       }).on('drag', function () {
         disabled = true;
       }).on('dragged', function () {

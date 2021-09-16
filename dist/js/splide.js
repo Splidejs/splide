@@ -1563,7 +1563,9 @@ function _extends() { _extends = Object.assign || function (target) { for (var i
       }
 
       if (options === void 0) {
-        options = {};
+        options = {
+          passive: true
+        };
       }
 
       this.Event.on(events, handler, elm, options);
@@ -4094,7 +4096,8 @@ function _extends() { _extends = Object.assign || function (target) { for (var i
        */
       mount: function mount() {
         Splide.on('click', onClick, Components.Elements.track, {
-          capture: true
+          capture: true,
+          passive: false
         }).on('drag', function () {
           disabled = true;
         }).on('dragged', function () {
