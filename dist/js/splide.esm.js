@@ -10,7 +10,7 @@ function _extends() { _extends = Object.assign || function (target) { for (var i
 
 /*!
  * Splide.js
- * Version  : 2.4.24
+ * Version  : 2.4.25
  * License  : MIT
  * Copyright: 2020 Naotoshi Fujita
  */
@@ -4834,19 +4834,12 @@ var LazyLoad = function LazyLoad(Splide, Components, name) {
 
   var images;
   /**
-   * Store the options.
-   *
-   * @type {Object}
-   */
-
-  var options = Splide.options;
-  /**
    * Whether to load images sequentially or not.
    *
    * @type {boolean}
    */
 
-  var isSequential = options.lazyLoad === 'sequential';
+  var isSequential = Splide.options.lazyLoad === 'sequential';
   /**
    * Lazyload component object.
    *
@@ -4859,7 +4852,7 @@ var LazyLoad = function LazyLoad(Splide, Components, name) {
      *
      * @type {boolean}
      */
-    required: options.lazyLoad,
+    required: Splide.options.lazyLoad,
 
     /**
      * Called when the component is mounted.
@@ -4915,7 +4908,7 @@ var LazyLoad = function LazyLoad(Splide, Components, name) {
   function check(index) {
     index = isNaN(index) ? Splide.index : index;
     images = images.filter(function (image) {
-      if (image.Slide.isWithin(index, options.perPage * (options.preloadPages + 1))) {
+      if (image.Slide.isWithin(index, Splide.options.perPage * (Splide.options.preloadPages + 1))) {
         load(image.img, image.Slide);
         return false;
       }
