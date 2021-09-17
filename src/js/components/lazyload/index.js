@@ -57,18 +57,11 @@ export default ( Splide, Components, name ) => {
 	let images;
 
 	/**
-	 * Store the options.
-	 *
-	 * @type {Object}
-	 */
-	const options = Splide.options;
-
-	/**
 	 * Whether to load images sequentially or not.
 	 *
 	 * @type {boolean}
 	 */
-	const isSequential = options.lazyLoad === 'sequential';
+	const isSequential = Splide.options.lazyLoad === 'sequential';
 
 	/**
 	 * Lazyload component object.
@@ -81,7 +74,7 @@ export default ( Splide, Components, name ) => {
 		 *
 		 * @type {boolean}
 		 */
-		required: options.lazyLoad,
+		required: Splide.options.lazyLoad,
 
 		/**
 		 * Called when the component is mounted.
@@ -133,7 +126,7 @@ export default ( Splide, Components, name ) => {
 		index = isNaN( index ) ? Splide.index : index;
 
 		images = images.filter( image => {
-			if ( image.Slide.isWithin( index, options.perPage * ( options.preloadPages + 1 ) ) ) {
+			if ( image.Slide.isWithin( index, Splide.options.perPage * ( Splide.options.preloadPages + 1 ) ) ) {
 				load( image.img, image.Slide );
 				return false;
 			}
