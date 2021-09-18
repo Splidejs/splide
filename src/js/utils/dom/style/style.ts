@@ -1,6 +1,5 @@
-import { forEach } from '../../array';
 import { forOwn } from '../../object';
-import { isArray, isNull, isString } from '../../type/type';
+import { isNull, isString } from '../../type/type';
 
 
 /**
@@ -11,17 +10,17 @@ import { isArray, isNull, isString } from '../../type/type';
 export type CSSStyleProperties = Exclude<keyof CSSStyleDeclaration, number>;
 
 export function style(
-  elms: HTMLElement | HTMLElement[],
+  elm: HTMLElement,
   styles: Record<string, string | number>
 ): void;
 
 export function style<K extends CSSStyleProperties>(
-  elms: HTMLElement,
+  elm: HTMLElement,
   styles: K
 ): CSSStyleDeclaration[ K ];
 
 export function style(
-  elms: HTMLElement,
+  elm: HTMLElement,
   styles: string
 ): string;
 
@@ -29,24 +28,20 @@ export function style(
 /**
  * Applies inline styles to the provided element by an object literal.
  *
- * @param elms   - An element or elements to apply styles to.
+ * @param elm    - An element to apply styles to.
  * @param styles - An object literal with styles.
  */
 export function style<K extends CSSStyleProperties>(
-  elms: HTMLElement | HTMLElement[],
+  elm: HTMLElement,
   styles: Record<string, string | number> | K
 ): CSSStyleDeclaration[ K ] | string | void {
   if ( isString( styles ) ) {
-    return isArray( elms ) ? null : getComputedStyle( elms )[ styles ];
+    return getComputedStyle( elm )[ styles ];
   }
 
   forOwn( styles, ( value, key ) => {
     if ( ! isNull( value ) ) {
-      forEach( elms, elm => {
-        if ( elm ) {
-          elm.style[ key ] = `${ value }`;
-        }
-      } );
+      elm.style[ key ] = `${ value }`;
     }
   } );
 }

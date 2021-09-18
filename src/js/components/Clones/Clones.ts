@@ -3,7 +3,7 @@ import { LOOP } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { addClass, append, before, ceil, empty, pad, push, rect, remove } from '../../utils';
+import { addClass, append, before, ceil, empty, measure, pad, push, rect, remove } from '../../utils';
 
 
 /**
@@ -135,7 +135,7 @@ export function Clones( Splide: Splide, Components: Components, options: Options
     if ( ! Splide.is( LOOP ) ) {
       clones = 0;
     } else if ( ! clones ) {
-      const fixedSize  = options[ resolve( 'fixedWidth' ) ];
+      const fixedSize  = measure( Elements.list, options[ resolve( 'fixedWidth' ) ] );
       const fixedCount = fixedSize && ceil( rect( Elements.track )[ resolve( 'width' ) ] / fixedSize );
       const baseCount  = fixedCount || ( options[ resolve( 'autoWidth' ) ] && Splide.length ) || options.perPage;
 

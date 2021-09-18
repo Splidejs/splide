@@ -8,6 +8,7 @@ export { display }         from './display/display';
 export { getAttribute }    from './getAttribute/getAttribute';
 export { hasClass }        from './hasClass/hasClass';
 export { matches }         from './matches/matches';
+export { measure }         from './measure/measure';
 export { parseHtml }       from './parseHtml/parseHtml';
 export { prevent }         from './prevent/prevent';
 export { query }           from './query/query';

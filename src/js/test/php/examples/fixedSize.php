@@ -20,7 +20,7 @@ $settings = get_settings();
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide01 = new Splide( '#splide01', {
         type       : 'loop',
-        fixedWidth : 100,
+        fixedWidth : '6rem',
         gap        : 10,
       } );
 

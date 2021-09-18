@@ -215,18 +215,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     return elm;
   }
 
-  function style(elms, styles) {
+  function style(elm, styles) {
     if (isString(styles)) {
-      return isArray(elms) ? null : getComputedStyle(elms)[styles];
+      return getComputedStyle(elm)[styles];
     }
 
     forOwn(styles, function (value, key) {
       if (!isNull(value)) {
-        forEach(elms, function (elm) {
-          if (elm) {
-            elm.style[key] = "" + value;
-          }
-        });
+        elm.style[key] = "" + value;
       }
     });
   }
@@ -243,6 +239,30 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
   function hasClass(elm, className) {
     return elm && elm.classList.contains(className);
+  }
+
+  function rect(target) {
+    return target.getBoundingClientRect();
+  }
+
+  function remove(nodes) {
+    forEach(nodes, function (node) {
+      if (node && node.parentNode) {
+        node.parentNode.removeChild(node);
+      }
+    });
+  }
+
+  function measure(parent, value) {
+    if (isString(value)) {
+      var div = create("div", {
+        style: "width: " + value + "; position: absolute;"
+      }, parent);
+      value = rect(div).width;
+      remove(div);
+    }
+
+    return value;
   }
 
   function parseHtml(html) {
@@ -264,18 +284,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
   function queryAll(parent, selector) {
     return slice(parent.querySelectorAll(selector));
-  }
-
-  function rect(target) {
-    return target.getBoundingClientRect();
-  }
-
-  function remove(nodes) {
-    forEach(nodes, function (node) {
-      if (node && node.parentNode) {
-        node.parentNode.removeChild(node);
-      }
-    });
   }
 
   function removeClass(elm, classes) {
@@ -960,11 +968,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function onMove(next, prev, dest) {
       if (!destroyed) {
+        update.call(this);
+
         if (dest === index) {
           updateActivity.call(this, true);
         }
-
-        update.call(this);
       }
     }
 
@@ -1256,7 +1264,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       if (!Splide2.is(LOOP)) {
         clones2 = 0;
       } else if (!clones2) {
-        var fixedSize = options[resolve("fixedWidth")];
+        var fixedSize = measure(Elements.list, options[resolve("fixedWidth")]);
         var fixedCount = fixedSize && ceil(rect(Elements.track)[resolve("width")] / fixedSize);
         var baseCount = fixedCount || options[resolve("autoWidth")] && Splide2.length || options.perPage;
         clones2 = baseCount * (options.drag ? (options.flickMaxPages || 1) + 1 : 2);

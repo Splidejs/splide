@@ -188,17 +188,13 @@ function create(tag, attrs, parent) {
   return elm;
 }
 
-function style(elms, styles) {
+function style(elm, styles) {
   if (isString(styles)) {
-    return isArray(elms) ? null : getComputedStyle(elms)[styles];
+    return getComputedStyle(elm)[styles];
   }
   forOwn(styles, (value, key) => {
     if (!isNull(value)) {
-      forEach(elms, (elm) => {
-        if (elm) {
-          elm.style[key] = `${value}`;
-        }
-      });
+      elm.style[key] = `${value}`;
     }
   });
 }
@@ -213,6 +209,27 @@ function getAttribute(elm, attr) {
 
 function hasClass(elm, className) {
   return elm && elm.classList.contains(className);
+}
+
+function rect(target) {
+  return target.getBoundingClientRect();
+}
+
+function remove(nodes) {
+  forEach(nodes, (node) => {
+    if (node && node.parentNode) {
+      node.parentNode.removeChild(node);
+    }
+  });
+}
+
+function measure(parent, value) {
+  if (isString(value)) {
+    const div = create("div", { style: `width: ${value}; position: absolute;` }, parent);
+    value = rect(div).width;
+    remove(div);
+  }
+  return value;
 }
 
 function parseHtml(html) {
@@ -233,18 +250,6 @@ function query(parent, selector) {
 
 function queryAll(parent, selector) {
   return slice(parent.querySelectorAll(selector));
-}
-
-function rect(target) {
-  return target.getBoundingClientRect();
-}
-
-function remove(nodes) {
-  forEach(nodes, (node) => {
-    if (node && node.parentNode) {
-      node.parentNode.removeChild(node);
-    }
-  });
 }
 
 function removeClass(elm, classes) {
@@ -827,10 +832,10 @@ function Slide$1(Splide2, index, slideIndex, slide) {
   }
   function onMove(next, prev, dest) {
     if (!destroyed) {
+      update.call(this);
       if (dest === index) {
         updateActivity.call(this, true);
       }
-      update.call(this);
     }
   }
   function update() {
@@ -1060,7 +1065,7 @@ function Clones(Splide2, Components2, options) {
     if (!Splide2.is(LOOP)) {
       clones2 = 0;
     } else if (!clones2) {
-      const fixedSize = options[resolve("fixedWidth")];
+      const fixedSize = measure(Elements.list, options[resolve("fixedWidth")]);
       const fixedCount = fixedSize && ceil(rect(Elements.track)[resolve("width")] / fixedSize);
       const baseCount = fixedCount || options[resolve("autoWidth")] && Splide2.length || options.perPage;
       clones2 = baseCount * (options.drag ? (options.flickMaxPages || 1) + 1 : 2);

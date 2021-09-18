@@ -151,11 +151,11 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    */
   function onMove( this: SlideComponent, next: number, prev: number, dest: number ): void {
     if ( ! destroyed ) {
+      update.call( this );
+
       if ( dest === index ) {
         updateActivity.call( this, true );
       }
-
-      update.call( this );
     }
   }
 
