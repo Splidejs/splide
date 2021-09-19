@@ -1,7 +1,7 @@
 import { EVENT_MOVE, EVENT_MOVED, EVENT_REFRESH, EVENT_RESIZED, EVENT_UPDATED } from '../../constants/events';
 import { DEFAULT_EVENT_PRIORITY } from '../../constants/priority';
 import { IDLE, MOVING } from '../../constants/states';
-import { LOOP, SLIDE } from '../../constants/types';
+import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
@@ -58,7 +58,9 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * Called when the component is mounted.
    */
   function mount(): void {
-    on( [ EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH ], reposition, DEFAULT_EVENT_PRIORITY - 1 );
+    if ( ! Splide.is( FADE ) ) {
+      on( [ EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH ], reposition, DEFAULT_EVENT_PRIORITY - 1 );
+    }
   }
 
   /**

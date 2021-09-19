@@ -1429,7 +1429,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var shouldSnap = true;
 
     function mount() {
-      on([EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition, DEFAULT_EVENT_PRIORITY - 1);
+      if (!Splide2.is(FADE)) {
+        on([EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition, DEFAULT_EVENT_PRIORITY - 1);
+      }
     }
 
     function reposition() {
