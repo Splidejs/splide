@@ -1187,7 +1187,9 @@ function Move(Splide2, Components2, options) {
   let waiting;
   let shouldSnap = true;
   function mount() {
-    on([EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition, DEFAULT_EVENT_PRIORITY - 1);
+    if (!Splide2.is(FADE)) {
+      on([EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition, DEFAULT_EVENT_PRIORITY - 1);
+    }
   }
   function reposition() {
     if (exceededLimit(true)) {
