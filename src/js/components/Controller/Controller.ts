@@ -227,7 +227,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
         }
       } else {
         if ( ! isLoop && ! incremental && dest !== from ) {
-          dest = toIndex( toPage( from ) + ( dest < from ? -1 : 1 ) );
+          dest = perMove ? dest : toIndex( toPage( from ) + ( dest < from ? -1 : 1 ) );
         }
       }
     } else {

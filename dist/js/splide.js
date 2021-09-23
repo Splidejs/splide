@@ -1691,7 +1691,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           }
         } else {
           if (!isLoop && !incremental && dest !== from) {
-            dest = toIndex(toPage(from) + (dest < from ? -1 : 1));
+            dest = perMove ? dest : toIndex(toPage(from) + (dest < from ? -1 : 1));
           }
         }
       } else {
