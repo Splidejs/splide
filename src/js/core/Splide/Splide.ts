@@ -185,10 +185,13 @@ export class Splide {
    * splide.go( '>2' );
    * ```
    *
-   * @param control
+   * @param control - A control pattern.
+   *
+   * @return `this`
    */
-  go( control: number | string ): void {
+  go( control: number | string ): this {
     this._Components.Controller.go( control );
+    return this;
   }
 
   /**

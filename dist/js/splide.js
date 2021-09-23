@@ -1598,10 +1598,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       slideCount = getLength(true);
       perMove = options.perMove;
       perPage = options.perPage;
-
-      if (currIndex >= slideCount) {
-        Move.jump(currIndex = slideCount - 1);
-      }
+      currIndex = min(currIndex, slideCount - 1);
+      Move.jump(currIndex);
     }
 
     function reindex() {
@@ -2868,6 +2866,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     _proto.go = function go(control) {
       this._Components.Controller.go(control);
+
+      return this;
     };
 
     _proto.on = function on(events, callback) {
