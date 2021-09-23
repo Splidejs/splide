@@ -120,7 +120,7 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
    */
   function listen(): void {
     const { go } = Controller;
-    on( [ EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_UPDATED, EVENT_REFRESH, EVENT_SCROLLED ], update );
+    on( [ EVENT_MOUNTED, EVENT_MOVED, EVENT_UPDATED, EVENT_REFRESH, EVENT_SCROLLED ], update );
     bind( next, 'click', () => { go( '>', true ) } );
     bind( prev, 'click', () => { go( '<', true ) } );
   }

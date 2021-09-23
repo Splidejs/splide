@@ -1654,14 +1654,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var dest = computeDestIndex(currIndex + number * (prev ? -1 : 1), currIndex);
 
       if (dest === -1 && Splide2.is(SLIDE)) {
+        var getLimit = Move.getLimit;
         var position = Move.getPosition();
 
         if (prev) {
-          if (!approximatelyEqual(position, 0, 1)) {
+          if (!approximatelyEqual(position, getLimit(false), 1)) {
             return 0;
           }
         } else {
-          if (!approximatelyEqual(position, Move.getLimit(true), 1)) {
+          if (!approximatelyEqual(position, getLimit(true), 1)) {
             return getEnd();
           }
         }
@@ -1816,7 +1817,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function listen() {
       var go = Controller.go;
-      on([EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_UPDATED, EVENT_REFRESH, EVENT_SCROLLED], update);
+      on([EVENT_MOUNTED, EVENT_MOVED, EVENT_UPDATED, EVENT_REFRESH, EVENT_SCROLLED], update);
       bind(next, "click", function () {
         go(">", true);
       });

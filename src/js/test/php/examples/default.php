@@ -23,7 +23,7 @@ $settings = get_settings();
         perPage: 3,
         // perMove: 1,
         gap    : '1.5rem',
-        drag   : 'free',
+        // drag   : 'free',
         height : 200,
       } );
 

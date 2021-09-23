@@ -177,14 +177,15 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
     const dest   = computeDestIndex( currIndex + number * ( prev ? -1 : 1 ), currIndex );
 
     if ( dest === -1 && Splide.is( SLIDE ) ) {
+      const { getLimit } = Move;
       const position = Move.getPosition();
 
       if ( prev ) {
-        if ( ! approximatelyEqual( position, 0, 1 ) ) {
+        if ( ! approximatelyEqual( position, getLimit( false ), 1 ) ) {
           return 0;
         }
       } else {
-        if ( ! approximatelyEqual( position, Move.getLimit( true ), 1 ) ) {
+        if ( ! approximatelyEqual( position, getLimit( true ), 1 ) ) {
           return getEnd();
         }
       }

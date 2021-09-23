@@ -20,7 +20,8 @@ $settings = get_settings();
         // width     : 1000,
         autoWidth : true,
         gap       : '1rem',
-        trimSpace : 'move',
+        trimSpace : false,
+        focus     : 'center',
         drag      : 'free',
       } );
 
@@ -28,6 +29,7 @@ $settings = get_settings();
 
       var splide02 = new Splide( '#splide02', {
         // width     : 1000,
+        type      : 'loop',
         autoWidth : true,
         gap       : '1rem',
         focus     : 'center',
