@@ -306,7 +306,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
   }
 
   /**
-   * Returns the current/previous index slide index.
+   * Returns the current/previous index.
    *
    * @param prev - Optional. Whether to return previous index or not.
    */

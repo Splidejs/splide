@@ -32,7 +32,7 @@ export interface  SlidesComponent extends BaseComponent {
   get( excludeClones?: boolean ): SlideComponent[];
   getIn( page: number ): SlideComponent[];
   getAt( index: number ): SlideComponent | undefined;
-  add( slide: string | Element | Array<string | Element>, index?: number, callback?: AnyFunction ): void;
+  add( slide: string | Element | Array<string | Element>, index?: number ): void;
   remove( selector: SlideMatcher ): void;
   forEach( iteratee: SlidesIteratee, excludeClones?: boolean ): void;
   filter( matcher: SlideMatcher ): SlideComponent[];
@@ -208,9 +208,9 @@ export function Slides( Splide: Splide, Components: Components, options: Options
 
   /**
    * Filters Slides by the matcher
-   * that can be an index, an array with indices, a selector, or an predicate function.
+   * that can be an index, an array with indices, a selector, or a predicate function.
    *
-   * @param matcher - An index, an array with indices, a selector string, or an predicate function.
+   * @param matcher - An index, an array with indices, a selector string, or a predicate function.
    *
    * @return An array with SlideComponent objects.
    */
