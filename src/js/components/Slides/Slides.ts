@@ -1,6 +1,6 @@
 import { EVENT_REFRESH, EVENT_RESIZE } from '../../constants/events';
-import { Splide } from '../../core/Splide/Splide';
 import { EventInterface } from '../../constructors';
+import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, BaseComponent, Components, Options } from '../../types';
 import {
   addClass,

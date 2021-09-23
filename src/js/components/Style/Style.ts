@@ -1,6 +1,7 @@
 import { BaseComponent } from '../../types';
 import { create, find, isHTMLElement, remove } from '../../utils';
 
+
 /**
  * The interface for the Style component.
  *

@@ -21,7 +21,6 @@ export const EVENT_DESTROY            = 'destroy';
 export const EVENT_ARROWS_MOUNTED     = 'arrows:mounted';
 export const EVENT_ARROWS_UPDATED     = 'arrows:updated';
 export const EVENT_PAGINATION_MOUNTED = 'pagination:mounted';
-export const EVENT_PAGINATION_PAGE    = 'pagination:page';
 export const EVENT_PAGINATION_UPDATED = 'pagination:updated';
 export const EVENT_NAVIGATION_MOUNTED = 'navigation:mounted';
 export const EVENT_AUTOPLAY_PLAY      = 'autoplay:play';

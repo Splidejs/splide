@@ -1,17 +1,17 @@
 import { ARIA_CONTROLS, ARIA_CURRENT, ARIA_LABEL } from '../../constants/attributes';
 import { CLASS_ACTIVE } from '../../constants/classes';
 import {
-  EVENT_MOVE, EVENT_PAGINATION_MOUNTED,
-  EVENT_PAGINATION_PAGE, EVENT_PAGINATION_UPDATED,
+  EVENT_MOVE,
+  EVENT_PAGINATION_MOUNTED,
+  EVENT_PAGINATION_UPDATED,
   EVENT_REFRESH,
   EVENT_SCROLLED,
   EVENT_UPDATED,
 } from '../../constants/events';
-import { Splide } from '../../core/Splide/Splide';
 import { EventInterface } from '../../constructors';
+import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { addClass, ceil, create, empty, remove, removeAttribute, removeClass, setAttribute } from '../../utils';
-import { format } from '../../utils';
+import { addClass, ceil, create, empty, format, remove, removeAttribute, removeClass, setAttribute } from '../../utils';
 
 
 /**
@@ -116,8 +116,6 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
 
       setAttribute( button, ARIA_CONTROLS, controls.join( ' ' ) );
       setAttribute( button, ARIA_LABEL, format( text, i + 1 ) );
-
-      emit( EVENT_PAGINATION_PAGE, list, li, button, i );
 
       items.push( { li, button, page: i } );
     }

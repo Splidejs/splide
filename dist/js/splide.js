@@ -448,7 +448,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var EVENT_ARROWS_MOUNTED = "arrows:mounted";
   var EVENT_ARROWS_UPDATED = "arrows:updated";
   var EVENT_PAGINATION_MOUNTED = "pagination:mounted";
-  var EVENT_PAGINATION_PAGE = "pagination:page";
   var EVENT_PAGINATION_UPDATED = "pagination:updated";
   var EVENT_NAVIGATION_MOUNTED = "navigation:mounted";
   var EVENT_AUTOPLAY_PLAY = "autoplay:play";
@@ -2547,7 +2546,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         });
         setAttribute(button, ARIA_CONTROLS, controls.join(" "));
         setAttribute(button, ARIA_LABEL, format(text, i + 1));
-        emit(EVENT_PAGINATION_PAGE, list, li, button, i);
         items.push({
           li: li,
           button: button,

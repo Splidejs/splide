@@ -1,8 +1,4 @@
-import {
-  EVENT_AUTOPLAY_PAUSE,
-  EVENT_AUTOPLAY_PLAY,
-  EVENT_AUTOPLAY_PLAYING,
-} from '../../../constants/events';
+import { EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING } from '../../../constants/events';
 import { init, wait } from '../../../test';
 
 

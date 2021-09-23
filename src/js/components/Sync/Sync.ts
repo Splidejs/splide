@@ -1,7 +1,7 @@
 import { EVENT_CLICK, EVENT_MOVE, EVENT_NAVIGATION_MOUNTED, EVENT_SLIDE_KEYDOWN } from '../../constants/events';
 import { LOOP } from '../../constants/types';
-import { Splide } from '../../core/Splide/Splide';
 import { EventInterface } from '../../constructors';
+import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import { empty, includes, prevent } from '../../utils';
 
