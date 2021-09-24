@@ -111,8 +111,6 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * @param index - An index to jump to.
    */
   function jump( index: number ): void {
-    waiting = false;
-    Components.Transition.cancel();
     translate( toPosition( index, true ) );
   }
 
@@ -155,8 +153,9 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * Cancels transition.
    */
   function cancel(): void {
-    translate( getPosition() );
+    waiting = false;
     Components.Transition.cancel();
+    translate( getPosition() );
   }
 
   /**

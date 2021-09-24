@@ -1463,8 +1463,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function jump(index) {
-      waiting = false;
-      Components2.Transition.cancel();
       translate(toPosition(index, true));
     }
 
@@ -1489,8 +1487,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function cancel() {
-      translate(getPosition());
+      waiting = false;
       Components2.Transition.cancel();
+      translate(getPosition());
     }
 
     function toIndex(position) {

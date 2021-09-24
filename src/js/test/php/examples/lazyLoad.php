@@ -12,7 +12,7 @@ $settings = get_settings();
 
   <link rel="stylesheet" href="../../../../../dist/css/themes/splide-<?php echo $settings['theme'] ?>.min.css">
   <link rel="stylesheet" href="../../assets/css/styles.css">
-  <script src="../../../../../dist/js/splide.min.js"></script>
+  <script src="../../../../../dist/js/splide.js"></script>
 
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
@@ -29,6 +29,7 @@ $settings = get_settings();
         perPage    : 2,
         lazyLoad   : 'nearby',
         heightRatio: ( 9 / 16 ) / 2,
+        speed      : 400,
       } );
 
       splide02.mount();
