@@ -1,5 +1,5 @@
 import { Splide } from '../../core/Splide/Splide';
-import { AnyFunction, BaseComponent, Components, Options } from '../../types';
+import { BaseComponent, Components, Options } from '../../types';
 import { SlideComponent } from './Slide';
 /**
  * The interface for the Slides component.
@@ -11,7 +11,7 @@ export interface SlidesComponent extends BaseComponent {
     get(excludeClones?: boolean): SlideComponent[];
     getIn(page: number): SlideComponent[];
     getAt(index: number): SlideComponent | undefined;
-    add(slide: string | Element | Array<string | Element>, index?: number, callback?: AnyFunction): void;
+    add(slide: string | Element | Array<string | Element>, index?: number): void;
     remove(selector: SlideMatcher): void;
     forEach(iteratee: SlidesIteratee, excludeClones?: boolean): void;
     filter(matcher: SlideMatcher): SlideComponent[];

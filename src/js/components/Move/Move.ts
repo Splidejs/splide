@@ -263,7 +263,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * @return `true` if the slider can move, or otherwise `false`.
    */
   function isBusy(): boolean {
-    return waiting;
+    return !! waiting;
   }
 
   /**

@@ -1545,7 +1545,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function isBusy() {
-      return waiting;
+      return !!waiting;
     }
 
     function exceededLimit(max, position) {

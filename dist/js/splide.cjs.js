@@ -393,7 +393,6 @@ const EVENT_DESTROY = "destroy";
 const EVENT_ARROWS_MOUNTED = "arrows:mounted";
 const EVENT_ARROWS_UPDATED = "arrows:updated";
 const EVENT_PAGINATION_MOUNTED = "pagination:mounted";
-const EVENT_PAGINATION_PAGE = "pagination:page";
 const EVENT_PAGINATION_UPDATED = "pagination:updated";
 const EVENT_NAVIGATION_MOUNTED = "navigation:mounted";
 const EVENT_AUTOPLAY_PLAY = "autoplay:play";
@@ -1222,8 +1221,6 @@ function Move(Splide2, Components2, options) {
     }
   }
   function jump(index) {
-    waiting = false;
-    Components2.Transition.cancel();
     translate(toPosition(index, true));
   }
   function translate(position) {
@@ -1243,8 +1240,9 @@ function Move(Splide2, Components2, options) {
     return position;
   }
   function cancel() {
-    translate(getPosition());
+    waiting = false;
     Components2.Transition.cancel();
+    translate(getPosition());
   }
   function toIndex(position) {
     const Slides = Components2.Slides.get();
@@ -1331,9 +1329,8 @@ function Controller(Splide2, Components2, options) {
     slideCount = getLength(true);
     perMove = options.perMove;
     perPage = options.perPage;
-    if (currIndex >= slideCount) {
-      Move.jump(currIndex = slideCount - 1);
-    }
+    currIndex = min(currIndex, slideCount - 1);
+    Move.jump(currIndex);
   }
   function reindex() {
     setIndex(Move.toIndex(Move.getPosition()));
@@ -1376,13 +1373,14 @@ function Controller(Splide2, Components2, options) {
     const number = perMove || hasFocus() ? 1 : perPage;
     const dest = computeDestIndex(currIndex + number * (prev ? -1 : 1), currIndex);
     if (dest === -1 && Splide2.is(SLIDE)) {
+      const { getLimit } = Move;
       const position = Move.getPosition();
       if (prev) {
-        if (!approximatelyEqual(position, 0, 1)) {
+        if (!approximatelyEqual(position, getLimit(false), 1)) {
           return 0;
         }
       } else {
-        if (!approximatelyEqual(position, Move.getLimit(true), 1)) {
+        if (!approximatelyEqual(position, getLimit(true), 1)) {
           return getEnd();
         }
       }
@@ -1406,7 +1404,7 @@ function Controller(Splide2, Components2, options) {
         }
       } else {
         if (!isLoop && !incremental && dest !== from) {
-          dest = toIndex(toPage(from) + (dest < from ? -1 : 1));
+          dest = perMove ? dest : toIndex(toPage(from) + (dest < from ? -1 : 1));
         }
       }
     } else {
@@ -1510,7 +1508,7 @@ function Arrows(Splide2, Components2, options) {
   }
   function listen() {
     const { go } = Controller;
-    on([EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_UPDATED, EVENT_REFRESH, EVENT_SCROLLED], update);
+    on([EVENT_MOUNTED, EVENT_MOVED, EVENT_UPDATED, EVENT_REFRESH, EVENT_SCROLLED], update);
     bind(next, "click", () => {
       go(">", true);
     });
@@ -2073,7 +2071,6 @@ function Pagination(Splide2, Components2, options) {
       });
       setAttribute(button, ARIA_CONTROLS, controls.join(" "));
       setAttribute(button, ARIA_LABEL, format(text, i + 1));
-      emit(EVENT_PAGINATION_PAGE, list, li, button, i);
       items.push({ li, button, page: i });
     }
   }
@@ -2336,6 +2333,7 @@ const _Splide = class {
   }
   go(control) {
     this._Components.Controller.go(control);
+    return this;
   }
   on(events, callback) {
     this.event.on(events, callback, null, DEFAULT_USER_EVENT_PRIORITY);
@@ -2445,7 +2443,6 @@ exports.EVENT_MOVE = EVENT_MOVE;
 exports.EVENT_MOVED = EVENT_MOVED;
 exports.EVENT_NAVIGATION_MOUNTED = EVENT_NAVIGATION_MOUNTED;
 exports.EVENT_PAGINATION_MOUNTED = EVENT_PAGINATION_MOUNTED;
-exports.EVENT_PAGINATION_PAGE = EVENT_PAGINATION_PAGE;
 exports.EVENT_PAGINATION_UPDATED = EVENT_PAGINATION_UPDATED;
 exports.EVENT_READY = EVENT_READY;
 exports.EVENT_REFRESH = EVENT_REFRESH;
