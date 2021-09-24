@@ -68,6 +68,17 @@ describe( 'Pagination', () => {
     expect( items[ 3 ].getAttribute( 'aria-current' ) ).toBe( 'true' );
   } );
 
+  test( 'can set focus to the selected slide.', () => {
+    const splide = init( { speed: 0 } );
+    const items  = document.getElementsByClassName( CLASS_PAGINATION_PAGE );
+
+    fire( items[ 0 ], 'click' );
+    expect( splide.Components.Slides.getAt( 0 ).slide ).toBe( document.activeElement );
+
+    fire( items[ 1 ], 'click' );
+    expect( splide.Components.Slides.getAt( 1).slide ).toBe( document.activeElement );
+  } );
+
   test( 'should not create pagination if slides are not enough to the perPage option.', () => {
     init( { perPage: 3 }, { length: 1 } );
     const items  = document.getElementsByClassName( CLASS_PAGINATION_PAGE );

@@ -4,7 +4,7 @@ import { IDLE, MOVING } from '../../constants/states';
 import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
-import { BaseComponent, Components, Options } from '../../types';
+import { AnyFunction, BaseComponent, Components, Options } from '../../types';
 import { abs, clamp, isUndefined, rect } from '../../utils';
 import { SNAP_THRESHOLD } from './constants';
 
@@ -15,7 +15,7 @@ import { SNAP_THRESHOLD } from './constants';
  * @since 3.0.0
  */
 export interface MoveComponent extends BaseComponent {
-  move( dest: number, index: number, prev: number ): void;
+  move( dest: number, index: number, prev: number, callback?: AnyFunction ): void;
   jump( index: number ): void;
   translate( position: number ): void;
   cancel(): void;
@@ -78,11 +78,12 @@ export function Move( Splide: Splide, Components: Components, options: Options )
   /**
    * Moves the slider to the dest index with the Transition component.
    *
-   * @param dest  - A destination index to go to, including clones'.
-   * @param index - A slide index.
-   * @param prev  - A previous index.
+   * @param dest     - A destination index to go to, including clones'.
+   * @param index    - A slide index.
+   * @param prev     - A previous index.
+   * @param callback - Optional. A callback function invoked after transition ends.
    */
-  function move( dest: number, index: number, prev: number ): void {
+  function move( dest: number, index: number, prev: number, callback?: AnyFunction ): void {
     if ( ! isBusy() ) {
       const { set } = Splide.state;
       const position = getPosition();
@@ -99,7 +100,9 @@ export function Move( Splide: Splide, Components: Components, options: Options )
         emit( EVENT_MOVED, index, prev, dest );
 
         if ( options.trimSpace === 'move' && dest !== prev && position === getPosition() ) {
-          Components.Controller.go( dest > prev ? '>' : '<' );
+          Components.Controller.go( dest > prev ? '>' : '<', false, callback );
+        } else {
+          callback && callback();
         }
       } );
     }

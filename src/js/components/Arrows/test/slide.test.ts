@@ -1,3 +1,4 @@
+import { EVENT_MOVED } from '../../../constants/events';
 import { fire, init } from '../../../test';
 
 
@@ -35,6 +36,22 @@ describe( 'Arrows', () => {
 
     expect( prev.disabled ).toBe( false );
     expect( next.disabled ).toBe( true );
+  } );
+
+  test( 'should not disable arrows if the slider position is not approximately same with each limit.', () => {
+    splide.go( 0 );
+
+    expect( prev.disabled ).toBe( true );
+    expect( next.disabled ).toBe( false );
+
+    splide.Components.Move.translate( -10 );
+    splide.emit( EVENT_MOVED );
+
+    // Index should be still 0
+    expect( splide.index ).toBe( 0 );
+
+    expect( prev.disabled ).toBe( false );
+    expect( next.disabled ).toBe( false );
   } );
 
   test( 'can update aria attributes.', () => {

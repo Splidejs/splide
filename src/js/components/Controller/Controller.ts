@@ -2,7 +2,7 @@ import { EVENT_REFRESH, EVENT_SCROLLED, EVENT_UPDATED } from '../../constants/ev
 import { LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
-import { BaseComponent, Components, Options } from '../../types';
+import { AnyFunction, BaseComponent, Components, Options } from '../../types';
 import { approximatelyEqual, between, clamp, floor, isString, isUndefined, max, min } from '../../utils';
 
 
@@ -12,7 +12,7 @@ import { approximatelyEqual, between, clamp, floor, isString, isUndefined, max, 
  * @since 3.0.0
  */
 export interface ControllerComponent extends BaseComponent {
-  go( control: number | string, allowSameIndex?: boolean ): void;
+  go( control: number | string, allowSameIndex?: boolean, callback?: AnyFunction ): void;
   getNext( destination?: boolean ): number;
   getPrev( destination?: boolean ): number;
   getEnd(): number;
@@ -37,6 +37,7 @@ export interface ControllerComponent extends BaseComponent {
 export function Controller( Splide: Splide, Components: Components, options: Options ): ControllerComponent {
   const { on } = EventInterface( Splide );
   const { Move } = Components;
+  const { jump, getPosition, getLimit } = Move;
   const { isEnough, getLength } = Components.Slides;
   const isLoop = Splide.is( LOOP );
 
@@ -70,7 +71,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    */
   function mount(): void {
     init();
-    Move.jump( currIndex );
+    jump( currIndex );
     on( [ EVENT_UPDATED, EVENT_REFRESH ], init );
     on( EVENT_SCROLLED, reindex, 0 );
   }
@@ -84,15 +85,14 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
     perMove    = options.perMove;
     perPage    = options.perPage;
     currIndex  = min( currIndex, slideCount - 1 );
-
-    Move.jump( currIndex );
+    jump( currIndex );
   }
 
   /**
    * Calculates the index by the current position and updates the current index.
    */
   function reindex(): void {
-    setIndex( Move.toIndex( Move.getPosition() ) );
+    setIndex( Move.toIndex( getPosition() ) );
   }
 
   /**
@@ -102,14 +102,15 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    *
    * @param control        - A control pattern.
    * @param allowSameIndex - Optional. Determines whether to allow to go to the current index or not.
+   * @param callback       - Optional. A callback function invoked after transition ends.
    */
-  function go( control: number | string, allowSameIndex?: boolean ): void {
+  function go( control: number | string, allowSameIndex?: boolean, callback?: AnyFunction ): void {
     const dest  = parse( control );
     const index = loop( dest );
 
     if ( index > -1 && ! Move.isBusy() && ( allowSameIndex || index !== currIndex ) ) {
       setIndex( index );
-      Move.move( dest, index, prevIndex );
+      Move.move( dest, index, prevIndex, callback );
     }
   }
 
@@ -177,17 +178,8 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
     const dest   = computeDestIndex( currIndex + number * ( prev ? -1 : 1 ), currIndex );
 
     if ( dest === -1 && Splide.is( SLIDE ) ) {
-      const { getLimit } = Move;
-      const position = Move.getPosition();
-
-      if ( prev ) {
-        if ( ! approximatelyEqual( position, getLimit( false ), 1 ) ) {
-          return 0;
-        }
-      } else {
-        if ( ! approximatelyEqual( position, getLimit( true ), 1 ) ) {
-          return getEnd();
-        }
+      if ( ! approximatelyEqual( getPosition(), getLimit( ! prev ), 1 ) ) {
+        return prev ? 0 : getEnd();
       }
     }
 

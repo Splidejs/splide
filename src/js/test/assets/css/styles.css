@@ -22,6 +22,10 @@ img {
   border: 2px solid deepskyblue;
 }
 
+.splide__slide:focus, .splide__arrow:focus, .splide__pagination__page:focus {
+  border: 2px solid tomato;
+}
+
 .splide__pagination__page.is-active {
   background: deepskyblue;
 }

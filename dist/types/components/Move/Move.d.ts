@@ -1,12 +1,12 @@
 import { Splide } from '../../core/Splide/Splide';
-import { BaseComponent, Components, Options } from '../../types';
+import { AnyFunction, BaseComponent, Components, Options } from '../../types';
 /**
  * The interface for the Move component.
  *
  * @since 3.0.0
  */
 export interface MoveComponent extends BaseComponent {
-    move(dest: number, index: number, prev: number): void;
+    move(dest: number, index: number, prev: number, callback?: AnyFunction): void;
     jump(index: number): void;
     translate(position: number): void;
     cancel(): void;

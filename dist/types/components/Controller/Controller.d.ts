@@ -1,12 +1,12 @@
 import { Splide } from '../../core/Splide/Splide';
-import { BaseComponent, Components, Options } from '../../types';
+import { AnyFunction, BaseComponent, Components, Options } from '../../types';
 /**
  * The interface for the Controller component.
  *
  * @since 3.0.0
  */
 export interface ControllerComponent extends BaseComponent {
-    go(control: number | string, allowSameIndex?: boolean): void;
+    go(control: number | string, allowSameIndex?: boolean, callback?: AnyFunction): void;
     getNext(destination?: boolean): number;
     getPrev(destination?: boolean): number;
     getEnd(): number;

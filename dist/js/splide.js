@@ -1441,7 +1441,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }
     }
 
-    function move(dest, index, prev) {
+    function move(dest, index, prev, callback) {
       if (!isBusy()) {
         var set = Splide2.state.set;
         var position = getPosition();
@@ -1456,7 +1456,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           emit(EVENT_MOVED, index, prev, dest);
 
           if (options.trimSpace === "move" && dest !== prev && position === getPosition()) {
-            Components2.Controller.go(dest > prev ? ">" : "<");
+            Components2.Controller.go(dest > prev ? ">" : "<", false, callback);
+          } else {
+            callback && callback();
           }
         });
       }
@@ -1575,6 +1577,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         on = _EventInterface7.on;
 
     var Move = Components2.Move;
+    var jump = Move.jump,
+        getPosition = Move.getPosition,
+        getLimit = Move.getLimit;
     var _Components2$Slides = Components2.Slides,
         isEnough = _Components2$Slides.isEnough,
         getLength = _Components2$Slides.getLength;
@@ -1587,7 +1592,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function mount() {
       init();
-      Move.jump(currIndex);
+      jump(currIndex);
       on([EVENT_UPDATED, EVENT_REFRESH], init);
       on(EVENT_SCROLLED, reindex, 0);
     }
@@ -1597,20 +1602,20 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       perMove = options.perMove;
       perPage = options.perPage;
       currIndex = min(currIndex, slideCount - 1);
-      Move.jump(currIndex);
+      jump(currIndex);
     }
 
     function reindex() {
-      setIndex(Move.toIndex(Move.getPosition()));
+      setIndex(Move.toIndex(getPosition()));
     }
 
-    function go(control, allowSameIndex) {
+    function go(control, allowSameIndex, callback) {
       var dest = parse(control);
       var index = loop(dest);
 
       if (index > -1 && !Move.isBusy() && (allowSameIndex || index !== currIndex)) {
         setIndex(index);
-        Move.move(dest, index, prevIndex);
+        Move.move(dest, index, prevIndex, callback);
       }
     }
 
@@ -1653,17 +1658,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var dest = computeDestIndex(currIndex + number * (prev ? -1 : 1), currIndex);
 
       if (dest === -1 && Splide2.is(SLIDE)) {
-        var getLimit = Move.getLimit;
-        var position = Move.getPosition();
-
-        if (prev) {
-          if (!approximatelyEqual(position, getLimit(false), 1)) {
-            return 0;
-          }
-        } else {
-          if (!approximatelyEqual(position, getLimit(true), 1)) {
-            return getEnd();
-          }
+        if (!approximatelyEqual(getPosition(), getLimit(!prev), 1)) {
+          return prev ? 0 : getEnd();
         }
       }
 
@@ -2483,12 +2479,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         unbind = _EventInterface15.unbind;
 
     var Slides = Components2.Slides,
-        Elements = Components2.Elements;
-    var _Components2$Controll = Components2.Controller,
-        go = _Components2$Controll.go,
-        toPage = _Components2$Controll.toPage,
-        hasFocus = _Components2$Controll.hasFocus,
-        getIndex = _Components2$Controll.getIndex;
+        Elements = Components2.Elements,
+        Controller = Components2.Controller;
+    var hasFocus = Controller.hasFocus,
+        getIndex = Controller.getIndex;
     var items = [];
     var list;
 
@@ -2531,7 +2525,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var max = hasFocus() ? length : ceil(length / perPage);
       list = create("ul", classes.pagination, parent);
 
-      var _loop = function _loop(i) {
+      for (var i = 0; i < max; i++) {
         var li = create("li", null, list);
         var button = create("button", {
           class: classes.page,
@@ -2541,9 +2535,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           return Slide.slide.id;
         });
         var text = !hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
-        bind(button, "click", function () {
-          go(">" + i, true);
-        });
+        bind(button, "click", onClick.bind(null, i));
         setAttribute(button, ARIA_CONTROLS, controls.join(" "));
         setAttribute(button, ARIA_LABEL, format(text, i + 1));
         items.push({
@@ -2551,15 +2543,18 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           button: button,
           page: i
         });
-      };
-
-      for (var i = 0; i < max; i++) {
-        _loop(i);
       }
     }
 
+    function onClick(page) {
+      Controller.go(">" + page, true, function () {
+        var Slide = Slides.getAt(Controller.toIndex(page));
+        Slide && Slide.slide.focus();
+      });
+    }
+
     function getAt(index) {
-      return items[toPage(index)];
+      return items[Controller.toPage(index)];
     }
 
     function update() {

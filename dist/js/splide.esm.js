@@ -1197,7 +1197,7 @@ function Move(Splide2, Components2, options) {
       jump(Splide2.index);
     }
   }
-  function move(dest, index, prev) {
+  function move(dest, index, prev, callback) {
     if (!isBusy()) {
       const { set } = Splide2.state;
       const position = getPosition();
@@ -1211,7 +1211,9 @@ function Move(Splide2, Components2, options) {
         set(IDLE);
         emit(EVENT_MOVED, index, prev, dest);
         if (options.trimSpace === "move" && dest !== prev && position === getPosition()) {
-          Components2.Controller.go(dest > prev ? ">" : "<");
+          Components2.Controller.go(dest > prev ? ">" : "<", false, callback);
+        } else {
+          callback && callback();
         }
       });
     }
@@ -1282,7 +1284,7 @@ function Move(Splide2, Components2, options) {
     return abs(position - toPosition(toIndex(position), true)) < SNAP_THRESHOLD;
   }
   function isBusy() {
-    return waiting;
+    return !!waiting;
   }
   function exceededLimit(max, position) {
     position = isUndefined(position) ? getPosition() : position;
@@ -1308,6 +1310,7 @@ function Move(Splide2, Components2, options) {
 function Controller(Splide2, Components2, options) {
   const { on } = EventInterface(Splide2);
   const { Move } = Components2;
+  const { jump, getPosition, getLimit } = Move;
   const { isEnough, getLength } = Components2.Slides;
   const isLoop = Splide2.is(LOOP);
   let currIndex = options.start || 0;
@@ -1317,7 +1320,7 @@ function Controller(Splide2, Components2, options) {
   let perPage;
   function mount() {
     init();
-    Move.jump(currIndex);
+    jump(currIndex);
     on([EVENT_UPDATED, EVENT_REFRESH], init);
     on(EVENT_SCROLLED, reindex, 0);
   }
@@ -1326,17 +1329,17 @@ function Controller(Splide2, Components2, options) {
     perMove = options.perMove;
     perPage = options.perPage;
     currIndex = min(currIndex, slideCount - 1);
-    Move.jump(currIndex);
+    jump(currIndex);
   }
   function reindex() {
-    setIndex(Move.toIndex(Move.getPosition()));
+    setIndex(Move.toIndex(getPosition()));
   }
-  function go(control, allowSameIndex) {
+  function go(control, allowSameIndex, callback) {
     const dest = parse(control);
     const index = loop(dest);
     if (index > -1 && !Move.isBusy() && (allowSameIndex || index !== currIndex)) {
       setIndex(index);
-      Move.move(dest, index, prevIndex);
+      Move.move(dest, index, prevIndex, callback);
     }
   }
   function parse(control) {
@@ -1369,16 +1372,8 @@ function Controller(Splide2, Components2, options) {
     const number = perMove || hasFocus() ? 1 : perPage;
     const dest = computeDestIndex(currIndex + number * (prev ? -1 : 1), currIndex);
     if (dest === -1 && Splide2.is(SLIDE)) {
-      const { getLimit } = Move;
-      const position = Move.getPosition();
-      if (prev) {
-        if (!approximatelyEqual(position, getLimit(false), 1)) {
-          return 0;
-        }
-      } else {
-        if (!approximatelyEqual(position, getLimit(true), 1)) {
-          return getEnd();
-        }
+      if (!approximatelyEqual(getPosition(), getLimit(!prev), 1)) {
+        return prev ? 0 : getEnd();
       }
     }
     return destination ? dest : loop(dest);
@@ -2024,8 +2019,8 @@ function LazyLoad(Splide2, Components2, options) {
 
 function Pagination(Splide2, Components2, options) {
   const { on, emit, bind, unbind } = EventInterface(Splide2);
-  const { Slides, Elements } = Components2;
-  const { go, toPage, hasFocus, getIndex } = Components2.Controller;
+  const { Slides, Elements, Controller } = Components2;
+  const { hasFocus, getIndex } = Controller;
   const items = [];
   let list;
   function mount() {
@@ -2062,16 +2057,20 @@ function Pagination(Splide2, Components2, options) {
       const button = create("button", { class: classes.page, type: "button" }, li);
       const controls = Slides.getIn(i).map((Slide) => Slide.slide.id);
       const text = !hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
-      bind(button, "click", () => {
-        go(`>${i}`, true);
-      });
+      bind(button, "click", onClick.bind(null, i));
       setAttribute(button, ARIA_CONTROLS, controls.join(" "));
       setAttribute(button, ARIA_LABEL, format(text, i + 1));
       items.push({ li, button, page: i });
     }
   }
+  function onClick(page) {
+    Controller.go(`>${page}`, true, () => {
+      const Slide = Slides.getAt(Controller.toIndex(page));
+      Slide && Slide.slide.focus();
+    });
+  }
   function getAt(index) {
-    return items[toPage(index)];
+    return items[Controller.toPage(index)];
   }
   function update() {
     const prev = getAt(getIndex(true));

@@ -48,8 +48,8 @@ export interface PaginationItem {
  */
 export function Pagination( Splide: Splide, Components: Components, options: Options ): PaginationComponent {
   const { on, emit, bind, unbind } = EventInterface( Splide );
-  const { Slides, Elements } = Components;
-  const { go, toPage, hasFocus, getIndex } = Components.Controller;
+  const { Slides, Elements, Controller } = Components;
+  const { hasFocus, getIndex } = Controller;
 
   /**
    * Stores all pagination items.
@@ -112,13 +112,28 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
       const controls = Slides.getIn( i ).map( Slide => Slide.slide.id );
       const text     = ! hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
 
-      bind( button, 'click', () => { go( `>${ i }`, true ) } );
+      bind( button, 'click', onClick.bind( null, i ) );
 
       setAttribute( button, ARIA_CONTROLS, controls.join( ' ' ) );
       setAttribute( button, ARIA_LABEL, format( text, i + 1 ) );
 
       items.push( { li, button, page: i } );
     }
+  }
+
+  /**
+   * Called when the user clicks each pagination dot.
+   * Moves the focus to the active slide for accessibility.
+   *
+   * @link https://www.w3.org/WAI/tutorials/carousels/functionality/
+   *
+   * @param page - A clicked page index.
+   */
+  function onClick( page: number ): void {
+    Controller.go( `>${ page }`, true, () => {
+      const Slide = Slides.getAt( Controller.toIndex( page ) );
+      Slide && Slide.slide.focus();
+    } );
   }
 
   /**
@@ -129,7 +144,7 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
    * @return A pagination item object if available, or otherwise `undefined`.
    */
   function getAt( index: number ): PaginationItem | undefined {
-    return items[ toPage( index ) ];
+    return items[ Controller.toPage( index ) ];
   }
 
   /**
