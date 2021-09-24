@@ -2139,7 +2139,7 @@ function Wheel(Splide2, Components2, options) {
   const { bind } = EventInterface(Splide2);
   function mount() {
     if (options.wheel) {
-      bind(Components2.Elements.track, "wheel", onWheel);
+      bind(Components2.Elements.track, "wheel", onWheel, { passive: false, capture: true });
     }
   }
   function onWheel(e) {

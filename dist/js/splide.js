@@ -2644,7 +2644,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function mount() {
       if (options.wheel) {
-        bind(Components2.Elements.track, "wheel", onWheel);
+        bind(Components2.Elements.track, "wheel", onWheel, {
+          passive: false,
+          capture: true
+        });
       }
     }
 

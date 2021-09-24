@@ -31,7 +31,7 @@ export function Wheel( Splide: Splide, Components: Components, options: Options 
    */
   function mount(): void {
     if ( options.wheel ) {
-      bind( Components.Elements.track, 'wheel', onWheel );
+      bind( Components.Elements.track, 'wheel', onWheel, { passive: false, capture: true } );
     }
   }
 
