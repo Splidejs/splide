@@ -1749,7 +1749,7 @@ function Drag(Splide2, Components2, options) {
   let disabled;
   let target;
   function mount() {
-    bind(track, POINTER_DOWN_EVENTS, onPointerDown);
+    bind(track, POINTER_DOWN_EVENTS, onPointerDown, { passive: false, capture: true });
     bind(track, "click", onClick, { capture: true });
     on([EVENT_MOUNTED, EVENT_UPDATED], init);
   }

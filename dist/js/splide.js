@@ -2128,7 +2128,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var target;
 
     function mount() {
-      bind(track, POINTER_DOWN_EVENTS, onPointerDown);
+      bind(track, POINTER_DOWN_EVENTS, onPointerDown, {
+        passive: false,
+        capture: true
+      });
       bind(track, "click", onClick, {
         capture: true
       });
