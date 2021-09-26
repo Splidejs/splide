@@ -1,4 +1,4 @@
-import { isArray, isString } from '../../type/type';
+import { isString } from '../../type/type';
 import { addClass } from '../addClass/addClass';
 import { append } from '../append/append';
 import { setAttribute } from '../setAttribute/setAttribute';
@@ -25,22 +25,16 @@ export function create(
  */
 export function create<K extends keyof HTMLElementTagNameMap>(
   tag: K,
-  attrs?: Record<string, string | number | boolean> | string | string[],
+  attrs?: Record<string, string | number | boolean> | string,
   parent?: HTMLElement
 ): HTMLElementTagNameMap[ K ] {
   const elm = document.createElement( tag );
 
   if ( attrs ) {
-    if ( isString( attrs ) || isArray( attrs ) ) {
-      addClass( elm, attrs );
-    } else {
-      setAttribute( elm, attrs );
-    }
+    isString( attrs ) ? addClass( elm, attrs ) : setAttribute( elm, attrs );
   }
 
-  if ( parent ) {
-    append( parent, elm );
-  }
+  parent && append( parent, elm );
 
   return elm;
 }

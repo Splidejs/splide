@@ -9,7 +9,7 @@ import { FADE } from '../../constants/types';
 import { EventBus, EventBusCallback, EventBusObject, State, StateObject } from '../../constructors';
 import { Fade, Slide } from '../../transitions';
 import { ComponentConstructor, Components, Options } from '../../types';
-import { addClass, assert, assign, empty, forOwn, isString, merge, query } from '../../utils';
+import { addClass, assert, assign, empty, forOwn, isString, merge, query, slice } from '../../utils';
 
 
 /**
@@ -253,8 +253,10 @@ export class Splide {
    *
    * @return `this`
    */
-  emit( event: string, ...args: any[] ): this {
-    this.event.emit( event, ...args );
+  emit( event: string, ...args: any[] ): this;
+  emit( event: string ): this {
+    // eslint-disable-next-line prefer-rest-params, prefer-spread
+    this.event.emit( event, ...slice( arguments, 1 ) );
     return this;
   }
 

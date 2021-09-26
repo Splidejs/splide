@@ -1,4 +1,5 @@
-const { max, min } = Math;
+import { max, min } from '../math/math';
+
 
 /**
  * Clamps a number.

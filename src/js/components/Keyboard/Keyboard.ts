@@ -76,12 +76,10 @@ export function Keyboard( Splide: Splide, Components: Components, options: Optio
    * Destroys the component.
    */
   function destroy() {
-    if ( target ) {
-      unbind( target, 'keydown' );
+    unbind( target, 'keydown' );
 
-      if ( isHTMLElement( target ) ) {
-        removeAttribute( target, TAB_INDEX );
-      }
+    if ( isHTMLElement( target ) ) {
+      removeAttribute( target, TAB_INDEX );
     }
   }
 
@@ -91,24 +89,14 @@ export function Keyboard( Splide: Splide, Components: Components, options: Optio
    * @param e - A KeyboardEvent object.
    */
   function onKeydown( e: KeyboardEvent ): void {
-    const key = normalize( e.key );
+    const { key } = e;
+    const normalizedKey = includes( IE_ARROW_KEYS, key ) ? `Arrow${ key }` : key;
 
-    if ( key === resolve( 'ArrowLeft' ) ) {
+    if ( normalizedKey === resolve( 'ArrowLeft' ) ) {
       Splide.go( '<' );
-    } else if ( key === resolve( 'ArrowRight' ) ) {
+    } else if ( normalizedKey === resolve( 'ArrowRight' ) ) {
       Splide.go( '>' );
     }
-  }
-
-  /**
-   * Absorbs the difference of key names among browsers.
-   *
-   * @param key - A key to normalize.
-   *
-   * @return A normalized key.
-   */
-  function normalize( key: string ): string {
-    return includes( IE_ARROW_KEYS, key ) ? `Arrow${ key }` : key;
   }
 
   return {

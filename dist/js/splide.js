@@ -104,7 +104,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   function addClass(elm, classes) {
-    toggleClass(elm, classes, true);
+    toggleClass(elm, isString(classes) ? classes.split(" ") : classes, true);
   }
 
   function append(parent, children) {
@@ -154,11 +154,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   function assign(object) {
-    for (var _len = arguments.length, sources = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      sources[_key - 1] = arguments[_key];
-    }
-
-    sources.forEach(function (source) {
+    slice(arguments, 1).forEach(function (source) {
       forOwn(source, function (value, key) {
         object[key] = source[key];
       });
@@ -201,17 +197,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var elm = document.createElement(tag);
 
     if (attrs) {
-      if (isString(attrs) || isArray(attrs)) {
-        addClass(elm, attrs);
-      } else {
-        setAttribute(elm, attrs);
-      }
+      isString(attrs) ? addClass(elm, attrs) : setAttribute(elm, attrs);
     }
 
-    if (parent) {
-      append(parent, elm);
-    }
-
+    parent && append(parent, elm);
     return elm;
   }
 
@@ -314,35 +303,31 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     return requestAnimationFrame(func);
   }
 
+  var min = Math.min,
+      max = Math.max,
+      floor = Math.floor,
+      ceil = Math.ceil,
+      abs = Math.abs;
+
   function approximatelyEqual(x, y, epsilon) {
-    return Math.abs(x - y) < epsilon;
+    return abs(x - y) < epsilon;
   }
 
   function between(number, minOrMax, maxOrMin, exclusive) {
-    var min = Math.min(minOrMax, maxOrMin);
-    var max = Math.max(minOrMax, maxOrMin);
-    return exclusive ? min < number && number < max : min <= number && number <= max;
+    var minimum = min(minOrMax, maxOrMin);
+    var maximum = max(minOrMax, maxOrMin);
+    return exclusive ? minimum < number && number < maximum : minimum <= number && number <= maximum;
   }
 
-  var max$1 = Math.max,
-      min$1 = Math.min;
-
   function clamp(number, x, y) {
-    var minimum = min$1(x, y);
-    var maximum = max$1(x, y);
-    return min$1(max$1(minimum, number), maximum);
+    var minimum = min(x, y);
+    var maximum = max(x, y);
+    return min(max(minimum, number), maximum);
   }
 
   function sign(x) {
     return +(x > 0) - +(x < 0);
   }
-
-  var min = Math.min,
-      max = Math.max,
-      floor = Math.floor,
-      ceil = Math.ceil,
-      abs = Math.abs,
-      round = Math.round;
 
   function format(string, replacements) {
     forEach(replacements, function (replacement) {
@@ -541,8 +526,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           onInterval();
 
           if (limit && ++count >= limit) {
-            pause();
-            return;
+            return pause();
           }
         }
 
@@ -700,11 +684,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var TTB = "ttb";
   var ORIENTATION_MAP = {
     marginRight: ["marginBottom", "marginLeft"],
-    width: ["height"],
     autoWidth: ["autoHeight"],
     fixedWidth: ["fixedHeight"],
     paddingLeft: ["paddingTop", "paddingRight"],
     paddingRight: ["paddingBottom", "paddingLeft"],
+    width: ["height"],
     left: ["top", "right"],
     right: ["bottom", "left"],
     x: ["y"],
@@ -811,7 +795,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       slider = child(root, "." + CLASS_SLIDER);
       track = query(root, "." + CLASS_TRACK);
       list = child(track, "." + CLASS_LIST);
-      assert(track && list, "Missing a track/list element.");
+      assert(track && list, "A track/list element is missing.");
       push(slides, children(list, "." + CLASS_SLIDE + ":not(." + CLASS_CLONE + ")"));
       var autoplay = find("." + CLASS_AUTOPLAY);
       var arrows = find("." + CLASS_ARROWS);
@@ -1329,7 +1313,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function cssPadding(right) {
       var padding = options.padding;
       var prop = resolve(right ? "right" : "left", true);
-      return padding ? unit(padding[prop] || (isObject(padding) ? "0" : padding)) : "";
+      return padding && unit(padding[prop] || (isObject(padding) ? 0 : padding)) || "0px";
     }
 
     function cssTrackHeight() {
@@ -1337,14 +1321,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       if (vertical) {
         height = cssHeight();
-        assert(height, '"height" or "heightRatio" is missing.');
-        var paddingTop = cssPadding(false);
-        var paddingBottom = cssPadding(true);
-
-        if (paddingTop || paddingBottom) {
-          height = "calc(" + height;
-          height += "" + (paddingTop ? " - " + paddingTop : "") + (paddingBottom ? " - " + paddingBottom : "") + ")";
-        }
+        assert(height, "height or heightRatio is missing.");
+        height = "calc(" + height + " - " + cssPadding(false) + " - " + cssPadding(true) + ")";
       }
 
       return height;
@@ -2180,30 +2158,28 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       lastEvent = e;
 
-      if (!e.cancelable) {
-        return;
-      }
+      if (e.cancelable) {
+        if (isDragging) {
+          var expired = timeOf(e) - timeOf(baseEvent) > LOG_INTERVAL;
+          var exceeded = hasExceeded !== (hasExceeded = exceededLimit());
 
-      if (isDragging) {
-        var expired = timeOf(e) - timeOf(baseEvent) > LOG_INTERVAL;
-        var exceeded = hasExceeded !== (hasExceeded = exceededLimit());
+          if (expired || exceeded) {
+            save(e);
+          }
 
-        if (expired || exceeded) {
-          save(e);
-        }
+          if (!isFade) {
+            Move.translate(basePosition + constrain(coordOf(e) - coordOf(baseEvent)));
+          }
 
-        if (!isFade) {
-          Move.translate(basePosition + constrain(coordOf(e) - coordOf(baseEvent)));
-        }
-
-        emit(EVENT_DRAGGING);
-        prevent(e);
-      } else {
-        var threshold = options.dragMinThreshold || 15;
-        isDragging = isMouse || abs(coordOf(e) - coordOf(baseEvent)) > threshold;
-
-        if (isSliderDirection()) {
+          emit(EVENT_DRAGGING);
           prevent(e);
+        } else {
+          var threshold = options.dragMinThreshold || 15;
+          isDragging = isMouse || abs(coordOf(e) - coordOf(baseEvent)) > threshold;
+
+          if (isSliderDirection()) {
+            prevent(e);
+          }
         }
       }
     }
@@ -2335,27 +2311,22 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function destroy() {
-      if (target) {
-        unbind(target, "keydown");
+      unbind(target, "keydown");
 
-        if (isHTMLElement(target)) {
-          removeAttribute(target, TAB_INDEX);
-        }
+      if (isHTMLElement(target)) {
+        removeAttribute(target, TAB_INDEX);
       }
     }
 
     function onKeydown(e) {
-      var key = normalize(e.key);
+      var key = e.key;
+      var normalizedKey = includes(IE_ARROW_KEYS, key) ? "Arrow" + key : key;
 
-      if (key === resolve("ArrowLeft")) {
+      if (normalizedKey === resolve("ArrowLeft")) {
         Splide2.go("<");
-      } else if (key === resolve("ArrowRight")) {
+      } else if (normalizedKey === resolve("ArrowRight")) {
         Splide2.go(">");
       }
-    }
-
-    function normalize(key) {
-      return includes(IE_ARROW_KEYS, key) ? "Arrow" + key : key;
     }
 
     return {
@@ -2888,11 +2859,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     _proto.emit = function emit(event) {
       var _this$event;
 
-      for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-        args[_key2 - 1] = arguments[_key2];
-      }
-
-      (_this$event = this.event).emit.apply(_this$event, [event].concat(args));
+      (_this$event = this.event).emit.apply(_this$event, [event].concat(slice(arguments, 1)));
 
       return this;
     };

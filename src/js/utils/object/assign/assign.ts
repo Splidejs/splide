@@ -1,3 +1,4 @@
+import { slice } from '../../arrayLike';
 import { forOwn } from '../forOwn/forOwn';
 
 
@@ -28,13 +29,13 @@ export function assign<T extends object, U1 extends object, U2 extends object, U
  * Assigns all own enumerable properties of all source objects to the provided object.
  * `undefined` in source objects will be skipped.
  *
- * @param object  - An object to assign properties to.
- * @param sources - Objects to assign properties from.
+ * @param object - An object to assign properties to.
  *
  * @return An object assigned properties of the sources to.
  */
-export function assign<T extends object, U extends object>( object: T, ...sources: U[] ): any {
-  sources.forEach( source => {
+export function assign<T extends object>( object: T ): any {
+  // eslint-disable-next-line prefer-rest-params, prefer-spread
+  slice( arguments, 1 ).forEach( source => {
     forOwn( source, ( value, key ) => {
       object[ key ] = source[ key ];
     } );

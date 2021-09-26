@@ -22,7 +22,7 @@ describe( 'Layout in the TTB mode', () => {
     const rule3   = findRuleBy( splide3.Components.Elements.track );
 
     expect( rule3.style.paddingTop ).toBe( '4%' );
-    expect( rule3.style.paddingBottom ).toBe( '0' );
+    expect( rule3.style.paddingBottom ).toBe( '0px' );
     splide3.destroy();
   } );
 
@@ -40,7 +40,7 @@ describe( 'Layout in the TTB mode', () => {
     const splide = init( { height: 100, direction: TTB } );
     const rule   = findRuleBy( splide.Components.Elements.track );
 
-    expect( rule.style.height ).toBe( '100px' );
+    expect( rule.style.height ).toBe( 'calc(100px - 0px - 0px)' );
     splide.destroy();
   } );
 
@@ -56,7 +56,7 @@ describe( 'Layout in the TTB mode', () => {
     const splide = init( { width: 500, heightRatio: 0.5, direction: TTB } );
     const rule   = findRuleBy( splide.Components.Elements.track );
 
-    expect( rule.style.height ).toBe( '250px' );
+    expect( rule.style.height ).toBe( 'calc(250px - 0px - 0px)' );
     splide.destroy();
   } );
 

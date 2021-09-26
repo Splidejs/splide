@@ -24,6 +24,10 @@ $settings = get_settings();
         gap    : '1.5rem',
         height : 200,
         focus  : 'center',
+        classes: {
+          arrows: 'splide__arrows splide__test',
+          clone : 'splide__clone splide__test',
+        }
       } );
 
       splide.on( 'moved', () => {

@@ -16,11 +16,11 @@ export interface DirectionComponent extends BaseComponent {
  */
 export declare const ORIENTATION_MAP: {
     marginRight: string[];
-    width: string[];
     autoWidth: string[];
     fixedWidth: string[];
     paddingLeft: string[];
     paddingRight: string[];
+    width: string[];
     left: string[];
     right: string[];
     x: string[];

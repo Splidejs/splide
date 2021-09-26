@@ -1,3 +1,6 @@
+import { max, min } from '../math/math';
+
+
 /**
  * Checks if the subject number is between `minOrMax` and `maxOrMin`.
  *
@@ -7,7 +10,7 @@
  * @param exclusive - Optional. Whether to exclude `x` or `y`.
  */
 export function between( number: number, minOrMax: number, maxOrMin: number, exclusive?: boolean ): boolean {
-  const min = Math.min( minOrMax, maxOrMin );
-  const max = Math.max( minOrMax, maxOrMin );
-  return exclusive ? min < number && number < max : min <= number && number <= max;
+  const minimum = min( minOrMax, maxOrMin );
+  const maximum = max( minOrMax, maxOrMin );
+  return exclusive ? minimum < number && number < maximum : minimum <= number && number <= maximum;
 }

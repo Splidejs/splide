@@ -93,7 +93,7 @@ export function Layout( Splide: Splide, Components: Components, options: Options
   function cssPadding( right: boolean ): string {
     const { padding } = options;
     const prop = resolve( right ? 'right' : 'left', true );
-    return padding ? unit( padding[ prop ] || ( isObject( padding ) ? '0' : padding ) ) : '';
+    return padding && unit( padding[ prop ] || ( isObject( padding ) ? 0 : padding ) ) || '0px';
   }
 
   /**
@@ -106,15 +106,8 @@ export function Layout( Splide: Splide, Components: Components, options: Options
 
     if ( vertical ) {
       height = cssHeight();
-      assert( height, '"height" or "heightRatio" is missing.' );
-
-      const paddingTop    = cssPadding( false );
-      const paddingBottom = cssPadding( true );
-
-      if ( paddingTop || paddingBottom ) {
-        height = `calc(${ height }`;
-        height += `${ paddingTop ? ` - ${ paddingTop }` : '' }${ paddingBottom ? ` - ${ paddingBottom }` : '' })`;
-      }
+      assert( height, 'height or heightRatio is missing.' );
+      height = `calc(${ height } - ${ cssPadding( false ) } - ${ cssPadding( true ) })`;
     }
 
     return height;

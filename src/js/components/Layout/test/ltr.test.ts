@@ -22,7 +22,7 @@ describe( 'Layout in the LTR mode', () => {
     const rule3   = findRuleBy( splide3.Components.Elements.track );
 
     expect( rule3.style.paddingLeft ).toBe( '4%' );
-    expect( rule3.style.paddingRight ).toBe( '0' );
+    expect( rule3.style.paddingRight ).toBe( '0px' );
     splide3.destroy();
   } );
 

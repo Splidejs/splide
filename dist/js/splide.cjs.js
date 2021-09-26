@@ -94,7 +94,7 @@ function toggleClass(elm, classes, add) {
 }
 
 function addClass(elm, classes) {
-  toggleClass(elm, classes, true);
+  toggleClass(elm, isString(classes) ? classes.split(" ") : classes, true);
 }
 
 function append(parent, children) {
@@ -137,8 +137,8 @@ function forOwn(object, iteratee) {
   return object;
 }
 
-function assign(object, ...sources) {
-  sources.forEach((source) => {
+function assign(object) {
+  slice(arguments, 1).forEach((source) => {
     forOwn(source, (value, key) => {
       object[key] = source[key];
     });
@@ -180,15 +180,9 @@ function setAttribute(elm, attrs, value) {
 function create(tag, attrs, parent) {
   const elm = document.createElement(tag);
   if (attrs) {
-    if (isString(attrs) || isArray(attrs)) {
-      addClass(elm, attrs);
-    } else {
-      setAttribute(elm, attrs);
-    }
+    isString(attrs) ? addClass(elm, attrs) : setAttribute(elm, attrs);
   }
-  if (parent) {
-    append(parent, elm);
-  }
+  parent && append(parent, elm);
   return elm;
 }
 
@@ -281,28 +275,27 @@ function raf(func) {
   return requestAnimationFrame(func);
 }
 
+const { min, max, floor, ceil, abs } = Math;
+
 function approximatelyEqual(x, y, epsilon) {
-  return Math.abs(x - y) < epsilon;
+  return abs(x - y) < epsilon;
 }
 
 function between(number, minOrMax, maxOrMin, exclusive) {
-  const min = Math.min(minOrMax, maxOrMin);
-  const max = Math.max(minOrMax, maxOrMin);
-  return exclusive ? min < number && number < max : min <= number && number <= max;
+  const minimum = min(minOrMax, maxOrMin);
+  const maximum = max(minOrMax, maxOrMin);
+  return exclusive ? minimum < number && number < maximum : minimum <= number && number <= maximum;
 }
 
-const { max: max$1, min: min$1 } = Math;
 function clamp(number, x, y) {
-  const minimum = min$1(x, y);
-  const maximum = max$1(x, y);
-  return min$1(max$1(minimum, number), maximum);
+  const minimum = min(x, y);
+  const maximum = max(x, y);
+  return min(max(minimum, number), maximum);
 }
 
 function sign(x) {
   return +(x > 0) - +(x < 0);
 }
-
-const { min, max, floor, ceil, abs, round } = Math;
 
 function camelToKebab(string) {
   return string.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
@@ -475,8 +468,7 @@ function RequestInterval(interval, onInterval, onUpdate, limit) {
       if (rate === 1) {
         onInterval();
         if (limit && ++count >= limit) {
-          pause();
-          return;
+          return pause();
         }
       }
       raf(update);
@@ -602,11 +594,11 @@ const TTB = "ttb";
 
 const ORIENTATION_MAP = {
   marginRight: ["marginBottom", "marginLeft"],
-  width: ["height"],
   autoWidth: ["autoHeight"],
   fixedWidth: ["fixedHeight"],
   paddingLeft: ["paddingTop", "paddingRight"],
   paddingRight: ["paddingBottom", "paddingLeft"],
+  width: ["height"],
   left: ["top", "right"],
   right: ["bottom", "left"],
   x: ["y"],
@@ -702,7 +694,7 @@ function Elements(Splide2, Components2, options) {
     slider = child(root, `.${CLASS_SLIDER}`);
     track = query(root, `.${CLASS_TRACK}`);
     list = child(track, `.${CLASS_LIST}`);
-    assert(track && list, "Missing a track/list element.");
+    assert(track && list, "A track/list element is missing.");
     push(slides, children(list, `.${CLASS_SLIDE}:not(.${CLASS_CLONE})`));
     const autoplay = find(`.${CLASS_AUTOPLAY}`);
     const arrows = find(`.${CLASS_ARROWS}`);
@@ -1124,19 +1116,14 @@ function Layout(Splide2, Components2, options) {
   function cssPadding(right) {
     const { padding } = options;
     const prop = resolve(right ? "right" : "left", true);
-    return padding ? unit(padding[prop] || (isObject(padding) ? "0" : padding)) : "";
+    return padding && unit(padding[prop] || (isObject(padding) ? 0 : padding)) || "0px";
   }
   function cssTrackHeight() {
     let height = "";
     if (vertical) {
       height = cssHeight();
-      assert(height, '"height" or "heightRatio" is missing.');
-      const paddingTop = cssPadding(false);
-      const paddingBottom = cssPadding(true);
-      if (paddingTop || paddingBottom) {
-        height = `calc(${height}`;
-        height += `${paddingTop ? ` - ${paddingTop}` : ""}${paddingBottom ? ` - ${paddingBottom}` : ""})`;
-      }
+      assert(height, "height or heightRatio is missing.");
+      height = `calc(${height} - ${cssPadding(false)} - ${cssPadding(true)})`;
     }
     return height;
   }
@@ -1797,25 +1784,24 @@ function Drag(Splide2, Components2, options) {
       emit(EVENT_DRAG);
     }
     lastEvent = e;
-    if (!e.cancelable) {
-      return;
-    }
-    if (isDragging) {
-      const expired = timeOf(e) - timeOf(baseEvent) > LOG_INTERVAL;
-      const exceeded = hasExceeded !== (hasExceeded = exceededLimit());
-      if (expired || exceeded) {
-        save(e);
-      }
-      if (!isFade) {
-        Move.translate(basePosition + constrain(coordOf(e) - coordOf(baseEvent)));
-      }
-      emit(EVENT_DRAGGING);
-      prevent(e);
-    } else {
-      const threshold = options.dragMinThreshold || 15;
-      isDragging = isMouse || abs(coordOf(e) - coordOf(baseEvent)) > threshold;
-      if (isSliderDirection()) {
+    if (e.cancelable) {
+      if (isDragging) {
+        const expired = timeOf(e) - timeOf(baseEvent) > LOG_INTERVAL;
+        const exceeded = hasExceeded !== (hasExceeded = exceededLimit());
+        if (expired || exceeded) {
+          save(e);
+        }
+        if (!isFade) {
+          Move.translate(basePosition + constrain(coordOf(e) - coordOf(baseEvent)));
+        }
+        emit(EVENT_DRAGGING);
         prevent(e);
+      } else {
+        const threshold = options.dragMinThreshold || 15;
+        isDragging = isMouse || abs(coordOf(e) - coordOf(baseEvent)) > threshold;
+        if (isSliderDirection()) {
+          prevent(e);
+        }
       }
     }
   }
@@ -1917,23 +1903,19 @@ function Keyboard(Splide2, Components2, options) {
     }
   }
   function destroy() {
-    if (target) {
-      unbind(target, "keydown");
-      if (isHTMLElement(target)) {
-        removeAttribute(target, TAB_INDEX);
-      }
+    unbind(target, "keydown");
+    if (isHTMLElement(target)) {
+      removeAttribute(target, TAB_INDEX);
     }
   }
   function onKeydown(e) {
-    const key = normalize(e.key);
-    if (key === resolve("ArrowLeft")) {
+    const { key } = e;
+    const normalizedKey = includes(IE_ARROW_KEYS, key) ? `Arrow${key}` : key;
+    if (normalizedKey === resolve("ArrowLeft")) {
       Splide2.go("<");
-    } else if (key === resolve("ArrowRight")) {
+    } else if (normalizedKey === resolve("ArrowRight")) {
       Splide2.go(">");
     }
-  }
-  function normalize(key) {
-    return includes(IE_ARROW_KEYS, key) ? `Arrow${key}` : key;
   }
   return {
     mount,
@@ -2351,8 +2333,8 @@ const _Splide = class {
     this.event.off(events);
     return this;
   }
-  emit(event, ...args) {
-    this.event.emit(event, ...args);
+  emit(event) {
+    this.event.emit(event, ...slice(arguments, 1));
     return this;
   }
   add(slides, index) {

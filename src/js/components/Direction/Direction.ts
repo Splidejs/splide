@@ -20,11 +20,11 @@ export interface DirectionComponent extends BaseComponent {
  */
 export const ORIENTATION_MAP = {
   marginRight : [ 'marginBottom', 'marginLeft' ],
-  width       : [ 'height' ],
   autoWidth   : [ 'autoHeight' ],
   fixedWidth  : [ 'fixedHeight' ],
   paddingLeft : [ 'paddingTop', 'paddingRight' ],
   paddingRight: [ 'paddingBottom', 'paddingLeft' ],
+  width       : [ 'height' ],
   left        : [ 'top', 'right' ],
   right       : [ 'bottom', 'left' ],
   x           : [ 'y' ],

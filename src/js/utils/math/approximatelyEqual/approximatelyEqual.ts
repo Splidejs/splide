@@ -1,3 +1,6 @@
+import { abs } from '../math/math';
+
+
 /**
  * Checks if the provided 2 numbers are approximately equal or not.
  *
@@ -8,5 +11,5 @@
  * @return `true` if 2 numbers are considered to be equal, or otherwise `false`.
  */
 export function approximatelyEqual( x: number, y: number, epsilon: number ): boolean {
-  return Math.abs( x - y ) < epsilon;
+  return abs( x - y ) < epsilon;
 }

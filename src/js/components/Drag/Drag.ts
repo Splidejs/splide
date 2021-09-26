@@ -153,30 +153,28 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
 
     lastEvent = e;
 
-    if ( ! e.cancelable ) {
-      return;
-    }
+    if ( e.cancelable ) {
+      if ( isDragging ) {
+        const expired  = timeOf( e ) - timeOf( baseEvent ) > LOG_INTERVAL;
+        const exceeded = hasExceeded !== ( hasExceeded = exceededLimit() );
 
-    if ( isDragging ) {
-      const expired  = timeOf( e ) - timeOf( baseEvent ) > LOG_INTERVAL;
-      const exceeded = hasExceeded !== ( hasExceeded = exceededLimit() );
+        if ( expired || exceeded ) {
+          save( e );
+        }
 
-      if ( expired || exceeded ) {
-        save( e );
-      }
+        if ( ! isFade ) {
+          Move.translate( basePosition + constrain( coordOf( e ) - coordOf( baseEvent ) ) );
+        }
 
-      if ( ! isFade ) {
-        Move.translate( basePosition + constrain( coordOf( e ) - coordOf( baseEvent ) ) );
-      }
-
-      emit( EVENT_DRAGGING );
-      prevent( e );
-    } else {
-      const threshold = options.dragMinThreshold || 15;
-      isDragging = isMouse || abs( coordOf( e ) - coordOf( baseEvent ) ) > threshold;
-
-      if ( isSliderDirection() ) {
+        emit( EVENT_DRAGGING );
         prevent( e );
+      } else {
+        const threshold = options.dragMinThreshold || 15;
+        isDragging = isMouse || abs( coordOf( e ) - coordOf( baseEvent ) ) > threshold;
+
+        if ( isSliderDirection() ) {
+          prevent( e );
+        }
       }
     }
   }

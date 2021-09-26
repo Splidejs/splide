@@ -79,8 +79,7 @@ export function RequestInterval(
         onInterval();
 
         if ( limit && ++count >= limit ) {
-          pause();
-          return;
+          return pause();
         }
       }
 
