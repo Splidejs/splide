@@ -76,7 +76,7 @@ describe( 'Pagination', () => {
     expect( splide.Components.Slides.getAt( 0 ).slide ).toBe( document.activeElement );
 
     fire( items[ 1 ], 'click' );
-    expect( splide.Components.Slides.getAt( 1).slide ).toBe( document.activeElement );
+    expect( splide.Components.Slides.getAt( 1 ).slide ).toBe( document.activeElement );
   } );
 
   test( 'should not create pagination if slides are not enough to the perPage option.', () => {

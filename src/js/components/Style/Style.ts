@@ -59,7 +59,12 @@ export function Style(): StyleComponent {
       || cssRules[ sheet.insertRule( `${ selector }{}`, 0 ) ];
 
     if ( isCSSStyleRule( cssRule ) ) {
-      cssRule.style[ prop ] = `${ value }`;
+      const { style } = cssRule;
+      value = `${ value }`;
+
+      if ( style[ prop ] !== value ) {
+        style[ prop ] = value;
+      }
     }
   }
 

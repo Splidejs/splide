@@ -19,11 +19,11 @@ $settings = get_settings();
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
-        // type   : 'loop',
-        perPage: 3,
-        // perMove: 1,
+        type   : 'loop',
+        perPage: 2,
         gap    : '1.5rem',
         height : 200,
+        focus  : 'center',
       } );
 
       splide.on( 'moved', () => {

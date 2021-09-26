@@ -300,6 +300,10 @@ function sign(x) {
 
 const { min, max, floor, ceil, abs, round } = Math;
 
+function camelToKebab(string) {
+  return string.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+}
+
 function format(string, replacements) {
   forEach(replacements, (replacement) => {
     string = string.replace("%s", `${replacement}`);
@@ -548,10 +552,11 @@ function Options(Splide2, Components2, options) {
   }
   function mount() {
     const { breakpoints } = options;
+    const isMin = options.mediaQuery === "min";
     if (breakpoints) {
-      points = Object.keys(breakpoints).sort((n, m) => +n - +m).map((point) => [
+      points = Object.keys(breakpoints).sort((n, m) => isMin ? +m - +n : +n - +m).map((point) => [
         point,
-        matchMedia(`(${options.mediaQuery || "max"}-width:${point}px)`)
+        matchMedia(`(${isMin ? "min" : "max"}-width:${point}px)`)
       ]);
       addEventListener("resize", throttledObserve);
       observe();
@@ -736,7 +741,7 @@ function Elements(Splide2, Components2, options) {
   });
 }
 
-function Style() {
+function Style$1() {
   let style;
   let sheet;
   function mount() {
@@ -751,7 +756,11 @@ function Style() {
     const { cssRules } = sheet;
     const cssRule = find(cssRules, (cssRule2) => isCSSStyleRule(cssRule2) && cssRule2.selectorText === selector) || cssRules[sheet.insertRule(`${selector}{}`, 0)];
     if (isCSSStyleRule(cssRule)) {
-      cssRule.style[prop] = `${value}`;
+      const { style: style2 } = cssRule;
+      value = `${value}`;
+      if (style2[prop] !== value) {
+        style2[prop] = value;
+      }
     }
   }
   function ruleBy(target, prop, value) {
@@ -2159,7 +2168,7 @@ var ComponentConstructors = /*#__PURE__*/Object.freeze({
   Options: Options,
   Direction: Direction,
   Elements: Elements,
-  Style: Style,
+  Style: Style$1,
   Slides: Slides,
   Clones: Clones,
   Layout: Layout,
@@ -2393,4 +2402,235 @@ let Splide = _Splide;
 Splide.defaults = {};
 Splide.STATES = STATES;
 
-export { CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_AUTOPLAY, CLASS_CLONE, CLASS_CONTAINER, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PAUSE, CLASS_PLAY, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SLIDER, CLASS_SPINNER, CLASS_TRACK, CLASS_VISIBLE, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, EventBus, EventInterface, RequestInterval, STATUS_CLASSES, Splide, State, Throttle, Splide as default };
+class Style {
+  constructor(id, options) {
+    this.styles = {};
+    this.id = id;
+    this.options = options;
+  }
+  rule(selector, prop, value, breakpoint) {
+    breakpoint = breakpoint || "default";
+    const selectors = this.styles[breakpoint] = this.styles[breakpoint] || {};
+    const styles = selectors[selector] = selectors[selector] || {};
+    styles[prop] = value;
+  }
+  build() {
+    let css = "";
+    if (this.styles.default) {
+      css += this.buildSelectors(this.styles.default);
+    }
+    Object.keys(this.styles).sort((n, m) => this.options.mediaQuery === "min" ? +n - +m : +m - +n).forEach((breakpoint) => {
+      if (breakpoint !== "default") {
+        css += `@media screen and (max-width: ${breakpoint}px) {`;
+        css += this.buildSelectors(this.styles[breakpoint]);
+        css += `}`;
+      }
+    });
+    return css;
+  }
+  buildSelectors(selectors) {
+    let css = "";
+    forOwn(selectors, (styles, selector) => {
+      css += `#${this.id} ${selector} {`;
+      forOwn(styles, (value, prop) => {
+        if (value || value === 0) {
+          css += `${prop}: ${value};`;
+        }
+      });
+      css += "}";
+    });
+    return css;
+  }
+}
+
+class SplideRenderer {
+  constructor(contents, options, id, defaults = {}) {
+    this.options = {};
+    this.breakpoints = [];
+    merge(DEFAULTS, defaults);
+    merge(merge(this.options, DEFAULTS), options || {});
+    this.id = id || uniqueId("splide");
+    this.contents = contents;
+    this.Style = new Style(this.id, this.options);
+    this.Direction = Direction(null, null, this.options);
+    assert(this.contents.length, "Provide at least 1 content.");
+    this.init();
+  }
+  init() {
+    this.parseBreakpoints();
+    this.generateSlides();
+    this.registerRootStyles();
+    this.registerTrackStyles();
+    this.registerSlideStyles();
+    this.registerListStyles();
+  }
+  generateSlides() {
+    this.slides = this.contents.map((content, index) => {
+      return `<li class="${this.options.classes.slide} ${index === 0 ? CLASS_ACTIVE : ""}">${content}</li>`;
+    });
+    if (this.isLoop()) {
+      this.generateClones();
+    }
+  }
+  generateClones() {
+    const { classes } = this.options;
+    const count = this.getCloneCount();
+    const contents = this.contents.slice();
+    while (contents.length < count) {
+      push(contents, contents);
+    }
+    push(contents.slice(-count).reverse(), contents.slice(0, count)).forEach((content, index) => {
+      const html = `<li class="${classes.slide} ${classes.clone}">${content}</li>`;
+      index < count ? this.slides.unshift(html) : this.slides.push(html);
+    });
+  }
+  getCloneCount() {
+    if (this.isLoop()) {
+      const { options } = this;
+      if (options.clones) {
+        return options.clones;
+      }
+      const perPage = max(...this.breakpoints.map(([, options2]) => options2.perPage));
+      return perPage * ((options.flickMaxPages || 1) + 1);
+    }
+    return 0;
+  }
+  registerRootStyles() {
+    this.breakpoints.forEach(([width, options]) => {
+      this.Style.rule(" ", "max-width", unit(options.width), width);
+    });
+  }
+  registerTrackStyles() {
+    const { Style: Style2 } = this;
+    const selector = `.${CLASS_TRACK}`;
+    this.breakpoints.forEach(([width, options]) => {
+      Style2.rule(selector, this.resolve("paddingLeft"), this.cssPadding(options, false), width);
+      Style2.rule(selector, this.resolve("paddingRight"), this.cssPadding(options, true), width);
+      Style2.rule(selector, "height", this.cssTrackHeight(options), width);
+    });
+  }
+  registerListStyles() {
+    const { Style: Style2, Direction: Direction2 } = this;
+    const selector = `.${CLASS_LIST}`;
+    this.breakpoints.forEach(([width, options]) => {
+      const percent = this.calcOffsetPercent(options);
+      Style2.rule(selector, "transform", `translate${Direction2.resolve("X")}(${percent}%)`, width);
+      Style2.rule(selector, this.resolve("left"), this.cssOffsetLeft(options), width);
+    });
+  }
+  registerSlideStyles() {
+    const { Style: Style2 } = this;
+    const selector = `.${CLASS_SLIDE}`;
+    this.breakpoints.forEach(([width, options]) => {
+      Style2.rule(selector, "width", this.cssSlideWidth(options), width);
+      Style2.rule(selector, "height", this.cssSlideHeight(options), width);
+      Style2.rule(selector, this.resolve("marginRight"), unit(options.gap) || "0px", width);
+    });
+  }
+  calcOffsetPercent(options) {
+    const slidePercent = 100 / options.perPage;
+    let percent = slidePercent * this.getCloneCount();
+    if (options.focus === "center") {
+      if (this.isLoop() || !this.options.trimSpace) {
+        percent -= 50 - slidePercent / 2;
+      }
+    }
+    return this.Direction.orient(percent);
+  }
+  cssOffsetLeft(options) {
+    if (this.isLoop() && options.gap) {
+      const { perPage } = options;
+      const cssGap = unit(options.gap) || "0px";
+      const baseOffset = `-${cssGap} * ${this.getCloneCount() / perPage}`;
+      if (options.focus === "center" && perPage > 1) {
+        return `calc( ${baseOffset} + ${cssGap} / 4)`;
+      } else {
+        return `calc(${baseOffset})`;
+      }
+    }
+    return "";
+  }
+  resolve(prop) {
+    return camelToKebab(this.Direction.resolve(prop));
+  }
+  cssPadding(options, right) {
+    const { padding } = options;
+    const prop = this.Direction.resolve(right ? "right" : "left", true);
+    return padding ? unit(padding[prop] || (isObject(padding) ? "0" : padding)) : "0";
+  }
+  cssTrackHeight(options) {
+    let height = "";
+    if (this.isVertical()) {
+      height = this.cssHeight(options);
+      assert(height, '"height" is missing.');
+      const paddingTop = this.cssPadding(options, false);
+      const paddingBottom = this.cssPadding(options, true);
+      if (paddingTop || paddingBottom) {
+        height = `calc(${height}`;
+        height += `${paddingTop ? ` - ${paddingTop}` : ""}${paddingBottom ? ` - ${paddingBottom}` : ""})`;
+      }
+    }
+    return height;
+  }
+  cssHeight(options) {
+    return unit(options.height);
+  }
+  cssSlideWidth(options) {
+    return options.autoWidth ? "" : unit(options.fixedWidth) || (this.isVertical() ? "" : this.cssSlideSize(options));
+  }
+  cssSlideHeight(options) {
+    return unit(options.fixedHeight) || (this.isVertical() ? options.autoHeight ? "" : this.cssSlideSize(options) : this.cssHeight(options));
+  }
+  cssSlideSize(options) {
+    const gap = unit(options.gap);
+    return `calc((100%${gap && ` + ${gap}`})/${options.perPage || 1}${gap && ` - ${gap}`})`;
+  }
+  parseBreakpoints() {
+    const { breakpoints } = this.options;
+    this.breakpoints.push(["default", this.options]);
+    if (breakpoints) {
+      forOwn(breakpoints, (options, width) => {
+        this.breakpoints.push([width, merge(merge({}, this.options), options)]);
+      });
+    }
+  }
+  isLoop() {
+    return this.options.type === LOOP;
+  }
+  isVertical() {
+    return this.options.direction === TTB;
+  }
+  buildClasses() {
+    const { options } = this;
+    return [
+      CLASS_ROOT,
+      `${CLASS_ROOT}--${options.type}`,
+      `${CLASS_ROOT}--${options.direction}`,
+      CLASS_ACTIVE,
+      CLASS_INITIALIZED
+    ].filter(Boolean).join(" ");
+  }
+  html() {
+    let html = "";
+    html += `<div id="${this.id}" class="${this.buildClasses()}">`;
+    html += `<style>${this.Style.build()}</style>`;
+    html += `<div class="splide__track">`;
+    html += `<ul class="splide__list">`;
+    html += this.slides.join("");
+    html += `</ul>`;
+    html += `</div>`;
+    html += `</div>`;
+    return html;
+  }
+  clean(splide) {
+    const { on } = EventInterface(splide);
+    const { root } = splide;
+    const clones = queryAll(root, `.${CLASS_CLONE}`);
+    on(EVENT_MOUNTED, () => {
+      remove(child(root, "style"));
+    });
+    remove(clones);
+  }
+}
+
+export { CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_AUTOPLAY, CLASS_CLONE, CLASS_CONTAINER, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PAUSE, CLASS_PLAY, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SLIDER, CLASS_SPINNER, CLASS_TRACK, CLASS_VISIBLE, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, EventBus, EventInterface, RequestInterval, STATUS_CLASSES, Splide, SplideRenderer, State, Throttle, Splide as default };

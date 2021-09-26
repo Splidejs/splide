@@ -64,13 +64,14 @@ export function Options( Splide: Splide, Components: Components, options: Option
    */
   function mount(): void {
     const { breakpoints } = options;
+    const isMin = options.mediaQuery === 'min';
 
     if ( breakpoints ) {
       points = Object.keys( breakpoints )
-        .sort( ( n, m ) => +n - +m )
+        .sort( ( n, m ) => isMin ? +m - +n : +n - +m )
         .map( point => [
           point,
-          matchMedia( `(${ options.mediaQuery || 'max' }-width:${ point }px)` ),
+          matchMedia( `(${ isMin ? 'min' : 'max' }-width:${ point }px)` ),
         ] );
 
       addEventListener( 'resize', throttledObserve );

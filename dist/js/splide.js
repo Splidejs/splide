@@ -644,12 +644,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function mount() {
       var breakpoints = options.breakpoints;
+      var isMin = options.mediaQuery === "min";
 
       if (breakpoints) {
         points = Object.keys(breakpoints).sort(function (n, m) {
-          return +n - +m;
+          return isMin ? +m - +n : +n - +m;
         }).map(function (point) {
-          return [point, matchMedia("(" + (options.mediaQuery || "max") + "-width:" + point + "px)")];
+          return [point, matchMedia("(" + (isMin ? "min" : "max") + "-width:" + point + "px)")];
         });
         addEventListener("resize", throttledObserve);
         observe();
@@ -873,7 +874,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }) || cssRules[sheet.insertRule(selector + "{}", 0)];
 
       if (isCSSStyleRule(cssRule)) {
-        cssRule.style[prop] = "" + value;
+        var style2 = cssRule.style;
+        value = "" + value;
+
+        if (style2[prop] !== value) {
+          style2[prop] = value;
+        }
       }
     }
 

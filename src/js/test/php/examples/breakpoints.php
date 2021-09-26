@@ -20,13 +20,21 @@ $settings = get_settings();
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
         perPage    : 3,
-        gap        : '2rem',
+        // gap        : '2rem',
         arrows     : false,
+        mediaQuery : 'min',
         breakpoints: {
           1200: {
-            perPage: 2,
+            perPage: 1,
             gap    : '1rem',
             arrows : true,
+            padding: 50,
+          },
+          1000: {
+            perPage: 2,
+            gap    : 0,
+            arrows : false,
+            padding: 0,
           },
           800: {
             destroy: true,
