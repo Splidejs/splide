@@ -120,6 +120,11 @@ export interface Options extends ResponsiveOptions {
      */
     mediaQuery?: 'min' | 'max';
     /**
+     * The selector to get focusable elements
+     * where `tabindex="-1"` will be assigned when their ascendant slide is hidden.
+     */
+    focusableNodes?: string;
+    /**
      * Options for specific breakpoints.
      *
      * @example

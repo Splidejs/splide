@@ -42,7 +42,7 @@ import {
   hasClass,
   isHTMLButtonElement,
   min,
-  pad,
+  pad, queryAll,
   rect,
   removeAttribute,
   removeClass,
@@ -192,22 +192,28 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   }
 
   /**
-   * Updates the status related with visibility.
+   * Updates classes and attributes related with visibility.
    *
    * @param visible - Set `true` if the slide is visible.
    */
   function updateVisibility( this: SlideComponent, visible: boolean ): void {
+    const { focusableNodes } = options;
     const ariaHidden = ! visible && ! isActive();
 
     setAttribute( slide, ARIA_HIDDEN, ariaHidden || null );
     setAttribute( slide, TAB_INDEX, ! ariaHidden && options.slideFocus ? 0 : null );
+
+    if ( focusableNodes ) {
+      queryAll( slide, focusableNodes ).forEach( node => {
+        setAttribute( node, TAB_INDEX, ariaHidden ? -1 : null );
+      } );
+    }
 
     if ( visible !== hasClass( slide, CLASS_VISIBLE ) ) {
       toggleClass( slide, CLASS_VISIBLE, visible );
       emit( visible ? EVENT_VISIBLE : EVENT_HIDDEN, this );
     }
   }
-
 
   /**
    * Adds a CSS rule to the slider or the container.

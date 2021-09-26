@@ -861,9 +861,15 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     }
   }
   function updateVisibility(visible) {
+    const { focusableNodes } = options;
     const ariaHidden = !visible && !isActive();
     setAttribute(slide, ARIA_HIDDEN, ariaHidden || null);
     setAttribute(slide, TAB_INDEX, !ariaHidden && options.slideFocus ? 0 : null);
+    if (focusableNodes) {
+      queryAll(slide, focusableNodes).forEach((node) => {
+        setAttribute(node, TAB_INDEX, ariaHidden ? -1 : null);
+      });
+    }
     if (visible !== hasClass(slide, CLASS_VISIBLE)) {
       toggleClass(slide, CLASS_VISIBLE, visible);
       emit(visible ? EVENT_VISIBLE : EVENT_HIDDEN, this);
@@ -2199,6 +2205,7 @@ const DEFAULTS = {
   direction: "ltr",
   slideFocus: true,
   trimSpace: true,
+  focusableNodes: "a, button, textarea, input, select, iframe",
   classes: CLASSES,
   i18n: I18N
 };

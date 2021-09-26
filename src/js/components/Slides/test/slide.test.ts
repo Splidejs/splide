@@ -73,7 +73,7 @@ describe( 'Slide', () => {
     expect( callback ).toHaveBeenCalledWith( Slide2 );
   } );
 
-  test( 'can toggle the `is-visible` class and the aria-hidden attribute.', () => {
+  test( 'can toggle the `is-visible` class and the `aria-hidden` attribute.', () => {
     const splide = init( { speed: 0, perPage: 2 } );
     const { Slides } = splide.Components;
 
@@ -121,6 +121,25 @@ describe( 'Slide', () => {
 
     splide.go( '<' );
     expect( visibleSlides ).toEqual( [ Slide0, Slide1 ] );
+  } );
+
+  test( 'can disable focus of focusable descendants when the slide is hidden.', () => {
+    const splide = init( { speed: 0 } );
+    const { Slides } = splide.Components;
+    const Slide0 = Slides.getAt( 0 );
+    const a      = document.createElement( 'a' );
+    const button = document.createElement( 'button' );
+
+    Slide0.slide.appendChild( a );
+    Slide0.slide.appendChild( button );
+
+    splide.go( 1 );
+    expect( a.tabIndex ).toBe( -1 );
+    expect( button.tabIndex ).toBe( -1 );
+
+    splide.go( 0 );
+    expect( a.tabIndex ).toBe( 0 );
+    expect( button.tabIndex ).toBe( 0 );
   } );
 
   test( 'can emit an event when the slide gets hidden.', () => {

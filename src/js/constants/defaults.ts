@@ -25,6 +25,7 @@ export const DEFAULTS: Options = {
   direction        : 'ltr',
   slideFocus       : true,
   trimSpace        : true,
+  focusableNodes   : 'a, button, textarea, input, select, iframe',
   classes          : CLASSES,
   i18n             : I18N,
 };

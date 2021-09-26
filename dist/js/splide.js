@@ -988,9 +988,16 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function updateVisibility(visible) {
+      var focusableNodes = options.focusableNodes;
       var ariaHidden = !visible && !isActive();
       setAttribute(slide, ARIA_HIDDEN, ariaHidden || null);
       setAttribute(slide, TAB_INDEX, !ariaHidden && options.slideFocus ? 0 : null);
+
+      if (focusableNodes) {
+        queryAll(slide, focusableNodes).forEach(function (node) {
+          setAttribute(node, TAB_INDEX, ariaHidden ? -1 : null);
+        });
+      }
 
       if (visible !== hasClass(slide, CLASS_VISIBLE)) {
         toggleClass(slide, CLASS_VISIBLE, visible);
@@ -2690,6 +2697,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     direction: "ltr",
     slideFocus: true,
     trimSpace: true,
+    focusableNodes: "a, button, textarea, input, select, iframe",
     classes: CLASSES,
     i18n: I18N
   };
