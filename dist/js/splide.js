@@ -890,7 +890,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var ARIA_HIDDEN = "aria-hidden";
   var TAB_INDEX = "tabindex";
   var DISABLED = "disabled";
-  var ALL_ATTRIBUTES = [ROLE, ARIA_CONTROLS, ARIA_CURRENT, ARIA_LABEL, ARIA_HIDDEN, TAB_INDEX, DISABLED];
+  var ARIA_ORIENTATION = "aria-orientation";
+  var ALL_ATTRIBUTES = [ROLE, ARIA_CONTROLS, ARIA_CURRENT, ARIA_LABEL, ARIA_HIDDEN, ARIA_ORIENTATION, TAB_INDEX, DISABLED];
   var SLIDE = "slide";
   var LOOP = "loop";
   var FADE = "fade";
@@ -934,10 +935,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }
 
       if (isNavigation) {
-        if (!isHTMLButtonElement(slide)) {
-          setAttribute(slide, ROLE, "button");
-        }
-
         var idx = isClone ? slideIndex : index;
         var label = format(options.i18n.slideX, idx + 1);
         var controls = Splide2.splides.map(function (splide) {
@@ -945,6 +942,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         }).join(" ");
         setAttribute(slide, ARIA_LABEL, label);
         setAttribute(slide, ARIA_CONTROLS, controls);
+        setAttribute(slide, ROLE, "menuitem");
       }
     }
 
@@ -2576,6 +2574,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
   function Sync(Splide2, Components2, options) {
     var splides = Splide2.splides;
+    var list = Components2.Elements.list;
 
     function mount() {
       if (options.isNavigation) {
@@ -2583,6 +2582,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       } else {
         sync();
       }
+    }
+
+    function destroy() {
+      removeAttribute(list, ALL_ATTRIBUTES);
     }
 
     function sync() {
@@ -2605,20 +2608,27 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           on = _EventInterface16.on,
           emit = _EventInterface16.emit;
 
-      on(EVENT_CLICK, function (Slide) {
-        Splide2.go(Slide.index);
-      });
-      on(EVENT_SLIDE_KEYDOWN, function (Slide, e) {
-        if (includes(TRIGGER_KEYS, e.key)) {
-          Splide2.go(Slide.index);
-          prevent(e);
-        }
-      });
+      on(EVENT_CLICK, onClick);
+      on(EVENT_SLIDE_KEYDOWN, onKeydown);
       emit(EVENT_NAVIGATION_MOUNTED, Splide2.splides);
+      setAttribute(list, ROLE, "menu");
+      setAttribute(list, ARIA_ORIENTATION, options.direction !== TTB ? "horizontal" : null);
+    }
+
+    function onClick(Slide) {
+      Splide2.go(Slide.index);
+    }
+
+    function onKeydown(Slide, e) {
+      if (includes(TRIGGER_KEYS, e.key)) {
+        onClick(Slide);
+        prevent(e);
+      }
     }
 
     return {
-      mount: mount
+      mount: mount,
+      destroy: destroy
     };
   }
 
@@ -2819,7 +2829,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       var state = this.state,
           Components2 = this.Components;
-      assert(state.is([CREATED, DESTROYED]), "Already mounted.");
+      assert(state.is([CREATED, DESTROYED]), "Already mounted!");
       state.set(CREATED);
       this._Components = Components2;
       this._Transition = Transition || this._Transition || (this.is(FADE) ? Fade : Slide);

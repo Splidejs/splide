@@ -22,8 +22,9 @@ $settings = get_settings();
         type   : 'loop',
         perPage: 2,
         gap    : '1.5rem',
-        height : 200,
+        height : 400,
         focus  : 'center',
+        cover  : true,
         classes: {
           arrows: 'splide__arrows splide__test',
           clone : 'splide__clone splide__test',

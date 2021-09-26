@@ -99,7 +99,7 @@ export class Splide {
    */
   mount( Extensions?: Record<string, ComponentConstructor>, Transition?: ComponentConstructor ): this {
     const { state, Components } = this;
-    assert( state.is( [ CREATED, DESTROYED ] ), 'Already mounted.' );
+    assert( state.is( [ CREATED, DESTROYED ] ), 'Already mounted!' );
 
     state.set( CREATED );
 

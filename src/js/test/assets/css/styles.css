@@ -23,7 +23,7 @@ img {
 }
 
 .splide__slide:focus, .splide__arrow:focus, .splide__pagination__page:focus {
-  border: 2px solid tomato;
+  border: 2px solid tomato !important;
 }
 
 .splide__pagination__page.is-active {

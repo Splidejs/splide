@@ -119,16 +119,13 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
     }
 
     if ( isNavigation ) {
-      if ( ! isHTMLButtonElement( slide ) ) {
-        setAttribute( slide, ROLE, 'button' );
-      }
-
       const idx      = isClone ? slideIndex : index;
       const label    = format( options.i18n.slideX, idx + 1 );
       const controls = Splide.splides.map( splide => splide.root.id ).join( ' ' );
 
       setAttribute( slide, ARIA_LABEL, label );
       setAttribute( slide, ARIA_CONTROLS, controls );
+      setAttribute( slide, ROLE, 'menuitem' );
     }
   }
 

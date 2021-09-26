@@ -24,8 +24,6 @@ $settings = get_settings();
         cover      : true,
       } );
 
-      splide01.mount();
-
       var splide02 = new Splide( '#splide02', {
         width       : 600,
         fixedWidth  : 100,

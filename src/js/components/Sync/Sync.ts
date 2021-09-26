@@ -1,9 +1,12 @@
+import { ALL_ATTRIBUTES, ARIA_ORIENTATION, ROLE } from '../../constants/attributes';
+import { TTB } from '../../constants/directions';
 import { EVENT_CLICK, EVENT_MOVE, EVENT_NAVIGATION_MOUNTED, EVENT_SLIDE_KEYDOWN } from '../../constants/events';
 import { LOOP } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { empty, includes, prevent } from '../../utils';
+import { empty, includes, prevent, removeAttribute, setAttribute } from '../../utils';
+import { SlideComponent } from '../Slides/Slide';
 
 
 /**
@@ -34,6 +37,7 @@ const TRIGGER_KEYS = [ ' ', 'Enter', 'Spacebar' ];
  */
 export function Sync( Splide: Splide, Components: Components, options: Options ): SyncComponent {
   const { splides } = Splide;
+  const { list } = Components.Elements;
 
   /**
    * Called when the component is mounted.
@@ -44,6 +48,13 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
     } else {
       sync();
     }
+  }
+
+  /**
+   * Destroys the component.
+   */
+  function destroy(): void {
+    removeAttribute( list, ALL_ATTRIBUTES )
   }
 
   /**
@@ -69,25 +80,43 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
 
   /**
    * Makes slides clickable and moves the slider to the index of clicked slide.
+   * Note that the direction of `menu` is implicitly `vertical` as default.
    */
   function navigate(): void {
     const { on, emit } = EventInterface( Splide );
 
-    on( EVENT_CLICK, Slide => {
-      Splide.go( Slide.index );
-    } );
-
-    on( EVENT_SLIDE_KEYDOWN, ( Slide, e: KeyboardEvent ) => {
-      if ( includes( TRIGGER_KEYS, e.key ) ) {
-        Splide.go( Slide.index );
-        prevent( e );
-      }
-    } );
-
+    on( EVENT_CLICK, onClick );
+    on( EVENT_SLIDE_KEYDOWN, onKeydown );
     emit( EVENT_NAVIGATION_MOUNTED, Splide.splides );
+
+    setAttribute( list, ROLE, 'menu' );
+    setAttribute( list, ARIA_ORIENTATION, options.direction !== TTB ? 'horizontal' : null );
+  }
+
+  /**
+   * Called when the navigation slide is clicked.
+   *
+   * @param Slide - A clicked Slide component.
+   */
+  function onClick( Slide: SlideComponent ): void {
+    Splide.go( Slide.index );
+  }
+
+  /**
+   * Called when any key is pressed on the navigation slide.
+   *
+   * @param Slide - A Slide component.
+   * @param e     - A KeyboardEvent object.
+   */
+  function onKeydown( Slide: SlideComponent, e: KeyboardEvent ): void {
+    if ( includes( TRIGGER_KEYS, e.key ) ) {
+      onClick( Slide );
+      prevent( e );
+    }
   }
 
   return {
     mount,
+    destroy,
   };
 }
