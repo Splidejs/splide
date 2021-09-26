@@ -776,12 +776,14 @@ const ARIA_LABEL = "aria-label";
 const ARIA_HIDDEN = "aria-hidden";
 const TAB_INDEX = "tabindex";
 const DISABLED = "disabled";
+const ARIA_ORIENTATION = "aria-orientation";
 const ALL_ATTRIBUTES = [
   ROLE,
   ARIA_CONTROLS,
   ARIA_CURRENT,
   ARIA_LABEL,
   ARIA_HIDDEN,
+  ARIA_ORIENTATION,
   TAB_INDEX,
   DISABLED
 ];
@@ -814,14 +816,12 @@ function Slide$1(Splide2, index, slideIndex, slide) {
       slide.id = `${root.id}-slide${pad(index + 1)}`;
     }
     if (isNavigation) {
-      if (!isHTMLButtonElement(slide)) {
-        setAttribute(slide, ROLE, "button");
-      }
       const idx = isClone ? slideIndex : index;
       const label = format(options.i18n.slideX, idx + 1);
       const controls = Splide2.splides.map((splide) => splide.root.id).join(" ");
       setAttribute(slide, ARIA_LABEL, label);
       setAttribute(slide, ARIA_CONTROLS, controls);
+      setAttribute(slide, ROLE, "menuitem");
     }
   }
   function destroy() {
@@ -2093,12 +2093,16 @@ function Pagination(Splide2, Components2, options) {
 const TRIGGER_KEYS = [" ", "Enter", "Spacebar"];
 function Sync(Splide2, Components2, options) {
   const { splides } = Splide2;
+  const { list } = Components2.Elements;
   function mount() {
     if (options.isNavigation) {
       navigate();
     } else {
       sync();
     }
+  }
+  function destroy() {
+    removeAttribute(list, ALL_ATTRIBUTES);
   }
   function sync() {
     const processed = [];
@@ -2116,19 +2120,24 @@ function Sync(Splide2, Components2, options) {
   }
   function navigate() {
     const { on, emit } = EventInterface(Splide2);
-    on(EVENT_CLICK, (Slide) => {
-      Splide2.go(Slide.index);
-    });
-    on(EVENT_SLIDE_KEYDOWN, (Slide, e) => {
-      if (includes(TRIGGER_KEYS, e.key)) {
-        Splide2.go(Slide.index);
-        prevent(e);
-      }
-    });
+    on(EVENT_CLICK, onClick);
+    on(EVENT_SLIDE_KEYDOWN, onKeydown);
     emit(EVENT_NAVIGATION_MOUNTED, Splide2.splides);
+    setAttribute(list, ROLE, "menu");
+    setAttribute(list, ARIA_ORIENTATION, options.direction !== TTB ? "horizontal" : null);
+  }
+  function onClick(Slide) {
+    Splide2.go(Slide.index);
+  }
+  function onKeydown(Slide, e) {
+    if (includes(TRIGGER_KEYS, e.key)) {
+      onClick(Slide);
+      prevent(e);
+    }
   }
   return {
-    mount
+    mount,
+    destroy
   };
 }
 
@@ -2299,7 +2308,7 @@ const _Splide = class {
   }
   mount(Extensions, Transition) {
     const { state, Components: Components2 } = this;
-    assert(state.is([CREATED, DESTROYED]), "Already mounted.");
+    assert(state.is([CREATED, DESTROYED]), "Already mounted!");
     state.set(CREATED);
     this._Components = Components2;
     this._Transition = Transition || this._Transition || (this.is(FADE) ? Fade : Slide);

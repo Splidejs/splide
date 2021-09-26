@@ -5,6 +5,7 @@ export declare const ARIA_LABEL = "aria-label";
 export declare const ARIA_HIDDEN = "aria-hidden";
 export declare const TAB_INDEX = "tabindex";
 export declare const DISABLED = "disabled";
+export declare const ARIA_ORIENTATION = "aria-orientation";
 /**
  * The array with all attributes.
  *

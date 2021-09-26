@@ -20,11 +20,12 @@ $settings = get_settings();
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
         type   : 'loop',
-        perPage: 2,
+        perPage: 3,
+        perMove: 1,
         gap    : '1.5rem',
         height : 400,
-        focus  : 'center',
-        cover  : true,
+        // focus  : 'center',
+        // cover  : true,
         classes: {
           arrows: 'splide__arrows splide__test',
           clone : 'splide__clone splide__test',
