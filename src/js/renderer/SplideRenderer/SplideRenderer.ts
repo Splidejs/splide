@@ -1,3 +1,4 @@
+import { PATH, SIZE, XML_NAME_SPACE } from '../../components/Arrows/path';
 import { Direction, DirectionComponent } from '../../components/Direction/Direction';
 import {
   CLASS_ACTIVE,
@@ -14,9 +15,10 @@ import { EVENT_MOUNTED } from '../../constants/events';
 import { LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
-import { Options } from '../../types';
+import { Options, RenderingOptions } from '../../types';
 import {
   assert,
+  assign,
   camelToKebab,
   child,
   forOwn,
@@ -30,6 +32,7 @@ import {
   uniqueId,
   unit,
 } from '../../utils';
+import { RENDERING_DEFAULT_OPTIONS } from '../constants/defaults';
 import { Style } from '../Style/Style';
 
 
@@ -40,19 +43,36 @@ import { Style } from '../Style/Style';
  */
 export class SplideRenderer {
   /**
+   * Removes a style element and clones.
+   *
+   * @param splide - A Splide instance.
+   */
+  static clean( splide: Splide ): void {
+    const { on } = EventInterface( splide );
+    const { root } = splide;
+    const clones = queryAll( root, `.${ CLASS_CLONE }` );
+
+    on( EVENT_MOUNTED, () => {
+      remove( child( root, 'style' ) );
+    } );
+
+    remove( clones );
+  }
+
+  /**
    * Holds slide contents.
    */
-  private contents: string[];
+  private readonly contents: string[];
 
   /**
    * The Direction component.
    */
-  private Direction: DirectionComponent;
+  private readonly Direction: DirectionComponent;
 
   /**
    * Holds the Style instance.
    */
-  private Style: Style;
+  private readonly Style: Style;
 
   /**
    * Holds options.
@@ -65,14 +85,9 @@ export class SplideRenderer {
   private readonly id: string;
 
   /**
-   * An array with slide HTML strings.
-   */
-  private slides: string[];
-
-  /**
    * An array with options for each breakpoint.
    */
-  private breakpoints: [ string, Options ][] = [];
+  private readonly breakpoints: [ string, Options ][] = [];
 
   /**
    * The SplideRenderer constructor.
@@ -101,42 +116,10 @@ export class SplideRenderer {
    */
   private init(): void {
     this.parseBreakpoints();
-    this.generateSlides();
     this.registerRootStyles();
     this.registerTrackStyles();
     this.registerSlideStyles();
     this.registerListStyles();
-  }
-
-  /**
-   * Generates HTML of slides with inserting provided contents.
-   */
-  private generateSlides(): void {
-    this.slides = this.contents.map( ( content, index ) => {
-      return `<li class="${ this.options.classes.slide } ${ index === 0 ? CLASS_ACTIVE : '' }">${ content }</li>`;
-    } );
-
-    if ( this.isLoop() ) {
-      this.generateClones();
-    }
-  }
-
-  /**
-   * Generates clones.
-   */
-  private generateClones(): void {
-    const { classes } = this.options;
-    const count    = this.getCloneCount();
-    const contents = this.contents.slice();
-
-    while ( contents.length < count ) {
-      push( contents, contents );
-    }
-
-    push( contents.slice( -count ).reverse(), contents.slice( 0, count ) ).forEach( ( content, index ) => {
-      const html = `<li class="${ classes.slide } ${ classes.clone }">${ content }</li>`;
-      index < count ? this.slides.unshift( html ) : this.slides.push( html );
-    } );
   }
 
   /**
@@ -499,41 +482,106 @@ export class SplideRenderer {
   }
 
   /**
-   * Returns the HTML of the slider.
+   * Generates HTML of slides with inserting provided contents.
    *
-   * @return The generated HTML.
+   * @param renderingOptions - Rendering options.
    */
-  html(): string {
+  private renderSlides( renderingOptions: RenderingOptions ): string {
+    const { slideTag } = renderingOptions;
+
+    const slides = this.contents.map( ( content, index ) => {
+      const classes = `${ this.options.classes.slide } ${ index === 0 ? CLASS_ACTIVE : '' }`;
+      return `<${ slideTag } class="${ classes }">${ content }</${ slideTag }>`;
+    } );
+
+    if ( this.isLoop() ) {
+      this.generateClones( slides, renderingOptions );
+    }
+
+    return slides.join( '' );
+  }
+
+  /**
+   * Generates clones.
+   *
+   * @param slides           - An array with slides.
+   * @param renderingOptions - Rendering options.
+   */
+  private generateClones( slides: string[], renderingOptions: RenderingOptions ): void {
+    const { slideTag } = renderingOptions;
+    const { classes } = this.options;
+    const count    = this.getCloneCount();
+    const contents = this.contents.slice();
+
+    while ( contents.length < count ) {
+      push( contents, contents );
+    }
+
+    push( contents.slice( -count ).reverse(), contents.slice( 0, count ) ).forEach( ( content, index ) => {
+      const html = `<${ slideTag } class="${ classes.slide } ${ classes.clone }">${ content }</${ slideTag }>`;
+      index < count ? slides.unshift( html ) : slides.push( html );
+    } );
+  }
+
+  /**
+   * Generates arrows and the wrapper element.
+   *
+   * @return The HTML for arrows.
+   */
+  private renderArrows(): string {
     let html = '';
 
-    html += `<div id="${ this.id }" class="${ this.buildClasses() }">`;
-    html += `<style>${ this.Style.build() }</style>`;
-    html += `<div class="splide__track">`;
-    html += `<ul class="splide__list">`;
-
-    html += this.slides.join( '' );
-
-    html += `</ul>`;
-    html += `</div>`;
+    html += `<div class="${ this.options.classes.arrows }">`;
+    html += this.renderArrow( true );
+    html += this.renderArrow( false );
     html += `</div>`;
 
     return html;
   }
 
   /**
-   * Removes a style element and clones.
+   * Generates an arrow HTML.
    *
-   * @param splide - A Splide instance.
+   * @param prev - Options for each breakpoint.
+   *
+   * @return The HTML for the prev or next arrow.
    */
-  clean( splide: Splide ): void {
-    const { on } = EventInterface( splide );
-    const { root } = splide;
-    const clones = queryAll( root, `.${ CLASS_CLONE }` );
+  private renderArrow( prev: boolean ): string {
+    const { classes } = this.options;
+    return `<button class="${ classes.arrow } ${ prev ? classes.prev : classes.next }" type="button">`
+      +	`<svg xmlns="${ XML_NAME_SPACE }" viewBox="0 0 ${ SIZE } ${ SIZE }" width="${ SIZE }" height="${ SIZE }">`
+      + `<path d="${ this.options.arrowPath || PATH }" />`
+      + `</svg>`
+      + `</button>`
+  }
 
-    on( EVENT_MOUNTED, () => {
-      remove( child( root, 'style' ) );
-    } );
+  /**
+   * Returns the HTML of the slider.
+   *
+   * @return The generated HTML.
+   */
+  html( renderingOptions: RenderingOptions = {} ): string {
+    renderingOptions = assign( {}, RENDERING_DEFAULT_OPTIONS, renderingOptions );
+    const { rootClass, listTag, arrows } = renderingOptions;
 
-    remove( clones );
+    let html = '';
+
+    html += `<div id="${ this.id }" class="${ this.buildClasses() } ${ rootClass || '' }">`;
+    html += `<style>${ this.Style.build() }</style>`;
+    html += `<div class="splide__track">`;
+    html += `<${ listTag } class="splide__list">`;
+
+    html += this.renderSlides( renderingOptions );
+
+    html += `</${ listTag }>`;
+    html += `</div>`;
+
+    if ( arrows ) {
+      html += this.renderArrows();
+    }
+
+    html += `</div>`;
+
+    return html;
   }
 }

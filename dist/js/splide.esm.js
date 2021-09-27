@@ -2400,6 +2400,11 @@ let Splide = _Splide;
 Splide.defaults = {};
 Splide.STATES = STATES;
 
+const RENDERING_DEFAULT_OPTIONS = {
+  listTag: "ul",
+  slideTag: "li"
+};
+
 class Style {
   constructor(id, options) {
     this.styles = {};
@@ -2454,33 +2459,21 @@ class SplideRenderer {
     assert(this.contents.length, "Provide at least 1 content.");
     this.init();
   }
+  static clean(splide) {
+    const { on } = EventInterface(splide);
+    const { root } = splide;
+    const clones = queryAll(root, `.${CLASS_CLONE}`);
+    on(EVENT_MOUNTED, () => {
+      remove(child(root, "style"));
+    });
+    remove(clones);
+  }
   init() {
     this.parseBreakpoints();
-    this.generateSlides();
     this.registerRootStyles();
     this.registerTrackStyles();
     this.registerSlideStyles();
     this.registerListStyles();
-  }
-  generateSlides() {
-    this.slides = this.contents.map((content, index) => {
-      return `<li class="${this.options.classes.slide} ${index === 0 ? CLASS_ACTIVE : ""}">${content}</li>`;
-    });
-    if (this.isLoop()) {
-      this.generateClones();
-    }
-  }
-  generateClones() {
-    const { classes } = this.options;
-    const count = this.getCloneCount();
-    const contents = this.contents.slice();
-    while (contents.length < count) {
-      push(contents, contents);
-    }
-    push(contents.slice(-count).reverse(), contents.slice(0, count)).forEach((content, index) => {
-      const html = `<li class="${classes.slide} ${classes.clone}">${content}</li>`;
-      index < count ? this.slides.unshift(html) : this.slides.push(html);
-    });
   }
   getCloneCount() {
     if (this.isLoop()) {
@@ -2647,26 +2640,58 @@ class SplideRenderer {
       CLASS_INITIALIZED
     ].filter(Boolean).join(" ");
   }
-  html() {
+  renderSlides(renderingOptions) {
+    const { slideTag } = renderingOptions;
+    const slides = this.contents.map((content, index) => {
+      const classes = `${this.options.classes.slide} ${index === 0 ? CLASS_ACTIVE : ""}`;
+      return `<${slideTag} class="${classes}">${content}</${slideTag}>`;
+    });
+    if (this.isLoop()) {
+      this.generateClones(slides, renderingOptions);
+    }
+    return slides.join("");
+  }
+  generateClones(slides, renderingOptions) {
+    const { slideTag } = renderingOptions;
+    const { classes } = this.options;
+    const count = this.getCloneCount();
+    const contents = this.contents.slice();
+    while (contents.length < count) {
+      push(contents, contents);
+    }
+    push(contents.slice(-count).reverse(), contents.slice(0, count)).forEach((content, index) => {
+      const html = `<${slideTag} class="${classes.slide} ${classes.clone}">${content}</${slideTag}>`;
+      index < count ? slides.unshift(html) : slides.push(html);
+    });
+  }
+  renderArrows() {
     let html = "";
-    html += `<div id="${this.id}" class="${this.buildClasses()}">`;
-    html += `<style>${this.Style.build()}</style>`;
-    html += `<div class="splide__track">`;
-    html += `<ul class="splide__list">`;
-    html += this.slides.join("");
-    html += `</ul>`;
-    html += `</div>`;
+    html += `<div class="${this.options.classes.arrows}">`;
+    html += this.renderArrow(true);
+    html += this.renderArrow(false);
     html += `</div>`;
     return html;
   }
-  clean(splide) {
-    const { on } = EventInterface(splide);
-    const { root } = splide;
-    const clones = queryAll(root, `.${CLASS_CLONE}`);
-    on(EVENT_MOUNTED, () => {
-      remove(child(root, "style"));
-    });
-    remove(clones);
+  renderArrow(prev) {
+    const { classes } = this.options;
+    return `<button class="${classes.arrow} ${prev ? classes.prev : classes.next}" type="button"><svg xmlns="${XML_NAME_SPACE}" viewBox="0 0 ${SIZE} ${SIZE}" width="${SIZE}" height="${SIZE}"><path d="${this.options.arrowPath || PATH}" /></svg></button>`;
+  }
+  html(renderingOptions = {}) {
+    renderingOptions = assign({}, RENDERING_DEFAULT_OPTIONS, renderingOptions);
+    const { rootClass, listTag, arrows } = renderingOptions;
+    let html = "";
+    html += `<div id="${this.id}" class="${this.buildClasses()} ${rootClass || ""}">`;
+    html += `<style>${this.Style.build()}</style>`;
+    html += `<div class="splide__track">`;
+    html += `<${listTag} class="splide__list">`;
+    html += this.renderSlides(renderingOptions);
+    html += `</${listTag}>`;
+    html += `</div>`;
+    if (arrows) {
+      html += this.renderArrows();
+    }
+    html += `</div>`;
+    return html;
   }
 }
 

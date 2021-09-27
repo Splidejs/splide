@@ -56,11 +56,11 @@ $settings = get_settings();
       );
 
       var wrapper = document.getElementById( 'wrapper' );
-      wrapper.innerHTML = renderer.html();
+      wrapper.innerHTML = renderer.html( { arrows: true } );
 
       setTimeout( () => {
         var splide = new Splide( wrapper.firstElementChild, options );
-        renderer.clean( splide );
+        SplideRenderer.clean( splide );
         splide.mount();
       }, 2000 );
     } );

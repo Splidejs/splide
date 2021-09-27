@@ -1,5 +1,5 @@
 import { Splide } from '../../core/Splide/Splide';
-import { Options } from '../../types';
+import { Options, RenderingOptions } from '../../types';
 /**
  * The class to generate static HTML of the slider for the first view.
  *
@@ -7,17 +7,23 @@ import { Options } from '../../types';
  */
 export declare class SplideRenderer {
     /**
+     * Removes a style element and clones.
+     *
+     * @param splide - A Splide instance.
+     */
+    static clean(splide: Splide): void;
+    /**
      * Holds slide contents.
      */
-    private contents;
+    private readonly contents;
     /**
      * The Direction component.
      */
-    private Direction;
+    private readonly Direction;
     /**
      * Holds the Style instance.
      */
-    private Style;
+    private readonly Style;
     /**
      * Holds options.
      */
@@ -27,13 +33,9 @@ export declare class SplideRenderer {
      */
     private readonly id;
     /**
-     * An array with slide HTML strings.
-     */
-    private slides;
-    /**
      * An array with options for each breakpoint.
      */
-    private breakpoints;
+    private readonly breakpoints;
     /**
      * The SplideRenderer constructor.
      *
@@ -47,14 +49,6 @@ export declare class SplideRenderer {
      * Initializes the instance.
      */
     private init;
-    /**
-     * Generates HTML of slides with inserting provided contents.
-     */
-    private generateSlides;
-    /**
-     * Generates clones.
-     */
-    private generateClones;
     /**
      * Returns the number of clones to generate.
      *
@@ -219,16 +213,37 @@ export declare class SplideRenderer {
      */
     private buildClasses;
     /**
+     * Generates HTML of slides with inserting provided contents.
+     *
+     * @param renderingOptions - Rendering options.
+     */
+    private renderSlides;
+    /**
+     * Generates clones.
+     *
+     * @param slides           - An array with slides.
+     * @param renderingOptions - Rendering options.
+     */
+    private generateClones;
+    /**
+     * Generates arrows and the wrapper element.
+     *
+     * @return The HTML for arrows.
+     */
+    private renderArrows;
+    /**
+     * Generates an arrow HTML.
+     *
+     * @param prev - Options for each breakpoint.
+     *
+     * @return The HTML for the prev or next arrow.
+     */
+    private renderArrow;
+    /**
      * Returns the HTML of the slider.
      *
      * @return The generated HTML.
      */
-    html(): string;
-    /**
-     * Removes a style element and clones.
-     *
-     * @param splide - A Splide instance.
-     */
-    clean(splide: Splide): void;
+    html(renderingOptions?: RenderingOptions): string;
 }
 //# sourceMappingURL=../../../../src/js/renderer/SplideRenderer/SplideRenderer.d.ts.map

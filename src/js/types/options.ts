@@ -333,3 +333,30 @@ export interface ResponsiveOptions {
    */
   destroy?: boolean | 'completely';
 }
+
+/**
+ * The interface for rendering options.
+ *
+ * @since 3.0.0
+ */
+export interface RenderingOptions {
+  /**
+   * The additional class for the root element.
+   */
+  rootClass?: string;
+
+  /**
+   * The tag used for the list element.
+   */
+  listTag?: string;
+
+  /**
+   * The tag used for each slide.
+   */
+  slideTag?: string;
+
+  /**
+   * Determines whether to render arrows or not.
+   */
+  arrows?: string;
+}
