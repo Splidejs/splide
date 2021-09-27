@@ -54,7 +54,7 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
    * Destroys the component.
    */
   function destroy(): void {
-    removeAttribute( list, ALL_ATTRIBUTES )
+    removeAttribute( list, ALL_ATTRIBUTES );
   }
 
   /**

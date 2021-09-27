@@ -21,20 +21,23 @@ $settings = get_settings();
     document.addEventListener( 'DOMContentLoaded', function () {
       const options = {
         type: 'loop',
-        // padding: '1rem',
-        perPage: 3,
+        padding: '1rem',
+        // perPage: 2,
+        // clones: 5,
         gap: 10,
         focus: 'center',
+        // fixedWidth: '20rem',
+        // fixedHeight: '20rem',
         // direction: 'ttb',
         height: 600,
         breakpoints: {
           1000: {
-            perPage: 3,
+            // perPage: 3,
             // gap: 10,
             // padding: '5rem',
           },
           640: {
-            perPage: 1,
+            // perPage: 1,
             gap: '3rem',
             padding: 0,
           }

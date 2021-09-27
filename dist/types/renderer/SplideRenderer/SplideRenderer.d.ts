@@ -78,18 +78,38 @@ export declare class SplideRenderer {
      */
     private registerSlideStyles;
     /**
-     * Returns percentage of the offset for the list element.
+     * Builds multiple `translateX` for the list element.
+     *
+     * @param options - Options for each breakpoint.
+     *
+     * @return A string with multiple translate functions.
+     */
+    private buildTranslate;
+    /**
+     * Returns offset for the list element.
      * This does not include gaps because it can not be converted into percent.
      *
-     * @return The offset as percent.
+     * @param options - Options for each breakpoint.
+     *
+     * @return The offset.
      */
-    private calcOffsetPercent;
+    private cssOffsetClones;
     /**
-     * Returns the value of the left offset for the list element.
+     * Returns offset for centering the active slide.
+     *
+     * @param options - Options for each breakpoint.
+     *
+     * @return The offset.
+     */
+    private cssOffsetCenter;
+    /**
+     * Returns offset for gaps.
+     *
+     * @param options - Options for each breakpoint.
      *
      * @return The offset as `calc()`.
      */
-    private cssOffsetLeft;
+    private cssOffsetGaps;
     /**
      * Resolves the prop for the current direction and converts it into the Kebab case.
      *
@@ -148,15 +168,44 @@ export declare class SplideRenderer {
      */
     private cssSlideSize;
     /**
+     * Builds the css value by the provided value and unit.
+     *
+     * @param value - A value.
+     * @param unit  - A CSS unit.
+     *
+     * @return A built value for a CSS value.
+     */
+    private buildCssValue;
+    /**
+     * Parses the CSS value into number and unit.
+     *
+     * @param value - A value to parse.
+     *
+     * @return An object with value and unit.
+     */
+    private parseCssValue;
+    /**
      * Parses breakpoints and generate options for each breakpoint.
      */
     private parseBreakpoints;
+    /**
+     * Checks if the slide width is fixed or not.
+     *
+     * @return `true` if the slide width is fixed, or otherwise `false`.
+     */
+    private isFixedWidth;
     /**
      * Checks if the slider type is loop or not.
      *
      * @return `true` if the slider type is loop, or otherwise `false`.
      */
     private isLoop;
+    /**
+     * Checks if the active slide should be centered or not.
+     *
+     * @return `true` if the slide should be centered, or otherwise `false`.
+     */
+    private isCenter;
     /**
      * Checks if the direction is TTB or not.
      *

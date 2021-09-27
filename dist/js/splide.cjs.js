@@ -2512,12 +2512,10 @@ class SplideRenderer {
     });
   }
   registerListStyles() {
-    const { Style: Style2, Direction: Direction2 } = this;
+    const { Style: Style2 } = this;
     const selector = `.${CLASS_LIST}`;
     this.breakpoints.forEach(([width, options]) => {
-      const percent = this.calcOffsetPercent(options);
-      Style2.rule(selector, "transform", `translate${Direction2.resolve("X")}(${percent}%)`, width);
-      Style2.rule(selector, this.resolve("left"), this.cssOffsetLeft(options), width);
+      Style2.rule(selector, "transform", this.buildTranslate(options), width);
     });
   }
   registerSlideStyles() {
@@ -2529,26 +2527,47 @@ class SplideRenderer {
       Style2.rule(selector, this.resolve("marginRight"), unit(options.gap) || "0px", width);
     });
   }
-  calcOffsetPercent(options) {
-    const slidePercent = 100 / options.perPage;
-    let percent = slidePercent * this.getCloneCount();
-    if (options.focus === "center") {
-      if (this.isLoop() || !this.options.trimSpace) {
-        percent -= 50 - slidePercent / 2;
-      }
+  buildTranslate(options) {
+    const { resolve, orient } = this.Direction;
+    const values = [];
+    values.push(this.cssOffsetClones(options));
+    values.push(this.cssOffsetGaps(options));
+    if (this.isCenter(options)) {
+      values.push(this.buildCssValue(orient(-50), "%"));
+      values.push(this.cssOffsetCenter(options));
     }
-    return this.Direction.orient(percent);
+    return values.map((value) => `translate${resolve("X")}(${value})`).join(" ");
   }
-  cssOffsetLeft(options) {
-    if (this.isLoop() && options.gap) {
-      const { perPage } = options;
-      const cssGap = unit(options.gap) || "0px";
-      const baseOffset = `-${cssGap} * ${this.getCloneCount() / perPage}`;
-      if (options.focus === "center" && perPage > 1) {
-        return `calc( ${baseOffset} + ${cssGap} / 4)`;
-      } else {
-        return `calc(${baseOffset})`;
+  cssOffsetClones(options) {
+    const { resolve, orient } = this.Direction;
+    const cloneCount = this.getCloneCount();
+    if (this.isFixedWidth(options)) {
+      const { value, unit: unit2 } = this.parseCssValue(options[resolve("fixedWidth")]);
+      return `${orient(value) * cloneCount}${unit2}`;
+    }
+    const percent = 100 * cloneCount / options.perPage;
+    return `${orient(percent)}%`;
+  }
+  cssOffsetCenter(options) {
+    const { resolve, orient } = this.Direction;
+    if (this.isFixedWidth(options)) {
+      const { value, unit: unit2 } = this.parseCssValue(options[resolve("fixedWidth")]);
+      return this.buildCssValue(orient(value / 2), unit2);
+    }
+    const slidePercent = 100 / options.perPage;
+    return `${orient(slidePercent / 2)}%`;
+  }
+  cssOffsetGaps(options) {
+    const cloneCount = this.getCloneCount();
+    if (cloneCount && options.gap) {
+      const { orient } = this.Direction;
+      const { value, unit: unit2 } = this.parseCssValue(options.gap);
+      if (this.isFixedWidth(options)) {
+        return this.buildCssValue(orient(value * cloneCount), unit2);
       }
+      const { perPage } = options;
+      const gaps = cloneCount / perPage;
+      return this.buildCssValue(orient(gaps * value), unit2);
     }
     return "";
   }
@@ -2558,19 +2577,14 @@ class SplideRenderer {
   cssPadding(options, right) {
     const { padding } = options;
     const prop = this.Direction.resolve(right ? "right" : "left", true);
-    return padding ? unit(padding[prop] || (isObject(padding) ? "0" : padding)) : "0";
+    return padding && unit(padding[prop] || (isObject(padding) ? 0 : padding)) || "0px";
   }
   cssTrackHeight(options) {
     let height = "";
     if (this.isVertical()) {
       height = this.cssHeight(options);
       assert(height, '"height" is missing.');
-      const paddingTop = this.cssPadding(options, false);
-      const paddingBottom = this.cssPadding(options, true);
-      if (paddingTop || paddingBottom) {
-        height = `calc(${height}`;
-        height += `${paddingTop ? ` - ${paddingTop}` : ""}${paddingBottom ? ` - ${paddingBottom}` : ""})`;
-      }
+      height = `calc(${height} - ${this.cssPadding(options, false)} - ${this.cssPadding(options, true)})`;
     }
     return height;
   }
@@ -2587,6 +2601,17 @@ class SplideRenderer {
     const gap = unit(options.gap);
     return `calc((100%${gap && ` + ${gap}`})/${options.perPage || 1}${gap && ` - ${gap}`})`;
   }
+  buildCssValue(value, unit2) {
+    return `${value}${unit2}`;
+  }
+  parseCssValue(value) {
+    if (isString(value)) {
+      const number = parseFloat(value) || 0;
+      const unit2 = value.replace(/\d*(\.\d*)?/, "") || "px";
+      return { value: number, unit: unit2 };
+    }
+    return { value, unit: "px" };
+  }
   parseBreakpoints() {
     const { breakpoints } = this.options;
     this.breakpoints.push(["default", this.options]);
@@ -2596,8 +2621,22 @@ class SplideRenderer {
       });
     }
   }
+  isFixedWidth(options) {
+    return !!options[this.Direction.resolve("fixedWidth")];
+  }
   isLoop() {
     return this.options.type === LOOP;
+  }
+  isCenter(options) {
+    if (options.focus === "center") {
+      if (this.isLoop()) {
+        return true;
+      }
+      if (this.options.type === SLIDE) {
+        return !this.options.trimSpace;
+      }
+    }
+    return false;
   }
   isVertical() {
     return this.options.direction === TTB;
