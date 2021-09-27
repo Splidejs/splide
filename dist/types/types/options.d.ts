@@ -305,6 +305,10 @@ export interface RenderingOptions {
      */
     slideTag?: string;
     /**
+     * Attributes for each slide.
+     */
+    slideAttrs?: Array<Record<string, string | number | boolean>>;
+    /**
      * Determines whether to render arrows or not.
      */
     arrows?: string;

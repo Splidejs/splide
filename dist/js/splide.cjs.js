@@ -2644,11 +2644,19 @@ class SplideRenderer {
       CLASS_INITIALIZED
     ].filter(Boolean).join(" ");
   }
+  buildAttrs(attrs) {
+    let html = "";
+    forOwn(attrs, (value, key) => {
+      html += ` ${camelToKebab(key)}="${value}"`;
+    });
+    return html.trim();
+  }
   renderSlides(renderingOptions) {
-    const { slideTag } = renderingOptions;
+    const { slideTag, slideAttrs = [] } = renderingOptions;
     const slides = this.contents.map((content, index) => {
       const classes = `${this.options.classes.slide} ${index === 0 ? CLASS_ACTIVE : ""}`;
-      return `<${slideTag} class="${classes}">${content}</${slideTag}>`;
+      const attrs = slideAttrs[index] ? this.buildAttrs(slideAttrs[index]) : "";
+      return `<${slideTag} class="${classes}" ${attrs}>${content}</${slideTag}>`;
     });
     if (this.isLoop()) {
       this.generateClones(slides, renderingOptions);

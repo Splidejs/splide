@@ -213,6 +213,14 @@ export declare class SplideRenderer {
      */
     private buildClasses;
     /**
+     * Converts provided attributes into a single string.
+     *
+     * @param attrs - An object with attributes.
+     *
+     * @return A built string.
+     */
+    private buildAttrs;
+    /**
      * Generates HTML of slides with inserting provided contents.
      *
      * @param renderingOptions - Rendering options.

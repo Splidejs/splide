@@ -482,16 +482,34 @@ export class SplideRenderer {
   }
 
   /**
+   * Converts provided attributes into a single string.
+   *
+   * @param attrs - An object with attributes.
+   *
+   * @return A built string.
+   */
+  private buildAttrs( attrs: Record<string, string | number | boolean> ): string {
+    let html = '';
+
+    forOwn( attrs, ( value, key ) => {
+      html += ` ${ camelToKebab( key ) }="${ value }"`;
+    } );
+
+    return html.trim();
+  }
+
+  /**
    * Generates HTML of slides with inserting provided contents.
    *
    * @param renderingOptions - Rendering options.
    */
   private renderSlides( renderingOptions: RenderingOptions ): string {
-    const { slideTag } = renderingOptions;
+    const { slideTag, slideAttrs = [] } = renderingOptions;
 
     const slides = this.contents.map( ( content, index ) => {
       const classes = `${ this.options.classes.slide } ${ index === 0 ? CLASS_ACTIVE : '' }`;
-      return `<${ slideTag } class="${ classes }">${ content }</${ slideTag }>`;
+      const attrs   = slideAttrs[ index ] ? this.buildAttrs( slideAttrs[ index ] ) : '';
+      return `<${ slideTag } class="${ classes }" ${ attrs }>${ content }</${ slideTag }>`;
     } );
 
     if ( this.isLoop() ) {
