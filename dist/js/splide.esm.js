@@ -2678,10 +2678,11 @@ class SplideRenderer {
   }
   html(renderingOptions = {}) {
     renderingOptions = assign({}, RENDERING_DEFAULT_OPTIONS, renderingOptions);
-    const { rootClass, listTag, arrows } = renderingOptions;
+    const { rootClass, listTag, arrows, beforeTrack, afterTrack } = renderingOptions;
     let html = "";
     html += `<div id="${this.id}" class="${this.buildClasses()} ${rootClass || ""}">`;
     html += `<style>${this.Style.build()}</style>`;
+    html += beforeTrack || "";
     html += `<div class="splide__track">`;
     html += `<${listTag} class="splide__list">`;
     html += this.renderSlides(renderingOptions);
@@ -2690,6 +2691,7 @@ class SplideRenderer {
     if (arrows) {
       html += this.renderArrows();
     }
+    html += afterTrack || "";
     html += `</div>`;
     return html;
   }

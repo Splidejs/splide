@@ -562,12 +562,15 @@ export class SplideRenderer {
    */
   html( renderingOptions: RenderingOptions = {} ): string {
     renderingOptions = assign( {}, RENDERING_DEFAULT_OPTIONS, renderingOptions );
-    const { rootClass, listTag, arrows } = renderingOptions;
+    const { rootClass, listTag, arrows, beforeTrack, afterTrack } = renderingOptions;
 
     let html = '';
 
     html += `<div id="${ this.id }" class="${ this.buildClasses() } ${ rootClass || '' }">`;
     html += `<style>${ this.Style.build() }</style>`;
+
+    html += beforeTrack || '';
+
     html += `<div class="splide__track">`;
     html += `<${ listTag } class="splide__list">`;
 
@@ -580,6 +583,7 @@ export class SplideRenderer {
       html += this.renderArrows();
     }
 
+    html += afterTrack || '';
     html += `</div>`;
 
     return html;

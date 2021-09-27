@@ -359,4 +359,14 @@ export interface RenderingOptions {
    * Determines whether to render arrows or not.
    */
   arrows?: string;
+
+  /**
+   * The additional HTML rendered before the track element.
+   */
+  beforeTrack?: string;
+
+  /**
+   * The additional HTML rendered after the track element.
+   */
+  afterTrack?: string;
 }
