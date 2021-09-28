@@ -2404,7 +2404,9 @@ let Splide = _Splide;
 Splide.defaults = {};
 Splide.STATES = STATES;
 
-const RENDERING_DEFAULT_OPTIONS = {
+const CLASS_RENDERED = "is-rendered";
+
+const RENDERER_DEFAULT_CONFIG = {
   listTag: "ul",
   slideTag: "li"
 };
@@ -2451,13 +2453,15 @@ class Style {
 }
 
 class SplideRenderer {
-  constructor(contents, options, id, defaults = {}) {
+  constructor(contents, options, config, defaults) {
+    this.slides = [];
     this.options = {};
     this.breakpoints = [];
-    merge(DEFAULTS, defaults);
+    merge(DEFAULTS, defaults || {});
     merge(merge(this.options, DEFAULTS), options || {});
-    this.id = id || uniqueId("splide");
     this.contents = contents;
+    this.config = assign({}, RENDERER_DEFAULT_CONFIG, config || {});
+    this.id = this.config.id || uniqueId("splide");
     this.Style = new Style(this.id, this.options);
     this.Direction = Direction(null, null, this.options);
     assert(this.contents.length, "Provide at least 1 content.");
@@ -2474,10 +2478,26 @@ class SplideRenderer {
   }
   init() {
     this.parseBreakpoints();
+    this.initSlides();
     this.registerRootStyles();
     this.registerTrackStyles();
     this.registerSlideStyles();
     this.registerListStyles();
+  }
+  initSlides() {
+    push(this.slides, this.contents.map((content, index) => {
+      content = isString(content) ? { html: content } : content;
+      content.styles = content.styles || {};
+      this.cover(content);
+      assign(content.attrs = content.attrs || {}, {
+        class: `${this.options.classes.slide} ${index === 0 ? CLASS_ACTIVE : ""}`.trim(),
+        style: this.buildStyles(content.styles)
+      });
+      return content;
+    }));
+    if (this.isLoop()) {
+      this.generateClones(this.slides);
+    }
   }
   registerRootStyles() {
     this.breakpoints.forEach(([width, options]) => {
@@ -2531,7 +2551,7 @@ class SplideRenderer {
     const cloneCount = this.getCloneCount();
     if (this.isFixedWidth(options)) {
       const { value, unit: unit2 } = this.parseCssValue(options[resolve("fixedWidth")]);
-      return `${orient(value) * cloneCount}${unit2}`;
+      return this.buildCssValue(orient(value) * cloneCount, unit2);
     }
     const percent = 100 * cloneCount / options.perPage;
     return `${orient(percent)}%`;
@@ -2623,6 +2643,9 @@ class SplideRenderer {
   isFixedWidth(options) {
     return !!options[this.Direction.resolve("fixedWidth")];
   }
+  isAutoWidth(options) {
+    return !!options[this.Direction.resolve("autoWidth")];
+  }
   isLoop() {
     return this.options.type === LOOP;
   }
@@ -2647,7 +2670,7 @@ class SplideRenderer {
       `${CLASS_ROOT}--${options.type}`,
       `${CLASS_ROOT}--${options.direction}`,
       CLASS_ACTIVE,
-      CLASS_INITIALIZED
+      !this.config.hidden && CLASS_RENDERED
     ].filter(Boolean).join(" ");
   }
   buildAttrs(attrs) {
@@ -2664,31 +2687,22 @@ class SplideRenderer {
     });
     return style.trim();
   }
-  renderSlides(renderingOptions) {
-    const { slideTag: tag } = renderingOptions;
-    const contents = this.contents.map((content, index) => {
-      content = isString(content) ? { html: content } : content;
-      const { styles = {}, html = "" } = content;
-      if (this.options.cover) {
-        const src = html.match(/<img.*?src\s*=\s*(['"])(.+?)\1.*?>/);
-        if (src && src[2]) {
-          styles.background = `center/cover no-repeat url('${src[2]}')`;
-        }
-      }
-      assign(content.attrs = content.attrs || {}, {
-        class: `${this.options.classes.slide} ${index === 0 ? CLASS_ACTIVE : ""}`.trim(),
-        style: this.buildStyles(styles)
-      });
-      return content;
-    });
-    if (this.isLoop()) {
-      this.generateClones(contents, renderingOptions);
-    }
-    return contents.map((content) => {
+  renderSlides() {
+    const { slideTag: tag } = this.config;
+    return this.slides.map((content) => {
       return `<${tag} ${this.buildAttrs(content.attrs)}>${content.html || ""}</${tag}>`;
     }).join("");
   }
-  generateClones(contents, renderingOptions) {
+  cover(content) {
+    const { styles, html = "" } = content;
+    if (this.options.cover) {
+      const src = html.match(/<img.*?src\s*=\s*(['"])(.+?)\1.*?>/);
+      if (src && src[2]) {
+        styles.background = `center/cover no-repeat url('${src[2]}')`;
+      }
+    }
+  }
+  generateClones(contents) {
     const { classes } = this.options;
     const count = this.getCloneCount();
     const slides = contents.slice();
@@ -2724,16 +2738,15 @@ class SplideRenderer {
     const { classes } = this.options;
     return `<button class="${classes.arrow} ${prev ? classes.prev : classes.next}" type="button"><svg xmlns="${XML_NAME_SPACE}" viewBox="0 0 ${SIZE} ${SIZE}" width="${SIZE}" height="${SIZE}"><path d="${this.options.arrowPath || PATH}" /></svg></button>`;
   }
-  html(renderingOptions = {}) {
-    renderingOptions = assign({}, RENDERING_DEFAULT_OPTIONS, renderingOptions);
-    const { rootClass, listTag, arrows, beforeTrack, afterTrack } = renderingOptions;
+  html() {
+    const { rootClass, listTag, arrows, beforeTrack, afterTrack } = this.config;
     let html = "";
     html += `<div id="${this.id}" class="${this.buildClasses()} ${rootClass || ""}">`;
     html += `<style>${this.Style.build()}</style>`;
     html += beforeTrack || "";
     html += `<div class="splide__track">`;
     html += `<${listTag} class="splide__list">`;
-    html += this.renderSlides(renderingOptions);
+    html += this.renderSlides();
     html += `</${listTag}>`;
     html += `</div>`;
     if (arrows) {

@@ -3,7 +3,8 @@
   position: relative;
   visibility: hidden;
 
-  &.is-initialized {
+  &.is-initialized,
+  &.is-rendered {
     visibility: visible;
   }
 }

@@ -88,11 +88,16 @@ $settings = get_settings();
             },
           },
         ],
-        options
+        options,
+        {
+          id: 'test',
+          arrows: true,
+          // hidden: true,
+        }
       );
 
       var wrapper = document.getElementById( 'wrapper' );
-      wrapper.innerHTML = renderer.html( { arrows: true } );
+      wrapper.innerHTML = renderer.html();
 
       setTimeout( () => {
         var splide = new Splide( wrapper.firstElementChild, options );
@@ -105,6 +110,7 @@ $settings = get_settings();
 <body>
 
 <div id="wrapper"></div>
+<span>The end of the slider</span>
 
 </body>
 </html>

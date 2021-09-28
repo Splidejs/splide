@@ -1,6 +1,6 @@
 import { Splide } from '../../core/Splide/Splide';
 import { Options } from '../../types';
-import { RenderingOptions, SlideContent } from '../types/types';
+import { RendererConfig, SlideContent } from '../types/types';
 /**
  * The class to generate static HTML of the slider for the first view.
  *
@@ -18,6 +18,10 @@ export declare class SplideRenderer {
      */
     private readonly contents;
     /**
+     * Stores data of slides.
+     */
+    private readonly slides;
+    /**
      * The Direction component.
      */
     private readonly Direction;
@@ -30,6 +34,10 @@ export declare class SplideRenderer {
      */
     private readonly options;
     /**
+     * Holds options for this instance.
+     */
+    private readonly config;
+    /**
      * The slider ID.
      */
     private readonly id;
@@ -41,15 +49,19 @@ export declare class SplideRenderer {
      * The SplideRenderer constructor.
      *
      * @param contents - An array with slide contents. Each item must be an HTML or a plain text.
-     * @param options  - Optional. Options.
-     * @param id       - Optional. An ID of the slider.
-     * @param defaults - Static default options.
+     * @param options  - Optional. Slider options.
+     * @param config   - Static default options.
+     * @param defaults - Default options for the slider. Pass `Splide.defaults` if you are using it.
      */
-    constructor(contents: string[] | SlideContent[], options?: Options, id?: string, defaults?: Options);
+    constructor(contents: string[] | SlideContent[], options?: Options, config?: RendererConfig, defaults?: Options);
     /**
      * Initializes the instance.
      */
     private init;
+    /**
+     * Initializes slides.
+     */
+    private initSlides;
     /**
      * Registers styles for the root element.
      */
@@ -197,6 +209,12 @@ export declare class SplideRenderer {
      */
     private isFixedWidth;
     /**
+     * Checks if the `autoWidth` is active or not.
+     *
+     * @return `true` if the `autoWidth` is active, or otherwise `false`.
+     */
+    private isAutoWidth;
+    /**
      * Checks if the slider type is loop or not.
      *
      * @return `true` if the slider type is loop, or otherwise `false`.
@@ -239,14 +257,19 @@ export declare class SplideRenderer {
     /**
      * Generates HTML of slides with inserting provided contents.
      *
-     * @param renderingOptions - Rendering options.
+     * @return The HTML for all slides and clones.
      */
     private renderSlides;
     /**
+     * Add the `background` style for the cover mode.
+     *
+     * @param content - A slide content.
+     */
+    private cover;
+    /**
      * Generates clones.
      *
-     * @param contents         - An array with SlideContent objects.
-     * @param renderingOptions - Rendering options.
+     * @param contents - An array with SlideContent objects.
      */
     private generateClones;
     /**
@@ -274,6 +297,6 @@ export declare class SplideRenderer {
      *
      * @return The generated HTML.
      */
-    html(renderingOptions?: RenderingOptions): string;
+    html(): string;
 }
 //# sourceMappingURL=../../../../src/js/renderer/SplideRenderer/SplideRenderer.d.ts.map

@@ -1,4 +1,4 @@
-import { RenderingOptions } from '../types/types';
+import { RendererConfig } from '../types/types';
 
 
 /**
@@ -6,7 +6,7 @@ import { RenderingOptions } from '../types/types';
  *
  * @since 3.0.0
  */
-export const RENDERING_DEFAULT_OPTIONS: RenderingOptions = {
+export const RENDERER_DEFAULT_CONFIG: RendererConfig = {
   listTag : 'ul',
   slideTag: 'li',
 };

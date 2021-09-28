@@ -1,14 +1,6 @@
 import { PATH, SIZE, XML_NAME_SPACE } from '../../components/Arrows/path';
 import { Direction, DirectionComponent } from '../../components/Direction/Direction';
-import {
-  CLASS_ACTIVE,
-  CLASS_CLONE,
-  CLASS_INITIALIZED,
-  CLASS_LIST,
-  CLASS_ROOT,
-  CLASS_SLIDE,
-  CLASS_TRACK,
-} from '../../constants/classes';
+import { CLASS_ACTIVE, CLASS_CLONE, CLASS_LIST, CLASS_ROOT, CLASS_SLIDE, CLASS_TRACK } from '../../constants/classes';
 import { DEFAULTS } from '../../constants/defaults';
 import { TTB } from '../../constants/directions';
 import { EVENT_MOUNTED } from '../../constants/events';
@@ -16,7 +8,6 @@ import { LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { Options } from '../../types';
-import { RenderingOptions, SlideContent } from '../types/types';
 import {
   assert,
   assign,
@@ -33,8 +24,10 @@ import {
   uniqueId,
   unit,
 } from '../../utils';
-import { RENDERING_DEFAULT_OPTIONS } from '../constants/defaults';
+import { CLASS_RENDERED } from '../constants/classes';
+import { RENDERER_DEFAULT_CONFIG } from '../constants/defaults';
 import { Style } from '../Style/Style';
+import { RendererConfig, SlideContent } from '../types/types';
 
 
 /**
@@ -66,6 +59,11 @@ export class SplideRenderer {
   private readonly contents: string[] | SlideContent[];
 
   /**
+   * Stores data of slides.
+   */
+  private readonly slides: SlideContent[] = [];
+
+  /**
    * The Direction component.
    */
   private readonly Direction: DirectionComponent;
@@ -81,6 +79,11 @@ export class SplideRenderer {
   private readonly options: Options = {};
 
   /**
+   * Holds options for this instance.
+   */
+  private readonly config: RendererConfig;
+
+  /**
    * The slider ID.
    */
   private readonly id: string;
@@ -94,16 +97,17 @@ export class SplideRenderer {
    * The SplideRenderer constructor.
    *
    * @param contents - An array with slide contents. Each item must be an HTML or a plain text.
-   * @param options  - Optional. Options.
-   * @param id       - Optional. An ID of the slider.
-   * @param defaults - Static default options.
+   * @param options  - Optional. Slider options.
+   * @param config   - Static default options.
+   * @param defaults - Default options for the slider. Pass `Splide.defaults` if you are using it.
    */
-  constructor( contents: string[] | SlideContent[], options?: Options, id?: string, defaults: Options = {} ) {
-    merge( DEFAULTS, defaults );
+  constructor( contents: string[] | SlideContent[], options?: Options, config?: RendererConfig, defaults?: Options ) {
+    merge( DEFAULTS, defaults || {} );
     merge( merge( this.options, DEFAULTS ), options || {} );
 
-    this.id        = id || uniqueId( 'splide' );
     this.contents  = contents;
+    this.config    = assign( {}, RENDERER_DEFAULT_CONFIG, config || {} );
+    this.id        = this.config.id || uniqueId( 'splide' );
     this.Style     = new Style( this.id, this.options );
     this.Direction = Direction( null, null, this.options );
 
@@ -117,10 +121,34 @@ export class SplideRenderer {
    */
   private init(): void {
     this.parseBreakpoints();
+    this.initSlides();
     this.registerRootStyles();
     this.registerTrackStyles();
     this.registerSlideStyles();
     this.registerListStyles();
+  }
+
+  /**
+   * Initializes slides.
+   */
+  private initSlides(): void {
+    push( this.slides, this.contents.map( ( content, index ) => {
+      content = isString( content ) ? { html: content } : content;
+      content.styles = content.styles || {};
+
+      this.cover( content );
+
+      assign( ( content.attrs = content.attrs || {} ), {
+        class: `${ this.options.classes.slide } ${ index === 0 ? CLASS_ACTIVE : '' }`.trim(),
+        style: this.buildStyles( content.styles ),
+      } );
+
+      return content;
+    } ) );
+
+    if ( this.isLoop() ) {
+      this.generateClones( this.slides );
+    }
   }
 
   /**
@@ -217,7 +245,7 @@ export class SplideRenderer {
 
     if ( this.isFixedWidth( options ) ) {
       const { value, unit } = this.parseCssValue( options[ resolve( 'fixedWidth' ) ] );
-      return `${ orient( value ) * cloneCount }${ unit }`;
+      return this.buildCssValue( orient( value ) * cloneCount, unit );
     }
 
     const percent = 100 * cloneCount / options.perPage;
@@ -445,6 +473,15 @@ export class SplideRenderer {
   }
 
   /**
+   * Checks if the `autoWidth` is active or not.
+   *
+   * @return `true` if the `autoWidth` is active, or otherwise `false`.
+   */
+  private isAutoWidth( options: Options ): boolean {
+    return !! options[ this.Direction.resolve( 'autoWidth' ) ];
+  }
+
+  /**
    * Checks if the slider type is loop or not.
    *
    * @return `true` if the slider type is loop, or otherwise `false`.
@@ -494,7 +531,7 @@ export class SplideRenderer {
       `${ CLASS_ROOT }--${ options.type }`,
       `${ CLASS_ROOT }--${ options.direction }`,
       CLASS_ACTIVE,
-      CLASS_INITIALIZED, // todo
+      ! this.config.hidden && CLASS_RENDERED,
     ].filter( Boolean ).join( ' ' );
   }
 
@@ -535,48 +572,39 @@ export class SplideRenderer {
   /**
    * Generates HTML of slides with inserting provided contents.
    *
-   * @param renderingOptions - Rendering options.
+   * @return The HTML for all slides and clones.
    */
-  private renderSlides( renderingOptions: RenderingOptions ): string {
-    const { slideTag: tag } = renderingOptions;
+  private renderSlides(): string {
+    const { slideTag: tag } = this.config;
 
-    const contents = this.contents.map( ( content, index ) => {
-      content = isString( content ) ? { html: content } : content;
-
-      const { styles = {}, html = '' } = content;
-
-      if ( this.options.cover ) {
-        const src = html.match( /<img.*?src\s*=\s*(['"])(.+?)\1.*?>/ );
-
-        if ( src && src[ 2 ] ) {
-          styles.background = `center/cover no-repeat url('${ src[ 2 ] }')`;
-        }
-      }
-
-      assign( ( content.attrs = content.attrs || {} ), {
-        class: `${ this.options.classes.slide } ${ index === 0 ? CLASS_ACTIVE : '' }`.trim(),
-        style: this.buildStyles( styles ),
-      } );
-
-      return content;
-    } );
-
-    if ( this.isLoop() ) {
-      this.generateClones( contents, renderingOptions );
-    }
-
-    return contents.map( content => {
+    return this.slides.map( content => {
       return `<${ tag } ${ this.buildAttrs( content.attrs ) }>${ content.html || '' }</${ tag }>`;
     } ).join( '' );
   }
 
   /**
+   * Add the `background` style for the cover mode.
+   *
+   * @param content - A slide content.
+   */
+  private cover( content: SlideContent ): void {
+    const { styles, html = '' } = content;
+
+    if ( this.options.cover ) {
+      const src = html.match( /<img.*?src\s*=\s*(['"])(.+?)\1.*?>/ );
+
+      if ( src && src[ 2 ] ) {
+        styles.background = `center/cover no-repeat url('${ src[ 2 ] }')`;
+      }
+    }
+  }
+
+  /**
    * Generates clones.
    *
-   * @param contents         - An array with SlideContent objects.
-   * @param renderingOptions - Rendering options.
+   * @param contents - An array with SlideContent objects.
    */
-  private generateClones( contents: SlideContent[], renderingOptions: RenderingOptions ): void {
+  private generateClones( contents: SlideContent[] ): void {
     const { classes } = this.options;
     const count  = this.getCloneCount();
     const slides = contents.slice();
@@ -641,7 +669,7 @@ export class SplideRenderer {
       +	`<svg xmlns="${ XML_NAME_SPACE }" viewBox="0 0 ${ SIZE } ${ SIZE }" width="${ SIZE }" height="${ SIZE }">`
       + `<path d="${ this.options.arrowPath || PATH }" />`
       + `</svg>`
-      + `</button>`
+      + `</button>`;
   }
 
   /**
@@ -649,9 +677,8 @@ export class SplideRenderer {
    *
    * @return The generated HTML.
    */
-  html( renderingOptions: RenderingOptions = {} ): string {
-    renderingOptions = assign( {}, RENDERING_DEFAULT_OPTIONS, renderingOptions );
-    const { rootClass, listTag, arrows, beforeTrack, afterTrack } = renderingOptions;
+  html(): string {
+    const { rootClass, listTag, arrows, beforeTrack, afterTrack } = this.config;
 
     let html = '';
 
@@ -663,7 +690,7 @@ export class SplideRenderer {
     html += `<div class="splide__track">`;
     html += `<${ listTag } class="splide__list">`;
 
-    html += this.renderSlides( renderingOptions );
+    html += this.renderSlides();
 
     html += `</${ listTag }>`;
     html += `</div>`;

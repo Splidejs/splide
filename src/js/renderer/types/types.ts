@@ -1,3 +1,8 @@
+/**
+ * The interface for the content of each slide.
+ *
+ * @since 3.0.0
+ */
 export interface SlideContent {
   /**
    * The HTML or text for each slide.
@@ -5,22 +10,27 @@ export interface SlideContent {
   html?: string;
 
   /**
-   * The collection of styles.
+   * The collection of styles. They will remain after Splide is applied.
    */
   styles?: Record<string, string | number>;
 
   /**
-   * The collection of attributes.
+   * The collection of attributes. They will remain after Splide is applied.
    */
   attrs?: Record<string, string | number | boolean>;
 }
 
 /**
- * The interface for rendering options.
+ * The interface for the config of the renderer.
  *
  * @since 3.0.0
  */
-export interface RenderingOptions {
+export interface RendererConfig {
+  /**
+   * The slider ID.
+   */
+  id?: string;
+
   /**
    * The additional class for the root element.
    */
@@ -50,4 +60,9 @@ export interface RenderingOptions {
    * The additional HTML rendered after the track element.
    */
   afterTrack?: string;
+
+  /**
+   * Keeps the slider hidden.
+   */
+  hidden?: boolean;
 }
