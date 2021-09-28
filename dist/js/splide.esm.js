@@ -2475,17 +2475,6 @@ class SplideRenderer {
     this.registerSlideStyles();
     this.registerListStyles();
   }
-  getCloneCount() {
-    if (this.isLoop()) {
-      const { options } = this;
-      if (options.clones) {
-        return options.clones;
-      }
-      const perPage = max(...this.breakpoints.map(([, options2]) => options2.perPage));
-      return perPage * ((options.flickMaxPages || 1) + 1);
-    }
-    return 0;
-  }
   registerRootStyles() {
     this.breakpoints.forEach(([width, options]) => {
       this.Style.rule(" ", "max-width", unit(options.width), width);
@@ -2656,28 +2645,45 @@ class SplideRenderer {
   }
   renderSlides(renderingOptions) {
     const { slideTag, slideAttrs = [] } = renderingOptions;
-    const slides = this.contents.map((content, index) => {
+    const data = this.contents.map((content, index) => {
       const classes = `${this.options.classes.slide} ${index === 0 ? CLASS_ACTIVE : ""}`;
       const attrs = slideAttrs[index] ? this.buildAttrs(slideAttrs[index]) : "";
-      return `<${slideTag} class="${classes}" ${attrs}>${content}</${slideTag}>`;
+      return {
+        tag: slideTag,
+        classes,
+        attrs,
+        content
+      };
     });
     if (this.isLoop()) {
-      this.generateClones(slides, renderingOptions);
+      this.generateClones(data, renderingOptions);
     }
-    return slides.join("");
+    return data.map((slide) => {
+      return `<${slide.tag} class="${slide.classes}" ${slide.attrs}>${slide.content}</${slide.tag}>`;
+    }).join("");
   }
-  generateClones(slides, renderingOptions) {
-    const { slideTag } = renderingOptions;
+  generateClones(data, renderingOptions) {
     const { classes } = this.options;
     const count = this.getCloneCount();
-    const contents = this.contents.slice();
-    while (contents.length < count) {
-      push(contents, contents);
+    const original = data.slice();
+    while (original.length < count) {
+      push(original, original);
     }
-    push(contents.slice(-count).reverse(), contents.slice(0, count)).forEach((content, index) => {
-      const html = `<${slideTag} class="${classes.slide} ${classes.clone}">${content}</${slideTag}>`;
-      index < count ? slides.unshift(html) : slides.push(html);
+    push(original.slice(-count).reverse(), original.slice(0, count)).forEach((slide, index) => {
+      const clone = assign({}, slide, { classes: `${slide.classes} ${classes.clone}` });
+      index < count ? data.unshift(clone) : data.push(clone);
     });
+  }
+  getCloneCount() {
+    if (this.isLoop()) {
+      const { options } = this;
+      if (options.clones) {
+        return options.clones;
+      }
+      const perPage = max(...this.breakpoints.map(([, options2]) => options2.perPage));
+      return perPage * ((options.flickMaxPages || 1) + 1);
+    }
+    return 0;
   }
   renderArrows() {
     let html = "";

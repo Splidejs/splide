@@ -123,26 +123,6 @@ export class SplideRenderer {
   }
 
   /**
-   * Returns the number of clones to generate.
-   *
-   * @return A number of clones.
-   */
-  private getCloneCount(): number {
-    if ( this.isLoop() ) {
-      const { options } = this;
-
-      if ( options.clones ) {
-        return options.clones;
-      }
-
-      const perPage = max( ...this.breakpoints.map( ( [ , options ] ) => options.perPage ) );
-      return perPage * ( ( options.flickMaxPages || 1 ) + 1 );
-    }
-
-    return 0;
-  }
-
-  /**
    * Registers styles for the root element.
    */
   private registerRootStyles(): void {
@@ -521,39 +501,69 @@ export class SplideRenderer {
   private renderSlides( renderingOptions: RenderingOptions ): string {
     const { slideTag, slideAttrs = [] } = renderingOptions;
 
-    const slides = this.contents.map( ( content, index ) => {
+    const data = this.contents.map( ( content, index ) => {
       const classes = `${ this.options.classes.slide } ${ index === 0 ? CLASS_ACTIVE : '' }`;
       const attrs   = slideAttrs[ index ] ? this.buildAttrs( slideAttrs[ index ] ) : '';
-      return `<${ slideTag } class="${ classes }" ${ attrs }>${ content }</${ slideTag }>`;
+
+      return {
+        tag: slideTag,
+        classes,
+        attrs,
+        content,
+      }
     } );
 
     if ( this.isLoop() ) {
-      this.generateClones( slides, renderingOptions );
+      this.generateClones( data, renderingOptions );
     }
 
-    return slides.join( '' );
+    return data.map( slide => {
+      return `<${ slide.tag } class="${ slide.classes }" ${ slide.attrs }>${ slide.content }</${ slide.tag }>`;
+    } ).join( '' );
   }
 
   /**
    * Generates clones.
    *
-   * @param slides           - An array with slides.
+   * @param data           - An array with slides.
    * @param renderingOptions - Rendering options.
    */
-  private generateClones( slides: string[], renderingOptions: RenderingOptions ): void {
-    const { slideTag } = renderingOptions;
+  private generateClones(
+    data: { tag: string, classes: string, attrs: string, content: string }[],
+    renderingOptions: RenderingOptions
+  ): void {
     const { classes } = this.options;
     const count    = this.getCloneCount();
-    const contents = this.contents.slice();
+    const original = data.slice();
 
-    while ( contents.length < count ) {
-      push( contents, contents );
+    while ( original.length < count ) {
+      push( original, original );
     }
 
-    push( contents.slice( -count ).reverse(), contents.slice( 0, count ) ).forEach( ( content, index ) => {
-      const html = `<${ slideTag } class="${ classes.slide } ${ classes.clone }">${ content }</${ slideTag }>`;
-      index < count ? slides.unshift( html ) : slides.push( html );
+    push( original.slice( -count ).reverse(), original.slice( 0, count ) ).forEach( ( slide, index ) => {
+      const clone = assign( {}, slide, { classes: `${ slide.classes } ${ classes.clone }` } );
+      index < count ? data.unshift( clone ) : data.push( clone );
     } );
+  }
+
+  /**
+   * Returns the number of clones to generate.
+   *
+   * @return A number of clones.
+   */
+  private getCloneCount(): number {
+    if ( this.isLoop() ) {
+      const { options } = this;
+
+      if ( options.clones ) {
+        return options.clones;
+      }
+
+      const perPage = max( ...this.breakpoints.map( ( [ , options ] ) => options.perPage ) );
+      return perPage * ( ( options.flickMaxPages || 1 ) + 1 );
+    }
+
+    return 0;
   }
 
   /**

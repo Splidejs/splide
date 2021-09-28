@@ -22,7 +22,7 @@ $settings = get_settings();
       const options = {
         type: 'loop',
         // padding: '1rem',
-        perPage: 3,
+        perPage: 5,
         // clones: 5,
         gap: 100,
         focus: 'center',
@@ -55,8 +55,16 @@ $settings = get_settings();
         options
       );
 
+      var attrs = [
+        { dataTest: 1 },
+        { dataTest: 2 },
+        { dataTest: 3 },
+        { dataTest: 4 },
+        { dataTest: 5 },
+      ];
+
       var wrapper = document.getElementById( 'wrapper' );
-      wrapper.innerHTML = renderer.html( { arrows: true } );
+      wrapper.innerHTML = renderer.html( { arrows: true, slideAttrs: attrs } );
 
       setTimeout( () => {
         var splide = new Splide( wrapper.firstElementChild, options );

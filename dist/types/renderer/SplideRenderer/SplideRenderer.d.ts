@@ -50,12 +50,6 @@ export declare class SplideRenderer {
      */
     private init;
     /**
-     * Returns the number of clones to generate.
-     *
-     * @return A number of clones.
-     */
-    private getCloneCount;
-    /**
      * Registers styles for the root element.
      */
     private registerRootStyles;
@@ -234,10 +228,16 @@ export declare class SplideRenderer {
     /**
      * Generates clones.
      *
-     * @param slides           - An array with slides.
+     * @param data           - An array with slides.
      * @param renderingOptions - Rendering options.
      */
     private generateClones;
+    /**
+     * Returns the number of clones to generate.
+     *
+     * @return A number of clones.
+     */
+    private getCloneCount;
     /**
      * Generates arrows and the wrapper element.
      *
