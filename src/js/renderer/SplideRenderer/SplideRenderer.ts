@@ -589,7 +589,7 @@ export class SplideRenderer {
   private cover( content: SlideContent ): void {
     const { styles, html = '' } = content;
 
-    if ( this.options.cover ) {
+    if ( this.options.cover && ! this.options.lazyLoad ) {
       const src = html.match( /<img.*?src\s*=\s*(['"])(.+?)\1.*?>/ );
 
       if ( src && src[ 2 ] ) {

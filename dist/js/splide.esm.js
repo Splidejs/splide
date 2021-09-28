@@ -2692,7 +2692,7 @@ class SplideRenderer {
   }
   cover(content) {
     const { styles, html = "" } = content;
-    if (this.options.cover) {
+    if (this.options.cover && !this.options.lazyLoad) {
       const src = html.match(/<img.*?src\s*=\s*(['"])(.+?)\1.*?>/);
       if (src && src[2]) {
         styles.background = `center/cover no-repeat url('${src[2]}')`;
