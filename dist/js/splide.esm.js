@@ -2501,8 +2501,14 @@ class SplideRenderer {
     const selector = `.${CLASS_SLIDE}`;
     this.breakpoints.forEach(([width, options]) => {
       Style2.rule(selector, "width", this.cssSlideWidth(options), width);
-      Style2.rule(selector, "height", this.cssSlideHeight(options), width);
       Style2.rule(selector, this.resolve("marginRight"), unit(options.gap) || "0px", width);
+      const height = this.cssSlideHeight(options);
+      if (height) {
+        Style2.rule(selector, "height", height, width);
+      } else {
+        Style2.rule(selector, "padding-top", this.cssSlidePadding(options), width);
+      }
+      Style2.rule(`${selector} > img`, "display", options.cover ? "none" : "inline", width);
     });
   }
   buildTranslate(options) {
@@ -2586,6 +2592,10 @@ class SplideRenderer {
     const gap = unit(options.gap);
     return `calc((100%${gap && ` + ${gap}`})/${options.perPage || 1}${gap && ` - ${gap}`})`;
   }
+  cssSlidePadding(options) {
+    const { heightRatio } = options;
+    return heightRatio ? `${heightRatio * 100}%` : "";
+  }
   buildCssValue(value, unit2) {
     return `${value}${unit2}`;
   }
@@ -2637,41 +2647,54 @@ class SplideRenderer {
     ].filter(Boolean).join(" ");
   }
   buildAttrs(attrs) {
-    let html = "";
+    let attr = "";
     forOwn(attrs, (value, key) => {
-      html += ` ${camelToKebab(key)}="${value}"`;
+      attr += value ? ` ${camelToKebab(key)}="${value}"` : "";
     });
-    return html.trim();
+    return attr.trim();
+  }
+  buildStyles(styles) {
+    let style = "";
+    forOwn(styles, (value, key) => {
+      style += ` ${camelToKebab(key)}:${value};`;
+    });
+    return style.trim();
   }
   renderSlides(renderingOptions) {
-    const { slideTag, slideAttrs = [] } = renderingOptions;
-    const data = this.contents.map((content, index) => {
-      const classes = `${this.options.classes.slide} ${index === 0 ? CLASS_ACTIVE : ""}`;
-      const attrs = slideAttrs[index] ? this.buildAttrs(slideAttrs[index]) : "";
-      return {
-        tag: slideTag,
-        classes,
-        attrs,
-        content
-      };
+    const { slideTag: tag } = renderingOptions;
+    const contents = this.contents.map((content, index) => {
+      content = isString(content) ? { html: content } : content;
+      const { styles = {}, html = "" } = content;
+      if (this.options.cover) {
+        const src = html.match(/<img.*?src\s*=\s*(['"])(.+?)\1.*?>/);
+        if (src && src[2]) {
+          styles.background = `center/cover no-repeat url('${src[2]}')`;
+        }
+      }
+      assign(content.attrs = content.attrs || {}, {
+        class: `${this.options.classes.slide} ${index === 0 ? CLASS_ACTIVE : ""}`.trim(),
+        style: this.buildStyles(styles)
+      });
+      return content;
     });
     if (this.isLoop()) {
-      this.generateClones(data, renderingOptions);
+      this.generateClones(contents, renderingOptions);
     }
-    return data.map((slide) => {
-      return `<${slide.tag} class="${slide.classes}" ${slide.attrs}>${slide.content}</${slide.tag}>`;
+    return contents.map((content) => {
+      return `<${tag} ${this.buildAttrs(content.attrs)}>${content.html || ""}</${tag}>`;
     }).join("");
   }
-  generateClones(data, renderingOptions) {
+  generateClones(contents, renderingOptions) {
     const { classes } = this.options;
     const count = this.getCloneCount();
-    const original = data.slice();
-    while (original.length < count) {
-      push(original, original);
+    const slides = contents.slice();
+    while (slides.length < count) {
+      push(slides, slides);
     }
-    push(original.slice(-count).reverse(), original.slice(0, count)).forEach((slide, index) => {
-      const clone = assign({}, slide, { classes: `${slide.classes} ${classes.clone}` });
-      index < count ? data.unshift(clone) : data.push(clone);
+    push(slides.slice(-count).reverse(), slides.slice(0, count)).forEach((content, index) => {
+      const attrs = assign({}, content.attrs, { class: `${content.attrs.class} ${classes.clone}` });
+      const clone = assign({}, content, { attrs });
+      index < count ? contents.unshift(clone) : contents.push(clone);
     });
   }
   getCloneCount() {

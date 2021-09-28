@@ -286,39 +286,4 @@ export interface ResponsiveOptions {
      */
     destroy?: boolean | 'completely';
 }
-/**
- * The interface for rendering options.
- *
- * @since 3.0.0
- */
-export interface RenderingOptions {
-    /**
-     * The additional class for the root element.
-     */
-    rootClass?: string;
-    /**
-     * The tag used for the list element.
-     */
-    listTag?: string;
-    /**
-     * The tag used for each slide.
-     */
-    slideTag?: string;
-    /**
-     * Attributes for each slide.
-     */
-    slideAttrs?: Array<Record<string, string | number | boolean>>;
-    /**
-     * Determines whether to render arrows or not.
-     */
-    arrows?: string;
-    /**
-     * The additional HTML rendered before the track element.
-     */
-    beforeTrack?: string;
-    /**
-     * The additional HTML rendered after the track element.
-     */
-    afterTrack?: string;
-}
 //# sourceMappingURL=../../../src/js/types/options.d.ts.map

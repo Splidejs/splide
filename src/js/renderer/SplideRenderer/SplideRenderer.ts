@@ -15,7 +15,8 @@ import { EVENT_MOUNTED } from '../../constants/events';
 import { LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
-import { Options, RenderingOptions } from '../../types';
+import { Options } from '../../types';
+import { RenderingOptions, SlideContent } from '../types/types';
 import {
   assert,
   assign,
@@ -62,7 +63,7 @@ export class SplideRenderer {
   /**
    * Holds slide contents.
    */
-  private readonly contents: string[];
+  private readonly contents: string[] | SlideContent[];
 
   /**
    * The Direction component.
@@ -97,7 +98,7 @@ export class SplideRenderer {
    * @param id       - Optional. An ID of the slider.
    * @param defaults - Static default options.
    */
-  constructor( contents: string[], options?: Options, id?: string, defaults: Options = {} ) {
+  constructor( contents: string[] | SlideContent[], options?: Options, id?: string, defaults: Options = {} ) {
     merge( DEFAULTS, defaults );
     merge( merge( this.options, DEFAULTS ), options || {} );
 
@@ -166,8 +167,17 @@ export class SplideRenderer {
 
     this.breakpoints.forEach( ( [ width, options ] ) => {
       Style.rule( selector, 'width', this.cssSlideWidth( options ), width );
-      Style.rule( selector, 'height', this.cssSlideHeight( options ), width );
       Style.rule( selector, this.resolve( 'marginRight' ), unit( options.gap ) || '0px', width );
+
+      const height = this.cssSlideHeight( options );
+
+      if ( height ) {
+        Style.rule( selector, 'height', height, width );
+      } else {
+        Style.rule( selector, 'padding-top', this.cssSlidePadding( options ), width );
+      }
+
+      Style.rule( `${ selector } > img`, 'display', options.cover ? 'none' : 'inline', width );
     } );
   }
 
@@ -370,6 +380,18 @@ export class SplideRenderer {
   }
 
   /**
+   * Returns the paddingTop value to simulate the height of each slide.
+   *
+   * @param options - Options.
+   *
+   * @return paddingTop in the CSS format.
+   */
+  private cssSlidePadding( options: Options ): string {
+    const { heightRatio } = options;
+    return heightRatio ? `${ heightRatio * 100 }%` : '';
+  }
+
+  /**
    * Builds the css value by the provided value and unit.
    *
    * @param value - A value.
@@ -484,13 +506,30 @@ export class SplideRenderer {
    * @return A built string.
    */
   private buildAttrs( attrs: Record<string, string | number | boolean> ): string {
-    let html = '';
+    let attr = '';
 
     forOwn( attrs, ( value, key ) => {
-      html += ` ${ camelToKebab( key ) }="${ value }"`;
+      attr += value ? ` ${ camelToKebab( key ) }="${ value }"` : '';
     } );
 
-    return html.trim();
+    return attr.trim();
+  }
+
+  /**
+   * Converts provided styles into a single string.
+   *
+   * @param styles - An object with styles.
+   *
+   * @return A built string.
+   */
+  private buildStyles( styles: Record<string, string | number> ): string {
+    let style = '';
+
+    forOwn( styles, ( value, key ) => {
+      style += ` ${ camelToKebab( key ) }:${ value };`;
+    } );
+
+    return style.trim();
   }
 
   /**
@@ -499,50 +538,57 @@ export class SplideRenderer {
    * @param renderingOptions - Rendering options.
    */
   private renderSlides( renderingOptions: RenderingOptions ): string {
-    const { slideTag, slideAttrs = [] } = renderingOptions;
+    const { slideTag: tag } = renderingOptions;
 
-    const data = this.contents.map( ( content, index ) => {
-      const classes = `${ this.options.classes.slide } ${ index === 0 ? CLASS_ACTIVE : '' }`;
-      const attrs   = slideAttrs[ index ] ? this.buildAttrs( slideAttrs[ index ] ) : '';
+    const contents = this.contents.map( ( content, index ) => {
+      content = isString( content ) ? { html: content } : content;
 
-      return {
-        tag: slideTag,
-        classes,
-        attrs,
-        content,
+      const { styles = {}, html = '' } = content;
+
+      if ( this.options.cover ) {
+        const src = html.match( /<img.*?src\s*=\s*(['"])(.+?)\1.*?>/ );
+
+        if ( src && src[ 2 ] ) {
+          styles.background = `center/cover no-repeat url('${ src[ 2 ] }')`;
+        }
       }
+
+      assign( ( content.attrs = content.attrs || {} ), {
+        class: `${ this.options.classes.slide } ${ index === 0 ? CLASS_ACTIVE : '' }`.trim(),
+        style: this.buildStyles( styles ),
+      } );
+
+      return content;
     } );
 
     if ( this.isLoop() ) {
-      this.generateClones( data, renderingOptions );
+      this.generateClones( contents, renderingOptions );
     }
 
-    return data.map( slide => {
-      return `<${ slide.tag } class="${ slide.classes }" ${ slide.attrs }>${ slide.content }</${ slide.tag }>`;
+    return contents.map( content => {
+      return `<${ tag } ${ this.buildAttrs( content.attrs ) }>${ content.html || '' }</${ tag }>`;
     } ).join( '' );
   }
 
   /**
    * Generates clones.
    *
-   * @param data           - An array with slides.
+   * @param contents         - An array with SlideContent objects.
    * @param renderingOptions - Rendering options.
    */
-  private generateClones(
-    data: { tag: string, classes: string, attrs: string, content: string }[],
-    renderingOptions: RenderingOptions
-  ): void {
+  private generateClones( contents: SlideContent[], renderingOptions: RenderingOptions ): void {
     const { classes } = this.options;
-    const count    = this.getCloneCount();
-    const original = data.slice();
+    const count  = this.getCloneCount();
+    const slides = contents.slice();
 
-    while ( original.length < count ) {
-      push( original, original );
+    while ( slides.length < count ) {
+      push( slides, slides );
     }
 
-    push( original.slice( -count ).reverse(), original.slice( 0, count ) ).forEach( ( slide, index ) => {
-      const clone = assign( {}, slide, { classes: `${ slide.classes } ${ classes.clone }` } );
-      index < count ? data.unshift( clone ) : data.push( clone );
+    push( slides.slice( -count ).reverse(), slides.slice( 0, count ) ).forEach( ( content, index ) => {
+      const attrs = assign( {}, content.attrs, { class: `${ content.attrs.class } ${ classes.clone }` } );
+      const clone = assign( {}, content, { attrs } );
+      index < count ? contents.unshift( clone ) : contents.push( clone );
     } );
   }
 

@@ -22,14 +22,14 @@ $settings = get_settings();
       const options = {
         type: 'loop',
         // padding: '1rem',
-        perPage: 5,
-        // clones: 5,
+        perPage: 3,
         gap: 100,
         focus: 'center',
         // fixedWidth: '20rem',
         // fixedHeight: '20rem',
         // direction: 'ttb',
-        height: 600,
+        cover: true,
+        heightRatio: 0.4,
         breakpoints: {
           1000: {
             // perPage: 3,
@@ -44,27 +44,55 @@ $settings = get_settings();
         },
       };
 
+      // var renderer = new SplideRenderer(
+      //   [
+      //     '<img src="../../assets/images/pics/slide01.jpg">',
+      //     '<img src="../../assets/images/pics/slide02.jpg">',
+      //     '<img src="../../assets/images/pics/slide03.jpg">',
+      //     '<img src="../../assets/images/pics/slide04.jpg">',
+      //     '<img src="../../assets/images/pics/slide05.jpg">',
+      //   ],
+      //   options
+      // );
+
       var renderer = new SplideRenderer(
         [
-          '<img src="../../assets/images/pics/slide01.jpg">',
-          '<img src="../../assets/images/pics/slide02.jpg">',
-          '<img src="../../assets/images/pics/slide03.jpg">',
-          '<img src="../../assets/images/pics/slide04.jpg">',
-          '<img src="../../assets/images/pics/slide05.jpg">',
+          {
+            html : '<img src="../../assets/images/pics/slide01.jpg">',
+            attrs: {
+              dataTest: 1,
+            },
+          },
+          {
+            html : '<img src="../../assets/images/pics/slide02.jpg">',
+            attrs: {
+              dataTest: 2,
+            },
+          },
+          {
+            html : '<img src="../../assets/images/pics/slide03.jpg">',
+            attrs: {
+              dataTest: 3,
+            },
+          },
+          {
+            html : '<img src="../../assets/images/pics/slide04.jpg">',
+            attrs: {
+              dataTest: 4,
+            },
+          },
+          {
+            html : '<img src="../../assets/images/pics/slide05.jpg">',
+            attrs: {
+              dataTest: 5,
+            },
+          },
         ],
         options
       );
 
-      var attrs = [
-        { dataTest: 1 },
-        { dataTest: 2 },
-        { dataTest: 3 },
-        { dataTest: 4 },
-        { dataTest: 5 },
-      ];
-
       var wrapper = document.getElementById( 'wrapper' );
-      wrapper.innerHTML = renderer.html( { arrows: true, slideAttrs: attrs } );
+      wrapper.innerHTML = renderer.html( { arrows: true } );
 
       setTimeout( () => {
         var splide = new Splide( wrapper.firstElementChild, options );

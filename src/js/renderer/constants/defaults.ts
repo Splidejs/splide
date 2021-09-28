@@ -1,4 +1,4 @@
-import { RenderingOptions } from '../../types';
+import { RenderingOptions } from '../types/types';
 
 
 /**

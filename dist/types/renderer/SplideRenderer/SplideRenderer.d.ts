@@ -1,5 +1,6 @@
 import { Splide } from '../../core/Splide/Splide';
-import { Options, RenderingOptions } from '../../types';
+import { Options } from '../../types';
+import { RenderingOptions, SlideContent } from '../types/types';
 /**
  * The class to generate static HTML of the slider for the first view.
  *
@@ -44,7 +45,7 @@ export declare class SplideRenderer {
      * @param id       - Optional. An ID of the slider.
      * @param defaults - Static default options.
      */
-    constructor(contents: string[], options?: Options, id?: string, defaults?: Options);
+    constructor(contents: string[] | SlideContent[], options?: Options, id?: string, defaults?: Options);
     /**
      * Initializes the instance.
      */
@@ -161,6 +162,14 @@ export declare class SplideRenderer {
      */
     private cssSlideSize;
     /**
+     * Returns the paddingTop value to simulate the height of each slide.
+     *
+     * @param options - Options.
+     *
+     * @return paddingTop in the CSS format.
+     */
+    private cssSlidePadding;
+    /**
      * Builds the css value by the provided value and unit.
      *
      * @param value - A value.
@@ -220,6 +229,14 @@ export declare class SplideRenderer {
      */
     private buildAttrs;
     /**
+     * Converts provided styles into a single string.
+     *
+     * @param styles - An object with styles.
+     *
+     * @return A built string.
+     */
+    private buildStyles;
+    /**
      * Generates HTML of slides with inserting provided contents.
      *
      * @param renderingOptions - Rendering options.
@@ -228,7 +245,7 @@ export declare class SplideRenderer {
     /**
      * Generates clones.
      *
-     * @param data           - An array with slides.
+     * @param contents         - An array with SlideContent objects.
      * @param renderingOptions - Rendering options.
      */
     private generateClones;
