@@ -2669,6 +2669,8 @@ class SplideRenderer {
       CLASS_ROOT,
       `${CLASS_ROOT}--${options.type}`,
       `${CLASS_ROOT}--${options.direction}`,
+      options.drag && `${CLASS_ROOT}--draggable`,
+      options.isNavigation && `${CLASS_ROOT}--nav`,
       CLASS_ACTIVE,
       !this.config.hidden && CLASS_RENDERED
     ].filter(Boolean).join(" ");
