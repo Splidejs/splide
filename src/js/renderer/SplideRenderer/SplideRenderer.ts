@@ -207,7 +207,7 @@ export class SplideRenderer {
 
     if ( this.isCenter( options ) ) {
       values.push( this.buildCssValue( orient( -50 ), '%' ) );
-      values.push( this.cssOffsetCenter( options ) );
+      values.push( ...this.cssOffsetCenter( options ) );
     }
 
     return values.map( value => `translate${ resolve( 'X' ) }(${ value })` ).join( ' ' );
@@ -237,20 +237,35 @@ export class SplideRenderer {
   /**
    * Returns offset for centering the active slide.
    *
+   * Note:
+   * ( 100% + gap ) / perPage - gap
+   * 100% / perPage + gap / perPage - gap;
+   * 50% / perPage + ( gap / perPage - gap ) / 2;
+   *
    * @param options - Options for each breakpoint.
    *
    * @return The offset.
    */
-  private cssOffsetCenter( options: Options ): string {
+  private cssOffsetCenter( options: Options ): string[] {
     const { resolve, orient } = this.Direction;
 
     if ( this.isFixedWidth( options ) ) {
       const { value, unit } = this.parseCssValue( options[ resolve( 'fixedWidth' ) ] );
-      return this.buildCssValue( orient( value / 2 ), unit );
+      return [ this.buildCssValue( orient( value / 2 ), unit ) ];
     }
 
-    const slidePercent = 100 / options.perPage;
-    return `${ orient( slidePercent / 2 ) }%`;
+    const values = [];
+    const { perPage, gap } = options;
+
+    values.push( `${ orient( 50 / perPage ) }%` );
+
+    if ( gap ) {
+      const { value, unit } = this.parseCssValue( gap );
+      const gapOffset = ( value / perPage - value ) / 2;
+      values.push( this.buildCssValue( orient( gapOffset ), unit ) );
+    }
+
+    return values;
   }
 
   /**

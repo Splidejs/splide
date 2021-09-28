@@ -21,10 +21,10 @@ $settings = get_settings();
     document.addEventListener( 'DOMContentLoaded', function () {
       const options = {
         type: 'loop',
-        padding: '1rem',
-        // perPage: 2,
+        // padding: '1rem',
+        perPage: 3,
         // clones: 5,
-        gap: 10,
+        gap: 100,
         focus: 'center',
         // fixedWidth: '20rem',
         // fixedHeight: '20rem',

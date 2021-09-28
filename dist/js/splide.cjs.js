@@ -2527,7 +2527,7 @@ class SplideRenderer {
     values.push(this.cssOffsetGaps(options));
     if (this.isCenter(options)) {
       values.push(this.buildCssValue(orient(-50), "%"));
-      values.push(this.cssOffsetCenter(options));
+      values.push(...this.cssOffsetCenter(options));
     }
     return values.map((value) => `translate${resolve("X")}(${value})`).join(" ");
   }
@@ -2545,10 +2545,17 @@ class SplideRenderer {
     const { resolve, orient } = this.Direction;
     if (this.isFixedWidth(options)) {
       const { value, unit: unit2 } = this.parseCssValue(options[resolve("fixedWidth")]);
-      return this.buildCssValue(orient(value / 2), unit2);
+      return [this.buildCssValue(orient(value / 2), unit2)];
     }
-    const slidePercent = 100 / options.perPage;
-    return `${orient(slidePercent / 2)}%`;
+    const values = [];
+    const { perPage, gap } = options;
+    values.push(`${orient(50 / perPage)}%`);
+    if (gap) {
+      const { value, unit: unit2 } = this.parseCssValue(gap);
+      const gapOffset = (value / perPage - value) / 2;
+      values.push(this.buildCssValue(orient(gapOffset), unit2));
+    }
+    return values;
   }
   cssOffsetGaps(options) {
     const cloneCount = this.getCloneCount();

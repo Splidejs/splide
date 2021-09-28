@@ -91,6 +91,11 @@ export declare class SplideRenderer {
     /**
      * Returns offset for centering the active slide.
      *
+     * Note:
+     * ( 100% + gap ) / perPage - gap
+     * 100% / perPage + gap / perPage - gap;
+     * 50% / perPage + ( gap / perPage - gap ) / 2;
+     *
      * @param options - Options for each breakpoint.
      *
      * @return The offset.
