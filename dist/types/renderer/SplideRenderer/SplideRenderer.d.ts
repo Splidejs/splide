@@ -209,12 +209,6 @@ export declare class SplideRenderer {
      */
     private isFixedWidth;
     /**
-     * Checks if the `autoWidth` is active or not.
-     *
-     * @return `true` if the `autoWidth` is active, or otherwise `false`.
-     */
-    private isAutoWidth;
-    /**
      * Checks if the slider type is loop or not.
      *
      * @return `true` if the slider type is loop, or otherwise `false`.

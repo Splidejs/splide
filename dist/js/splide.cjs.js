@@ -2544,7 +2544,7 @@ class SplideRenderer {
       values.push(this.buildCssValue(orient(-50), "%"));
       values.push(...this.cssOffsetCenter(options));
     }
-    return values.map((value) => `translate${resolve("X")}(${value})`).join(" ");
+    return values.filter(Boolean).map((value) => `translate${resolve("X")}(${value})`).join(" ");
   }
   cssOffsetClones(options) {
     const { resolve, orient } = this.Direction;
@@ -2642,9 +2642,6 @@ class SplideRenderer {
   }
   isFixedWidth(options) {
     return !!options[this.Direction.resolve("fixedWidth")];
-  }
-  isAutoWidth(options) {
-    return !!options[this.Direction.resolve("autoWidth")];
   }
   isLoop() {
     return this.options.type === LOOP;

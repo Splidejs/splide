@@ -228,7 +228,10 @@ export class SplideRenderer {
       values.push( ...this.cssOffsetCenter( options ) );
     }
 
-    return values.map( value => `translate${ resolve( 'X' ) }(${ value })` ).join( ' ' );
+    return values
+      .filter( Boolean )
+      .map( value => `translate${ resolve( 'X' ) }(${ value })` )
+      .join( ' ' );
   }
 
   /**
@@ -473,15 +476,6 @@ export class SplideRenderer {
   }
 
   /**
-   * Checks if the `autoWidth` is active or not.
-   *
-   * @return `true` if the `autoWidth` is active, or otherwise `false`.
-   */
-  private isAutoWidth( options: Options ): boolean {
-    return !! options[ this.Direction.resolve( 'autoWidth' ) ];
-  }
-
-  /**
    * Checks if the slider type is loop or not.
    *
    * @return `true` if the slider type is loop, or otherwise `false`.
@@ -496,7 +490,7 @@ export class SplideRenderer {
    * @return `true` if the slide should be centered, or otherwise `false`.
    */
   private isCenter( options: Options ): boolean {
-    if( options.focus === 'center'  ) {
+    if( options.focus === 'center' ) {
       if ( this.isLoop() ) {
         return true;
       }

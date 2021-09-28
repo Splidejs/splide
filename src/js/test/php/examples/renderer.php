@@ -20,7 +20,7 @@ $settings = get_settings();
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
       const options = {
-        type: 'loop',
+        // type: 'loop',
         // padding: '1rem',
         perPage: 3,
         gap: 100,
@@ -29,6 +29,7 @@ $settings = get_settings();
         // fixedHeight: '20rem',
         // direction: 'ttb',
         cover: true,
+        trimSpace: false,
         heightRatio: 0.4,
         breakpoints: {
           1000: {
@@ -100,9 +101,9 @@ $settings = get_settings();
       wrapper.innerHTML = renderer.html();
 
       setTimeout( () => {
-        var splide = new Splide( wrapper.firstElementChild, options );
-        SplideRenderer.clean( splide );
-        splide.mount();
+        // var splide = new Splide( wrapper.firstElementChild, options );
+        // SplideRenderer.clean( splide );
+        // splide.mount();
       }, 2000 );
     } );
   </script>
