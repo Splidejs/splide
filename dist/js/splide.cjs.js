@@ -2488,9 +2488,11 @@ class SplideRenderer {
     push(this.slides, this.contents.map((content, index) => {
       content = isString(content) ? { html: content } : content;
       content.styles = content.styles || {};
+      content.attrs = content.attrs || {};
       this.cover(content);
-      assign(content.attrs = content.attrs || {}, {
-        class: `${this.options.classes.slide} ${index === 0 ? CLASS_ACTIVE : ""}`.trim(),
+      const classes = `${this.options.classes.slide} ${index === 0 ? CLASS_ACTIVE : ""}`;
+      assign(content.attrs, {
+        class: `${classes} ${content.attrs.class || ""}`.trim(),
         style: this.buildStyles(content.styles)
       });
       return content;

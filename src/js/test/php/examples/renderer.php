@@ -62,6 +62,7 @@ $settings = get_settings();
             html : '<img src="../../assets/images/pics/slide01.jpg">',
             attrs: {
               dataTest: 1,
+              class: 'test',
             },
           },
           {
