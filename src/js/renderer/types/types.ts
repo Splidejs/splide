@@ -49,7 +49,7 @@ export interface RendererConfig {
   /**
    * Determines whether to render arrows or not.
    */
-  arrows?: string;
+  arrows?: boolean;
 
   /**
    * The additional HTML rendered before the track element.

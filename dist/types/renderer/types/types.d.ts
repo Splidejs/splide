@@ -1,14 +1,19 @@
+/**
+ * The interface for the content of each slide.
+ *
+ * @since 3.0.0
+ */
 export interface SlideContent {
     /**
      * The HTML or text for each slide.
      */
     html?: string;
     /**
-     * The collection of styles.
+     * The collection of styles. They will remain after Splide is applied.
      */
     styles?: Record<string, string | number>;
     /**
-     * The collection of attributes.
+     * The collection of attributes. They will remain after Splide is applied.
      */
     attrs?: Record<string, string | number | boolean>;
 }
@@ -37,7 +42,7 @@ export interface RendererConfig {
     /**
      * Determines whether to render arrows or not.
      */
-    arrows?: string;
+    arrows?: boolean;
     /**
      * The additional HTML rendered before the track element.
      */
