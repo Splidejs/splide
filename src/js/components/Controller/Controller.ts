@@ -3,7 +3,7 @@ import { LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, BaseComponent, Components, Options } from '../../types';
-import { approximatelyEqual, between, clamp, floor, isString, isUndefined, max, min } from '../../utils';
+import { approximatelyEqual, between, clamp, floor, isString, isUndefined, max } from '../../utils';
 
 
 /**
@@ -84,7 +84,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
     slideCount = getLength( true );
     perMove    = options.perMove;
     perPage    = options.perPage;
-    currIndex  = min( currIndex, slideCount - 1 );
+    currIndex  = clamp( currIndex, 0, slideCount - 1 );
     jump( currIndex );
   }
 

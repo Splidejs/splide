@@ -1330,7 +1330,7 @@ function Controller(Splide2, Components2, options) {
     slideCount = getLength(true);
     perMove = options.perMove;
     perPage = options.perPage;
-    currIndex = min(currIndex, slideCount - 1);
+    currIndex = clamp(currIndex, 0, slideCount - 1);
     jump(currIndex);
   }
   function reindex() {

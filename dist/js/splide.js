@@ -1590,7 +1590,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       slideCount = getLength(true);
       perMove = options.perMove;
       perPage = options.perPage;
-      currIndex = min(currIndex, slideCount - 1);
+      currIndex = clamp(currIndex, 0, slideCount - 1);
       jump(currIndex);
     }
 

@@ -44,6 +44,14 @@ export interface RendererConfig {
      */
     arrows?: boolean;
     /**
+     * Keeps the slider hidden.
+     */
+    hidden?: boolean;
+    /**
+     * Determines whether to wrap the track by the slider element or not.
+     */
+    slider?: boolean;
+    /**
      * The additional HTML rendered before the slider element.
      */
     beforeSlider?: string;
@@ -59,13 +67,5 @@ export interface RendererConfig {
      * The additional HTML rendered after the track element.
      */
     afterTrack?: string;
-    /**
-     * Keeps the slider hidden.
-     */
-    hidden?: boolean;
-    /**
-     * Determines whether to wrap the track by the slider element or not.
-     */
-    slider?: boolean;
 }
 //# sourceMappingURL=../../../../src/js/renderer/types/types.d.ts.map

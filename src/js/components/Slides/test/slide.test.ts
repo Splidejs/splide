@@ -210,10 +210,10 @@ describe( 'Slide', () => {
     const Slide0 = Slides.getAt( 0 );
     const Slide1 = Slides.getAt( 1 );
 
-    expect( Slide0.slide.getAttribute( 'role' ) ).toBe( 'button' );
+    expect( Slide0.slide.getAttribute( 'role' ) ).toBe( 'menuitem' );
     expect( Slide0.slide.getAttribute( 'aria-label' ) ).toBe( format( splide.options.i18n.slideX, 1 ) );
 
-    expect( Slide1.slide.getAttribute( 'role' ) ).toBe( 'button' );
+    expect( Slide1.slide.getAttribute( 'role' ) ).toBe( 'menuitem' );
     expect( Slide1.slide.getAttribute( 'aria-label' ) ).toBe( format( splide.options.i18n.slideX, 2 ) );
   } );
 

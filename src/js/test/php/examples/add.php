@@ -25,7 +25,7 @@ $settings = get_settings();
 
 <script>
   var splide = new Splide( '#splide01', {
-    type   : 'loop',
+    // type   : 'loop',
     perPage: 3,
     gap    : '1rem',
   } );
