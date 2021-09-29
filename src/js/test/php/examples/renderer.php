@@ -94,7 +94,7 @@ $settings = get_settings();
         {
           id: 'test',
           arrows: true,
-          // hidden: true,
+          slider: true,
         }
       );
 

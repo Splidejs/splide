@@ -280,6 +280,7 @@ export declare class SplideRenderer {
     private renderArrows;
     /**
      * Generates an arrow HTML.
+     * Some attributes are temporary, and Splide changes them after mount.
      *
      * @param prev - Options for each breakpoint.
      *

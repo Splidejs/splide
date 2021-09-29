@@ -657,14 +657,21 @@ export class SplideRenderer {
 
   /**
    * Generates an arrow HTML.
+   * Some attributes are temporary, and Splide changes them after mount.
    *
    * @param prev - Options for each breakpoint.
    *
    * @return The HTML for the prev or next arrow.
    */
   private renderArrow( prev: boolean ): string {
-    const { classes } = this.options;
-    return `<button class="${ classes.arrow } ${ prev ? classes.prev : classes.next }" type="button">`
+    const { classes, i18n } = this.options;
+    const attrs = {
+      class    : `${ classes.arrow } ${ prev ? classes.prev : classes.next }`,
+      type     : 'button',
+      ariaLabel: prev ? i18n.prev : i18n.next,
+    };
+
+    return `<button ${ this.buildAttrs( attrs ) }>`
       +	`<svg xmlns="${ XML_NAME_SPACE }" viewBox="0 0 ${ SIZE } ${ SIZE }" width="${ SIZE }" height="${ SIZE }">`
       + `<path d="${ this.options.arrowPath || PATH }" />`
       + `</svg>`
@@ -677,12 +684,17 @@ export class SplideRenderer {
    * @return The generated HTML.
    */
   html(): string {
-    const { rootClass, listTag, arrows, beforeTrack, afterTrack } = this.config;
+    const { rootClass, listTag, arrows, beforeTrack, afterTrack, slider, beforeSlider, afterSlider } = this.config;
 
     let html = '';
 
     html += `<div id="${ this.id }" class="${ this.buildClasses() } ${ rootClass || '' }">`;
     html += `<style>${ this.Style.build() }</style>`;
+
+    if ( slider ) {
+      html += beforeSlider || '';
+      html += `<div class="splide__slider">`;
+    }
 
     html += beforeTrack || '';
 
@@ -692,14 +704,20 @@ export class SplideRenderer {
     html += this.renderSlides();
 
     html += `</${ listTag }>`;
-    html += `</div>`;
+    html += `</div>`; // .track
 
     if ( arrows ) {
       html += this.renderArrows();
     }
 
     html += afterTrack || '';
-    html += `</div>`;
+
+    if ( slider ) {
+      html += `</div>`;
+      html += afterSlider || '';
+    }
+
+    html += `</div>`; // .splide
 
     return html;
   }

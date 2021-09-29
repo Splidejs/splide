@@ -2736,14 +2736,23 @@ class SplideRenderer {
     return html;
   }
   renderArrow(prev) {
-    const { classes } = this.options;
-    return `<button class="${classes.arrow} ${prev ? classes.prev : classes.next}" type="button"><svg xmlns="${XML_NAME_SPACE}" viewBox="0 0 ${SIZE} ${SIZE}" width="${SIZE}" height="${SIZE}"><path d="${this.options.arrowPath || PATH}" /></svg></button>`;
+    const { classes, i18n } = this.options;
+    const attrs = {
+      class: `${classes.arrow} ${prev ? classes.prev : classes.next}`,
+      type: "button",
+      ariaLabel: prev ? i18n.prev : i18n.next
+    };
+    return `<button ${this.buildAttrs(attrs)}><svg xmlns="${XML_NAME_SPACE}" viewBox="0 0 ${SIZE} ${SIZE}" width="${SIZE}" height="${SIZE}"><path d="${this.options.arrowPath || PATH}" /></svg></button>`;
   }
   html() {
-    const { rootClass, listTag, arrows, beforeTrack, afterTrack } = this.config;
+    const { rootClass, listTag, arrows, beforeTrack, afterTrack, slider, beforeSlider, afterSlider } = this.config;
     let html = "";
     html += `<div id="${this.id}" class="${this.buildClasses()} ${rootClass || ""}">`;
     html += `<style>${this.Style.build()}</style>`;
+    if (slider) {
+      html += beforeSlider || "";
+      html += `<div class="splide__slider">`;
+    }
     html += beforeTrack || "";
     html += `<div class="splide__track">`;
     html += `<${listTag} class="splide__list">`;
@@ -2754,6 +2763,10 @@ class SplideRenderer {
       html += this.renderArrows();
     }
     html += afterTrack || "";
+    if (slider) {
+      html += `</div>`;
+      html += afterSlider || "";
+    }
     html += `</div>`;
     return html;
   }
