@@ -5,11 +5,13 @@
     height: 100%;
     margin: 0 !important;
     padding: 0 !important;
+    backface-visibility: hidden;
+    display: flex;
   }
 
-  &.is-active {
+  &.is-initialized:not(.is-active) {
     #{ $root }__list {
-      display: flex;
+      display: block;
     }
   }
 }
