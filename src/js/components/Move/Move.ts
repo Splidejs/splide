@@ -1,3 +1,4 @@
+import { TTB } from '../../constants/directions';
 import { EVENT_MOVE, EVENT_MOVED, EVENT_REFRESH, EVENT_RESIZED, EVENT_UPDATED } from '../../constants/events';
 import { DEFAULT_EVENT_PRIORITY } from '../../constants/priority';
 import { IDLE, MOVING } from '../../constants/states';
@@ -126,10 +127,13 @@ export function Move( Splide: Splide, Components: Components, options: Options )
     position   = loop( position );
     shouldSnap = canSnap( position );
 
+    const isVertical = options.direction === TTB;
+    const percent    = 100 * position / listSize();
+
     Components.Style.ruleBy(
       list,
       'transform',
-      `translate${ resolve( 'X' ) }(${ 100 * position / listSize() }%)`
+      `translate3d( ${ isVertical ? 0 : percent }%, ${ isVertical ? percent : 0 }%, 0 )`,
     );
   }
 

@@ -1230,7 +1230,9 @@ function Move(Splide2, Components2, options) {
   function translate(position) {
     position = loop(position);
     shouldSnap = canSnap(position);
-    Components2.Style.ruleBy(list, "transform", `translate${resolve("X")}(${100 * position / listSize()}%)`);
+    const isVertical = options.direction === TTB;
+    const percent = 100 * position / listSize();
+    Components2.Style.ruleBy(list, "transform", `translate3d( ${isVertical ? 0 : percent}%, ${isVertical ? percent : 0}%, 0 )`);
   }
   function loop(position) {
     if (!waiting && Splide2.is(LOOP)) {
