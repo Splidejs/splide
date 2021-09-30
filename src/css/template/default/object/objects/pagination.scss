@@ -19,10 +19,10 @@ $dot-transform-active: scale( 1.4 ) !default;
   &__pagination {
     bottom: $bottom;
     left: 0;
-    right: 0;
-    position: absolute;
-    z-index: 1;
     padding: 0 1em;
+    position: absolute;
+    right: 0;
+    z-index: 1;
 
     &__page {
       background: $dot-background;

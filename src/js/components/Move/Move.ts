@@ -127,13 +127,10 @@ export function Move( Splide: Splide, Components: Components, options: Options )
     position   = loop( position );
     shouldSnap = canSnap( position );
 
-    const isVertical = options.direction === TTB;
-    const percent    = 100 * position / listSize();
-
     Components.Style.ruleBy(
       list,
       'transform',
-      `translate3d( ${ isVertical ? 0 : percent }%, ${ isVertical ? percent : 0 }%, 0 )`,
+      `translate${ resolve( 'X' ) }(${ 100 * position / listSize() }%)`
     );
   }
 

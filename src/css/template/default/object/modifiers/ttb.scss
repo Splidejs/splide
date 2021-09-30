@@ -37,13 +37,13 @@ $pagination-dot-height: false !default;
 
     > #{ $root }__pagination,
     > #{ $root }__slider > #{ $root }__pagination {
-      top: 0;
       bottom: 0;
       display: flex;
       flex-direction: column;
       left: $pagination-left;
-      right: $pagination-right;
       padding: 1em 0;
+      right: $pagination-right;
+      top: 0;
 
       #{ $root }__pagination__page {
         @if $pagination-dot-width {

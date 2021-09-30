@@ -2,11 +2,10 @@
   $root: &;
 
   &__list {
+    display: flex;
     height: 100%;
     margin: 0 !important;
     padding: 0 !important;
-    backface-visibility: hidden;
-    display: flex;
   }
 
   &.is-initialized:not(.is-active) {

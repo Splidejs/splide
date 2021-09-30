@@ -1460,9 +1460,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function translate(position) {
       position = loop(position);
       shouldSnap = canSnap(position);
-      var isVertical = options.direction === TTB;
-      var percent = 100 * position / listSize();
-      Components2.Style.ruleBy(list, "transform", "translate3d( " + (isVertical ? 0 : percent) + "%, " + (isVertical ? percent : 0) + "%, 0 )");
+      Components2.Style.ruleBy(list, "transform", "translate" + resolve("X") + "(" + 100 * position / listSize() + "%)");
     }
 
     function loop(position) {
