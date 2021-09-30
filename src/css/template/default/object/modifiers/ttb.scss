@@ -35,14 +35,15 @@ $pagination-dot-height: false !default;
       }
     }
 
-    // todo slider
-    > #{ $root }__pagination {
-      bottom: 50%;
+    > #{ $root }__pagination,
+    > #{ $root }__slider > #{ $root }__pagination {
+      top: 0;
+      bottom: 0;
       display: flex;
       flex-direction: column;
       left: $pagination-left;
       right: $pagination-right;
-      transform: translate( 0, 50% );
+      padding: 1em 0;
 
       #{ $root }__pagination__page {
         @if $pagination-dot-width {

@@ -18,6 +18,7 @@ $main-light: lighten( $main, 20% ) !default;
 @use '../../template/default/object/modifiers/ttb' with (
   $pagination-dot-width: 5px,
   $pagination-dot-height: 20px,
+  $pagination-right: 1em,
 );
 
 @use '../../template/default/object/objects/arrow' with (
