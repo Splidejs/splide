@@ -18,10 +18,9 @@ $dot-transform-active: scale( 1.4 ) !default;
 .splide {
   &__pagination {
     bottom: $bottom;
-    left: 50%;
-    padding: 0;
+    left: 0;
+    right: 0;
     position: absolute;
-    transform: translateX( -50% );
     z-index: 1;
 
     &__page {
