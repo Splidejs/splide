@@ -2752,14 +2752,14 @@ class SplideRenderer {
       html += `<div class="splide__slider">`;
     }
     html += beforeTrack || "";
+    if (arrows) {
+      html += this.renderArrows();
+    }
     html += `<div class="splide__track">`;
     html += `<${listTag} class="splide__list">`;
     html += this.renderSlides();
     html += `</${listTag}>`;
     html += `</div>`;
-    if (arrows) {
-      html += this.renderArrows();
-    }
     html += afterTrack || "";
     if (slider) {
       html += `</div>`;

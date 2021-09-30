@@ -698,6 +698,10 @@ export class SplideRenderer {
 
     html += beforeTrack || '';
 
+    if ( arrows ) {
+      html += this.renderArrows();
+    }
+
     html += `<div class="splide__track">`;
     html += `<${ listTag } class="splide__list">`;
 
@@ -705,10 +709,6 @@ export class SplideRenderer {
 
     html += `</${ listTag }>`;
     html += `</div>`; // .track
-
-    if ( arrows ) {
-      html += this.renderArrows();
-    }
 
     html += afterTrack || '';
 

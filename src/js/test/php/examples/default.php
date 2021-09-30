@@ -54,5 +54,9 @@ $settings = get_settings();
 
 <?php render(); ?>
 
+<div aria-hidden="true">
+  <input>
+</div>
+
 </body>
 </html>

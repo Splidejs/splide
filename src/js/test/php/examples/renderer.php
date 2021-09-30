@@ -102,9 +102,9 @@ $settings = get_settings();
       wrapper.innerHTML = renderer.html();
 
       setTimeout( () => {
-        // var splide = new Splide( wrapper.firstElementChild, options );
-        // SplideRenderer.clean( splide );
-        // splide.mount();
+        var splide = new Splide( wrapper.firstElementChild, options );
+        SplideRenderer.clean( splide );
+        splide.mount();
       }, 2000 );
     } );
   </script>
