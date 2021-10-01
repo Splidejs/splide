@@ -6,6 +6,7 @@
     > #{ $root }__track {
       > #{ $root }__list {
         display: block;
+        will-change: auto;
 
         > #{ $root }__slide {
           left: 0;
