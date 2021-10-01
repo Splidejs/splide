@@ -1,14 +1,11 @@
 .splide {
   &__slide {
-    backface-visibility: hidden;
     box-sizing: border-box;
     flex-shrink: 0;
     list-style-type: none !important;
     margin: 0;
     outline: none;
-    overflow: hidden;
     position: relative;
-    transform: translateZ( 0 );
 
     img {
       vertical-align: bottom;

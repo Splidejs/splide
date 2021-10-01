@@ -2797,7 +2797,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function apply(transition) {
-      Components2.Style.ruleBy(list, "transition", transition);
+      var ruleBy = Components2.Style.ruleBy;
+      var prop = "transition";
+      ruleBy(list, "will-change", transition ? prop : "");
+      ruleBy(list, prop, transition);
     }
 
     return {

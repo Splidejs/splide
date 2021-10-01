@@ -2,12 +2,10 @@
   $root: &;
 
   &__list {
-    backface-visibility: hidden;
     display: flex;
     height: 100%;
     margin: 0 !important;
     padding: 0 !important;
-    transform-style: preserve-3d;
   }
 
   &.is-initialized:not(.is-active) {
