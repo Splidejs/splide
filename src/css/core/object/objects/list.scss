@@ -2,11 +2,11 @@
   $root: &;
 
   &__list {
+    backface-visibility: hidden;
     display: flex;
     height: 100%;
     margin: 0 !important;
     padding: 0 !important;
-    backface-visibility: hidden;
     transform-style: preserve-3d;
   }
 
