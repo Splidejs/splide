@@ -93,10 +93,7 @@ export function Slide( Splide: Splide, Components: Components, options: Options 
    * @param transition - A transition CSS value.
    */
   function apply( transition: string ): void {
-    const { ruleBy } = Components.Style;
-    const prop = 'transition';
-    ruleBy( list, 'will-change', transition ? prop : '' );
-    ruleBy( list, prop, transition );
+    Components.Style.ruleBy( list, 'transition', transition );
   }
 
   return {

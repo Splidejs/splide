@@ -2287,9 +2287,7 @@ function Slide(Splide2, Components2, options) {
     return options.speed;
   }
   function apply(transition) {
-    const { ruleBy } = Components2.Style;
-    ruleBy(list, "will-change", transition ? "transition" : "");
-    ruleBy(list, "transition", transition);
+    Components2.Style.ruleBy(list, "transition", transition);
   }
   return {
     mount,
