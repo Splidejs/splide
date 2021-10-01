@@ -1226,7 +1226,7 @@ function Move(Splide2, Components2, options) {
   function translate(position) {
     position = loop(position);
     shouldSnap = canSnap(position);
-    Components2.Style.ruleBy(list, "transform", `translate${resolve("X")}(${100 * position / listSize()}%) translateZ(0)`);
+    Components2.Style.ruleBy(list, "transform", `translate${resolve("X")}(${100 * position / listSize()}%)`);
   }
   function loop(position) {
     if (!waiting && Splide2.is(LOOP)) {
