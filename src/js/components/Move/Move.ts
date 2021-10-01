@@ -130,7 +130,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
     Components.Style.ruleBy(
       list,
       'transform',
-      `translate${ resolve( 'X' ) }(${ 100 * position / listSize() }%)`
+      `translate${ resolve( 'X' ) }(${ 100 * position / listSize() }%) translateZ(0)`
     );
   }
 

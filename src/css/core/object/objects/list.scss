@@ -6,7 +6,8 @@
     height: 100%;
     margin: 0 !important;
     padding: 0 !important;
-    will-change: transform;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
   }
 
   &.is-initialized:not(.is-active) {

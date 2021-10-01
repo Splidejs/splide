@@ -1460,7 +1460,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function translate(position) {
       position = loop(position);
       shouldSnap = canSnap(position);
-      Components2.Style.ruleBy(list, "transform", "translate" + resolve("X") + "(" + 100 * position / listSize() + "%)");
+      Components2.Style.ruleBy(list, "transform", "translate" + resolve("X") + "(" + 100 * position / listSize() + "%) translateZ(0)");
     }
 
     function loop(position) {
