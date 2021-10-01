@@ -11,7 +11,7 @@
 * [Documents](https://splidejs.com/category/users-guide/)
 
 ## 🚨 Splide v3.0.0 Is Coming
-Splide is planning to release the major version update soon (hopefully in the end of this month). I'm carefully building it with trying not to break sliders using old versions, but you should **lock the version** just in case.
+Splide is planning to release the major version update soon (in a few days). I'm carefully building it with trying not to break sliders using old versions, but you should **lock the version** just in case.
 
 I didn't expect so many people pick my library, but now it hits more than 240M per month in jsDelivr.
 Thank you guys! 😄
@@ -25,7 +25,7 @@ Thank you guys! 😄
 * Support sync with multiple sliders
 * Support a placeholder image for lazy loading
 * Support the `min-width` media query for breakpoints
-* Remove the passive event listeners where Lighthouse complains
+* Handles passive event listeners where Lighthouse complains
 * Solve the `window` reference error for SSR
 * And more
 
@@ -36,8 +36,8 @@ If you are interested in the new version, check out the v3 branch 😎.
 2. ✔️Rewrite Video Extension
 3. ✔️Rewrite URL Hash Extension
 4. ✔️Rewrite Grid Extension
-5. Test and debug (I'm here)
-6. Update the website and documents
+5. ✔️Test and debug
+6. Update the website and documents (I'm here)
 7. Release
 8. Rewrite React component
 9. Rewrite Vue component
