@@ -3,6 +3,7 @@ body {
   height: 200vh;
   font-family: Roboto, sans-serif;
   line-height: 1.5;
+  padding: 2rem;
 }
 
 img {
@@ -12,6 +13,9 @@ img {
 
 .splide {
   margin: 2rem auto;
+}
+
+.splide__track {
 }
 
 .splide__slide.is-visible {
