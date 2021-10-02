@@ -6,7 +6,7 @@
 <h1>Splide</h1>
 
 <p>
-Splide is a lightweight, flexible and accessible slider and carousel. written in TypeScript.
+Splide is a lightweight, flexible and accessible slider and carousel written in TypeScript.<br>
 No dependencies, no Lighthouse errors.
 </p>
 
