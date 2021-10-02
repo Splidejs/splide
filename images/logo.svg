@@ -1,0 +1,14 @@
+<svg width="212.1" height="212.1" version="1.1" viewBox="0 0 56.13 56.13" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <linearGradient id="logo-a">
+   <stop stop-color="#c0e900" offset="0"/>
+   <stop stop-color="#00c3f3" offset="1"/>
+  </linearGradient>
+  <linearGradient id="logo-c" x1="-17.57" x2="-38.96" y1="124.6" y2="124.6" gradientTransform="rotate(180 -5.58 76.61)" gradientUnits="userSpaceOnUse" xlink:href="#logo-a"/>
+  <linearGradient id="logo-b" x1="-42.43" x2="-11.16" y1="125.1" y2="125.1" gradientTransform="translate(67.29 -97.09)" gradientUnits="userSpaceOnUse" xlink:href="#logo-a"/>
+ </defs>
+ <g stroke-linecap="square" stroke-linejoin="round" stroke-width="1.137">
+  <path d="m9.354 18.71 28.06 28.06-9.354 9.354-28.06-28.06zm-9.354 9.354 28.06-28.06 9.354 9.354-28.06 28.06z" fill="url(#logo-c)" opacity=".996" style="paint-order:stroke fill markers"/>
+  <path d="m46.77 37.42-28.06-28.06 9.354-9.354 28.06 28.06zm9.354-9.354-28.06 28.06-9.354-9.354 28.06-28.06z" fill="url(#logo-b)" opacity=".996" style="paint-order:stroke fill markers"/>
+ </g>
+</svg>
