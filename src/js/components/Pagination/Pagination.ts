@@ -25,6 +25,16 @@ export interface PaginationComponent extends BaseComponent {
 }
 
 /**
+ * The interface for data of the pagination.
+ *
+ * @since 3.0.0
+ */
+export interface PaginationData {
+  list: HTMLUListElement;
+  items: PaginationItem[];
+}
+
+/**
  * The interface for each pagination item.
  *
  * @since 3.0.0

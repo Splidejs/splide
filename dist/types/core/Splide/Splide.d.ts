@@ -1,6 +1,7 @@
 import { SlideMatcher } from '../../components/Slides/Slides';
-import { EventBusCallback, EventBusObject, StateObject } from '../../constructors';
+import { EventBusObject, StateObject } from '../../constructors';
 import { ComponentConstructor, Components, Options } from '../../types';
+import { EventMap } from '../../types/events';
 /**
  * The frontend class for the Splide slider.
  *
@@ -151,7 +152,7 @@ export declare class Splide {
      *
      * @return `this`
      */
-    on(events: string, callback: EventBusCallback): this;
+    on<K extends keyof EventMap>(events: K, callback: (...args: EventMap[K]) => void): this;
     /**
      * Removes the registered all handlers for the specified event or events.
      * If you want to only remove a particular handler, use namespace to identify it.
@@ -171,7 +172,7 @@ export declare class Splide {
      *
      * @return `this`
      */
-    off(events: string): this;
+    off<K extends keyof EventMap>(events: K | K[] | string | string[]): this;
     /**
      * Emits an event and triggers registered handlers.
      *
@@ -180,6 +181,7 @@ export declare class Splide {
      *
      * @return `this`
      */
+    emit<K extends keyof EventMap>(event: K, ...args: EventMap[K]): this;
     emit(event: string, ...args: any[]): this;
     /**
      * Inserts a slide at the specified position.

@@ -1,6 +1,7 @@
 import { EVENT_DESTROY } from '../../constants/events';
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction } from '../../types';
+import { EventMap } from '../../types/events';
 import { forEach } from '../../utils';
 import { EventBusCallback } from '../EventBus/EventBus';
 
@@ -11,8 +12,10 @@ import { EventBusCallback } from '../EventBus/EventBus';
  * @since 3.0.0
  */
 export interface EventInterfaceObject {
+  on<K extends keyof EventMap>( event: K, callback: ( ...args: EventMap[ K ] ) => void, priority?: number ): void;
   on( events: string | string[], callback: EventBusCallback, priority?: number ): void;
-  off( events: string | string[] ): void;
+  off<K extends keyof EventMap>( events: K | K[] | string | string[] ): void;
+  emit<K extends keyof EventMap>( event: K, ...args: EventMap[ K ] ): void
   emit( event: string, ...args: any[] ): void;
   bind(
     target: Element | Window | Document | Array<Element | Window | Document>,

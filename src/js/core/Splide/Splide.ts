@@ -9,6 +9,7 @@ import { FADE } from '../../constants/types';
 import { EventBus, EventBusCallback, EventBusObject, State, StateObject } from '../../constructors';
 import { Fade, Slide } from '../../transitions';
 import { ComponentConstructor, Components, Options } from '../../types';
+import { EventMap } from '../../types/events';
 import { addClass, assert, assign, empty, forOwn, isString, merge, query, slice } from '../../utils';
 
 
@@ -216,7 +217,8 @@ export class Splide {
    *
    * @return `this`
    */
-  on( events: string, callback: EventBusCallback ): this {
+  on<K extends keyof EventMap>( events: K, callback: ( ...args: EventMap[ K ] ) => void ): this;
+  on( events: string | string[], callback: EventBusCallback ): this {
     this.event.on( events, callback, null, DEFAULT_USER_EVENT_PRIORITY );
     return this;
   }
@@ -240,7 +242,7 @@ export class Splide {
    *
    * @return `this`
    */
-  off( events: string ): this {
+  off<K extends keyof EventMap>( events: K | K[] | string | string[] ): this {
     this.event.off( events );
     return this;
   }
@@ -253,6 +255,7 @@ export class Splide {
    *
    * @return `this`
    */
+  emit<K extends keyof EventMap>( event: K, ...args: EventMap[ K ] ): this;
   emit( event: string, ...args: any[] ): this;
   emit( event: string ): this {
     // eslint-disable-next-line prefer-rest-params, prefer-spread
@@ -385,4 +388,3 @@ export class Splide {
     return this._Components.Controller.getIndex();
   }
 }
-

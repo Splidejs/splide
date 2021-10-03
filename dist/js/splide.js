@@ -421,7 +421,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var EVENT_HIDDEN = "hidden";
   var EVENT_SLIDE_KEYDOWN = "slide:keydown";
   var EVENT_REFRESH = "refresh";
-  var EVENT_UPDATED = "undated";
+  var EVENT_UPDATED = "updated";
   var EVENT_RESIZE = "resize";
   var EVENT_RESIZED = "resized";
   var EVENT_DRAG = "drag";
