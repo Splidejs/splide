@@ -18,6 +18,10 @@ img {
 .splide__track {
 }
 
+.splide__slide {
+  border: 2px solid transparent;
+}
+
 .splide__slide.is-visible {
   border: 2px solid darkgray;
 }

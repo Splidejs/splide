@@ -16,7 +16,7 @@ describe( 'Style', () => {
       } );
 
       expect( listRule ).not.toBeUndefined();
-      expect( listRule.style.transform ).toBe( 'translateX(0%)' );
+      expect( listRule.style.transform ).toBe( 'translateX(0px)' );
     }
 
     splide.destroy();

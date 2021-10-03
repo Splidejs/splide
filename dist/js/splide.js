@@ -1394,8 +1394,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     };
   }
 
-  var SNAP_THRESHOLD = 10;
-
   function Move(Splide2, Components2, options) {
     var _EventInterface6 = EventInterface(Splide2),
         on = _EventInterface6.on,
@@ -1414,7 +1412,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         list = _Components2$Elements3.list,
         track = _Components2$Elements3.track;
     var waiting;
-    var shouldSnap = true;
 
     function mount() {
       if (!Splide2.is(FADE)) {
@@ -1423,11 +1420,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function reposition() {
-      if (exceededLimit(true)) {
-        translate(getLimit(true));
-      } else if (shouldSnap || (shouldSnap = canSnap())) {
-        jump(Splide2.index);
-      }
+      Components2.Scroll.cancel();
+      cancel();
+      jump(Splide2.index);
     }
 
     function move(dest, index, prev, callback) {
@@ -1458,9 +1453,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function translate(position) {
-      position = loop(position);
-      shouldSnap = canSnap(position);
-      Components2.Style.ruleBy(list, "transform", "translate" + resolve("X") + "(" + 100 * position / listSize() + "%)");
+      Components2.Style.ruleBy(list, "transform", "translate" + resolve("X") + "(" + loop(position) + "px)");
     }
 
     function loop(position) {
@@ -1528,11 +1521,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function getLimit(max) {
       return toPosition(max ? Components2.Controller.getEnd() : 0, !!options.trimSpace);
-    }
-
-    function canSnap(position) {
-      position = isUndefined(position) ? getPosition() : position;
-      return abs(position - toPosition(toIndex(position), true)) < SNAP_THRESHOLD;
     }
 
     function isBusy() {

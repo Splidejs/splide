@@ -31,8 +31,8 @@ export interface EventMap {
   'pagination:updated': [ PaginationData, PaginationItem, PaginationItem ];
   'navigation:mounted': [ Splide[] ];
   'autoplay:play': [];
-  'autoplay:playing': [];
-  'autoplay:pause': [ number ];
+  'autoplay:playing': [ number ];
+  'autoplay:pause': [];
   'lazyload:loaded': [ HTMLImageElement, SlideComponent ];
 }
 

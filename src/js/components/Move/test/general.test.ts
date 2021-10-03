@@ -9,10 +9,10 @@ describe( 'Move', () => {
     const rule = findRuleBy( list );
 
     Move.jump( 2 );
-    expect( rule.style.transform ).toBe( 'translateX(-200%)' );
+    expect( rule.style.transform ).toBe( 'translateX(-400px)' );
 
     Move.jump( 4 );
-    expect( rule.style.transform ).toBe( 'translateX(-400%)' );
+    expect( rule.style.transform ).toBe( 'translateX(-800px)' );
 
     splide.destroy();
   } );
@@ -24,30 +24,24 @@ describe( 'Move', () => {
     const rule = findRuleBy( list );
 
     Move.translate( 100 );
-    expect( rule.style.transform ).toBe( 'translateX(50%)' );
+    expect( rule.style.transform ).toBe( 'translateX(100px)' );
 
     Move.translate( 500 );
-    expect( rule.style.transform ).toBe( 'translateX(250%)' );
+    expect( rule.style.transform ).toBe( 'translateX(500px)' );
 
     splide.destroy();
   } );
 
   test( 'can loop the slider if it exceeds bounds.', () => {
     // Note: All clones do not have dimensions.
-    const width     = 200;
-    const splide    = init( { type: 'loop', width, height: 100 } );
-    const totalSize = width * splide.length;
-    const { Move }  = splide.Components;
-    const { list }  = splide.Components.Elements;
+    const width    = 200;
+    const splide   = init( { type: 'loop', width, height: 100 } );
+    const { Move } = splide.Components;
+    const { list } = splide.Components.Elements;
     const rule = findRuleBy( list );
 
     Move.translate( width );
-    expect( rule.style.transform ).toBe( `translateX(${ -100 * ( splide.length - 1 ) }%)` );
-
-    Move.translate( 0 );
-
-    Move.translate( - totalSize );
-    expect( rule.style.transform ).toBe( `translateX(-100%)` ); // 1 slide
+    expect( rule.style.transform ).toBe( `translateX(${ -width * ( splide.length - 1 ) }px)` );
 
     splide.destroy();
   } );

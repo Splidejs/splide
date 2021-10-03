@@ -7,6 +7,9 @@ describe( 'Scroll', () => {
     const splide   = init();
     const duration = 100;
 
+    // Waiting for the initial reposition. It will cancel scrolling.
+    await wait( 100 );
+
     splide.Components.Scroll.scroll( -100, duration );
 
     await wait( duration + 10 );
@@ -20,6 +23,8 @@ describe( 'Scroll', () => {
     const splide   = init();
     const duration = 200;
     const { getPosition } = splide.Components.Move;
+
+    await wait( 100 );
 
     splide.Components.Scroll.scroll( -100, duration );
 

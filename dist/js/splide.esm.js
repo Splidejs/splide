@@ -1178,26 +1178,21 @@ function Layout(Splide2, Components2, options) {
   };
 }
 
-const SNAP_THRESHOLD = 10;
-
 function Move(Splide2, Components2, options) {
   const { on, emit } = EventInterface(Splide2);
   const { slideSize, getPadding, totalSize, listSize, sliderSize } = Components2.Layout;
   const { resolve, orient } = Components2.Direction;
   const { list, track } = Components2.Elements;
   let waiting;
-  let shouldSnap = true;
   function mount() {
     if (!Splide2.is(FADE)) {
       on([EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition, DEFAULT_EVENT_PRIORITY - 1);
     }
   }
   function reposition() {
-    if (exceededLimit(true)) {
-      translate(getLimit(true));
-    } else if (shouldSnap || (shouldSnap = canSnap())) {
-      jump(Splide2.index);
-    }
+    Components2.Scroll.cancel();
+    cancel();
+    jump(Splide2.index);
   }
   function move(dest, index, prev, callback) {
     if (!isBusy()) {
@@ -1224,9 +1219,7 @@ function Move(Splide2, Components2, options) {
     translate(toPosition(index, true));
   }
   function translate(position) {
-    position = loop(position);
-    shouldSnap = canSnap(position);
-    Components2.Style.ruleBy(list, "transform", `translate${resolve("X")}(${100 * position / listSize()}%)`);
+    Components2.Style.ruleBy(list, "transform", `translate${resolve("X")}(${loop(position)}px)`);
   }
   function loop(position) {
     if (!waiting && Splide2.is(LOOP)) {
@@ -1280,10 +1273,6 @@ function Move(Splide2, Components2, options) {
   }
   function getLimit(max) {
     return toPosition(max ? Components2.Controller.getEnd() : 0, !!options.trimSpace);
-  }
-  function canSnap(position) {
-    position = isUndefined(position) ? getPosition() : position;
-    return abs(position - toPosition(toIndex(position), true)) < SNAP_THRESHOLD;
   }
   function isBusy() {
     return !!waiting;
