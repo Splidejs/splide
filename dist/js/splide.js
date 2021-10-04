@@ -909,6 +909,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var resolve = Components.Direction.resolve;
     var isClone = slideIndex > -1;
     var container = child(slide, "." + CLASS_CONTAINER);
+    var focusableNodes = options.focusableNodes && queryAll(slide, options.focusableNodes);
     var destroyed;
 
     function mount() {
@@ -982,13 +983,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function updateVisibility(visible) {
-      var focusableNodes = options.focusableNodes;
       var ariaHidden = !visible && !isActive();
       setAttribute(slide, ARIA_HIDDEN, ariaHidden || null);
       setAttribute(slide, TAB_INDEX, !ariaHidden && options.slideFocus ? 0 : null);
 
       if (focusableNodes) {
-        queryAll(slide, focusableNodes).forEach(function (node) {
+        focusableNodes.forEach(function (node) {
           setAttribute(node, TAB_INDEX, ariaHidden ? -1 : null);
         });
       }

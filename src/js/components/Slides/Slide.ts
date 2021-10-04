@@ -22,11 +22,9 @@ import {
   EVENT_INACTIVE,
   EVENT_MOVE,
   EVENT_MOVED,
-  EVENT_REFRESH, EVENT_REPOSITIONED,
-  EVENT_RESIZED,
+  EVENT_REPOSITIONED,
   EVENT_SCROLLED,
   EVENT_SLIDE_KEYDOWN,
-  EVENT_UPDATED,
   EVENT_VISIBLE,
 } from '../../constants/events';
 import { FADE, SLIDE } from '../../constants/types';
@@ -83,8 +81,9 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   const { Components, root, options } = Splide;
   const { isNavigation, updateOnMove } = options;
   const { resolve } = Components.Direction;
-  const isClone   = slideIndex > -1;
-  const container = child( slide, `.${ CLASS_CONTAINER }` );
+  const isClone        = slideIndex > -1;
+  const container      = child( slide, `.${ CLASS_CONTAINER }` );
+  const focusableNodes = options.focusableNodes && queryAll( slide, options.focusableNodes );
 
   /**
    * Turns into `true` when the component is destroyed.
@@ -192,14 +191,13 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    * @param visible - Set `true` if the slide is visible.
    */
   function updateVisibility( this: SlideComponent, visible: boolean ): void {
-    const { focusableNodes } = options;
     const ariaHidden = ! visible && ! isActive();
 
     setAttribute( slide, ARIA_HIDDEN, ariaHidden || null );
     setAttribute( slide, TAB_INDEX, ! ariaHidden && options.slideFocus ? 0 : null );
 
     if ( focusableNodes ) {
-      queryAll( slide, focusableNodes ).forEach( node => {
+      focusableNodes.forEach( node => {
         setAttribute( node, TAB_INDEX, ariaHidden ? -1 : null );
       } );
     }

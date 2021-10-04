@@ -798,6 +798,7 @@ function Slide$1(Splide2, index, slideIndex, slide) {
   const { resolve } = Components.Direction;
   const isClone = slideIndex > -1;
   const container = child(slide, `.${CLASS_CONTAINER}`);
+  const focusableNodes = options.focusableNodes && queryAll(slide, options.focusableNodes);
   let destroyed;
   function mount() {
     init();
@@ -855,12 +856,11 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     }
   }
   function updateVisibility(visible) {
-    const { focusableNodes } = options;
     const ariaHidden = !visible && !isActive();
     setAttribute(slide, ARIA_HIDDEN, ariaHidden || null);
     setAttribute(slide, TAB_INDEX, !ariaHidden && options.slideFocus ? 0 : null);
     if (focusableNodes) {
-      queryAll(slide, focusableNodes).forEach((node) => {
+      focusableNodes.forEach((node) => {
         setAttribute(node, TAB_INDEX, ariaHidden ? -1 : null);
       });
     }
