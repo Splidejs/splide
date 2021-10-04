@@ -79,8 +79,6 @@ export function init( options: Options = {}, args: InitArgs = {} ): Splide {
   };
 
   list.getBoundingClientRect = (): DOMRect => {
-    const parsed = parseTransform( list as HTMLElement );
-
     return assign( {}, domRect, {
       width: +width,
       ...parseTransform( list as HTMLElement ),

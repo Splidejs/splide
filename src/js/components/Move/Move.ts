@@ -152,10 +152,8 @@ export function Move( Splide: Splide, Components: Components, options: Options )
 
   /**
    * Cancels transition.
-   *
-   * @param settle - Determines whether to settle the position or not.
    */
-  function cancel( settle?: boolean ): void {
+  function cancel(): void {
     waiting = false;
     Components.Transition.cancel();
     translate( getPosition() );

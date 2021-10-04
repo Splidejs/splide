@@ -1236,7 +1236,7 @@ function Move(Splide2, Components2, options) {
     }
     return position;
   }
-  function cancel(settle) {
+  function cancel() {
     waiting = false;
     Components2.Transition.cancel();
     translate(getPosition());

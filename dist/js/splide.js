@@ -1468,7 +1468,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       return position;
     }
 
-    function cancel(settle) {
+    function cancel() {
       waiting = false;
       Components2.Transition.cancel();
       translate(getPosition());
