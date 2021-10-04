@@ -420,6 +420,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var EVENT_UPDATED = "updated";
   var EVENT_RESIZE = "resize";
   var EVENT_RESIZED = "resized";
+  var EVENT_REPOSITIONED = "repositioned";
   var EVENT_DRAG = "drag";
   var EVENT_DRAGGING = "dragging";
   var EVENT_DRAGGED = "dragged";
@@ -768,7 +769,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function mount() {
-      on(EVENT_REFRESH, refresh);
+      on(EVENT_REFRESH, refresh, DEFAULT_EVENT_PRIORITY - 2);
       on(EVENT_UPDATED, update);
     }
 
@@ -917,7 +918,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       bind(slide, "click keydown", function (e) {
         emit(e.type === "click" ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, _this2, e);
       });
-      on([EVENT_RESIZED, EVENT_MOVED, EVENT_UPDATED, EVENT_REFRESH, EVENT_SCROLLED], update.bind(this));
+      on([EVENT_REPOSITIONED, EVENT_MOVED, EVENT_SCROLLED], update.bind(this));
 
       if (updateOnMove) {
         on(EVENT_MOVE, onMove.bind(this));
@@ -1410,14 +1411,16 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function mount() {
       if (!Splide2.is(FADE)) {
-        on([EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition, DEFAULT_EVENT_PRIORITY - 1);
+        on([EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition);
+      } else {
+        emit(EVENT_REPOSITIONED);
       }
     }
 
     function reposition() {
       Components2.Scroll.cancel();
-      cancel(false);
       jump(Splide2.index);
+      emit(EVENT_REPOSITIONED);
     }
 
     function move(dest, index, prev, callback) {
@@ -1468,10 +1471,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function cancel(settle) {
       waiting = false;
       Components2.Transition.cancel();
-
-      if (settle) {
-        translate(getPosition());
-      }
+      translate(getPosition());
     }
 
     function toIndex(position) {
@@ -1566,7 +1566,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function mount() {
       init();
-      on([EVENT_UPDATED, EVENT_REFRESH], init, DEFAULT_EVENT_PRIORITY - 2);
+      on([EVENT_UPDATED, EVENT_REFRESH], init, DEFAULT_EVENT_PRIORITY - 1);
       on(EVENT_SCROLLED, reindex, 0);
     }
 
@@ -2123,7 +2123,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
             clickPrevented = false;
             bind(target, POINTER_MOVE_EVENTS, onPointerMove);
             bind(target, POINTER_UP_EVENTS, onPointerUp);
-            Move.cancel(true);
+            Move.cancel();
             Scroll.cancel();
             save(e);
           } else {

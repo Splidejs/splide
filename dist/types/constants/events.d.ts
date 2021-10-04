@@ -12,6 +12,7 @@ export declare const EVENT_REFRESH = "refresh";
 export declare const EVENT_UPDATED = "updated";
 export declare const EVENT_RESIZE = "resize";
 export declare const EVENT_RESIZED = "resized";
+export declare const EVENT_REPOSITIONED = "repositioned";
 export declare const EVENT_DRAG = "drag";
 export declare const EVENT_DRAGGING = "dragging";
 export declare const EVENT_DRAGGED = "dragged";

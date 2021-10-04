@@ -72,8 +72,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    */
   function mount(): void {
     init();
-    // jump( currIndex );
-    on( [ EVENT_UPDATED, EVENT_REFRESH ], init, DEFAULT_EVENT_PRIORITY - 2 );
+    on( [ EVENT_UPDATED, EVENT_REFRESH ], init, DEFAULT_EVENT_PRIORITY - 1 );
     on( EVENT_SCROLLED, reindex, 0 );
   }
 

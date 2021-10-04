@@ -22,7 +22,7 @@ import {
   EVENT_INACTIVE,
   EVENT_MOVE,
   EVENT_MOVED,
-  EVENT_REFRESH,
+  EVENT_REFRESH, EVENT_REPOSITIONED,
   EVENT_RESIZED,
   EVENT_SCROLLED,
   EVENT_SLIDE_KEYDOWN,
@@ -101,7 +101,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
       emit( e.type === 'click' ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, this, e );
     } );
 
-    on( [ EVENT_RESIZED, EVENT_MOVED, EVENT_UPDATED, EVENT_REFRESH, EVENT_SCROLLED ], update.bind( this ) );
+    on( [ EVENT_REPOSITIONED, EVENT_MOVED, EVENT_SCROLLED ], update.bind( this ) );
 
     if ( updateOnMove ) {
       on( EVENT_MOVE, onMove.bind( this ) );

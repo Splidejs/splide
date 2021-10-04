@@ -378,6 +378,7 @@ const EVENT_REFRESH = "refresh";
 const EVENT_UPDATED = "updated";
 const EVENT_RESIZE = "resize";
 const EVENT_RESIZED = "resized";
+const EVENT_REPOSITIONED = "repositioned";
 const EVENT_DRAG = "drag";
 const EVENT_DRAGGING = "dragging";
 const EVENT_DRAGGED = "dragged";
@@ -672,7 +673,7 @@ function Elements(Splide2, Components2, options) {
     addClass(root, classes = getClasses());
   }
   function mount() {
-    on(EVENT_REFRESH, refresh);
+    on(EVENT_REFRESH, refresh, DEFAULT_EVENT_PRIORITY - 2);
     on(EVENT_UPDATED, update);
   }
   function destroy() {
@@ -807,7 +808,7 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     bind(slide, "click keydown", (e) => {
       emit(e.type === "click" ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, this, e);
     });
-    on([EVENT_RESIZED, EVENT_MOVED, EVENT_UPDATED, EVENT_REFRESH, EVENT_SCROLLED], update.bind(this));
+    on([EVENT_REPOSITIONED, EVENT_MOVED, EVENT_SCROLLED], update.bind(this));
     if (updateOnMove) {
       on(EVENT_MOVE, onMove.bind(this));
     }
@@ -1187,13 +1188,15 @@ function Move(Splide2, Components2, options) {
   let waiting;
   function mount() {
     if (!Splide2.is(FADE)) {
-      on([EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition, DEFAULT_EVENT_PRIORITY - 1);
+      on([EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition);
+    } else {
+      emit(EVENT_REPOSITIONED);
     }
   }
   function reposition() {
     Components2.Scroll.cancel();
-    cancel(false);
     jump(Splide2.index);
+    emit(EVENT_REPOSITIONED);
   }
   function move(dest, index, prev, callback) {
     if (!isBusy()) {
@@ -1236,9 +1239,7 @@ function Move(Splide2, Components2, options) {
   function cancel(settle) {
     waiting = false;
     Components2.Transition.cancel();
-    if (settle) {
-      translate(getPosition());
-    }
+    translate(getPosition());
   }
   function toIndex(position) {
     const Slides = Components2.Slides.get();
@@ -1314,7 +1315,7 @@ function Controller(Splide2, Components2, options) {
   let perPage;
   function mount() {
     init();
-    on([EVENT_UPDATED, EVENT_REFRESH], init, DEFAULT_EVENT_PRIORITY - 2);
+    on([EVENT_UPDATED, EVENT_REFRESH], init, DEFAULT_EVENT_PRIORITY - 1);
     on(EVENT_SCROLLED, reindex, 0);
   }
   function init() {
@@ -1757,7 +1758,7 @@ function Drag(Splide2, Components2, options) {
           clickPrevented = false;
           bind(target, POINTER_MOVE_EVENTS, onPointerMove);
           bind(target, POINTER_UP_EVENTS, onPointerUp);
-          Move.cancel(true);
+          Move.cancel();
           Scroll.cancel();
           save(e);
         } else {
@@ -2802,6 +2803,7 @@ exports.EVENT_PAGINATION_MOUNTED = EVENT_PAGINATION_MOUNTED;
 exports.EVENT_PAGINATION_UPDATED = EVENT_PAGINATION_UPDATED;
 exports.EVENT_READY = EVENT_READY;
 exports.EVENT_REFRESH = EVENT_REFRESH;
+exports.EVENT_REPOSITIONED = EVENT_REPOSITIONED;
 exports.EVENT_RESIZE = EVENT_RESIZE;
 exports.EVENT_RESIZED = EVENT_RESIZED;
 exports.EVENT_SCROLL = EVENT_SCROLL;

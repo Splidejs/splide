@@ -374,6 +374,7 @@ const EVENT_REFRESH = "refresh";
 const EVENT_UPDATED = "updated";
 const EVENT_RESIZE = "resize";
 const EVENT_RESIZED = "resized";
+const EVENT_REPOSITIONED = "repositioned";
 const EVENT_DRAG = "drag";
 const EVENT_DRAGGING = "dragging";
 const EVENT_DRAGGED = "dragged";
@@ -668,7 +669,7 @@ function Elements(Splide2, Components2, options) {
     addClass(root, classes = getClasses());
   }
   function mount() {
-    on(EVENT_REFRESH, refresh);
+    on(EVENT_REFRESH, refresh, DEFAULT_EVENT_PRIORITY - 2);
     on(EVENT_UPDATED, update);
   }
   function destroy() {
@@ -803,7 +804,7 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     bind(slide, "click keydown", (e) => {
       emit(e.type === "click" ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, this, e);
     });
-    on([EVENT_RESIZED, EVENT_MOVED, EVENT_UPDATED, EVENT_REFRESH, EVENT_SCROLLED], update.bind(this));
+    on([EVENT_REPOSITIONED, EVENT_MOVED, EVENT_SCROLLED], update.bind(this));
     if (updateOnMove) {
       on(EVENT_MOVE, onMove.bind(this));
     }
@@ -1183,13 +1184,15 @@ function Move(Splide2, Components2, options) {
   let waiting;
   function mount() {
     if (!Splide2.is(FADE)) {
-      on([EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition, DEFAULT_EVENT_PRIORITY - 1);
+      on([EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition);
+    } else {
+      emit(EVENT_REPOSITIONED);
     }
   }
   function reposition() {
     Components2.Scroll.cancel();
-    cancel(false);
     jump(Splide2.index);
+    emit(EVENT_REPOSITIONED);
   }
   function move(dest, index, prev, callback) {
     if (!isBusy()) {
@@ -1232,9 +1235,7 @@ function Move(Splide2, Components2, options) {
   function cancel(settle) {
     waiting = false;
     Components2.Transition.cancel();
-    if (settle) {
-      translate(getPosition());
-    }
+    translate(getPosition());
   }
   function toIndex(position) {
     const Slides = Components2.Slides.get();
@@ -1310,7 +1311,7 @@ function Controller(Splide2, Components2, options) {
   let perPage;
   function mount() {
     init();
-    on([EVENT_UPDATED, EVENT_REFRESH], init, DEFAULT_EVENT_PRIORITY - 2);
+    on([EVENT_UPDATED, EVENT_REFRESH], init, DEFAULT_EVENT_PRIORITY - 1);
     on(EVENT_SCROLLED, reindex, 0);
   }
   function init() {
@@ -1753,7 +1754,7 @@ function Drag(Splide2, Components2, options) {
           clickPrevented = false;
           bind(target, POINTER_MOVE_EVENTS, onPointerMove);
           bind(target, POINTER_UP_EVENTS, onPointerUp);
-          Move.cancel(true);
+          Move.cancel();
           Scroll.cancel();
           save(e);
         } else {
@@ -2750,4 +2751,4 @@ class SplideRenderer {
   }
 }
 
-export { CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_AUTOPLAY, CLASS_CLONE, CLASS_CONTAINER, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PAUSE, CLASS_PLAY, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SLIDER, CLASS_SPINNER, CLASS_TRACK, CLASS_VISIBLE, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, EventBus, EventInterface, RequestInterval, STATUS_CLASSES, Splide, SplideRenderer, State, Throttle, Splide as default };
+export { CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_AUTOPLAY, CLASS_CLONE, CLASS_CONTAINER, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PAUSE, CLASS_PLAY, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SLIDER, CLASS_SPINNER, CLASS_TRACK, CLASS_VISIBLE, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, EventBus, EventInterface, RequestInterval, STATUS_CLASSES, Splide, SplideRenderer, State, Throttle, Splide as default };

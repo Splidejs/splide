@@ -2,11 +2,10 @@ import {
   EVENT_MOUNTED,
   EVENT_MOVE,
   EVENT_MOVED,
-  EVENT_REFRESH,
+  EVENT_REFRESH, EVENT_REPOSITIONED,
   EVENT_RESIZED,
   EVENT_UPDATED,
 } from '../../constants/events';
-import { DEFAULT_EVENT_PRIORITY } from '../../constants/priority';
 import { IDLE, MOVING } from '../../constants/states';
 import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
@@ -24,7 +23,7 @@ export interface MoveComponent extends BaseComponent {
   move( dest: number, index: number, prev: number, callback?: AnyFunction ): void;
   jump( index: number ): void;
   translate( position: number ): void;
-  cancel( settle?: boolean ): void;
+  cancel(): void;
   toIndex( position: number ): number;
   toPosition( index: number, trimming?: boolean ): number;
   getPosition(): number;
@@ -60,18 +59,21 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    */
   function mount(): void {
     if ( ! Splide.is( FADE ) ) {
-      on( [ EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH ], reposition, DEFAULT_EVENT_PRIORITY - 1 );
+      on( [ EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH ], reposition );
+    } else {
+      emit( EVENT_REPOSITIONED );
     }
   }
 
   /**
    * Repositions the slider.
    * This must be called before the Slide component checks the visibility.
+   * Do not call `cancel()` here because LazyLoad may emit resize while transitioning.
    */
   function reposition(): void {
     Components.Scroll.cancel();
-    cancel( false );
     jump( Splide.index );
+    emit( EVENT_REPOSITIONED );
   }
 
   /**
@@ -156,10 +158,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
   function cancel( settle?: boolean ): void {
     waiting = false;
     Components.Transition.cancel();
-
-    if ( settle ) {
-      translate( getPosition() );
-    }
+    translate( getPosition() );
   }
 
   /**
