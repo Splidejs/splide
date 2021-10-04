@@ -38,8 +38,9 @@ export interface ElementCollection {
   prev: HTMLButtonElement;
   next: HTMLButtonElement;
   bar: HTMLElement;
-  play: HTMLElement;
-  pause: HTMLElement;
+  autoplay: HTMLElement;
+  play: HTMLButtonElement;
+  pause: HTMLButtonElement;
 }
 
 /**
@@ -154,6 +155,7 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
       list,
       slides,
       arrows,
+      autoplay,
       prev : query( arrows, `.${ CLASS_ARROW_PREV }` ),
       next : query( arrows, `.${ CLASS_ARROW_NEXT }` ),
       bar  : query( find( `.${ CLASS_PROGRESS }` ), `.${ CLASS_PROGRESS_BAR }` ),

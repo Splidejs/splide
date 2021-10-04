@@ -62,10 +62,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     return subject instanceof HTMLElement;
   }
 
-  function isHTMLButtonElement(subject) {
-    return subject instanceof HTMLButtonElement;
-  }
-
   function toArray(value) {
     return isArray(value) ? value : [value];
   }
@@ -806,6 +802,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         list: list,
         slides: slides,
         arrows: arrows,
+        autoplay: autoplay,
         prev: query(arrows, "." + CLASS_ARROW_PREV),
         next: query(arrows, "." + CLASS_ARROW_NEXT),
         bar: query(find("." + CLASS_PROGRESS), "." + CLASS_PROGRESS_BAR),
@@ -1864,10 +1861,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var button = Elements[prop];
 
       if (button) {
-        if (!isHTMLButtonElement(button)) {
-          setAttribute(button, ROLE, "button");
-        }
-
         setAttribute(button, ARIA_CONTROLS, Elements.track.id);
         setAttribute(button, ARIA_LABEL, options.i18n[prop]);
         bind(button, "click", forPause ? pause : play);
@@ -1897,8 +1890,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function play() {
       if (isPaused() && Components2.Slides.isEnough()) {
         interval.start(!options.resetProgress);
-        focused = false;
-        hovered = false;
+        focused = hovered = paused = false;
         emit(EVENT_AUTOPLAY_PLAY);
       }
     }

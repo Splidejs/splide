@@ -48,9 +48,6 @@ function isNull(subject) {
 function isHTMLElement(subject) {
   return subject instanceof HTMLElement;
 }
-function isHTMLButtonElement(subject) {
-  return subject instanceof HTMLButtonElement;
-}
 
 function toArray(value) {
   return isArray(value) ? value : [value];
@@ -701,6 +698,7 @@ function Elements(Splide2, Components2, options) {
       list,
       slides,
       arrows,
+      autoplay,
       prev: query(arrows, `.${CLASS_ARROW_PREV}`),
       next: query(arrows, `.${CLASS_ARROW_NEXT}`),
       bar: query(find(`.${CLASS_PROGRESS}`), `.${CLASS_PROGRESS_BAR}`),
@@ -1552,9 +1550,6 @@ function Autoplay(Splide2, Components2, options) {
     const prop = forPause ? "pause" : "play";
     const button = Elements[prop];
     if (button) {
-      if (!isHTMLButtonElement(button)) {
-        setAttribute(button, ROLE, "button");
-      }
       setAttribute(button, ARIA_CONTROLS, Elements.track.id);
       setAttribute(button, ARIA_LABEL, options.i18n[prop]);
       bind(button, "click", forPause ? pause : play);
@@ -1579,8 +1574,7 @@ function Autoplay(Splide2, Components2, options) {
   function play() {
     if (isPaused() && Components2.Slides.isEnough()) {
       interval.start(!options.resetProgress);
-      focused = false;
-      hovered = false;
+      focused = hovered = paused = false;
       emit(EVENT_AUTOPLAY_PLAY);
     }
   }

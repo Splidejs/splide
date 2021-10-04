@@ -1,4 +1,4 @@
-import { ARIA_CONTROLS, ARIA_LABEL, ROLE } from '../../constants/attributes';
+import { ARIA_CONTROLS, ARIA_LABEL } from '../../constants/attributes';
 import {
   EVENT_AUTOPLAY_PAUSE,
   EVENT_AUTOPLAY_PLAY,
@@ -10,7 +10,7 @@ import {
 import { EventInterface, RequestInterval } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { isHTMLButtonElement, setAttribute, style } from '../../utils';
+import { setAttribute, style } from '../../utils';
 
 
 /**
@@ -83,10 +83,6 @@ export function Autoplay( Splide: Splide, Components: Components, options: Optio
     const button = Elements[ prop ];
 
     if ( button ) {
-      if ( ! isHTMLButtonElement( button ) ) {
-        setAttribute( button, ROLE, 'button' );
-      }
-
       setAttribute( button, ARIA_CONTROLS, Elements.track.id );
       setAttribute( button, ARIA_LABEL, options.i18n[ prop ] );
 
@@ -123,8 +119,7 @@ export function Autoplay( Splide: Splide, Components: Components, options: Optio
   function play(): void {
     if ( isPaused() && Components.Slides.isEnough() ) {
       interval.start( ! options.resetProgress );
-      focused = false;
-      hovered = false;
+      focused = hovered = paused = false;
       emit( EVENT_AUTOPLAY_PLAY );
     }
   }

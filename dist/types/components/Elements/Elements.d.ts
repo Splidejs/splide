@@ -15,8 +15,9 @@ export interface ElementCollection {
     prev: HTMLButtonElement;
     next: HTMLButtonElement;
     bar: HTMLElement;
-    play: HTMLElement;
-    pause: HTMLElement;
+    autoplay: HTMLElement;
+    play: HTMLButtonElement;
+    pause: HTMLButtonElement;
 }
 /**
  * The interface for the Elements component.

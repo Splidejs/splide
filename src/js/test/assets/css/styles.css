@@ -11,6 +11,10 @@ img {
   height: auto;
 }
 
+button:focus {
+  outline: 2px solid yellowgreen;
+}
+
 .splide {
   margin: 2rem auto;
 }

@@ -5,12 +5,14 @@
     flex-wrap: wrap;
     justify-content: center;
     margin: 0;
+    pointer-events: none;
 
     li {
       display: inline-block;
       line-height: 1;
       list-style-type: none;
       margin: 0;
+      pointer-events: auto;
     }
   }
 }
