@@ -1193,7 +1193,7 @@ function Move(Splide2, Components2, options) {
   }
   function reposition() {
     Components2.Scroll.cancel();
-    cancel();
+    cancel(false);
     jump(Splide2.index);
   }
   function move(dest, index, prev, callback) {
@@ -1234,10 +1234,12 @@ function Move(Splide2, Components2, options) {
     }
     return position;
   }
-  function cancel() {
+  function cancel(settle) {
     waiting = false;
     Components2.Transition.cancel();
-    translate(getPosition());
+    if (settle) {
+      translate(getPosition());
+    }
   }
   function toIndex(position) {
     const Slides = Components2.Slides.get();
@@ -1756,7 +1758,7 @@ function Drag(Splide2, Components2, options) {
           clickPrevented = false;
           bind(target, POINTER_MOVE_EVENTS, onPointerMove);
           bind(target, POINTER_UP_EVENTS, onPointerUp);
-          Move.cancel();
+          Move.cancel(true);
           Scroll.cancel();
           save(e);
         } else {

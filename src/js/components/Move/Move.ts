@@ -24,7 +24,7 @@ export interface MoveComponent extends BaseComponent {
   move( dest: number, index: number, prev: number, callback?: AnyFunction ): void;
   jump( index: number ): void;
   translate( position: number ): void;
-  cancel(): void;
+  cancel( settle?: boolean ): void;
   toIndex( position: number ): number;
   toPosition( index: number, trimming?: boolean ): number;
   getPosition(): number;
@@ -70,7 +70,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    */
   function reposition(): void {
     Components.Scroll.cancel();
-    cancel();
+    cancel( false );
     jump( Splide.index );
   }
 
@@ -150,11 +150,16 @@ export function Move( Splide: Splide, Components: Components, options: Options )
 
   /**
    * Cancels transition.
+   *
+   * @param settle - Determines whether to settle the position or not.
    */
-  function cancel(): void {
+  function cancel( settle?: boolean ): void {
     waiting = false;
     Components.Transition.cancel();
-    translate( getPosition() );
+
+    if ( settle ) {
+      translate( getPosition() );
+    }
   }
 
   /**

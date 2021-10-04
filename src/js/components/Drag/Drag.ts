@@ -130,7 +130,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
 
           bind( target, POINTER_MOVE_EVENTS, onPointerMove );
           bind( target, POINTER_UP_EVENTS, onPointerUp );
-          Move.cancel();
+          Move.cancel( true );
           Scroll.cancel();
           save( e );
         } else {

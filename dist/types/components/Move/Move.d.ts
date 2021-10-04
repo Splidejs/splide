@@ -9,7 +9,7 @@ export interface MoveComponent extends BaseComponent {
     move(dest: number, index: number, prev: number, callback?: AnyFunction): void;
     jump(index: number): void;
     translate(position: number): void;
-    cancel(): void;
+    cancel(settle?: boolean): void;
     toIndex(position: number): number;
     toPosition(index: number, trimming?: boolean): number;
     getPosition(): number;

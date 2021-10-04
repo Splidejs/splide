@@ -1418,7 +1418,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function reposition() {
       Components2.Scroll.cancel();
-      cancel();
+      cancel(false);
       jump(Splide2.index);
     }
 
@@ -1467,10 +1467,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       return position;
     }
 
-    function cancel() {
+    function cancel(settle) {
       waiting = false;
       Components2.Transition.cancel();
-      translate(getPosition());
+
+      if (settle) {
+        translate(getPosition());
+      }
     }
 
     function toIndex(position) {
@@ -2122,7 +2125,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
             clickPrevented = false;
             bind(target, POINTER_MOVE_EVENTS, onPointerMove);
             bind(target, POINTER_UP_EVENTS, onPointerUp);
-            Move.cancel();
+            Move.cancel(true);
             Scroll.cancel();
             save(e);
           } else {

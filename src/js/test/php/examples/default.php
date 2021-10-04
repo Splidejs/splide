@@ -20,7 +20,7 @@ $settings = get_settings();
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
         // type   : 'loop',
-        perPage: 1,
+        perPage: 3,
         gap    : '1.5rem',
         height : 400,
         start  : 2,
@@ -28,10 +28,16 @@ $settings = get_settings();
         // cover  : true,
         // speed: 1000,
         // padding: '20%',
+        waitForTransition: false,
         classes: {
           arrows: 'splide__arrows splide__test',
           clone : 'splide__clone splide__test',
-        }
+        },
+        breakpoints: {
+          640: {
+            perPage: 2,
+          }
+        },
       } );
 
       splide.on( 'moved', () => {
