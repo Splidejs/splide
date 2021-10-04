@@ -19,7 +19,7 @@ $settings = get_settings();
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
-        type   : 'loop',
+        // type   : 'loop',
         perPage: 1,
         gap    : '1.5rem',
         height : 400,
@@ -36,6 +36,10 @@ $settings = get_settings();
 
       splide.on( 'moved', () => {
         console.log( 'moved' );
+      } );
+
+      splide.on( 'resized', () => {
+        console.log( 'resized' );
       } );
 
       splide.on( 'click', () => {

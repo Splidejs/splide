@@ -2349,7 +2349,7 @@ const _Splide = class {
     this.emit(EVENT_REFRESH);
     return this;
   }
-  destroy(completely) {
+  destroy(completely = true) {
     const { event, state } = this;
     if (state.is(CREATED)) {
       event.on(EVENT_READY, this.destroy.bind(this, completely), this);

@@ -2881,6 +2881,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     };
 
     _proto.destroy = function destroy(completely) {
+      if (completely === void 0) {
+        completely = true;
+      }
+
       var event = this.event,
           state = this.state;
 

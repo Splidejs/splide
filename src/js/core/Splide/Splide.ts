@@ -327,7 +327,7 @@ export class Splide {
    *
    * @return `this`
    */
-  destroy( completely?: boolean ): this {
+  destroy( completely = true ): this {
     const { event, state } = this;
 
     if ( state.is( CREATED ) ) {
