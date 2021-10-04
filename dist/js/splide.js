@@ -1412,7 +1412,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function mount() {
       if (!Splide2.is(FADE)) {
-        on([EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition, DEFAULT_EVENT_PRIORITY - 1);
+        on([EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition, DEFAULT_EVENT_PRIORITY - 1);
       }
     }
 
@@ -1551,8 +1551,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         on = _EventInterface7.on;
 
     var Move = Components2.Move;
-    var jump = Move.jump,
-        getPosition = Move.getPosition,
+    var getPosition = Move.getPosition,
         getLimit = Move.getLimit;
     var _Components2$Slides = Components2.Slides,
         isEnough = _Components2$Slides.isEnough,
@@ -1566,8 +1565,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function mount() {
       init();
-      jump(currIndex);
-      on([EVENT_UPDATED, EVENT_REFRESH], init);
+      on([EVENT_UPDATED, EVENT_REFRESH], init, DEFAULT_EVENT_PRIORITY - 2);
       on(EVENT_SCROLLED, reindex, 0);
     }
 
@@ -1576,7 +1574,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       perMove = options.perMove;
       perPage = options.perPage;
       currIndex = clamp(currIndex, 0, slideCount - 1);
-      jump(currIndex);
     }
 
     function reindex() {

@@ -1,4 +1,5 @@
 import { EVENT_REFRESH, EVENT_SCROLLED, EVENT_UPDATED } from '../../constants/events';
+import { DEFAULT_EVENT_PRIORITY } from '../../constants/priority';
 import { LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
@@ -37,7 +38,7 @@ export interface ControllerComponent extends BaseComponent {
 export function Controller( Splide: Splide, Components: Components, options: Options ): ControllerComponent {
   const { on } = EventInterface( Splide );
   const { Move } = Components;
-  const { jump, getPosition, getLimit } = Move;
+  const { getPosition, getLimit } = Move;
   const { isEnough, getLength } = Components.Slides;
   const isLoop = Splide.is( LOOP );
 
@@ -71,8 +72,8 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    */
   function mount(): void {
     init();
-    jump( currIndex );
-    on( [ EVENT_UPDATED, EVENT_REFRESH ], init );
+    // jump( currIndex );
+    on( [ EVENT_UPDATED, EVENT_REFRESH ], init, DEFAULT_EVENT_PRIORITY - 2 );
     on( EVENT_SCROLLED, reindex, 0 );
   }
 
@@ -85,7 +86,6 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
     perMove    = options.perMove;
     perPage    = options.perPage;
     currIndex  = clamp( currIndex, 0, slideCount - 1 );
-    jump( currIndex );
   }
 
   /**

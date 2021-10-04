@@ -23,6 +23,7 @@ $settings = get_settings();
         perPage: 1,
         gap    : '1.5rem',
         height : 400,
+        start  : 2,
         // focus  : 'center',
         // cover  : true,
         // speed: 1000,

@@ -19,16 +19,33 @@ $settings = get_settings();
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
-        autoplay: true,
-        pauseOnHover: false,
+        autoplay     : true,
+        pauseOnHover : false,
+        resetProgress: false,
       } );
 
-      splide.on( 'autoplay:play', () => {
-        console.log( 'play' );
+      var toggleButton = document.querySelector( '.splide__toggle' );
+
+      splide.on( 'autoplay:play', function () {
+        toggleButton.classList.add( 'is-active' );
+        toggleButton.setAttribute( 'aria-label', 'Pause autoplay' );
+        toggleButton.textContent = 'Pause';
       } );
 
-      splide.on( 'autoplay:pause', () => {
-        console.log( 'paused' );
+      splide.on( 'autoplay:pause', function () {
+        toggleButton.classList.remove( 'is-active' );
+        toggleButton.setAttribute( 'aria-label', 'Start autoplay' );
+        toggleButton.textContent = 'Play';
+      } );
+
+      toggleButton.addEventListener( 'click', function () {
+        var Autoplay = splide.Components.Autoplay;
+
+        if ( Autoplay.isPaused() ) {
+          Autoplay.play();
+        } else {
+          Autoplay.pause();
+        }
       } );
 
       splide.mount();
@@ -53,6 +70,10 @@ $settings = get_settings();
     <button class="splide__pause">Pause</button>
   </div>
 </div>
+
+<button class="splide__toggle is-active" type="button">
+  Pause
+</button>
 
 </body>
 </html>

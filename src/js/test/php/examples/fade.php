@@ -10,7 +10,7 @@ $settings = get_settings();
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Default</title>
+  <title>Fade</title>
 
   <link rel="stylesheet" href="../../../../../dist/css/themes/splide-<?php echo $settings['theme'] ?>.min.css">
   <link rel="stylesheet" href="../../assets/css/styles.css">
@@ -21,6 +21,11 @@ $settings = get_settings();
       var splide = new Splide( '#splide01', {
         width: 800,
         type : 'fade',
+        breakpoints: {
+          640: {
+            width: '100%',
+          },
+        },
       } );
 
       splide.mount();

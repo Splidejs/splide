@@ -1188,7 +1188,7 @@ function Move(Splide2, Components2, options) {
   let waiting;
   function mount() {
     if (!Splide2.is(FADE)) {
-      on([EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition, DEFAULT_EVENT_PRIORITY - 1);
+      on([EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition, DEFAULT_EVENT_PRIORITY - 1);
     }
   }
   function reposition() {
@@ -1303,7 +1303,7 @@ function Move(Splide2, Components2, options) {
 function Controller(Splide2, Components2, options) {
   const { on } = EventInterface(Splide2);
   const { Move } = Components2;
-  const { jump, getPosition, getLimit } = Move;
+  const { getPosition, getLimit } = Move;
   const { isEnough, getLength } = Components2.Slides;
   const isLoop = Splide2.is(LOOP);
   let currIndex = options.start || 0;
@@ -1313,8 +1313,7 @@ function Controller(Splide2, Components2, options) {
   let perPage;
   function mount() {
     init();
-    jump(currIndex);
-    on([EVENT_UPDATED, EVENT_REFRESH], init);
+    on([EVENT_UPDATED, EVENT_REFRESH], init, DEFAULT_EVENT_PRIORITY - 2);
     on(EVENT_SCROLLED, reindex, 0);
   }
   function init() {
@@ -1322,7 +1321,6 @@ function Controller(Splide2, Components2, options) {
     perMove = options.perMove;
     perPage = options.perPage;
     currIndex = clamp(currIndex, 0, slideCount - 1);
-    jump(currIndex);
   }
   function reindex() {
     setIndex(Move.toIndex(getPosition()));
