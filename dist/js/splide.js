@@ -922,8 +922,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       if (updateOnMove) {
         on(EVENT_MOVE, onMove.bind(this));
       }
-
-      update.call(this);
     }
 
     function init() {

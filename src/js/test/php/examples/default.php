@@ -19,11 +19,11 @@ $settings = get_settings();
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
-        // type   : 'loop',
+        type   : 'loop',
         perPage: 3,
         gap    : '1.5rem',
         height : 400,
-        start  : 2,
+        // start  : 2,
         // focus  : 'center',
         // cover  : true,
         // speed: 1000,
@@ -44,8 +44,12 @@ $settings = get_settings();
         console.log( 'moved' );
       } );
 
-      splide.on( 'resized', () => {
-        console.log( 'resized' );
+      splide.on( 'visible', Slide => {
+        console.log( 'visible', Slide.index );
+      } );
+
+      splide.on( 'hidden', Slide => {
+        console.log( 'hidden', Slide.index );
       } );
 
       splide.on( 'click', () => {

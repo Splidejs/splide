@@ -106,8 +106,6 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
     if ( updateOnMove ) {
       on( EVENT_MOVE, onMove.bind( this ) );
     }
-
-    update.call( this );
   }
 
   /**

@@ -807,7 +807,6 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     if (updateOnMove) {
       on(EVENT_MOVE, onMove.bind(this));
     }
-    update.call(this);
   }
   function init() {
     if (!isClone) {
