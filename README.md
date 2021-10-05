@@ -25,6 +25,9 @@ No dependencies, no Lighthouse errors.
 </p>
 </div>
 
+## Notice
+I'm working on updating v2 -> b3. The website can be unstable today.
+
 ## Features
 
 - Written in TypeScript
