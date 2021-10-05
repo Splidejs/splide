@@ -1,0 +1,51 @@
+body {
+  background : #eee;
+  height: 200vh;
+  font-family: Roboto, sans-serif;
+  line-height: 1.5;
+  padding: 2rem;
+}
+
+img {
+  width: 100%;
+  height: auto;
+}
+
+button:focus {
+  outline: 2px solid yellowgreen;
+}
+
+.splide {
+  margin: 2rem auto;
+}
+
+.splide__track {
+}
+
+.splide__slide {
+  border: 2px solid transparent;
+}
+
+.splide__slide.is-visible {
+  border: 2px solid darkgray;
+}
+
+.splide__slide.is-active {
+  border: 2px solid deepskyblue;
+}
+
+.splide__slide:focus, .splide__arrow:focus, .splide__pagination__page:focus {
+  border: 2px solid tomato !important;
+}
+
+.splide__pagination__page.is-active {
+  background: deepskyblue;
+}
+
+.splide__arrow:disabled {
+  background: darkorchid;
+}
+
+.splide__progress {
+  margin: .5rem 0;
+}

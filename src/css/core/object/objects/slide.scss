@@ -1,11 +1,12 @@
 .splide {
   &__slide {
-    position: relative;
+    backface-visibility: hidden;
     box-sizing: border-box;
-    list-style-type: none!important;
+    flex-shrink: 0;
+    list-style-type: none !important;
     margin: 0;
     outline: none;
-    flex-shrink: 0;
+    position: relative;
 
     img {
       vertical-align: bottom;

@@ -1,0 +1,67 @@
+@use '../../foundation/colors';
+
+$bottom: .5em !default;
+$dot-width: 8px !default;
+$dot-height: 8px !default;
+$dot-background: colors.$background !default;
+$dot-background-hover: false !default;
+$dot-background-active: colors.$background-active !default;
+$dot-border: 0 !default;
+$dot-border-radius: 50% !default;
+$dot-margin: 3px !default;
+$dot-padding: 0 !default;
+$dot-opacity: .7 !default;
+$dot-opacity-hover: .9 !default;
+$dot-transition: transform .2s linear !default;
+$dot-transform-active: scale( 1.4 ) !default;
+
+.splide {
+  &__pagination {
+    bottom: $bottom;
+    left: 0;
+    padding: 0 1em;
+    position: absolute;
+    right: 0;
+    z-index: 1;
+
+    &__page {
+      background: $dot-background;
+      border: $dot-border;
+      border-radius: $dot-border-radius;
+      display: inline-block;
+      height: $dot-height;
+      margin: $dot-margin;
+      padding: $dot-padding;
+      transition: $dot-transition;
+      width: $dot-width;
+
+      @if $dot-opacity {
+        opacity: $dot-opacity;
+      }
+
+      &.is-active {
+        background: $dot-background-active;
+
+        @if $dot-transform-active {
+          transform: $dot-transform-active;
+        }
+      }
+
+      &:hover {
+        cursor: pointer;
+
+        @if $dot-opacity-hover {
+          opacity: $dot-opacity-hover;
+        }
+
+        @if $dot-background-hover {
+          background: $dot-background-hover;
+        }
+      }
+
+      &:focus {
+        outline: none;
+      }
+    }
+  }
+}

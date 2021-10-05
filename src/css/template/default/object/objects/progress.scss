@@ -1,0 +1,13 @@
+@use '../../foundation/colors';
+
+$height: 3px !default;
+$background: colors.$background;
+
+.splide {
+  &__progress {
+    &__bar {
+      background: $background;
+      height: $height;
+    }
+  }
+}

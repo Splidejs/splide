@@ -1,0 +1,3 @@
+export declare function create<K extends keyof HTMLElementTagNameMap>(tag: K, attrs?: Record<string, string | number | boolean> | string | string[], parent?: HTMLElement): HTMLElementTagNameMap[K];
+export declare function create(tag: string, attrs?: Record<string, string | number | boolean> | string | string[], parent?: HTMLElement): HTMLElement;
+//# sourceMappingURL=../../../../../src/js/utils/dom/create/create.d.ts.map

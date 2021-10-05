@@ -1,5 +1,10 @@
 .splide {
+  outline: none;
   position: relative;
   visibility: hidden;
-  outline: none;
+
+  &.is-initialized,
+  &.is-rendered {
+    visibility: visible;
+  }
 }

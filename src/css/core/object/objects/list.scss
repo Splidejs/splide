@@ -2,15 +2,17 @@
   $root: &;
 
   &__list {
-    margin: 0!important;
-    padding: 0!important;
-    width: max-content;
-    will-change: transform;
+    backface-visibility: hidden;
+    display: flex;
+    height: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform-style: preserve-3d;
   }
 
-  &.is-active {
-    #{$root}__list {
-      display: flex;
+  &.is-initialized:not(.is-active) {
+    #{ $root }__list {
+      display: block;
     }
   }
 }
