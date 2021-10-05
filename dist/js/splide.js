@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.0.0
+ * Version  : 3.0.1
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -2131,7 +2131,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
             Move.cancel();
             Scroll.cancel();
             save(e);
-          } else {
+          }
+
+          if (e.cancelable) {
             prevent(e, true);
           }
         }

@@ -22,17 +22,20 @@ $settings = get_settings();
         type             : 'loop',
         perPage          : 3,
         gap              : '1.5rem',
-        height           : 400,
-        waitForTransition: false,
+        // height           : 400,
+        // waitForTransition: false,
         // direction        : 'ltr',
-        drag             : true,
+        // drag      : true,
+        pagination: false,
+        arrows: false,
         classes: {
           arrows: 'splide__arrows splide__test',
         },
+        slideFocus: false,
         breakpoints: {
           1000: {
             // direction: 'rtl',
-            drag: false,
+            // drag: false,
             perPage: 2,
           }
         },
@@ -71,6 +74,8 @@ $settings = get_settings();
 <body>
 
 <?php render(); ?>
+
+<pre></pre>
 
 </body>
 </html>

@@ -133,7 +133,9 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
           Move.cancel();
           Scroll.cancel();
           save( e );
-        } else {
+        }
+
+        if ( e.cancelable ) {
           prevent( e, true );
         }
       }

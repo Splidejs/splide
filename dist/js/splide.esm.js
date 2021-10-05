@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.0.0
+ * Version  : 3.0.1
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1762,7 +1762,8 @@ function Drag(Splide2, Components2, options) {
           Move.cancel();
           Scroll.cancel();
           save(e);
-        } else {
+        }
+        if (e.cancelable) {
           prevent(e, true);
         }
       }
