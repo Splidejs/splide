@@ -26,7 +26,7 @@ No dependencies, no Lighthouse errors.
 </div>
 
 ## Notice
-I'm working on updating v2 -> b3. The website can be unstable today.
+I'm working on updating v2 -> v3. The website can be unstable today.
 
 ## Features
 
