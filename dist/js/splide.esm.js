@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.0.1
+ * Version  : 3.0.2
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1722,6 +1722,7 @@ const POINTER_UP_EVENTS = "touchend touchcancel mouseup mouseleave";
 function Drag(Splide2, Components2, options) {
   const { on, emit, bind, unbind } = EventInterface(Splide2);
   const { Move, Scroll, Controller } = Components2;
+  const { ruleBy } = Components2.Style;
   const { track } = Components2.Elements;
   const { resolve, orient } = Components2.Direction;
   const { getPosition, exceededLimit } = Move;
@@ -1761,9 +1762,9 @@ function Drag(Splide2, Components2, options) {
           bind(target, POINTER_UP_EVENTS, onPointerUp);
           Move.cancel();
           Scroll.cancel();
+          ruleBy(track, "will-change", "transform");
           save(e);
-        }
-        if (e.cancelable) {
+        } else {
           prevent(e, true);
         }
       }
@@ -1798,6 +1799,7 @@ function Drag(Splide2, Components2, options) {
   }
   function onPointerUp(e) {
     unbind(target, `${POINTER_MOVE_EVENTS} ${POINTER_UP_EVENTS}`);
+    ruleBy(track, "will-change", "");
     if (lastEvent) {
       if (isDragging || e.cancelable && isSliderDirection()) {
         const velocity = computeVelocity(e);

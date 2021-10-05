@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.0.1
+ * Version  : 3.0.0
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -2079,6 +2079,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var Move = Components2.Move,
         Scroll = Components2.Scroll,
         Controller = Components2.Controller;
+    var ruleBy = Components2.Style.ruleBy;
     var track = Components2.Elements.track;
     var _Components2$Directio2 = Components2.Direction,
         resolve = _Components2$Directio2.resolve,
@@ -2130,10 +2131,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
             bind(target, POINTER_UP_EVENTS, onPointerUp);
             Move.cancel();
             Scroll.cancel();
+            ruleBy(track, "will-change", "transform");
             save(e);
-          }
-
-          if (e.cancelable) {
+          } else {
             prevent(e, true);
           }
         }
@@ -2176,6 +2176,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function onPointerUp(e) {
       unbind(target, POINTER_MOVE_EVENTS + " " + POINTER_UP_EVENTS);
+      ruleBy(track, "will-change", "");
 
       if (lastEvent) {
         if (isDragging || e.cancelable && isSliderDirection()) {

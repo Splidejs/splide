@@ -30,6 +30,7 @@ export interface DragComponent extends BaseComponent {
 export function Drag( Splide: Splide, Components: Components, options: Options ): DragComponent {
   const { on, emit, bind, unbind } = EventInterface( Splide );
   const { Move, Scroll, Controller } = Components;
+  const { ruleBy } = Components.Style;
   const { track } = Components.Elements;
   const { resolve, orient } = Components.Direction;
   const { getPosition, exceededLimit } = Move;
@@ -132,10 +133,9 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
           bind( target, POINTER_UP_EVENTS, onPointerUp );
           Move.cancel();
           Scroll.cancel();
+          ruleBy( track, 'will-change', 'transform' );
           save( e );
-        }
-
-        if ( e.cancelable ) {
+        } else {
           prevent( e, true );
         }
       }
@@ -190,6 +190,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    */
   function onPointerUp( e: TouchEvent | MouseEvent ): void {
     unbind( target, `${ POINTER_MOVE_EVENTS } ${ POINTER_UP_EVENTS }` );
+    ruleBy( track, 'will-change', '' );
 
     if ( lastEvent ) {
       if ( isDragging || ( e.cancelable && isSliderDirection() ) ) {
