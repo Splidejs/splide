@@ -1,7 +1,7 @@
 {
   "name": "@splidejs/splide",
   "version": "3.0.0",
-  "description": "Splide is a lightweight and powerful slider/carousel without any dependencies.",
+  "description": "Splide is a lightweight, flexible and accessible slider/carousel. No dependencies, no Lighthouse errors.",
   "author": "Naotoshi Fujita",
   "license": "MIT",
   "main": "dist/js/splide.cjs.js",
@@ -67,6 +67,5 @@
   "browserslist": [
     "> 5%",
     "ie 10"
-  ],
-  "dependencies": {}
+  ]
 }
