@@ -8,7 +8,7 @@ import { AnyFunction, BaseComponent, Components, Options } from '../../types';
 export interface MoveComponent extends BaseComponent {
     move(dest: number, index: number, prev: number, callback?: AnyFunction): void;
     jump(index: number): void;
-    translate(position: number): void;
+    translate(position: number, preventLoop?: boolean): void;
     cancel(): void;
     toIndex(position: number): number;
     toPosition(index: number, trimming?: boolean): number;

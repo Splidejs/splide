@@ -539,17 +539,19 @@ function Options(Splide2, Components2, options) {
       assert(false, e.message);
     }
     initialOptions = merge({}, options);
-  }
-  function mount() {
     const { breakpoints } = options;
-    const isMin = options.mediaQuery === "min";
     if (breakpoints) {
+      const isMin = options.mediaQuery === "min";
       points = Object.keys(breakpoints).sort((n, m) => isMin ? +m - +n : +n - +m).map((point) => [
         point,
         matchMedia(`(${isMin ? "min" : "max"}-width:${point}px)`)
       ]);
-      addEventListener("resize", throttledObserve);
       observe();
+    }
+  }
+  function mount() {
+    if (points) {
+      addEventListener("resize", throttledObserve);
     }
   }
   function destroy(completely) {
@@ -1089,7 +1091,7 @@ function Layout(Splide2, Components2, options) {
   const { resolve } = Components2.Direction;
   const { track, list } = Components2.Elements;
   const { getAt } = Slides;
-  const vertical = options.direction === TTB;
+  let vertical;
   function mount() {
     init();
     bind(window, "resize load", Throttle(emit.bind(this, EVENT_RESIZE)));
@@ -1097,6 +1099,7 @@ function Layout(Splide2, Components2, options) {
     on(EVENT_RESIZE, resize);
   }
   function init() {
+    vertical = options.direction === TTB;
     ruleBy(Splide2.root, "maxWidth", unit(options.width));
     ruleBy(track, resolve("paddingLeft"), cssPadding(false));
     ruleBy(track, resolve("paddingRight"), cssPadding(true));
@@ -1218,16 +1221,18 @@ function Move(Splide2, Components2, options) {
   function jump(index) {
     translate(toPosition(index, true));
   }
-  function translate(position) {
-    Components2.Style.ruleBy(list, "transform", `translate${resolve("X")}(${loop(position)}px)`);
+  function translate(position, preventLoop) {
+    Components2.Style.ruleBy(list, "transform", `translate${resolve("X")}(${preventLoop ? position : loop(position)}px)`);
   }
   function loop(position) {
     if (!waiting && Splide2.is(LOOP)) {
-      const diff = position - getPosition();
-      const exceededMin = exceededLimit(false, position);
-      const exceededMax = exceededLimit(true, position);
-      if (exceededMin && diff > 0 || exceededMax && diff < 0) {
-        position += orient(sliderSize() * (exceededMin ? 1 : -1));
+      const diff = orient(position - getPosition());
+      const exceededMin = exceededLimit(false, position) && diff < 0;
+      const exceededMax = exceededLimit(true, position) && diff > 0;
+      if (exceededMin || exceededMax) {
+        const excess = position - getLimit(exceededMax);
+        const size = sliderSize();
+        position -= sign(excess) * size * ceil(abs(excess) / size);
       }
     }
     return position;
@@ -2105,8 +2110,11 @@ function Sync(Splide2, Components2, options) {
     const { on, emit } = EventInterface(Splide2);
     on(EVENT_CLICK, onClick);
     on(EVENT_SLIDE_KEYDOWN, onKeydown);
-    emit(EVENT_NAVIGATION_MOUNTED, Splide2.splides);
+    on([EVENT_MOUNTED, EVENT_UPDATED], update);
     setAttribute(list, ROLE, "menu");
+    emit(EVENT_NAVIGATION_MOUNTED, Splide2.splides);
+  }
+  function update() {
     setAttribute(list, ARIA_ORIENTATION, options.direction !== TTB ? "horizontal" : null);
   }
   function onClick(Slide) {
@@ -2244,7 +2252,7 @@ function Slide(Splide2, Components2, options) {
     const speed = getSpeed(index);
     if (abs(destination - position) >= 1 && speed >= 1) {
       apply(`transform ${speed}ms ${options.easing}`);
-      Move.translate(destination);
+      Move.translate(destination, true);
       endCallback = done;
     } else {
       Move.jump(index);

@@ -57,16 +57,12 @@ export function Options( Splide: Splide, Components: Components, options: Option
     }
 
     initialOptions = merge( {}, options );
-  }
 
-  /**
-   * Called when the component is mounted.
-   */
-  function mount(): void {
     const { breakpoints } = options;
-    const isMin = options.mediaQuery === 'min';
 
     if ( breakpoints ) {
+      const isMin = options.mediaQuery === 'min';
+
       points = Object.keys( breakpoints )
         .sort( ( n, m ) => isMin ? +m - +n : +n - +m )
         .map( point => [
@@ -74,8 +70,16 @@ export function Options( Splide: Splide, Components: Components, options: Option
           matchMedia( `(${ isMin ? 'min' : 'max' }-width:${ point }px)` ),
         ] );
 
-      addEventListener( 'resize', throttledObserve );
       observe();
+    }
+  }
+
+  /**
+   * Called when the component is mounted.
+   */
+  function mount(): void {
+    if ( points ) {
+      addEventListener( 'resize', throttledObserve );
     }
   }
 

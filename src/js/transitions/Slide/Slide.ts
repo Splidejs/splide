@@ -52,7 +52,7 @@ export function Slide( Splide: Splide, Components: Components, options: Options 
 
     if ( abs( destination - position ) >= 1 && speed >= 1 ) {
       apply( `transform ${ speed }ms ${ options.easing }` );
-      Move.translate( destination );
+      Move.translate( destination, true );
       endCallback = done;
     } else {
       Move.jump( index );

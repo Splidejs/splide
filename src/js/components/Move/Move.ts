@@ -11,7 +11,7 @@ import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, BaseComponent, Components, Options } from '../../types';
-import { abs, clamp, isUndefined, rect } from '../../utils';
+import { abs, ceil, clamp, isUndefined, rect, sign } from '../../utils';
 
 
 /**
@@ -22,7 +22,7 @@ import { abs, clamp, isUndefined, rect } from '../../utils';
 export interface MoveComponent extends BaseComponent {
   move( dest: number, index: number, prev: number, callback?: AnyFunction ): void;
   jump( index: number ): void;
-  translate( position: number ): void;
+  translate( position: number, preventLoop?: boolean ): void;
   cancel(): void;
   toIndex( position: number ): number;
   toPosition( index: number, trimming?: boolean ): number;
@@ -121,13 +121,14 @@ export function Move( Splide: Splide, Components: Components, options: Options )
   /**
    * Moves the slider to the provided position.
    *
-   * @param position - The position to move to.
+   * @param position    - The position to move to.
+   * @param preventLoop - Optional. If `true`, sets the provided position as is.
    */
-  function translate( position: number ): void {
+  function translate( position: number, preventLoop?: boolean ): void {
     Components.Style.ruleBy(
       list,
       'transform',
-      `translate${ resolve( 'X' ) }(${ loop( position ) }px)`
+      `translate${ resolve( 'X' ) }(${ preventLoop ? position : loop( position ) }px)`
     );
   }
 
@@ -138,12 +139,14 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    */
   function loop( position: number ): number {
     if ( ! waiting && Splide.is( LOOP ) ) {
-      const diff        = position - getPosition();
-      const exceededMin = exceededLimit( false, position );
-      const exceededMax = exceededLimit( true, position );
+      const diff        = orient( position - getPosition() );
+      const exceededMin = exceededLimit( false, position ) && diff < 0;
+      const exceededMax = exceededLimit( true, position ) && diff > 0;
 
-      if ( ( exceededMin && diff > 0 ) || ( exceededMax && diff < 0 ) ) {
-        position += orient( sliderSize() * ( exceededMin ? 1 : -1 ) );
+      if ( exceededMin || exceededMax ) {
+        const excess = position - getLimit( exceededMax );
+        const size   = sliderSize();
+        position -= sign( excess ) * size * ceil( abs( excess ) / size );
       }
     }
 

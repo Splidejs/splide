@@ -621,20 +621,22 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }
 
       initialOptions = merge({}, options);
-    }
-
-    function mount() {
       var breakpoints = options.breakpoints;
-      var isMin = options.mediaQuery === "min";
 
       if (breakpoints) {
+        var isMin = options.mediaQuery === "min";
         points = Object.keys(breakpoints).sort(function (n, m) {
           return isMin ? +m - +n : +n - +m;
         }).map(function (point) {
           return [point, matchMedia("(" + (isMin ? "min" : "max") + "-width:" + point + "px)")];
         });
-        addEventListener("resize", throttledObserve);
         observe();
+      }
+    }
+
+    function mount() {
+      if (points) {
+        addEventListener("resize", throttledObserve);
       }
     }
 
@@ -1282,7 +1284,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         track = _Components2$Elements2.track,
         list = _Components2$Elements2.list;
     var getAt = Slides.getAt;
-    var vertical = options.direction === TTB;
+    var vertical;
 
     function mount() {
       init();
@@ -1292,6 +1294,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function init() {
+      vertical = options.direction === TTB;
       ruleBy(Splide2.root, "maxWidth", unit(options.width));
       ruleBy(track, resolve("paddingLeft"), cssPadding(false));
       ruleBy(track, resolve("paddingRight"), cssPadding(true));
@@ -1450,18 +1453,20 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       translate(toPosition(index, true));
     }
 
-    function translate(position) {
-      Components2.Style.ruleBy(list, "transform", "translate" + resolve("X") + "(" + loop(position) + "px)");
+    function translate(position, preventLoop) {
+      Components2.Style.ruleBy(list, "transform", "translate" + resolve("X") + "(" + (preventLoop ? position : loop(position)) + "px)");
     }
 
     function loop(position) {
       if (!waiting && Splide2.is(LOOP)) {
-        var diff = position - getPosition();
-        var exceededMin = exceededLimit(false, position);
-        var exceededMax = exceededLimit(true, position);
+        var diff = orient(position - getPosition());
+        var exceededMin = exceededLimit(false, position) && diff < 0;
+        var exceededMax = exceededLimit(true, position) && diff > 0;
 
-        if (exceededMin && diff > 0 || exceededMax && diff < 0) {
-          position += orient(sliderSize() * (exceededMin ? 1 : -1));
+        if (exceededMin || exceededMax) {
+          var excess = position - getLimit(exceededMax);
+          var size = sliderSize();
+          position -= sign(excess) * size * ceil(abs(excess) / size);
         }
       }
 
@@ -2588,8 +2593,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       on(EVENT_CLICK, onClick);
       on(EVENT_SLIDE_KEYDOWN, onKeydown);
-      emit(EVENT_NAVIGATION_MOUNTED, Splide2.splides);
+      on([EVENT_MOUNTED, EVENT_UPDATED], update);
       setAttribute(list, ROLE, "menu");
+      emit(EVENT_NAVIGATION_MOUNTED, Splide2.splides);
+    }
+
+    function update() {
       setAttribute(list, ARIA_ORIENTATION, options.direction !== TTB ? "horizontal" : null);
     }
 
@@ -2747,7 +2756,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       if (abs(destination - position) >= 1 && speed >= 1) {
         apply("transform " + speed + "ms " + options.easing);
-        Move.translate(destination);
+        Move.translate(destination, true);
         endCallback = done;
       } else {
         Move.jump(index);

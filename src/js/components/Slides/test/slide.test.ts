@@ -1,4 +1,4 @@
-import { CLASS_ACTIVE, CLASS_NEXT, CLASS_PREV, CLASS_VISIBLE } from '../../../constants/classes';
+import { CLASS_ACTIVE, CLASS_NEXT, CLASS_PREV, CLASS_SLIDE, CLASS_VISIBLE } from '../../../constants/classes';
 import {
   EVENT_ACTIVE,
   EVENT_CLICK,
@@ -123,15 +123,16 @@ describe( 'Slide', () => {
     expect( visibleSlides ).toEqual( [ Slide0, Slide1 ] );
   } );
 
-  test( 'can disable focus of focusable descendants when the slide is hidden.', () => {
-    const splide = init( { speed: 0 } );
-    const { Slides } = splide.Components;
-    const Slide0 = Slides.getAt( 0 );
+  test( 'can disable focus of focusable descendants when the slide gets hidden.', () => {
+    const splide = init( { speed: 0 }, { mount: false } );
+    const slide0 = document.querySelector( `.${ CLASS_SLIDE }` );
     const a      = document.createElement( 'a' );
     const button = document.createElement( 'button' );
 
-    Slide0.slide.appendChild( a );
-    Slide0.slide.appendChild( button );
+    slide0.appendChild( a );
+    slide0.appendChild( button );
+
+    splide.mount();
 
     splide.go( 1 );
     expect( a.tabIndex ).toBe( -1 );

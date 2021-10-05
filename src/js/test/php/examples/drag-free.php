@@ -23,6 +23,8 @@ $settings = get_settings();
         gap    : '1.5rem',
         drag   : 'free',
         height : 200,
+        type   : 'loop',
+        // direction: 'rtl',
       } );
 
       splide.mount();

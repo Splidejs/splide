@@ -1,6 +1,13 @@
 import { ALL_ATTRIBUTES, ARIA_ORIENTATION, ROLE } from '../../constants/attributes';
 import { TTB } from '../../constants/directions';
-import { EVENT_CLICK, EVENT_MOVE, EVENT_NAVIGATION_MOUNTED, EVENT_SLIDE_KEYDOWN } from '../../constants/events';
+import {
+  EVENT_CLICK,
+  EVENT_MOUNTED,
+  EVENT_MOVE,
+  EVENT_NAVIGATION_MOUNTED,
+  EVENT_SLIDE_KEYDOWN,
+  EVENT_UPDATED,
+} from '../../constants/events';
 import { LOOP } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
@@ -87,9 +94,17 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
 
     on( EVENT_CLICK, onClick );
     on( EVENT_SLIDE_KEYDOWN, onKeydown );
-    emit( EVENT_NAVIGATION_MOUNTED, Splide.splides );
+    on( [ EVENT_MOUNTED, EVENT_UPDATED ], update );
 
     setAttribute( list, ROLE, 'menu' );
+
+    emit( EVENT_NAVIGATION_MOUNTED, Splide.splides );
+  }
+
+  /**
+   * Update attributes.
+   */
+  function update(): void {
     setAttribute( list, ARIA_ORIENTATION, options.direction !== TTB ? 'horizontal' : null );
   }
 

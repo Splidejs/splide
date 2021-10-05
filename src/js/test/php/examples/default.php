@@ -19,22 +19,20 @@ $settings = get_settings();
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
-        type   : 'loop',
-        perPage: 3,
-        gap    : '1.5rem',
-        height : 400,
-        // start  : 2,
-        // focus  : 'center',
-        // cover  : true,
-        // speed: 1000,
-        // padding: '20%',
+        type             : 'loop',
+        perPage          : 3,
+        gap              : '1.5rem',
+        height           : 400,
         waitForTransition: false,
+        // direction        : 'ltr',
+        drag             : true,
         classes: {
           arrows: 'splide__arrows splide__test',
-          clone : 'splide__clone splide__test',
         },
         breakpoints: {
-          640: {
+          1000: {
+            // direction: 'rtl',
+            drag: false,
             perPage: 2,
           }
         },
@@ -63,6 +61,10 @@ $settings = get_settings();
   <style>
     body {
       margin: 50em 0;
+    }
+
+    .splide__slide {
+      overflow: hidden;
     }
   </style>
 </head>

@@ -37,7 +37,11 @@ export function Layout( Splide: Splide, Components: Components, options: Options
   const { resolve } = Components.Direction;
   const { track, list } = Components.Elements;
   const { getAt } = Slides;
-  const vertical = options.direction === TTB;
+
+  /**
+   * Indicates whether the slider direction is vertical or not.
+   */
+  let vertical: boolean;
 
   /**
    * Called when the component is mounted.
@@ -55,6 +59,8 @@ export function Layout( Splide: Splide, Components: Components, options: Options
    * Uses `max-width` for the root to prevent the slider from exceeding the parent element.
    */
   function init(): void {
+    vertical = options.direction === TTB;
+
     ruleBy( Splide.root, 'maxWidth', unit( options.width ) );
     ruleBy( track, resolve( 'paddingLeft' ), cssPadding( false ) );
     ruleBy( track, resolve( 'paddingRight' ), cssPadding( true ) );
