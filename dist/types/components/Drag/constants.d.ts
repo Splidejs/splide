@@ -9,7 +9,7 @@ export declare const FRICTION = 5;
  *
  * @since 3.0.0
  */
-export declare const LOG_INTERVAL = 50;
+export declare const LOG_INTERVAL = 200;
 /**
  * Start events for dragging.
  *

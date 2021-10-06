@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.0.2
+ * Version  : 3.0.3
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1718,7 +1718,7 @@ function Scroll(Splide2, Components2, options) {
 }
 
 const FRICTION = 5;
-const LOG_INTERVAL = 50;
+const LOG_INTERVAL = 200;
 const POINTER_DOWN_EVENTS = "touchstart mousedown";
 const POINTER_MOVE_EVENTS = "touchmove mousemove";
 const POINTER_UP_EVENTS = "touchend touchcancel mouseup mouseleave";
