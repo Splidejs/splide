@@ -65,10 +65,6 @@ $settings = get_settings();
     body {
       margin: 50em 0;
     }
-
-    .splide__slide {
-      overflow: hidden;
-    }
   </style>
 </head>
 <body>

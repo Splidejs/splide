@@ -158,8 +158,8 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    */
   function cancel(): void {
     waiting = false;
-    Components.Transition.cancel();
     translate( getPosition() );
+    Components.Transition.cancel();
   }
 
   /**

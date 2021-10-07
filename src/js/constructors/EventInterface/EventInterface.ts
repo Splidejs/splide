@@ -23,7 +23,11 @@ export interface EventInterfaceObject {
     callback: AnyFunction,
     options?: AddEventListenerOptions
   ): void
-  unbind( target: Element | Window | Document | Array<Element | Window | Document>, events: string ): void;
+  unbind(
+    target: Element | Window | Document | Array<Element | Window | Document>,
+    events: string,
+    callback?: AnyFunction,
+  ): void;
   destroy(): void;
 }
 
@@ -105,13 +109,14 @@ export function EventInterface( Splide: Splide ): EventInterfaceObject {
   /**
    * Removes the event handler.
    *
-   * @param targets - A target element, the window object or the document object.
-   * @param events  - An event name or names to remove.
+   * @param targets  - A target element, the window object or the document object.
+   * @param events   - An event name or names to remove.
+   * @param callback - Optional. Specify the callback to remove.
    */
-  function unbind( targets: EventTarget | EventTarget[], events: string ): void {
+  function unbind( targets: EventTarget | EventTarget[], events: string, callback?: AnyFunction ): void {
     forEachEvent( targets, events, ( target, event ) => {
       listeners = listeners.filter( listener => {
-        if ( listener[ 0 ] === target && listener[ 1 ] === event ) {
+        if ( listener[ 0 ] === target && listener[ 1 ] === event && ( ! callback || listener[ 2 ] === callback ) ) {
           target.removeEventListener( event, listener[ 2 ], listener[ 3 ] );
           return false;
         }

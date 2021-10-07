@@ -14,7 +14,7 @@ export interface EventInterfaceObject {
     emit<K extends keyof EventMap>(event: K, ...args: EventMap[K]): void;
     emit(event: string, ...args: any[]): void;
     bind(target: Element | Window | Document | Array<Element | Window | Document>, events: string, callback: AnyFunction, options?: AddEventListenerOptions): void;
-    unbind(target: Element | Window | Document | Array<Element | Window | Document>, events: string): void;
+    unbind(target: Element | Window | Document | Array<Element | Window | Document>, events: string, callback?: AnyFunction): void;
     destroy(): void;
 }
 /**

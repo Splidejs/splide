@@ -3,7 +3,7 @@ import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { abs, clamp, min, prevent, sign } from '../../utils';
+import { abs, clamp, min, noop, prevent, sign } from '../../utils';
 import { FRICTION, LOG_INTERVAL, POINTER_DOWN_EVENTS, POINTER_MOVE_EVENTS, POINTER_UP_EVENTS } from './constants';
 
 
@@ -30,10 +30,10 @@ export interface DragComponent extends BaseComponent {
 export function Drag( Splide: Splide, Components: Components, options: Options ): DragComponent {
   const { on, emit, bind, unbind } = EventInterface( Splide );
   const { Move, Scroll, Controller } = Components;
-  const { ruleBy } = Components.Style;
   const { track } = Components.Elements;
   const { resolve, orient } = Components.Direction;
   const { getPosition, exceededLimit } = Move;
+  const listenerOptions = { capture: true, passive: false };
   const isSlide = Splide.is( SLIDE );
   const isFade  = Splide.is( FADE );
 
@@ -68,11 +68,6 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
   let isDragging: boolean;
 
   /**
-   * Indicates whether the user drags the slider by the mouse or not.
-   */
-  let isMouse: boolean;
-
-  /**
    * Indicates whether the slider exceeds limits or not.
    * This must not be `undefined` for strict comparison.
    */
@@ -97,8 +92,11 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    * Called when the component is mounted.
    */
   function mount(): void {
-    bind( track, POINTER_DOWN_EVENTS, onPointerDown, { passive: false, capture: true } );
+    bind( track, POINTER_MOVE_EVENTS, noop );
+    bind( track, POINTER_UP_EVENTS, noop );
+    bind( track, POINTER_DOWN_EVENTS, onPointerDown, listenerOptions );
     bind( track, 'click', onClick, { capture: true } );
+
     on( [ EVENT_MOUNTED, EVENT_UPDATED ], init );
   }
 
@@ -120,20 +118,19 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    */
   function onPointerDown( e: TouchEvent | MouseEvent ): void {
     if ( ! disabled ) {
-      isMouse = e.type === 'mousedown';
+      const isTouch = isTouchEvent( e );
 
-      if ( ! isMouse || ! ( e as MouseEvent ).button ) {
+      if ( isTouch || ! e.button ) {
         if ( ! Move.isBusy() ) {
-          target         = isMouse ? window : track;
+          target         = isTouch ? track : window;
           prevBaseEvent  = null;
           lastEvent      = null;
           clickPrevented = false;
 
-          bind( target, POINTER_MOVE_EVENTS, onPointerMove );
-          bind( target, POINTER_UP_EVENTS, onPointerUp );
+          bind( target, POINTER_MOVE_EVENTS, onPointerMove, listenerOptions );
+          bind( target, POINTER_UP_EVENTS, onPointerUp, listenerOptions );
           Move.cancel();
           Scroll.cancel();
-          ruleBy( track, 'will-change', 'transform' );
           save( e );
         } else {
           prevent( e, true );
@@ -171,8 +168,8 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
         emit( EVENT_DRAGGING );
         prevent( e );
       } else {
-        const threshold = options.dragMinThreshold || 15;
-        isDragging = isMouse || abs( coordOf( e ) - coordOf( baseEvent ) ) > threshold;
+        const threshold = options.dragMinThreshold || 5;
+        isDragging = ! isTouchEvent( e ) || abs( coordOf( e ) - coordOf( baseEvent ) ) > threshold;
 
         if ( isSliderDirection() ) {
           prevent( e );
@@ -189,8 +186,8 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    * @param e - A TouchEvent or MouseEvent object
    */
   function onPointerUp( e: TouchEvent | MouseEvent ): void {
-    unbind( target, `${ POINTER_MOVE_EVENTS } ${ POINTER_UP_EVENTS }` );
-    ruleBy( track, 'will-change', '' );
+    unbind( target, POINTER_MOVE_EVENTS, onPointerMove );
+    unbind( target, POINTER_UP_EVENTS, onPointerUp );
 
     if ( lastEvent ) {
       if ( isDragging || ( e.cancelable && isSliderDirection() ) ) {
@@ -306,8 +303,18 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    * @return A pageX or pageY coordinate.
    */
   function coordOf( e: TouchEvent | MouseEvent, orthogonal?: boolean ): number {
-    const prop = `page${ resolve( orthogonal ? 'Y' : 'X' ) }`;
-    return ( isMouse ? e : ( e as TouchEvent ).touches[ 0 ] )[ prop ];
+    return ( isTouchEvent( e ) ? e.touches[ 0 ] : e )[ `page${ resolve( orthogonal ? 'Y' : 'X' ) }` ];
+  }
+
+  /**
+   * Checks if the provided event is TouchEvent or MouseEvent.
+   *
+   * @param e - An event to check.
+   *
+   * @return `true` if the `e` is TouchEvent.
+   */
+  function isTouchEvent( e: TouchEvent | MouseEvent ): e is TouchEvent {
+    return typeof TouchEvent !== 'undefined' && e instanceof TouchEvent;
   }
 
   /**

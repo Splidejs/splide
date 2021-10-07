@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.0.3
+ * Version  : 3.0.4
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -457,10 +457,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       });
     }
 
-    function unbind(targets, events) {
+    function unbind(targets, events, callback) {
       forEachEvent(targets, events, function (target, event2) {
         listeners = listeners.filter(function (listener) {
-          if (listener[0] === target && listener[1] === event2) {
+          if (listener[0] === target && listener[1] === event2 && (!callback || listener[2] === callback)) {
             target.removeEventListener(event2, listener[2], listener[3]);
             return false;
           }
@@ -1475,8 +1475,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function cancel() {
       waiting = false;
-      Components2.Transition.cancel();
       translate(getPosition());
+      Components2.Transition.cancel();
     }
 
     function toIndex(position) {
@@ -2079,13 +2079,16 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var Move = Components2.Move,
         Scroll = Components2.Scroll,
         Controller = Components2.Controller;
-    var ruleBy = Components2.Style.ruleBy;
     var track = Components2.Elements.track;
     var _Components2$Directio2 = Components2.Direction,
         resolve = _Components2$Directio2.resolve,
         orient = _Components2$Directio2.orient;
     var getPosition = Move.getPosition,
         exceededLimit = Move.exceededLimit;
+    var listenerOptions = {
+      capture: true,
+      passive: false
+    };
     var isSlide = Splide2.is(SLIDE);
     var isFade = Splide2.is(FADE);
     var basePosition;
@@ -2094,17 +2097,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var lastEvent;
     var isFree;
     var isDragging;
-    var isMouse;
     var hasExceeded = false;
     var clickPrevented;
     var disabled;
     var target;
 
     function mount() {
-      bind(track, POINTER_DOWN_EVENTS, onPointerDown, {
-        passive: false,
-        capture: true
-      });
+      bind(track, POINTER_MOVE_EVENTS, noop);
+      bind(track, POINTER_UP_EVENTS, noop);
+      bind(track, POINTER_DOWN_EVENTS, onPointerDown, listenerOptions);
       bind(track, "click", onClick, {
         capture: true
       });
@@ -2119,19 +2120,18 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function onPointerDown(e) {
       if (!disabled) {
-        isMouse = e.type === "mousedown";
+        var isTouch = isTouchEvent(e);
 
-        if (!isMouse || !e.button) {
+        if (isTouch || !e.button) {
           if (!Move.isBusy()) {
-            target = isMouse ? window : track;
+            target = isTouch ? track : window;
             prevBaseEvent = null;
             lastEvent = null;
             clickPrevented = false;
-            bind(target, POINTER_MOVE_EVENTS, onPointerMove);
-            bind(target, POINTER_UP_EVENTS, onPointerUp);
+            bind(target, POINTER_MOVE_EVENTS, onPointerMove, listenerOptions);
+            bind(target, POINTER_UP_EVENTS, onPointerUp, listenerOptions);
             Move.cancel();
             Scroll.cancel();
-            ruleBy(track, "will-change", "transform");
             save(e);
           } else {
             prevent(e, true);
@@ -2164,8 +2164,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           emit(EVENT_DRAGGING);
           prevent(e);
         } else {
-          var threshold = options.dragMinThreshold || 15;
-          isDragging = isMouse || abs(coordOf(e) - coordOf(baseEvent)) > threshold;
+          var threshold = options.dragMinThreshold || 5;
+          isDragging = !isTouchEvent(e) || abs(coordOf(e) - coordOf(baseEvent)) > threshold;
 
           if (isSliderDirection()) {
             prevent(e);
@@ -2175,8 +2175,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function onPointerUp(e) {
-      unbind(target, POINTER_MOVE_EVENTS + " " + POINTER_UP_EVENTS);
-      ruleBy(track, "will-change", "");
+      unbind(target, POINTER_MOVE_EVENTS, onPointerMove);
+      unbind(target, POINTER_UP_EVENTS, onPointerUp);
 
       if (lastEvent) {
         if (isDragging || e.cancelable && isSliderDirection()) {
@@ -2243,8 +2243,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function coordOf(e, orthogonal) {
-      var prop = "page" + resolve(orthogonal ? "Y" : "X");
-      return (isMouse ? e : e.touches[0])[prop];
+      return (isTouchEvent(e) ? e.touches[0] : e)["page" + resolve(orthogonal ? "Y" : "X")];
+    }
+
+    function isTouchEvent(e) {
+      return typeof TouchEvent !== "undefined" && e instanceof TouchEvent;
     }
 
     function timeOf(e) {

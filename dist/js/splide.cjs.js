@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.0.3
+ * Version  : 3.0.4
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -411,10 +411,10 @@ function EventInterface(Splide2) {
       target.addEventListener(event2, callback, options);
     });
   }
-  function unbind(targets, events) {
+  function unbind(targets, events, callback) {
     forEachEvent(targets, events, (target, event2) => {
       listeners = listeners.filter((listener) => {
-        if (listener[0] === target && listener[1] === event2) {
+        if (listener[0] === target && listener[1] === event2 && (!callback || listener[2] === callback)) {
           target.removeEventListener(event2, listener[2], listener[3]);
           return false;
         }
@@ -1243,8 +1243,8 @@ function Move(Splide2, Components2, options) {
   }
   function cancel() {
     waiting = false;
-    Components2.Transition.cancel();
     translate(getPosition());
+    Components2.Transition.cancel();
   }
   function toIndex(position) {
     const Slides = Components2.Slides.get();
@@ -1726,10 +1726,10 @@ const POINTER_UP_EVENTS = "touchend touchcancel mouseup mouseleave";
 function Drag(Splide2, Components2, options) {
   const { on, emit, bind, unbind } = EventInterface(Splide2);
   const { Move, Scroll, Controller } = Components2;
-  const { ruleBy } = Components2.Style;
   const { track } = Components2.Elements;
   const { resolve, orient } = Components2.Direction;
   const { getPosition, exceededLimit } = Move;
+  const listenerOptions = { capture: true, passive: false };
   const isSlide = Splide2.is(SLIDE);
   const isFade = Splide2.is(FADE);
   let basePosition;
@@ -1738,13 +1738,14 @@ function Drag(Splide2, Components2, options) {
   let lastEvent;
   let isFree;
   let isDragging;
-  let isMouse;
   let hasExceeded = false;
   let clickPrevented;
   let disabled;
   let target;
   function mount() {
-    bind(track, POINTER_DOWN_EVENTS, onPointerDown, { passive: false, capture: true });
+    bind(track, POINTER_MOVE_EVENTS, noop);
+    bind(track, POINTER_UP_EVENTS, noop);
+    bind(track, POINTER_DOWN_EVENTS, onPointerDown, listenerOptions);
     bind(track, "click", onClick, { capture: true });
     on([EVENT_MOUNTED, EVENT_UPDATED], init);
   }
@@ -1755,18 +1756,17 @@ function Drag(Splide2, Components2, options) {
   }
   function onPointerDown(e) {
     if (!disabled) {
-      isMouse = e.type === "mousedown";
-      if (!isMouse || !e.button) {
+      const isTouch = isTouchEvent(e);
+      if (isTouch || !e.button) {
         if (!Move.isBusy()) {
-          target = isMouse ? window : track;
+          target = isTouch ? track : window;
           prevBaseEvent = null;
           lastEvent = null;
           clickPrevented = false;
-          bind(target, POINTER_MOVE_EVENTS, onPointerMove);
-          bind(target, POINTER_UP_EVENTS, onPointerUp);
+          bind(target, POINTER_MOVE_EVENTS, onPointerMove, listenerOptions);
+          bind(target, POINTER_UP_EVENTS, onPointerUp, listenerOptions);
           Move.cancel();
           Scroll.cancel();
-          ruleBy(track, "will-change", "transform");
           save(e);
         } else {
           prevent(e, true);
@@ -1793,8 +1793,8 @@ function Drag(Splide2, Components2, options) {
         emit(EVENT_DRAGGING);
         prevent(e);
       } else {
-        const threshold = options.dragMinThreshold || 15;
-        isDragging = isMouse || abs(coordOf(e) - coordOf(baseEvent)) > threshold;
+        const threshold = options.dragMinThreshold || 5;
+        isDragging = !isTouchEvent(e) || abs(coordOf(e) - coordOf(baseEvent)) > threshold;
         if (isSliderDirection()) {
           prevent(e);
         }
@@ -1802,8 +1802,8 @@ function Drag(Splide2, Components2, options) {
     }
   }
   function onPointerUp(e) {
-    unbind(target, `${POINTER_MOVE_EVENTS} ${POINTER_UP_EVENTS}`);
-    ruleBy(track, "will-change", "");
+    unbind(target, POINTER_MOVE_EVENTS, onPointerMove);
+    unbind(target, POINTER_UP_EVENTS, onPointerUp);
     if (lastEvent) {
       if (isDragging || e.cancelable && isSliderDirection()) {
         const velocity = computeVelocity(e);
@@ -1856,8 +1856,10 @@ function Drag(Splide2, Components2, options) {
     return isSlide ? clamp(dest, 0, Controller.getEnd()) : dest;
   }
   function coordOf(e, orthogonal) {
-    const prop = `page${resolve(orthogonal ? "Y" : "X")}`;
-    return (isMouse ? e : e.touches[0])[prop];
+    return (isTouchEvent(e) ? e.touches[0] : e)[`page${resolve(orthogonal ? "Y" : "X")}`];
+  }
+  function isTouchEvent(e) {
+    return typeof TouchEvent !== "undefined" && e instanceof TouchEvent;
   }
   function timeOf(e) {
     return e.timeStamp;
