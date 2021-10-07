@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.0.8
+ * Version  : 3.0.9
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -328,7 +328,7 @@ function EventBus() {
     forEachEvent(events, (event, namespace) => {
       const eventHandlers = handlers[event];
       handlers[event] = eventHandlers && eventHandlers.filter((handler) => {
-        return handler._key ? handler._key !== key : handler._namespace !== namespace;
+        return handler._key ? handler._key !== key : key || handler._namespace !== namespace;
       });
     });
   }

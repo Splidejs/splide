@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.0.8
+ * Version  : 3.0.9
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -368,7 +368,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       forEachEvent(events, function (event, namespace) {
         var eventHandlers = handlers[event];
         handlers[event] = eventHandlers && eventHandlers.filter(function (handler) {
-          return handler._key ? handler._key !== key : handler._namespace !== namespace;
+          return handler._key ? handler._key !== key : key || handler._namespace !== namespace;
         });
       });
     }

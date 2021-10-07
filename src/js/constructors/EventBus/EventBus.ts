@@ -90,7 +90,7 @@ export function EventBus(): EventBusObject {
       const eventHandlers = handlers[ event ];
 
       handlers[ event ] = eventHandlers && eventHandlers.filter( handler => {
-        return handler._key ? handler._key !== key : handler._namespace !== namespace;
+        return handler._key ? handler._key !== key : key || handler._namespace !== namespace;
       } );
     } );
   }

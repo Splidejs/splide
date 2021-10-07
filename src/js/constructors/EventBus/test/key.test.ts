@@ -63,4 +63,24 @@ describe( 'EventBus', () => {
     expect( onMounted ).not.toHaveBeenCalled();
     expect( onMoved ).not.toHaveBeenCalled();
   } );
+
+  test( 'should not remove a handler if a key does not match.', () => {
+    const event     = EventBus();
+    const callback1 = jest.fn();
+    const callback2 = jest.fn();
+    const callback3 = jest.fn();
+    const key       = {};
+
+    event.on( 'mounted', callback1 );
+    event.on( 'mounted', callback2, key );
+    event.on( 'mounted', callback3, key );
+
+    event.off( 'mounted', key );
+
+    event.emit( 'mounted' );
+
+    expect( callback1 ).toHaveBeenCalledTimes( 1 );
+    expect( callback2 ).not.toHaveBeenCalled()
+    expect( callback3 ).not.toHaveBeenCalled()
+  } );
 } );
