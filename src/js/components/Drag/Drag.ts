@@ -33,7 +33,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
   const { track } = Components.Elements;
   const { resolve, orient } = Components.Direction;
   const { getPosition, exceededLimit } = Move;
-  const listenerOptions = { capture: true, passive: false };
+  const listenerOptions = { passive: false, capture: true };
   const isSlide         = Splide.is( SLIDE );
 
   /**
@@ -91,8 +91,10 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    * Called when the component is mounted.
    */
   function mount(): void {
-    bind( track, POINTER_MOVE_EVENTS, noop );
-    bind( track, POINTER_UP_EVENTS, noop );
+    const passive = { passive: true };
+
+    bind( track, POINTER_MOVE_EVENTS, noop, passive );
+    bind( track, POINTER_UP_EVENTS, noop, passive );
     bind( track, POINTER_DOWN_EVENTS, onPointerDown, listenerOptions );
     bind( track, 'click', onClick, { capture: true } );
 

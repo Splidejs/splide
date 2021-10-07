@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.0.6
+ * Version  : 3.0.7
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1731,7 +1731,7 @@ function Drag(Splide2, Components2, options) {
   const { track } = Components2.Elements;
   const { resolve, orient } = Components2.Direction;
   const { getPosition, exceededLimit } = Move;
-  const listenerOptions = { capture: true, passive: false };
+  const listenerOptions = { passive: false, capture: true };
   const isSlide = Splide2.is(SLIDE);
   let basePosition;
   let baseEvent;
@@ -1744,8 +1744,9 @@ function Drag(Splide2, Components2, options) {
   let disabled;
   let target;
   function mount() {
-    bind(track, POINTER_MOVE_EVENTS, noop);
-    bind(track, POINTER_UP_EVENTS, noop);
+    const passive = { passive: true };
+    bind(track, POINTER_MOVE_EVENTS, noop, passive);
+    bind(track, POINTER_UP_EVENTS, noop, passive);
     bind(track, POINTER_DOWN_EVENTS, onPointerDown, listenerOptions);
     bind(track, "click", onClick, { capture: true });
     on([EVENT_MOUNTED, EVENT_UPDATED], init);

@@ -25,14 +25,11 @@ No dependencies, no Lighthouse errors.
 </p>
 </div>
 
-## Notice
-I'm working on updating v2 -> v3. The website can be unstable today.
-
 ## Features
 
 - Written in TypeScript
 - No dependencies
-- Lightweight, less than 26kB (11kB gzipped)
+- Lightweight, 26kB (11kB gzipped)
 - Flexible and extensible
 - Protected by 300+ test cases
 - Multiple slides

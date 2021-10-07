@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.0.6
+ * Version  : 3.0.7
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -2089,8 +2089,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var getPosition = Move.getPosition,
         exceededLimit = Move.exceededLimit;
     var listenerOptions = {
-      capture: true,
-      passive: false
+      passive: false,
+      capture: true
     };
     var isSlide = Splide2.is(SLIDE);
     var basePosition;
@@ -2105,8 +2105,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var target;
 
     function mount() {
-      bind(track, POINTER_MOVE_EVENTS, noop);
-      bind(track, POINTER_UP_EVENTS, noop);
+      var passive = {
+        passive: true
+      };
+      bind(track, POINTER_MOVE_EVENTS, noop, passive);
+      bind(track, POINTER_UP_EVENTS, noop, passive);
       bind(track, POINTER_DOWN_EVENTS, onPointerDown, listenerOptions);
       bind(track, "click", onClick, {
         capture: true
