@@ -1,0 +1,57 @@
+name: Bug Report
+description: Create a bug report.
+labels: [ "bug" ]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking your time to post a bug report!
+        Please fill out the following form. I might need to close the issue without required fields or e.g. clear repro steps.
+  - type: checkboxes
+    attributes:
+      label: Checks
+      description: Before posting a report, please check following things.
+      options:
+        - label: "Not a duplicate."
+          required: true
+        - label: "Not a question, feature request, or anything other than a bug report directly related to Splide."
+          required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The version where the bug happens.
+      placeholder: v3.x.x
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Description
+      description: Describe the bug.
+      placeholder: Provide a clear and precise description. Feel free to paste your code, screenshort, etc.
+    validations:
+      required: true
+  - type: input
+    id: reproduction-link
+    attributes:
+      label: Reproduction Link
+      description: A link to a reproduction (CodeSandbox, etc.). **Do not link to your project**, it has to be a minimal and fresh reproduction.
+      placeholder: "https://codesandbox.io/"
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Steps to Reproduce
+      description: Describe steps how to reproduce the bug.
+      value: |
+        1.
+        2.
+        ...
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected Behaviour
+      description: Describe what you expected to happen.
+    validations:
+      required: true
