@@ -3,7 +3,7 @@ import { findRuleBy, init } from '../../../test';
 
 describe( 'Style', () => {
   test( 'can create a style element and append it to the head element.', () => {
-    const splide = init();
+    const splide = init( { width: 100 } );
     const style  = document.head.lastElementChild;
 
     expect( style instanceof HTMLStyleElement ).toBe( true );
@@ -11,12 +11,12 @@ describe( 'Style', () => {
     if ( style instanceof HTMLStyleElement ) {
       const { cssRules } = style.sheet;
 
-      const listRule = Array.prototype.find.call( cssRules, ( cssRule: CSSStyleRule ) => {
-        return cssRule.selectorText === `#${ splide.Components.Elements.list.id }`;
+      const rootRule = Array.prototype.find.call( cssRules, ( cssRule: CSSStyleRule ) => {
+        return cssRule.selectorText === `#${ splide.root.id }`;
       } );
 
-      expect( listRule ).not.toBeUndefined();
-      expect( listRule.style.transform ).toBe( 'translateX(0px)' );
+      expect( rootRule ).not.toBeUndefined();
+      expect( rootRule.style.maxWidth ).toBe( '100px' );
     }
 
     splide.destroy();

@@ -29,6 +29,10 @@ $settings = get_settings();
       } );
 
       splide.mount();
+
+      setTimeout( () => {
+        splide.refresh();
+      }, 1000 );
     } );
   </script>
 </head>

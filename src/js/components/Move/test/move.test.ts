@@ -1,6 +1,6 @@
 import { EVENT_MOVE, EVENT_MOVED } from '../../../constants/events';
 import { IDLE, MOVING } from '../../../constants/states';
-import { findRuleBy, fire, init } from '../../../test';
+import { fire, init } from '../../../test';
 
 
 describe( 'Move#move()', () => {
@@ -8,15 +8,14 @@ describe( 'Move#move()', () => {
     const splide = init( { width: 200, height: 100 } );
     const { Move } = splide.Components;
     const { list } = splide.Components.Elements;
-    const rule = findRuleBy( list );
 
     Move.move( 1, 1, -1 );
     fire( list, 'transitionend' );
-    expect( rule.style.transform ).toBe( 'translateX(-200px)' );
+    expect( list.style.transform ).toBe( 'translateX(-200px)' );
 
     Move.move( 2, 2, -1 );
     fire( list, 'transitionend' );
-    expect( rule.style.transform ).toBe( 'translateX(-400px)' );
+    expect( list.style.transform ).toBe( 'translateX(-400px)' );
   } );
 
   test( 'can change the state.', () => {

@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.0.4
+ * Version  : 3.0.5
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -807,7 +807,7 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     bind(slide, "click keydown", (e) => {
       emit(e.type === "click" ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, this, e);
     });
-    on([EVENT_REPOSITIONED, EVENT_MOVED, EVENT_SCROLLED], update.bind(this));
+    on([EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_MOVED, EVENT_SCROLLED], update.bind(this));
     if (updateOnMove) {
       on(EVENT_MOVE, onMove.bind(this));
     }
@@ -1186,11 +1186,10 @@ function Move(Splide2, Components2, options) {
   const { list, track } = Components2.Elements;
   let waiting;
   function mount() {
-    if (!Splide2.is(FADE)) {
-      on([EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition);
-    } else {
-      emit(EVENT_REPOSITIONED);
-    }
+    on([EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition);
+  }
+  function destroy() {
+    removeAttribute(list, "style");
   }
   function reposition() {
     Components2.Scroll.cancel();
@@ -1222,7 +1221,9 @@ function Move(Splide2, Components2, options) {
     translate(toPosition(index, true));
   }
   function translate(position, preventLoop) {
-    Components2.Style.ruleBy(list, "transform", `translate${resolve("X")}(${preventLoop ? position : loop(position)}px)`);
+    if (!Splide2.is(FADE)) {
+      list.style.transform = `translate${resolve("X")}(${preventLoop ? position : loop(position)}px)`;
+    }
   }
   function loop(position) {
     if (!waiting && Splide2.is(LOOP)) {
@@ -1290,6 +1291,7 @@ function Move(Splide2, Components2, options) {
   }
   return {
     mount,
+    destroy,
     move,
     jump,
     translate,
@@ -1717,7 +1719,7 @@ const FRICTION = 5;
 const LOG_INTERVAL = 200;
 const POINTER_DOWN_EVENTS = "touchstart mousedown";
 const POINTER_MOVE_EVENTS = "touchmove mousemove";
-const POINTER_UP_EVENTS = "touchend touchcancel mouseup mouseleave";
+const POINTER_UP_EVENTS = "touchend touchcancel mouseup";
 
 function Drag(Splide2, Components2, options) {
   const { on, emit, bind, unbind } = EventInterface(Splide2);
@@ -1727,7 +1729,6 @@ function Drag(Splide2, Components2, options) {
   const { getPosition, exceededLimit } = Move;
   const listenerOptions = { capture: true, passive: false };
   const isSlide = Splide2.is(SLIDE);
-  const isFade = Splide2.is(FADE);
   let basePosition;
   let baseEvent;
   let prevBaseEvent;
@@ -1783,9 +1784,7 @@ function Drag(Splide2, Components2, options) {
         if (expired || exceeded) {
           save(e);
         }
-        if (!isFade) {
-          Move.translate(basePosition + constrain(coordOf(e) - coordOf(baseEvent)));
-        }
+        Move.translate(basePosition + constrain(coordOf(e) - coordOf(baseEvent)));
         emit(EVENT_DRAGGING);
         prevent(e);
       } else {
@@ -1806,7 +1805,7 @@ function Drag(Splide2, Components2, options) {
         const destination = computeDestination(velocity);
         if (isFree) {
           Scroll.scroll(destination);
-        } else if (isFade) {
+        } else if (Splide2.is(FADE)) {
           Controller.go(Splide2.index + orient(sign(velocity)));
         } else {
           Controller.go(computeIndex(destination), true);

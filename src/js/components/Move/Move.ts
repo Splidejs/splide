@@ -2,7 +2,8 @@ import {
   EVENT_MOUNTED,
   EVENT_MOVE,
   EVENT_MOVED,
-  EVENT_REFRESH, EVENT_REPOSITIONED,
+  EVENT_REFRESH,
+  EVENT_REPOSITIONED,
   EVENT_RESIZED,
   EVENT_UPDATED,
 } from '../../constants/events';
@@ -11,7 +12,7 @@ import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, BaseComponent, Components, Options } from '../../types';
-import { abs, ceil, clamp, isUndefined, rect, sign } from '../../utils';
+import { abs, ceil, clamp, isUndefined, rect, removeAttribute, sign } from '../../utils';
 
 
 /**
@@ -58,11 +59,14 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * Called when the component is mounted.
    */
   function mount(): void {
-    if ( ! Splide.is( FADE ) ) {
-      on( [ EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH ], reposition );
-    } else {
-      emit( EVENT_REPOSITIONED );
-    }
+    on( [ EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH ], reposition );
+  }
+
+  /**
+   * Destroys the component.
+   */
+  function destroy(): void {
+    removeAttribute( list, 'style' );
   }
 
   /**
@@ -125,11 +129,9 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * @param preventLoop - Optional. If `true`, sets the provided position as is.
    */
   function translate( position: number, preventLoop?: boolean ): void {
-    Components.Style.ruleBy(
-      list,
-      'transform',
-      `translate${ resolve( 'X' ) }(${ preventLoop ? position : loop( position ) }px)`
-    );
+    if ( ! Splide.is( FADE ) ) {
+      list.style.transform = `translate${ resolve( 'X' ) }(${ preventLoop ? position : loop( position ) }px)`;
+    }
   }
 
   /**
@@ -275,6 +277,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
 
   return {
     mount,
+    destroy,
     move,
     jump,
     translate,

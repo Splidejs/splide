@@ -34,8 +34,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
   const { resolve, orient } = Components.Direction;
   const { getPosition, exceededLimit } = Move;
   const listenerOptions = { capture: true, passive: false };
-  const isSlide = Splide.is( SLIDE );
-  const isFade  = Splide.is( FADE );
+  const isSlide         = Splide.is( SLIDE );
 
   /**
    * The base slider position to calculate the delta of coords.
@@ -161,10 +160,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
           save( e );
         }
 
-        if ( ! isFade ) {
-          Move.translate( basePosition + constrain( coordOf( e ) - coordOf( baseEvent ) ) );
-        }
-
+        Move.translate( basePosition + constrain( coordOf( e ) - coordOf( baseEvent ) ) );
         emit( EVENT_DRAGGING );
         prevent( e );
       } else {
@@ -196,7 +192,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
 
         if ( isFree ) {
           Scroll.scroll( destination );
-        } else if ( isFade ) {
+        } else if ( Splide.is( FADE ) ) {
           Controller.go( Splide.index + orient( sign( velocity ) ) );
         } else {
           Controller.go( computeIndex( destination ), true );

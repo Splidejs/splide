@@ -6,13 +6,12 @@ describe( 'Move', () => {
     const splide = init( { width: 200, height: 100 } );
     const { Move } = splide.Components;
     const { list } = splide.Components.Elements;
-    const rule = findRuleBy( list );
 
     Move.jump( 2 );
-    expect( rule.style.transform ).toBe( 'translateX(-400px)' );
+    expect( list.style.transform ).toBe( 'translateX(-400px)' );
 
     Move.jump( 4 );
-    expect( rule.style.transform ).toBe( 'translateX(-800px)' );
+    expect( list.style.transform ).toBe( 'translateX(-800px)' );
 
     splide.destroy();
   } );
@@ -21,13 +20,12 @@ describe( 'Move', () => {
     const splide = init( { width: 200, height: 100 } );
     const { Move } = splide.Components;
     const { list } = splide.Components.Elements;
-    const rule = findRuleBy( list );
 
     Move.translate( 100 );
-    expect( rule.style.transform ).toBe( 'translateX(100px)' );
+    expect( list.style.transform ).toBe( 'translateX(100px)' );
 
     Move.translate( 500 );
-    expect( rule.style.transform ).toBe( 'translateX(500px)' );
+    expect( list.style.transform ).toBe( 'translateX(500px)' );
 
     splide.destroy();
   } );
@@ -38,10 +36,9 @@ describe( 'Move', () => {
     const splide   = init( { type: 'loop', width, height: 100 } );
     const { Move } = splide.Components;
     const { list } = splide.Components.Elements;
-    const rule = findRuleBy( list );
 
     Move.translate( width );
-    expect( rule.style.transform ).toBe( `translateX(${ -width * ( splide.length - 1 ) }px)` );
+    expect( list.style.transform ).toBe( `translateX(${ -width * ( splide.length - 1 ) }px)` );
 
     splide.destroy();
   } );
@@ -50,9 +47,10 @@ describe( 'Move', () => {
     const splide = init( { width: 200, height: 100 } );
     const { Move } = splide.Components;
     const { list } = splide.Components.Elements;
-    const rule = findRuleBy( list );
 
     Move.move( 1, 1, -1 );
+    const rule = findRuleBy( list );
+
     expect( rule.style.transition ).not.toBe( '' );
 
     Move.cancel();

@@ -27,5 +27,5 @@ export declare const POINTER_MOVE_EVENTS = "touchmove mousemove";
  *
  * @since 3.0.0
  */
-export declare const POINTER_UP_EVENTS = "touchend touchcancel mouseup mouseleave";
+export declare const POINTER_UP_EVENTS = "touchend touchcancel mouseup";
 //# sourceMappingURL=../../../../src/js/components/Drag/constants.d.ts.map

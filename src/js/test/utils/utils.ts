@@ -115,11 +115,10 @@ export function init( options: Options = {}, args: InitArgs = {} ): Splide {
  * @return An object with left and top offsets.
  */
 export function parseTransform( elm: HTMLElement ): { left: number, top: number } {
-  const rule     = findRuleBy( elm );
   const position = { left: 0, top: 0 };
 
-  if ( rule && rule.style.transform ) {
-    const { transform } = rule.style;
+  if ( elm && elm.style.transform ) {
+    const { transform } = elm.style;
 
     if ( transform.includes( 'translateX' ) ) {
       position.left = parseFloat( transform.replace( /translateX\(|\)/g, '' ) ) || 0;
