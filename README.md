@@ -49,6 +49,14 @@ No dependencies, no Lighthouse errors.
 - Accessibility friendly
 - Internet Explorer 10
 
+## No Lighthouse Errors
+
+Here is the mobile version result of the [Splide front page](https://splidejs.com):
+
+<img alt="Lighthouse result of the Splide frontpage" src="./images/lighthouse-mobile.png" width="500">
+
+The Splide slider does not degrade Accessibility, Best Practices and SEO 🎉
+
 ## License
 
 Splide is released under MIT license. © 2021 Naotoshi Fujita
