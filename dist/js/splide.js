@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.0.7
+ * Version  : 3.0.8
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -2105,11 +2105,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var target;
 
     function mount() {
-      var passive = {
-        passive: true
-      };
-      bind(track, POINTER_MOVE_EVENTS, noop, passive);
-      bind(track, POINTER_UP_EVENTS, noop, passive);
+      bind(track, POINTER_MOVE_EVENTS, noop, listenerOptions);
+      bind(track, POINTER_UP_EVENTS, noop, listenerOptions);
       bind(track, POINTER_DOWN_EVENTS, onPointerDown, listenerOptions);
       bind(track, "click", onClick, {
         capture: true

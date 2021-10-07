@@ -91,10 +91,8 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    * Called when the component is mounted.
    */
   function mount(): void {
-    const passive = { passive: true };
-
-    bind( track, POINTER_MOVE_EVENTS, noop, passive );
-    bind( track, POINTER_UP_EVENTS, noop, passive );
+    bind( track, POINTER_MOVE_EVENTS, noop, listenerOptions );
+    bind( track, POINTER_UP_EVENTS, noop, listenerOptions );
     bind( track, POINTER_DOWN_EVENTS, onPointerDown, listenerOptions );
     bind( track, 'click', onClick, { capture: true } );
 
