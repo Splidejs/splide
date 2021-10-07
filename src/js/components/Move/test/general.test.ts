@@ -64,11 +64,11 @@ describe( 'Move', () => {
     const { Move } = splide.Components;
 
     expect( Move.toIndex( 0 ) ).toBe( 0 );
-    expect( Move.toIndex( -100 ) ).toBe( 0 );
-    expect( Move.toIndex( -101 ) ).toBe( 1 );
+    expect( Move.toIndex( -99 ) ).toBe( 0 );
+    expect( Move.toIndex( -100 ) ).toBe( 1 );
     expect( Move.toIndex( -200 ) ).toBe( 1 );
-    expect( Move.toIndex( -300 ) ).toBe( 1 );
-    expect( Move.toIndex( -301 ) ).toBe( 2 );
+    expect( Move.toIndex( -299 ) ).toBe( 1 );
+    expect( Move.toIndex( -300 ) ).toBe( 2 );
 
     splide.destroy();
   } );

@@ -164,7 +164,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
         emit( EVENT_DRAGGING );
         prevent( e );
       } else {
-        const threshold = options.dragMinThreshold || 5;
+        const threshold = options.dragMinThreshold || 10;
         isDragging = ! isTouchEvent( e ) || abs( coordOf( e ) - coordOf( baseEvent ) ) > threshold;
 
         if ( isSliderDirection() ) {

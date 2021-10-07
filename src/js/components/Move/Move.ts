@@ -181,7 +181,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
       const slideIndex = Slides[ i ].index;
       const distance   = abs( toPosition( slideIndex, true ) - position );
 
-      if ( distance < minDistance ) {
+      if ( distance <= minDistance ) {
         minDistance = distance;
         index       = slideIndex;
       } else {

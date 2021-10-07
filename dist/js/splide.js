@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.0.5
+ * Version  : 3.0.6
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1490,7 +1490,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         var slideIndex = Slides[i].index;
         var distance = abs(toPosition(slideIndex, true) - position);
 
-        if (distance < minDistance) {
+        if (distance <= minDistance) {
           minDistance = distance;
           index = slideIndex;
         } else {
@@ -2163,7 +2163,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           emit(EVENT_DRAGGING);
           prevent(e);
         } else {
-          var threshold = options.dragMinThreshold || 5;
+          var threshold = options.dragMinThreshold || 10;
           isDragging = !isTouchEvent(e) || abs(coordOf(e) - coordOf(baseEvent)) > threshold;
 
           if (isSliderDirection()) {

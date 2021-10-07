@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.0.5
+ * Version  : 3.0.6
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1254,7 +1254,7 @@ function Move(Splide2, Components2, options) {
     for (let i = 0; i < Slides.length; i++) {
       const slideIndex = Slides[i].index;
       const distance = abs(toPosition(slideIndex, true) - position);
-      if (distance < minDistance) {
+      if (distance <= minDistance) {
         minDistance = distance;
         index = slideIndex;
       } else {
@@ -1792,7 +1792,7 @@ function Drag(Splide2, Components2, options) {
         emit(EVENT_DRAGGING);
         prevent(e);
       } else {
-        const threshold = options.dragMinThreshold || 5;
+        const threshold = options.dragMinThreshold || 10;
         isDragging = !isTouchEvent(e) || abs(coordOf(e) - coordOf(baseEvent)) > threshold;
         if (isSliderDirection()) {
           prevent(e);
