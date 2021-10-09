@@ -83,7 +83,7 @@ export function Layout( Splide: Splide, Components: Components, options: Options
    * Updates the height of slides or their container elements if available.
    */
   function setSlidesHeight(): void {
-    Slides.style( 'height', cssSlideHeight(), true );
+    Slides.style( 'height', cssSlideHeight() || null, true );
   }
 
   /**

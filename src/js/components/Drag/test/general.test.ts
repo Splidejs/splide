@@ -9,7 +9,7 @@ describe( 'Drag', () => {
     const track  = splide.Components.Elements.track;
 
     fireWithCoord( track, 'mousedown', { x: 0, timeStamp: 1 } );
-    fireWithCoord( window, 'mousemove', { x: 0, timeStamp: 1 } );
+    fireWithCoord( window, 'mousemove', { x: 1, timeStamp: 1 } );
     fireWithCoord( window, 'mousemove', { x: -100, timeStamp: 2 } );
 
     expect( splide.Components.Move.getPosition() ).toBe( -100 );
@@ -24,7 +24,7 @@ describe( 'Drag', () => {
     const track  = splide.Components.Elements.track;
 
     fireWithCoord( track, 'mousedown', { x: 0 } );
-    fireWithCoord( window, 'mousemove', { x: 0 } );
+    fireWithCoord( window, 'mousemove', { x: 1 } );
     fireWithCoord( window, 'mouseup' );
 
     expect( splide.Components.Move.getPosition() ).toBe( 0 );
@@ -40,7 +40,7 @@ describe( 'Drag', () => {
     const track  = splide.Components.Elements.track;
 
     fireWithCoord( track, 'mousedown', { x: 0, timeStamp: 1 } );
-    fireWithCoord( window, 'mousemove', { x: 0, timeStamp: 1 } );
+    fireWithCoord( window, 'mousemove', { x: 1, timeStamp: 1 } );
     fireWithCoord( window, 'mousemove', { x: -20, timeStamp: 21 } ); // v = -1
     fireWithCoord( window, 'mouseup',   { x: -20, timeStamp: 21 } );
 
@@ -53,7 +53,7 @@ describe( 'Drag', () => {
     const track  = splide.Components.Elements.track;
 
     fireWithCoord( track, 'mousedown', { x: 0, timeStamp: 1 } );
-    fireWithCoord( window, 'mousemove', { x: 0, timeStamp: 1 } );
+    fireWithCoord( window, 'mousemove', { x: 1, timeStamp: 1 } );
     fireWithCoord( window, 'mousemove', { x: -20, timeStamp: 100 } );
     fireWithCoord( window, 'mouseup',   { x: -20, timeStamp: 100 } );
 

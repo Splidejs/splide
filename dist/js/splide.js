@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.1.1
+ * Version  : 3.1.2
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1186,7 +1186,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function setSlidesHeight() {
-      Slides.style("height", cssSlideHeight(), true);
+      Slides.style("height", cssSlideHeight() || null, true);
     }
 
     function cssPadding(right) {

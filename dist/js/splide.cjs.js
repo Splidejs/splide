@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.1.1
+ * Version  : 3.1.2
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1020,7 +1020,7 @@ function Layout(Splide2, Components2, options) {
     emit(EVENT_RESIZED);
   }
   function setSlidesHeight() {
-    Slides.style("height", cssSlideHeight(), true);
+    Slides.style("height", cssSlideHeight() || null, true);
   }
   function cssPadding(right) {
     const { padding } = options;

@@ -23,11 +23,18 @@ $settings = get_settings();
         autoHeight: true,
         gap       : '1rem',
         trimSpace : 'move',
+        focus     : 'center',
       } );
 
       splide.mount();
     } );
   </script>
+
+  <style>
+    .splide__slide {
+      overflow: hidden;
+    }
+  </style>
 </head>
 <body>
 
