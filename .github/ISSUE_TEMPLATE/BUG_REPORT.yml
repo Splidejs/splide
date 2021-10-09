@@ -14,7 +14,7 @@ body:
       options:
         - label: "Not a duplicate."
           required: true
-        - label: "Not a question, feature request, or anything other than a bug report directly related to Splide."
+        - label: "Not a question, feature request, or anything other than a bug report directly related to Splide. Use Discussions for these topics: https://github.com/Splidejs/splide/discussions"
           required: true
   - type: input
     id: version
