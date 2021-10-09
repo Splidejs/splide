@@ -31,7 +31,10 @@ $settings = get_settings();
         // pagination: false,
         // arrows: false,
         useScroll: true,
-        // focus: 'center',1
+        // focus: 'center',
+        dragMinThreshold: {
+          mouse: 4,
+        },
         classes: {
           arrows: 'splide__arrows splide__test',
         },
@@ -45,21 +48,21 @@ $settings = get_settings();
         },
       } );
 
-      // splide.on( 'moved', () => {
-      //   console.log( 'moved' );
-      // } );
-      //
-      // splide.on( 'visible', Slide => {
-      //   console.log( 'visible', Slide.index );
-      // } );
-      //
-      // splide.on( 'hidden', Slide => {
-      //   console.log( 'hidden', Slide.index );
-      // } );
-      //
-      // splide.on( 'click', () => {
-      //   console.log( 'click' );
-      // } );
+      splide.on( 'moved', () => {
+        console.log( 'moved' );
+      } );
+
+      splide.on( 'visible', Slide => {
+        console.log( 'visible', Slide.index );
+      } );
+
+      splide.on( 'hidden', Slide => {
+        console.log( 'hidden', Slide.index );
+      } );
+
+      splide.on( 'click', () => {
+        console.log( 'click' );
+      } );
 
       splide.mount();
     } );

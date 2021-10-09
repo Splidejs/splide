@@ -38,6 +38,9 @@ export function Scroll( Splide: Splide, Components: Components, options: Options
    */
   let interval: RequestIntervalInterface;
 
+  /**
+   * Holds the callback function.
+   */
   let scrollCallback: AnyFunction;
 
   /**

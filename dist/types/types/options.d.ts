@@ -273,9 +273,12 @@ export interface ResponsiveOptions {
     drag?: boolean | 'free';
     /**
      * The required distance to start moving the slider by the touch action.
-     * Other pointing devices will ignore this value.
+     * If you want to define the threshold for the mouse, provide an object.
      */
-    dragMinThreshold?: number;
+    dragMinThreshold?: number | {
+        mouse: number;
+        touch: number;
+    };
     /**
      * Determine the power of "flick". The larger number this is, the farther the slider runs.
      * Around 500 is recommended.

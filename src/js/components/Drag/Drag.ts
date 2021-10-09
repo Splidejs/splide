@@ -3,7 +3,7 @@ import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { abs, min, noop, prevent, sign } from '../../utils';
+import { abs, isObject, min, noop, prevent, sign } from '../../utils';
 import { FRICTION, LOG_INTERVAL, POINTER_DOWN_EVENTS, POINTER_MOVE_EVENTS, POINTER_UP_EVENTS } from './constants';
 
 
@@ -145,7 +145,6 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    */
   function onPointerMove( e: TouchEvent | MouseEvent ): void {
     if ( ! lastEvent ) {
-      clickPrevented = true;
       emit( EVENT_DRAG );
     }
 
@@ -162,10 +161,13 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
 
         Move.translate( basePosition + constrain( coordOf( e ) - coordOf( baseEvent ) ) );
         emit( EVENT_DRAGGING );
+        clickPrevented = true;
         prevent( e );
       } else {
-        const threshold = options.dragMinThreshold || 10;
-        isDragging = ! isTouchEvent( e ) || abs( coordOf( e ) - coordOf( baseEvent ) ) > threshold;
+        const diff = abs( coordOf( e ) - coordOf( baseEvent ) );
+        let { dragMinThreshold: thresholds } = options;
+        thresholds = isObject( thresholds ) ? thresholds : { mouse: 0, touch: +thresholds || 10 };
+        isDragging = diff > ( isTouchEvent( e ) ? thresholds.touch : thresholds.mouse );
 
         if ( isSliderDirection() ) {
           prevent( e );
