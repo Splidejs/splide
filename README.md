@@ -22,6 +22,8 @@ No dependencies, no Lighthouse errors.
   <a href="https://splidejs.com/guides/themes/">Themes</a>
   <br>
   <a href="https://splidejs.com/guides/version3/">About v3</a>
+  <br>
+  <a href="https://github.com/Splidejs/splide/discussions">Discussions</a>
 </p>
 </div>
 
