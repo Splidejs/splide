@@ -1,12 +1,12 @@
 import { Splide } from '../../core/Splide/Splide';
-import { BaseComponent, Components, Options } from '../../types';
+import { AnyFunction, BaseComponent, Components, Options } from '../../types';
 /**
  * The interface for the Scroll component.
  *
  * @since 3.0.0
  */
 export interface ScrollComponent extends BaseComponent {
-    scroll(position: number, duration?: number): void;
+    scroll(position: number, duration?: number, callback?: AnyFunction): void;
     cancel(): void;
 }
 /**

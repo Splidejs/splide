@@ -33,7 +33,6 @@ export interface LayoutComponent extends BaseComponent {
 export function Layout( Splide: Splide, Components: Components, options: Options ): LayoutComponent {
   const { on, bind, emit } = EventInterface( Splide );
   const { Slides } = Components;
-  const { ruleBy } = Components.Style;
   const { resolve } = Components.Direction;
   const { track, list } = Components.Elements;
   const { getAt } = Slides;
@@ -48,7 +47,6 @@ export function Layout( Splide: Splide, Components: Components, options: Options
    */
   function mount(): void {
     init();
-
     bind( window, 'resize load', Throttle( emit.bind( this, EVENT_RESIZE ) ) );
     on( [ EVENT_UPDATED, EVENT_REFRESH ], init );
     on( EVENT_RESIZE, resize );
@@ -61,14 +59,10 @@ export function Layout( Splide: Splide, Components: Components, options: Options
   function init(): void {
     vertical = options.direction === TTB;
 
-    ruleBy( Splide.root, 'maxWidth', unit( options.width ) );
-    ruleBy( track, resolve( 'paddingLeft' ), cssPadding( false ) );
-    ruleBy( track, resolve( 'paddingRight' ), cssPadding( true ) );
+    style( Splide.root, 'maxWidth', unit( options.width ) );
+    style( track, resolve( 'paddingLeft' ), cssPadding( false ) );
+    style( track, resolve( 'paddingRight' ), cssPadding( true ) );
 
-    Slides.rule( resolve( 'marginRight' ), unit( options.gap ) );
-    Slides.rule( 'width', cssSlideWidth() );
-
-    setSlidesHeight();
     resize();
   }
 
@@ -76,8 +70,12 @@ export function Layout( Splide: Splide, Components: Components, options: Options
    * Updates dimensions of some elements when the slider is resized.
    */
   function resize(): void {
-    ruleBy( track, 'height', cssTrackHeight() );
-    options.heightRatio && setSlidesHeight();
+    style( track, 'height', cssTrackHeight() );
+
+    Slides.style( resolve( 'marginRight' ), unit( options.gap ) );
+    Slides.style( 'width', cssSlideWidth() || null );
+    setSlidesHeight();
+
     emit( EVENT_RESIZED );
   }
 
@@ -85,7 +83,7 @@ export function Layout( Splide: Splide, Components: Components, options: Options
    * Updates the height of slides or their container elements if available.
    */
   function setSlidesHeight(): void {
-    Slides.rule( 'height', cssSlideHeight(), true );
+    Slides.style( 'height', cssSlideHeight(), true );
   }
 
   /**

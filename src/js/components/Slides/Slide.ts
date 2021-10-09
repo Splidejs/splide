@@ -38,6 +38,7 @@ import {
   child,
   floor,
   format,
+  getAttribute,
   hasClass,
   min,
   pad,
@@ -46,6 +47,7 @@ import {
   removeAttribute,
   removeClass,
   setAttribute,
+  style as _style,
   toggleClass,
 } from '../../utils';
 
@@ -61,7 +63,7 @@ export interface  SlideComponent extends BaseComponent {
   slide: HTMLElement;
   container: HTMLElement;
   isClone: boolean;
-  rule( prop: string, value: string | number, useContainer?: boolean ): void
+  style( prop: string, value: string | number, useContainer?: boolean ): void
   isWithin( from: number, distance: number ): boolean;
 }
 
@@ -72,7 +74,7 @@ export interface  SlideComponent extends BaseComponent {
  *
  * @param Splide     - A Splide instance.
  * @param index      - A slide index.
- * @param slideIndex - A slide index for clones. This must be `-1` if the slide is not clone.
+ * @param slideIndex - A slide index for clones. This must be `-1` if the slide is not a clone.
  * @param slide      - A slide element.
  *
  * @return A Slide sub component.
@@ -82,6 +84,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   const { Components, root, options } = Splide;
   const { isNavigation, updateOnMove } = options;
   const { resolve } = Components.Direction;
+  const styles         = getAttribute( slide, 'style' );
   const isClone        = slideIndex > -1;
   const container      = child( slide, `.${ CLASS_CONTAINER }` );
   const focusableNodes = options.focusableNodes && queryAll( slide, options.focusableNodes );
@@ -135,6 +138,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
     destroyEvents();
     removeClass( slide, STATUS_CLASSES );
     removeAttribute( slide, ALL_ATTRIBUTES );
+    setAttribute( slide, 'style', styles );
   }
 
   /**
@@ -216,9 +220,8 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    * @param value        - A CSS value to add.
    * @param useContainer - Optional. Determines whether to apply the rule to the container or not.
    */
-  function rule( prop: string, value: string | number, useContainer?: boolean ): void {
-    const selector = `#${ slide.id }${ container && useContainer ? ` > .${ CLASS_CONTAINER }` : '' }`;
-    Components.Style.rule( selector, prop, value );
+  function style( prop: string, value: string | number, useContainer?: boolean ): void {
+    _style( ( useContainer && container ) || slide, prop, value );
   }
 
   /**
@@ -274,7 +277,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
     isClone,
     mount,
     destroy,
-    rule,
+    style,
     isWithin,
   };
 }

@@ -1,47 +1,45 @@
-import { forOwn } from '../../object';
-import { isNull, isString } from '../../type/type';
+import { isNull, isUndefined } from '../../type/type';
 
 
-/**
- * The union for CSS style properties, such as "padding", "fontSize", etc.
- *
- * @since 0.1.0
- */
-export type CSSStyleProperties = Exclude<keyof CSSStyleDeclaration, number>;
-
-export function style(
+export function style<K extends keyof CSSStyleDeclaration>(
   elm: HTMLElement,
-  styles: Record<string, string | number>
-): void;
-
-export function style<K extends CSSStyleProperties>(
-  elm: HTMLElement,
-  styles: K
+  prop: K,
 ): CSSStyleDeclaration[ K ];
 
 export function style(
   elm: HTMLElement,
-  styles: string
+  prop: string,
 ): string;
+
+export function style(
+  elm: HTMLElement,
+  prop: string,
+  value: string | number
+): void;
 
 
 /**
  * Applies inline styles to the provided element by an object literal.
  *
- * @param elm    - An element to apply styles to.
- * @param styles - An object literal with styles.
+ * @param elm   - An element to apply styles to.
+ * @param prop  - An object literal with styles or a property name.
+ * @param value - A value to set.
  */
-export function style<K extends CSSStyleProperties>(
+export function style(
   elm: HTMLElement,
-  styles: Record<string, string | number> | K
-): CSSStyleDeclaration[ K ] | string | void {
-  if ( isString( styles ) ) {
-    return getComputedStyle( elm )[ styles ];
+  prop: string,
+  value?: string | number
+): string | void {
+  if ( isUndefined( value ) ) {
+    return getComputedStyle( elm )[ prop ];
   }
 
-  forOwn( styles, ( value, key ) => {
-    if ( ! isNull( value ) ) {
-      elm.style[ key ] = `${ value }`;
+  if ( ! isNull( value ) ) {
+    const { style } = elm;
+    value = `${ value }`;
+
+    if ( style[ prop ] !== value ) {
+      style[ prop ] = value;
     }
-  } );
+  }
 }

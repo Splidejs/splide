@@ -148,6 +148,11 @@ export interface Options extends ResponsiveOptions {
   focusableNodes?: string,
 
   /**
+   * Determines whether to use the Transition component or not.
+   */
+  useScroll?: boolean;
+
+  /**
    * Options for specific breakpoints.
    *
    * @example

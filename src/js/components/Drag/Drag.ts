@@ -3,7 +3,7 @@ import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { abs, clamp, min, noop, prevent, sign } from '../../utils';
+import { abs, min, noop, prevent, sign } from '../../utils';
 import { FRICTION, LOG_INTERVAL, POINTER_DOWN_EVENTS, POINTER_MOVE_EVENTS, POINTER_UP_EVENTS } from './constants';
 
 
@@ -34,7 +34,6 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
   const { resolve, orient } = Components.Direction;
   const { getPosition, exceededLimit } = Move;
   const listenerOptions = { passive: false, capture: true };
-  const isSlide         = Splide.is( SLIDE );
 
   /**
    * The base slider position to calculate the delta of coords.
@@ -95,6 +94,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
     bind( track, POINTER_UP_EVENTS, noop, listenerOptions );
     bind( track, POINTER_DOWN_EVENTS, onPointerDown, listenerOptions );
     bind( track, 'click', onClick, { capture: true } );
+    bind( track, 'dragstart', prevent );
 
     on( [ EVENT_MOUNTED, EVENT_UPDATED ], init );
   }
@@ -191,11 +191,11 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
         const destination = computeDestination( velocity );
 
         if ( isFree ) {
-          Scroll.scroll( destination );
+          Controller.scroll( destination );
         } else if ( Splide.is( FADE ) ) {
           Controller.go( Splide.index + orient( sign( velocity ) ) );
         } else {
-          Controller.go( computeIndex( destination ), true );
+          Controller.go( Controller.toDest( destination ), true );
         }
 
         prevent( e );
@@ -278,18 +278,6 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
   }
 
   /**
-   * Converts the destination to the slide index.
-   *
-   * @param destination - The target destination.
-   *
-   * @return The destination index.
-   */
-  function computeIndex( destination: number ): number {
-    const dest = Move.toIndex( destination );
-    return isSlide ? clamp( dest, 0, Controller.getEnd() ) : dest;
-  }
-
-  /**
    * Returns the `pageX` and `pageY` coordinates provided by the event.
    * Be aware that IE does not support both TouchEvent and MouseEvent constructors.
    *
@@ -333,7 +321,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    * @return The constrained diff.
    */
   function constrain( diff: number ): number {
-    return diff / ( hasExceeded && isSlide ? FRICTION : 1 );
+    return diff / ( hasExceeded && Splide.is( SLIDE ) ? FRICTION : 1 );
   }
 
   /**

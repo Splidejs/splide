@@ -21,7 +21,19 @@ import { PROJECT_CODE } from '../../constants/project';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { addClass, assert, assign, child, children, empty, push, query, removeClass, uniqueId } from '../../utils';
+import {
+  addClass,
+  assert,
+  assign,
+  child,
+  children,
+  empty,
+  push,
+  query,
+  removeAttribute,
+  removeClass,
+  uniqueId,
+} from '../../utils';
 
 
 /**
@@ -114,6 +126,10 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
    * Destroys the component.
    */
   function destroy(): void {
+    [ root, track, list ].forEach( elm => {
+      removeAttribute( elm, 'style' );
+    } );
+
     empty( slides );
     removeClass( root, classes );
   }

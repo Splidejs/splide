@@ -2,7 +2,7 @@ import { EVENT_MOUNTED, EVENT_REFRESH } from '../../constants/events';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { Components, Options, TransitionComponent } from '../../types';
-import { nextTick, noop, rect, unit } from '../../utils';
+import { nextTick, noop, rect, unit, style } from '../../utils';
 
 
 /**
@@ -18,7 +18,6 @@ import { nextTick, noop, rect, unit } from '../../utils';
  */
 export function Fade( Splide: Splide, Components: Components, options: Options ): TransitionComponent {
   const { on } = EventInterface( Splide );
-  const { ruleBy } = Components.Style;
 
   /**
    * Called when the component is mounted.
@@ -27,9 +26,7 @@ export function Fade( Splide: Splide, Components: Components, options: Options )
   function mount(): void {
     on( [ EVENT_MOUNTED, EVENT_REFRESH ], () => {
       nextTick( () => {
-        Components.Slides.forEach( Slide => {
-          ruleBy( Slide.slide, 'transition', `opacity ${ options.speed }ms ${ options.easing }` );
-        } );
+        Components.Slides.style( 'transition', `opacity ${ options.speed }ms ${ options.easing }` );
       } );
     } );
   }
@@ -43,11 +40,11 @@ export function Fade( Splide: Splide, Components: Components, options: Options )
    */
   function start( index: number, done: () => void ): void {
     const { track } = Components.Elements;
-    ruleBy( track, 'height', unit( rect( track ).height ) );
+    style( track, 'height', unit( rect( track ).height ) );
 
     nextTick( () => {
       done();
-      ruleBy( track, 'height', '' );
+      style( track, 'height', '' );
     } );
   }
 

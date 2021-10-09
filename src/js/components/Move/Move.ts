@@ -24,6 +24,7 @@ export interface MoveComponent extends BaseComponent {
   move( dest: number, index: number, prev: number, callback?: AnyFunction ): void;
   jump( index: number ): void;
   translate( position: number, preventLoop?: boolean ): void;
+  shift( position: number, backwards: boolean ): number;
   cancel(): void;
   toIndex( position: number ): number;
   toPosition( index: number, trimming?: boolean ): number;
@@ -146,12 +147,25 @@ export function Move( Splide: Splide, Components: Components, options: Options )
       const exceededMax = exceededLimit( true, position ) && diff > 0;
 
       if ( exceededMin || exceededMax ) {
-        const excess = position - getLimit( exceededMax );
-        const size   = sliderSize();
-        position -= sign( excess ) * size * ceil( abs( excess ) / size );
+        position = shift( position, exceededMax );
       }
     }
 
+    return position;
+  }
+
+  /**
+   * Adds or subtracts the slider width to the provided position.
+   *
+   * @param position  - A position to shift.
+   * @param backwards - Determines whether to shift the slider backwards or forwards.
+   *
+   * @return The shifted position.
+   */
+  function shift( position: number, backwards: boolean ): number {
+    const excess = position - getLimit( backwards );
+    const size   = sliderSize();
+    position -= sign( excess ) * size * ceil( abs( excess ) / size );
     return position;
   }
 
@@ -281,6 +295,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
     move,
     jump,
     translate,
+    shift,
     cancel,
     toIndex,
     toPosition,

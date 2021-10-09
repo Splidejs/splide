@@ -80,7 +80,7 @@ describe( 'EventBus', () => {
     event.emit( 'mounted' );
 
     expect( callback1 ).toHaveBeenCalledTimes( 1 );
-    expect( callback2 ).not.toHaveBeenCalled()
-    expect( callback3 ).not.toHaveBeenCalled()
+    expect( callback2 ).not.toHaveBeenCalled();
+    expect( callback3 ).not.toHaveBeenCalled();
   } );
 } );

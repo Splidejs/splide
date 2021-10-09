@@ -22,12 +22,16 @@ $settings = get_settings();
         type             : 'loop',
         perPage          : 3,
         gap              : '1.5rem',
-        // height           : 400,
+        // speed: 600,
+        cover: true,
+        height           : 400,
         // waitForTransition: false,
         // direction        : 'ltr',
         // drag      : true,
-        pagination: false,
-        arrows: false,
+        // pagination: false,
+        // arrows: false,
+        useScroll: true,
+        // focus: 'center',1
         classes: {
           arrows: 'splide__arrows splide__test',
         },
@@ -41,21 +45,21 @@ $settings = get_settings();
         },
       } );
 
-      splide.on( 'moved', () => {
-        console.log( 'moved' );
-      } );
-
-      splide.on( 'visible', Slide => {
-        console.log( 'visible', Slide.index );
-      } );
-
-      splide.on( 'hidden', Slide => {
-        console.log( 'hidden', Slide.index );
-      } );
-
-      splide.on( 'click', () => {
-        console.log( 'click' );
-      } );
+      // splide.on( 'moved', () => {
+      //   console.log( 'moved' );
+      // } );
+      //
+      // splide.on( 'visible', Slide => {
+      //   console.log( 'visible', Slide.index );
+      // } );
+      //
+      // splide.on( 'hidden', Slide => {
+      //   console.log( 'hidden', Slide.index );
+      // } );
+      //
+      // splide.on( 'click', () => {
+      //   console.log( 'click' );
+      // } );
 
       splide.mount();
     } );
@@ -68,7 +72,7 @@ $settings = get_settings();
   </style>
 </head>
 <body>
-
+2
 <?php render(); ?>
 
 <pre></pre>

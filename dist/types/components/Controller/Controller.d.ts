@@ -7,6 +7,7 @@ import { AnyFunction, BaseComponent, Components, Options } from '../../types';
  */
 export interface ControllerComponent extends BaseComponent {
     go(control: number | string, allowSameIndex?: boolean, callback?: AnyFunction): void;
+    scroll(destination: number, useIndex?: boolean, snap?: boolean, duration?: number, callback?: AnyFunction): void;
     getNext(destination?: boolean): number;
     getPrev(destination?: boolean): number;
     getEnd(): number;
@@ -14,6 +15,7 @@ export interface ControllerComponent extends BaseComponent {
     getIndex(prev?: boolean): number;
     toIndex(page: number): number;
     toPage(index: number): number;
+    toDest(position: number): number;
     hasFocus(): boolean;
 }
 /**

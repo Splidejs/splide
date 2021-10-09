@@ -68,7 +68,7 @@ export function Cover( Splide: Splide, Components: Components, options: Options 
    * @param Slide - A SlideComponent object where the image belongs.
    */
   function toggle( cover: boolean, img: HTMLImageElement, Slide: SlideComponent ): void {
-    Slide.rule( 'background', cover ? `center/cover no-repeat url("${ img.src }")` : '', true );
+    Slide.style( 'background', cover ? `center/cover no-repeat url("${ img.src }")` : '', true );
     display( img, cover ? 'none' : '' );
   }
 

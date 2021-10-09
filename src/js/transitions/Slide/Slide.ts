@@ -2,7 +2,7 @@ import { SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { Components, Options, TransitionComponent } from '../../types';
-import { abs } from '../../utils';
+import { abs, style } from '../../utils';
 
 
 /**
@@ -93,7 +93,7 @@ export function Slide( Splide: Splide, Components: Components, options: Options 
    * @param transition - A transition CSS value.
    */
   function apply( transition: string ): void {
-    Components.Style.ruleBy( list, 'transition', transition );
+    style( list, 'transition', transition );
   }
 
   return {

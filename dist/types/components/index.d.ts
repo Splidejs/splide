@@ -1,10 +1,9 @@
 export { Options } from './Options/Options';
 export { Direction } from './Direction/Direction';
 export { Elements } from './Elements/Elements';
-export { Style } from './Style/Style';
 export { Slides } from './Slides/Slides';
-export { Clones } from './Clones/Clones';
 export { Layout } from './Layout/Layout';
+export { Clones } from './Clones/Clones';
 export { Move } from './Move/Move';
 export { Controller } from './Controller/Controller';
 export { Arrows } from './Arrows/Arrows';

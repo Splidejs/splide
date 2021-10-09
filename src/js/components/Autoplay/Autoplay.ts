@@ -161,7 +161,7 @@ export function Autoplay( Splide: Splide, Components: Components, options: Optio
     const { bar } = Elements;
 
     if ( bar ) {
-      style( bar, { width: `${ rate * 100 }%` } );
+      style( bar, 'width', `${ rate * 100 }%` );
     }
 
     emit( EVENT_AUTOPLAY_PLAYING, rate );

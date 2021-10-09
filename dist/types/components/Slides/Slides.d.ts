@@ -15,7 +15,7 @@ export interface SlidesComponent extends BaseComponent {
     remove(selector: SlideMatcher): void;
     forEach(iteratee: SlidesIteratee, excludeClones?: boolean): void;
     filter(matcher: SlideMatcher): SlideComponent[];
-    rule(prop: string, value: string | number, useContainer?: boolean): void;
+    style(prop: string, value: string | number, useContainer?: boolean): void;
     getLength(excludeClones?: boolean): number;
     isEnough(): boolean;
 }

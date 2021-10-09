@@ -181,29 +181,3 @@ export function wait( duration: number ): Promise<void> {
     setTimeout( resolve, duration );
   } );
 }
-
-/**
- * Finds the CSSRule object.
- *
- * @param selector - A selector to find.
- *
- * @return A found CSSRule object.
- */
-export function findRule( selector: string ): CSSStyleRule {
-  const cssRules = document.styleSheets[ 0 ].cssRules;
-
-  return Array.prototype.find.call( cssRules, ( rule: CSSRule ) => {
-    return rule instanceof CSSStyleRule && rule.selectorText === selector;
-  } );
-}
-
-/**
- * Finds the CSSRule object by ID.
- *
- * @param target - The element or ID.
- *
- * @return A found CSSRule object.
- */
-export function findRuleBy( target: string | HTMLElement ): CSSStyleRule {
-  return findRule( `#${ target instanceof HTMLElement ? target.id : target }` );
-}

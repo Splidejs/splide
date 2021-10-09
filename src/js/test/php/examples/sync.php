@@ -21,17 +21,18 @@ $settings = get_settings();
         type       : 'loop',
         heightRatio: 0.3,
         perPage    : 2,
-        cover      : true,
+        // cover      : true,
       } );
 
       var splide02 = new Splide( '#splide02', {
-        width       : 600,
+        // width       : 600,
         fixedWidth  : 100,
         fixedHeight : 56,
         gap         : '.7em',
         isNavigation: true,
         focus       : 'center',
         pagination  : false,
+        type        : 'loop',
       } );
 
       var splide03 = new Splide( '#splide03', {

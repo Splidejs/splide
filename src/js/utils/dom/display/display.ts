@@ -8,5 +8,5 @@ import { style } from '../style/style';
  * @param display - A new `display` value.
  */
 export function display( elm: HTMLElement, display: string ): void {
-  style( elm, { display } );
+  style( elm, 'display', display );
 }

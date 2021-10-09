@@ -1,4 +1,4 @@
-import { EVENT_REFRESH, EVENT_SCROLLED, EVENT_UPDATED } from '../../constants/events';
+import { EVENT_REFRESH, EVENT_UPDATED } from '../../constants/events';
 import { DEFAULT_EVENT_PRIORITY } from '../../constants/priority';
 import { LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
@@ -14,6 +14,7 @@ import { approximatelyEqual, between, clamp, floor, isString, isUndefined, max }
  */
 export interface ControllerComponent extends BaseComponent {
   go( control: number | string, allowSameIndex?: boolean, callback?: AnyFunction ): void;
+  scroll( destination: number, useIndex?: boolean, snap?: boolean, duration?: number, callback?: AnyFunction ): void;
   getNext( destination?: boolean ): number;
   getPrev( destination?: boolean ): number;
   getEnd(): number;
@@ -21,6 +22,7 @@ export interface ControllerComponent extends BaseComponent {
   getIndex( prev?: boolean ): number;
   toIndex( page: number ): number;
   toPage( index: number ): number;
+  toDest( position: number ): number;
   hasFocus(): boolean;
 }
 
@@ -40,7 +42,8 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
   const { Move } = Components;
   const { getPosition, getLimit } = Move;
   const { isEnough, getLength } = Components.Slides;
-  const isLoop = Splide.is( LOOP );
+  const isLoop  = Splide.is( LOOP );
+  const isSlide = Splide.is( SLIDE );
 
   /**
    * The current index.
@@ -73,7 +76,6 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
   function mount(): void {
     init();
     on( [ EVENT_UPDATED, EVENT_REFRESH ], init, DEFAULT_EVENT_PRIORITY - 1 );
-    on( EVENT_SCROLLED, reindex, 0 );
   }
 
   /**
@@ -88,13 +90,6 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
   }
 
   /**
-   * Calculates the index by the current position and updates the current index.
-   */
-  function reindex(): void {
-    setIndex( Move.toIndex( getPosition() ) );
-  }
-
-  /**
    * Moves the slider by the control pattern.
    *
    * @see `Splide#go()`
@@ -104,13 +99,42 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    * @param callback       - Optional. A callback function invoked after transition ends.
    */
   function go( control: number | string, allowSameIndex?: boolean, callback?: AnyFunction ): void {
-    const dest  = parse( control );
-    const index = loop( dest );
+    const dest = parse( control );
 
-    if ( index > -1 && ! Move.isBusy() && ( allowSameIndex || index !== currIndex ) ) {
-      setIndex( index );
-      Move.move( dest, index, prevIndex, callback );
+    if ( options.useScroll ) {
+      scroll( dest, true, true, options.speed, callback );
+    } else {
+      const index = loop( dest );
+
+      if ( index > -1 && ! Move.isBusy() && ( allowSameIndex || index !== currIndex ) ) {
+        setIndex( index );
+        Move.move( dest, index, prevIndex, callback );
+      }
     }
+  }
+
+  /**
+   * Scrolls the slider to the specified destination with updating indices.
+   *
+   * @param destination - A position or an index to scroll to.
+   * @param useIndex    - Optional. Whether to use an index as a destination or not.
+   * @param snap        - Optional. Whether to snap the closest slide or not.
+   * @param duration    - Optional. Specifies the scroll duration.
+   * @param callback    - Optional. A callback function invoked after scroll ends.
+   */
+  function scroll(
+    destination: number,
+    useIndex?: boolean,
+    snap?: boolean,
+    duration?: number,
+    callback?: AnyFunction
+  ): void {
+    const dest = useIndex ? destination : toDest( destination );
+
+    Components.Scroll.scroll( useIndex || snap ? Move.toPosition( dest, true ) : destination, duration, () => {
+      setIndex( Move.toIndex( Move.getPosition() ) );
+      callback && callback();
+    } );
   }
 
   /**
@@ -176,7 +200,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
     const number = perMove || hasFocus() ? 1 : perPage;
     const dest   = computeDestIndex( currIndex + number * ( prev ? -1 : 1 ), currIndex );
 
-    if ( dest === -1 && Splide.is( SLIDE ) ) {
+    if ( dest === -1 && isSlide ) {
       if ( ! approximatelyEqual( getPosition(), getLimit( ! prev ), 1 ) ) {
         return prev ? 0 : getEnd();
       }
@@ -286,6 +310,18 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
   }
 
   /**
+   * Converts the destination position to the dest index.
+   *
+   * @param destination - A position to convert.
+   *
+   * @return A dest index.
+   */
+  function toDest( destination: number ): number {
+    const closest = Move.toIndex( destination );
+    return isSlide ? clamp( closest, 0, getEnd() ) : closest;
+  }
+
+  /**
    * Sets a new index and retains old one.
    *
    * @param index - A new index to set.
@@ -318,6 +354,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
   return {
     mount,
     go,
+    scroll,
     getNext,
     getPrev,
     getEnd,
@@ -325,6 +362,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
     getIndex,
     toIndex,
     toPage,
+    toDest,
     hasFocus,
   };
 }

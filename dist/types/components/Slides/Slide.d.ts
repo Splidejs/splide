@@ -11,7 +11,7 @@ export interface SlideComponent extends BaseComponent {
     slide: HTMLElement;
     container: HTMLElement;
     isClone: boolean;
-    rule(prop: string, value: string | number, useContainer?: boolean): void;
+    style(prop: string, value: string | number, useContainer?: boolean): void;
     isWithin(from: number, distance: number): boolean;
 }
 /**
@@ -21,7 +21,7 @@ export interface SlideComponent extends BaseComponent {
  *
  * @param Splide     - A Splide instance.
  * @param index      - A slide index.
- * @param slideIndex - A slide index for clones. This must be `-1` if the slide is not clone.
+ * @param slideIndex - A slide index for clones. This must be `-1` if the slide is not a clone.
  * @param slide      - A slide element.
  *
  * @return A Slide sub component.

@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.0.9
+ * Version  : 3.1.0
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -179,19 +179,21 @@ function create(tag, attrs, parent) {
   return elm;
 }
 
-function style(elm, styles) {
-  if (isString(styles)) {
-    return getComputedStyle(elm)[styles];
+function style(elm, prop, value) {
+  if (isUndefined(value)) {
+    return getComputedStyle(elm)[prop];
   }
-  forOwn(styles, (value, key) => {
-    if (!isNull(value)) {
-      elm.style[key] = `${value}`;
+  if (!isNull(value)) {
+    const { style: style2 } = elm;
+    value = `${value}`;
+    if (style2[prop] !== value) {
+      style2[prop] = value;
     }
-  });
+  }
 }
 
 function display(elm, display2) {
-  style(elm, { display: display2 });
+  style(elm, "display", display2);
 }
 
 function getAttribute(elm, attr) {
@@ -675,6 +677,9 @@ function Elements(Splide2, Components2, options) {
     on(EVENT_UPDATED, update);
   }
   function destroy() {
+    [root, track, list].forEach((elm) => {
+      removeAttribute(elm, "style");
+    });
     empty(slides);
     removeClass(root, classes);
   }
@@ -734,42 +739,6 @@ function Elements(Splide2, Components2, options) {
   });
 }
 
-function Style$1() {
-  let style;
-  let sheet;
-  function mount() {
-    style = create("style", {}, document.head);
-    sheet = style.sheet;
-  }
-  function destroy() {
-    remove(style);
-    sheet = null;
-  }
-  function rule(selector, prop, value) {
-    const { cssRules } = sheet;
-    const cssRule = find(cssRules, (cssRule2) => isCSSStyleRule(cssRule2) && cssRule2.selectorText === selector) || cssRules[sheet.insertRule(`${selector}{}`, 0)];
-    if (isCSSStyleRule(cssRule)) {
-      const { style: style2 } = cssRule;
-      value = `${value}`;
-      if (style2[prop] !== value) {
-        style2[prop] = value;
-      }
-    }
-  }
-  function ruleBy(target, prop, value) {
-    rule(`#${isHTMLElement(target) ? target.id : target}`, prop, value);
-  }
-  function isCSSStyleRule(cssRule) {
-    return cssRule instanceof CSSStyleRule;
-  }
-  return {
-    mount,
-    destroy,
-    rule,
-    ruleBy
-  };
-}
-
 const ROLE = "role";
 const ARIA_CONTROLS = "aria-controls";
 const ARIA_CURRENT = "aria-current";
@@ -798,6 +767,7 @@ function Slide$1(Splide2, index, slideIndex, slide) {
   const { Components, root, options } = Splide2;
   const { isNavigation, updateOnMove } = options;
   const { resolve } = Components.Direction;
+  const styles = getAttribute(slide, "style");
   const isClone = slideIndex > -1;
   const container = child(slide, `.${CLASS_CONTAINER}`);
   const focusableNodes = options.focusableNodes && queryAll(slide, options.focusableNodes);
@@ -830,6 +800,7 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     destroyEvents();
     removeClass(slide, STATUS_CLASSES);
     removeAttribute(slide, ALL_ATTRIBUTES);
+    setAttribute(slide, "style", styles);
   }
   function onMove(next, prev, dest) {
     if (!destroyed) {
@@ -871,9 +842,8 @@ function Slide$1(Splide2, index, slideIndex, slide) {
       emit(visible ? EVENT_VISIBLE : EVENT_HIDDEN, this);
     }
   }
-  function rule(prop, value, useContainer) {
-    const selector = `#${slide.id}${container && useContainer ? ` > .${CLASS_CONTAINER}` : ""}`;
-    Components.Style.rule(selector, prop, value);
+  function style$1(prop, value, useContainer) {
+    style(useContainer && container || slide, prop, value);
   }
   function isActive() {
     return Splide2.index === index;
@@ -903,7 +873,7 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     isClone,
     mount,
     destroy,
-    rule,
+    style: style$1,
     isWithin
   };
 }
@@ -915,6 +885,9 @@ function Slides(Splide2, Components2, options) {
   function mount() {
     init();
     on(EVENT_REFRESH, refresh);
+    on([EVENT_MOUNTED, EVENT_REFRESH], () => {
+      Slides2.sort((Slide1, Slide2) => Slide1.index - Slide2.index);
+    });
   }
   function init() {
     slides.forEach((slide, index) => {
@@ -972,9 +945,9 @@ function Slides(Splide2, Components2, options) {
   function filter(matcher) {
     return Slides2.filter(isFunction(matcher) ? matcher : (Slide2) => isString(matcher) ? matches(Slide2.slide, matcher) : includes(toArray(matcher), Slide2.index));
   }
-  function rule(prop, value, useContainer) {
+  function style(prop, value, useContainer) {
     forEach$1((Slide2) => {
-      Slide2.rule(prop, value, useContainer);
+      Slide2.style(prop, value, useContainer);
     });
   }
   function observeImages(elm, callback) {
@@ -1009,85 +982,15 @@ function Slides(Splide2, Components2, options) {
     remove: remove$1,
     forEach: forEach$1,
     filter,
-    rule,
+    style,
     getLength,
     isEnough
-  };
-}
-
-function Clones(Splide2, Components2, options) {
-  const { on, emit } = EventInterface(Splide2);
-  const { Elements, Slides } = Components2;
-  const { resolve } = Components2.Direction;
-  const clones = [];
-  let cloneCount;
-  function mount() {
-    init();
-    on(EVENT_REFRESH, refresh);
-    on([EVENT_UPDATED, EVENT_RESIZE], observe);
-  }
-  function init() {
-    if (cloneCount = computeCloneCount()) {
-      generate(cloneCount);
-    }
-  }
-  function destroy() {
-    remove(clones);
-    empty(clones);
-  }
-  function refresh() {
-    destroy();
-    init();
-  }
-  function observe() {
-    if (cloneCount !== computeCloneCount()) {
-      emit(EVENT_REFRESH);
-    }
-  }
-  function generate(count) {
-    const slides = Slides.get().slice();
-    const { length } = slides;
-    if (length) {
-      while (slides.length < count) {
-        push(slides, slides);
-      }
-      push(slides.slice(-count), slides.slice(0, count)).forEach((Slide, index) => {
-        const isHead = index < count;
-        const clone = cloneDeep(Slide.slide, index);
-        isHead ? before(clone, slides[0].slide) : append(Elements.list, clone);
-        push(clones, clone);
-        Slides.register(clone, index - count + (isHead ? 0 : length), Slide.index);
-      });
-    }
-  }
-  function cloneDeep(elm, index) {
-    const clone = elm.cloneNode(true);
-    addClass(clone, options.classes.clone);
-    clone.id = `${Splide2.root.id}-clone${pad(index + 1)}`;
-    return clone;
-  }
-  function computeCloneCount() {
-    let { clones: clones2 } = options;
-    if (!Splide2.is(LOOP)) {
-      clones2 = 0;
-    } else if (!clones2) {
-      const fixedSize = measure(Elements.list, options[resolve("fixedWidth")]);
-      const fixedCount = fixedSize && ceil(rect(Elements.track)[resolve("width")] / fixedSize);
-      const baseCount = fixedCount || options[resolve("autoWidth")] && Splide2.length || options.perPage;
-      clones2 = baseCount * (options.drag ? (options.flickMaxPages || 1) + 1 : 2);
-    }
-    return clones2;
-  }
-  return {
-    mount,
-    destroy
   };
 }
 
 function Layout(Splide2, Components2, options) {
   const { on, bind, emit } = EventInterface(Splide2);
   const { Slides } = Components2;
-  const { ruleBy } = Components2.Style;
   const { resolve } = Components2.Direction;
   const { track, list } = Components2.Elements;
   const { getAt } = Slides;
@@ -1100,21 +1003,20 @@ function Layout(Splide2, Components2, options) {
   }
   function init() {
     vertical = options.direction === TTB;
-    ruleBy(Splide2.root, "maxWidth", unit(options.width));
-    ruleBy(track, resolve("paddingLeft"), cssPadding(false));
-    ruleBy(track, resolve("paddingRight"), cssPadding(true));
-    Slides.rule(resolve("marginRight"), unit(options.gap));
-    Slides.rule("width", cssSlideWidth());
-    setSlidesHeight();
+    style(Splide2.root, "maxWidth", unit(options.width));
+    style(track, resolve("paddingLeft"), cssPadding(false));
+    style(track, resolve("paddingRight"), cssPadding(true));
     resize();
   }
   function resize() {
-    ruleBy(track, "height", cssTrackHeight());
-    options.heightRatio && setSlidesHeight();
+    style(track, "height", cssTrackHeight());
+    Slides.style(resolve("marginRight"), unit(options.gap));
+    Slides.style("width", cssSlideWidth() || null);
+    setSlidesHeight();
     emit(EVENT_RESIZED);
   }
   function setSlidesHeight() {
-    Slides.rule("height", cssSlideHeight(), true);
+    Slides.style("height", cssSlideHeight(), true);
   }
   function cssPadding(right) {
     const { padding } = options;
@@ -1179,6 +1081,76 @@ function Layout(Splide2, Components2, options) {
   };
 }
 
+function Clones(Splide2, Components2, options) {
+  const { on, emit } = EventInterface(Splide2);
+  const { Elements, Slides } = Components2;
+  const { resolve } = Components2.Direction;
+  const clones = [];
+  let cloneCount;
+  function mount() {
+    init();
+    on(EVENT_REFRESH, refresh);
+    on([EVENT_UPDATED, EVENT_RESIZE], observe);
+  }
+  function init() {
+    if (cloneCount = computeCloneCount()) {
+      generate(cloneCount);
+      emit(EVENT_RESIZE);
+    }
+  }
+  function destroy() {
+    remove(clones);
+    empty(clones);
+  }
+  function refresh() {
+    destroy();
+    init();
+  }
+  function observe() {
+    if (cloneCount < computeCloneCount()) {
+      emit(EVENT_REFRESH);
+    }
+  }
+  function generate(count) {
+    const slides = Slides.get().slice();
+    const { length } = slides;
+    if (length) {
+      while (slides.length < count) {
+        push(slides, slides);
+      }
+      push(slides.slice(-count), slides.slice(0, count)).forEach((Slide, index) => {
+        const isHead = index < count;
+        const clone = cloneDeep(Slide.slide, index);
+        isHead ? before(clone, slides[0].slide) : append(Elements.list, clone);
+        push(clones, clone);
+        Slides.register(clone, index - count + (isHead ? 0 : length), Slide.index);
+      });
+    }
+  }
+  function cloneDeep(elm, index) {
+    const clone = elm.cloneNode(true);
+    addClass(clone, options.classes.clone);
+    clone.id = `${Splide2.root.id}-clone${pad(index + 1)}`;
+    return clone;
+  }
+  function computeCloneCount() {
+    let { clones: clones2 } = options;
+    if (!Splide2.is(LOOP)) {
+      clones2 = 0;
+    } else if (!clones2) {
+      const fixedSize = measure(Elements.list, options[resolve("fixedWidth")]);
+      const fixedCount = fixedSize && ceil(rect(Elements.track)[resolve("width")] / fixedSize);
+      const baseCount = fixedCount || options[resolve("autoWidth")] && Splide2.length || options.perPage;
+      clones2 = baseCount * (options.drag ? (options.flickMaxPages || 1) + 1 : 2);
+    }
+    return clones2;
+  }
+  return {
+    mount,
+    destroy
+  };
+}
+
 function Move(Splide2, Components2, options) {
   const { on, emit } = EventInterface(Splide2);
   const { slideSize, getPadding, totalSize, listSize, sliderSize } = Components2.Layout;
@@ -1231,11 +1203,15 @@ function Move(Splide2, Components2, options) {
       const exceededMin = exceededLimit(false, position) && diff < 0;
       const exceededMax = exceededLimit(true, position) && diff > 0;
       if (exceededMin || exceededMax) {
-        const excess = position - getLimit(exceededMax);
-        const size = sliderSize();
-        position -= sign(excess) * size * ceil(abs(excess) / size);
+        position = shift(position, exceededMax);
       }
     }
+    return position;
+  }
+  function shift(position, backwards) {
+    const excess = position - getLimit(backwards);
+    const size = sliderSize();
+    position -= sign(excess) * size * ceil(abs(excess) / size);
     return position;
   }
   function cancel() {
@@ -1295,6 +1271,7 @@ function Move(Splide2, Components2, options) {
     move,
     jump,
     translate,
+    shift,
     cancel,
     toIndex,
     toPosition,
@@ -1311,6 +1288,7 @@ function Controller(Splide2, Components2, options) {
   const { getPosition, getLimit } = Move;
   const { isEnough, getLength } = Components2.Slides;
   const isLoop = Splide2.is(LOOP);
+  const isSlide = Splide2.is(SLIDE);
   let currIndex = options.start || 0;
   let prevIndex = currIndex;
   let slideCount;
@@ -1319,7 +1297,6 @@ function Controller(Splide2, Components2, options) {
   function mount() {
     init();
     on([EVENT_UPDATED, EVENT_REFRESH], init, DEFAULT_EVENT_PRIORITY - 1);
-    on(EVENT_SCROLLED, reindex, 0);
   }
   function init() {
     slideCount = getLength(true);
@@ -1327,16 +1304,24 @@ function Controller(Splide2, Components2, options) {
     perPage = options.perPage;
     currIndex = clamp(currIndex, 0, slideCount - 1);
   }
-  function reindex() {
-    setIndex(Move.toIndex(getPosition()));
-  }
   function go(control, allowSameIndex, callback) {
     const dest = parse(control);
-    const index = loop(dest);
-    if (index > -1 && !Move.isBusy() && (allowSameIndex || index !== currIndex)) {
-      setIndex(index);
-      Move.move(dest, index, prevIndex, callback);
+    if (options.useScroll) {
+      scroll(dest, true, true, options.speed, callback);
+    } else {
+      const index = loop(dest);
+      if (index > -1 && !Move.isBusy() && (allowSameIndex || index !== currIndex)) {
+        setIndex(index);
+        Move.move(dest, index, prevIndex, callback);
+      }
     }
+  }
+  function scroll(destination, useIndex, snap, duration, callback) {
+    const dest = useIndex ? destination : toDest(destination);
+    Components2.Scroll.scroll(useIndex || snap ? Move.toPosition(dest, true) : destination, duration, () => {
+      setIndex(Move.toIndex(Move.getPosition()));
+      callback && callback();
+    });
   }
   function parse(control) {
     let index = currIndex;
@@ -1367,7 +1352,7 @@ function Controller(Splide2, Components2, options) {
   function getAdjacent(prev, destination) {
     const number = perMove || hasFocus() ? 1 : perPage;
     const dest = computeDestIndex(currIndex + number * (prev ? -1 : 1), currIndex);
-    if (dest === -1 && Splide2.is(SLIDE)) {
+    if (dest === -1 && isSlide) {
       if (!approximatelyEqual(getPosition(), getLimit(!prev), 1)) {
         return prev ? 0 : getEnd();
       }
@@ -1422,6 +1407,10 @@ function Controller(Splide2, Components2, options) {
     }
     return index;
   }
+  function toDest(destination) {
+    const closest = Move.toIndex(destination);
+    return isSlide ? clamp(closest, 0, getEnd()) : closest;
+  }
   function setIndex(index) {
     if (index !== currIndex) {
       prevIndex = currIndex;
@@ -1437,6 +1426,7 @@ function Controller(Splide2, Components2, options) {
   return {
     mount,
     go,
+    scroll,
     getNext,
     getPrev,
     getEnd,
@@ -1444,6 +1434,7 @@ function Controller(Splide2, Components2, options) {
     getIndex,
     toIndex,
     toPage,
+    toDest,
     hasFocus
   };
 }
@@ -1604,7 +1595,7 @@ function Autoplay(Splide2, Components2, options) {
   function update(rate) {
     const { bar } = Elements;
     if (bar) {
-      style(bar, { width: `${rate * 100}%` });
+      style(bar, "width", `${rate * 100}%`);
     }
     emit(EVENT_AUTOPLAY_PLAYING, rate);
   }
@@ -1639,7 +1630,7 @@ function Cover(Splide2, Components2, options) {
     });
   }
   function toggle(cover, img, Slide) {
-    Slide.rule("background", cover ? `center/cover no-repeat url("${img.src}")` : "", true);
+    Slide.style("background", cover ? `center/cover no-repeat url("${img.src}")` : "", true);
     display(img, cover ? "none" : "");
   }
   return {
@@ -1659,14 +1650,16 @@ function Scroll(Splide2, Components2, options) {
   const { Move } = Components2;
   const { getPosition, getLimit, exceededLimit } = Move;
   let interval;
+  let scrollCallback;
   function mount() {
     on(EVENT_MOVE, clear);
     on([EVENT_UPDATED, EVENT_REFRESH], cancel);
   }
-  function scroll(destination, duration, suppressConstraint) {
+  function scroll(destination, duration, callback, suppressConstraint) {
     const start = getPosition();
     let friction = 1;
     duration = duration || computeDuration(abs(destination - start));
+    scrollCallback = callback;
     clear();
     interval = RequestInterval(duration, onScrolled, (rate) => {
       const position = getPosition();
@@ -1684,9 +1677,15 @@ function Scroll(Splide2, Components2, options) {
     interval.start();
   }
   function bounce(backwards) {
-    scroll(getLimit(!backwards), BOUNCE_DURATION, true);
+    scroll(getLimit(!backwards), BOUNCE_DURATION, null, true);
   }
   function onScrolled() {
+    const position = getPosition();
+    const index = Move.toIndex(position);
+    if (!between(index, 0, Splide2.length - 1)) {
+      Move.translate(Move.shift(position, index > 0), true);
+    }
+    scrollCallback && scrollCallback();
     emit(EVENT_SCROLLED);
   }
   function computeDuration(distance) {
@@ -1728,7 +1727,6 @@ function Drag(Splide2, Components2, options) {
   const { resolve, orient } = Components2.Direction;
   const { getPosition, exceededLimit } = Move;
   const listenerOptions = { passive: false, capture: true };
-  const isSlide = Splide2.is(SLIDE);
   let basePosition;
   let baseEvent;
   let prevBaseEvent;
@@ -1744,6 +1742,7 @@ function Drag(Splide2, Components2, options) {
     bind(track, POINTER_UP_EVENTS, noop, listenerOptions);
     bind(track, POINTER_DOWN_EVENTS, onPointerDown, listenerOptions);
     bind(track, "click", onClick, { capture: true });
+    bind(track, "dragstart", prevent);
     on([EVENT_MOUNTED, EVENT_UPDATED], init);
   }
   function init() {
@@ -1804,11 +1803,11 @@ function Drag(Splide2, Components2, options) {
         const velocity = computeVelocity(e);
         const destination = computeDestination(velocity);
         if (isFree) {
-          Scroll.scroll(destination);
+          Controller.scroll(destination);
         } else if (Splide2.is(FADE)) {
           Controller.go(Splide2.index + orient(sign(velocity)));
         } else {
-          Controller.go(computeIndex(destination), true);
+          Controller.go(Controller.toDest(destination), true);
         }
         prevent(e);
       }
@@ -1846,10 +1845,6 @@ function Drag(Splide2, Components2, options) {
   function computeDestination(velocity) {
     return getPosition() + sign(velocity) * min(abs(velocity) * (options.flickPower || 600), isFree ? Infinity : Components2.Layout.listSize() * (options.flickMaxPages || 1));
   }
-  function computeIndex(destination) {
-    const dest = Move.toIndex(destination);
-    return isSlide ? clamp(dest, 0, Controller.getEnd()) : dest;
-  }
   function coordOf(e, orthogonal) {
     return (isTouchEvent(e) ? e.touches[0] : e)[`page${resolve(orthogonal ? "Y" : "X")}`];
   }
@@ -1860,7 +1855,7 @@ function Drag(Splide2, Components2, options) {
     return e.timeStamp;
   }
   function constrain(diff) {
-    return diff / (hasExceeded && isSlide ? FRICTION : 1);
+    return diff / (hasExceeded && Splide2.is(SLIDE) ? FRICTION : 1);
   }
   function disable(value) {
     disabled = value;
@@ -2160,10 +2155,9 @@ var ComponentConstructors = /*#__PURE__*/Object.freeze({
   Options: Options,
   Direction: Direction,
   Elements: Elements,
-  Style: Style$1,
   Slides: Slides,
-  Clones: Clones,
   Layout: Layout,
+  Clones: Clones,
   Move: Move,
   Controller: Controller,
   Arrows: Arrows,
@@ -2200,7 +2194,7 @@ const DEFAULTS = {
   pauseOnHover: true,
   pauseOnFocus: true,
   resetProgress: true,
-  easing: "cubic-bezier(.42,.65,.27,.99)",
+  easing: "cubic-bezier(0.25, 1, 0.5, 1)",
   drag: true,
   direction: "ltr",
   slideFocus: true,
@@ -2212,22 +2206,19 @@ const DEFAULTS = {
 
 function Fade(Splide2, Components2, options) {
   const { on } = EventInterface(Splide2);
-  const { ruleBy } = Components2.Style;
   function mount() {
     on([EVENT_MOUNTED, EVENT_REFRESH], () => {
       nextTick(() => {
-        Components2.Slides.forEach((Slide) => {
-          ruleBy(Slide.slide, "transition", `opacity ${options.speed}ms ${options.easing}`);
-        });
+        Components2.Slides.style("transition", `opacity ${options.speed}ms ${options.easing}`);
       });
     });
   }
   function start(index, done) {
     const { track } = Components2.Elements;
-    ruleBy(track, "height", unit(rect(track).height));
+    style(track, "height", unit(rect(track).height));
     nextTick(() => {
       done();
-      ruleBy(track, "height", "");
+      style(track, "height", "");
     });
   }
   return {
@@ -2278,7 +2269,7 @@ function Slide(Splide2, Components2, options) {
     return options.speed;
   }
   function apply(transition) {
-    Components2.Style.ruleBy(list, "transition", transition);
+    style(list, "transition", transition);
   }
   return {
     mount,

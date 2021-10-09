@@ -52,21 +52,5 @@ export declare function keydown(key: string, target?: Window | Element): void;
  * @return A Promise instance.
  */
 export declare function wait(duration: number): Promise<void>;
-/**
- * Finds the CSSRule object.
- *
- * @param selector - A selector to find.
- *
- * @return A found CSSRule object.
- */
-export declare function findRule(selector: string): CSSStyleRule;
-/**
- * Finds the CSSRule object by ID.
- *
- * @param target - The element or ID.
- *
- * @return A found CSSRule object.
- */
-export declare function findRuleBy(target: string | HTMLElement): CSSStyleRule;
 export {};
 //# sourceMappingURL=../../../../src/js/test/utils/utils.d.ts.map

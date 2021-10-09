@@ -55,6 +55,7 @@ export function Clones( Splide: Splide, Components: Components, options: Options
   function init(): void {
     if ( ( cloneCount = computeCloneCount() ) ) {
       generate( cloneCount );
+      emit( EVENT_RESIZE );
     }
   }
 
@@ -79,7 +80,7 @@ export function Clones( Splide: Splide, Components: Components, options: Options
    * Observes the required clone count and refreshes the slider if necessary.
    */
   function observe(): void {
-    if ( cloneCount !== computeCloneCount() ) {
+    if ( cloneCount < computeCloneCount() ) {
       emit( EVENT_REFRESH );
     }
   }

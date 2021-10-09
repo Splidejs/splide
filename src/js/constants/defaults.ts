@@ -20,7 +20,7 @@ export const DEFAULTS: Options = {
   pauseOnHover     : true,
   pauseOnFocus     : true,
   resetProgress    : true,
-  easing           : 'cubic-bezier(.42,.65,.27,.99)',
+  easing           : 'cubic-bezier(0.25, 1, 0.5, 1)',
   drag             : true,
   direction        : 'ltr',
   slideFocus       : true,

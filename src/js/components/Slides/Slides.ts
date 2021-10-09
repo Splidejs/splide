@@ -1,4 +1,4 @@
-import { EVENT_REFRESH, EVENT_RESIZE } from '../../constants/events';
+import { EVENT_MOUNTED, EVENT_REFRESH, EVENT_RESIZE } from '../../constants/events';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, BaseComponent, Components, Options } from '../../types';
@@ -36,7 +36,7 @@ export interface  SlidesComponent extends BaseComponent {
   remove( selector: SlideMatcher ): void;
   forEach( iteratee: SlidesIteratee, excludeClones?: boolean ): void;
   filter( matcher: SlideMatcher ): SlideComponent[];
-  rule( prop: string, value: string | number, useContainer?: boolean ): void
+  style( prop: string, value: string | number, useContainer?: boolean ): void
   getLength( excludeClones?: boolean ): number;
   isEnough(): boolean;
 }
@@ -88,6 +88,9 @@ export function Slides( Splide: Splide, Components: Components, options: Options
   function mount(): void {
     init();
     on( EVENT_REFRESH, refresh );
+    on( [ EVENT_MOUNTED, EVENT_REFRESH ], () => {
+      Slides.sort( ( Slide1, Slide2 ) => Slide1.index - Slide2.index );
+    } );
   }
 
   /**
@@ -230,8 +233,8 @@ export function Slides( Splide: Splide, Components: Components, options: Options
    * @param value        - A CSS value to add.
    * @param useContainer - Optional. Determines whether to apply the rule to the container or not.
    */
-  function rule( prop: string, value: string | number, useContainer?: boolean ): void {
-    forEach( Slide => { Slide.rule( prop, value, useContainer ) } );
+  function style( prop: string, value: string | number, useContainer?: boolean ): void {
+    forEach( Slide => { Slide.style( prop, value, useContainer ) } );
   }
 
   /**
@@ -288,7 +291,7 @@ export function Slides( Splide: Splide, Components: Components, options: Options
     remove,
     forEach,
     filter,
-    rule,
+    style,
     getLength,
     isEnough,
   };

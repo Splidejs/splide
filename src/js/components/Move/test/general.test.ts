@@ -1,4 +1,4 @@
-import { findRuleBy, fire, init } from '../../../test';
+import { fire, init } from '../../../test';
 
 
 describe( 'Move', () => {
@@ -49,12 +49,11 @@ describe( 'Move', () => {
     const { list } = splide.Components.Elements;
 
     Move.move( 1, 1, -1 );
-    const rule = findRuleBy( list );
 
-    expect( rule.style.transition ).not.toBe( '' );
+    expect( list.style.transition ).not.toBe( '' );
 
     Move.cancel();
-    expect( rule.style.transition ).toBe( '' );
+    expect( list.style.transition ).toBe( '' );
 
     splide.destroy();
   } );
