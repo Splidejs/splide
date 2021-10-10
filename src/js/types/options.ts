@@ -329,7 +329,7 @@ export interface ResponsiveOptions {
   flickPower?: number;
 
   /**
-   * Limies the number of pages to move by "flick".
+   * Limits the number of pages to move by "flick".
    */
   flickMaxPages?: number;
 
