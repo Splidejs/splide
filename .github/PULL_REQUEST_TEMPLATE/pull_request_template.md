@@ -1,5 +1,5 @@
 <!--
-  Please make sure add a new issue before you send PR!
+  Please make sure to add a new issue before you send PR!
 -->
 
 ## Related Issues
