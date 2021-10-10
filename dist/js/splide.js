@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.1.2
+ * Version  : 3.1.3
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1611,7 +1611,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function getAdjacent(prev, destination) {
-      var number = perMove || hasFocus() ? 1 : perPage;
+      var number = perMove || (hasFocus() ? 1 : perPage);
       var dest = computeDestIndex(currIndex + number * (prev ? -1 : 1), currIndex);
 
       if (dest === -1 && isSlide) {

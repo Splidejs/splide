@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.1.2
+ * Version  : 3.1.3
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1350,7 +1350,7 @@ function Controller(Splide2, Components2, options) {
     return getAdjacent(true, destination);
   }
   function getAdjacent(prev, destination) {
-    const number = perMove || hasFocus() ? 1 : perPage;
+    const number = perMove || (hasFocus() ? 1 : perPage);
     const dest = computeDestIndex(currIndex + number * (prev ? -1 : 1), currIndex);
     if (dest === -1 && isSlide) {
       if (!approximatelyEqual(getPosition(), getLimit(!prev), 1)) {

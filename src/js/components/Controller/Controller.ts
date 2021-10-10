@@ -197,7 +197,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    * @return An adjacent index if available, or otherwise `-1`.
    */
   function getAdjacent( prev: boolean, destination?: boolean ): number {
-    const number = perMove || hasFocus() ? 1 : perPage;
+    const number = perMove || ( hasFocus() ? 1 : perPage );
     const dest   = computeDestIndex( currIndex + number * ( prev ? -1 : 1 ), currIndex );
 
     if ( dest === -1 && isSlide ) {

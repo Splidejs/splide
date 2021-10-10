@@ -43,6 +43,19 @@ describe( 'Controller#getAdjacent()', () => {
     expect( Controller.getPrev() ).toBe( 2 );
   } );
 
+  test( 'can return the next/previous index with respecting the perMove option that is above 1.', () => {
+    const splide = init( { speed: 0, perPage: 3, perMove: 2 } );
+    const { Controller } = splide.Components;
+
+    expect( Controller.getNext() ).toBe( 2 );
+    expect( Controller.getPrev() ).toBe( -1 );
+
+    splide.go( 3 );
+
+    expect( Controller.getNext() ).toBe( 5 );
+    expect( Controller.getPrev() ).toBe( 1 );
+  } );
+
   test( 'can return -1 if there is no adjacent slide.', () => {
     const splide = init( { speed: 0 } );
     const { Controller } = splide.Components;

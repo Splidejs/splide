@@ -19,50 +19,62 @@ $settings = get_settings();
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
-        type             : 'loop',
-        perPage          : 3,
-        gap              : '1.5rem',
-        // speed: 600,
-        cover: true,
-        height           : 400,
-        // waitForTransition: false,
-        // direction        : 'ltr',
-        // drag      : true,
-        // pagination: false,
-        // arrows: false,
-        useScroll: true,
-        // focus: 'center',
-        dragMinThreshold: {
-          mouse: 4,
-        },
-        classes: {
-          arrows: 'splide__arrows splide__test',
-        },
-        slideFocus: false,
+        type   : 'slide',
+        perPage: 3,
+        // direction: 'ttb',
+        // height: 1000,
+        perMove: 2,
+        rewind: true,
+        // focus: 0,
         breakpoints: {
           1000: {
-            // direction: 'rtl',
-            // drag: false,
-            perPage: 2,
-          }
+            destroy: true,
+            // type   : 'fade',
+            // perPage: 1,
+          },
         },
       } );
 
-      splide.on( 'moved', () => {
-        console.log( 'moved' );
-      } );
+      // splide.on( 'moved', () => {
+      //   console.log( 'moved' );
+      // } );
+      //
+      // splide.on( 'visible', Slide => {
+      //   console.log( 'visible', Slide.index );
+      // } );
+      //
+      // splide.on( 'hidden', Slide => {
+      //   console.log( 'hidden', Slide.index );
+      // } );
+      //
+      // splide.on( 'click', () => {
+      //   console.log( 'click' );
+      // } );
 
-      splide.on( 'visible', Slide => {
-        console.log( 'visible', Slide.index );
-      } );
 
-      splide.on( 'hidden', Slide => {
-        console.log( 'hidden', Slide.index );
-      } );
+      // let prevType;
+      //
+      // splide.on( 'update', function onUpdate( options ) {
+      //   if ( prevType && prevType !== options.type ) {
+      //     splide.destroy();
+      //     splide.mount();
+      //     splide.on( 'update', onUpdate );
+      //
+      //     console.log( 'remount' );
+      //   }
+      //
+      //   prevType = options.type;
+      // } );
 
-      splide.on( 'click', () => {
-        console.log( 'click' );
-      } );
+      // let direction;
+
+      // splide.on( 'updated', options => {
+      //   if ( direction !== options.direction ) {
+      //     splide.refresh();
+      //     direction = options.direction;
+      //   }
+      // } );
+
 
       splide.mount();
     } );
