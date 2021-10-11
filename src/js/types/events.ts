@@ -5,34 +5,35 @@ import { Options } from './options';
 
 
 export interface EventMap {
-  'mounted': [];
-  'ready': [];
-  'click': [ SlideComponent, MouseEvent ];
-  'move': [ number, number, number ];
-  'moved': [ number, number, number ];
-  'active': [ SlideComponent ];
-  'inactive': [ SlideComponent ];
-  'visible': [ SlideComponent ];
-  'hidden': [ SlideComponent ];
-  'slide:keydown': [ SlideComponent, KeyboardEvent ];
-  'refresh': [];
-  'updated': [ Options ];
-  'resize': [];
-  'resized': [];
-  'drag': [];
-  'dragging': [];
-  'dragged': [];
-  'scroll': [];
-  'scrolled': [];
-  'destroy': [];
-  'arrows:mounted': [ HTMLButtonElement, HTMLButtonElement ];
-  'arrows:updated': [ HTMLButtonElement, HTMLButtonElement, number, number ];
-  'pagination:mounted': [ PaginationData, PaginationItem ];
-  'pagination:updated': [ PaginationData, PaginationItem, PaginationItem ];
-  'navigation:mounted': [ Splide[] ];
-  'autoplay:play': [];
-  'autoplay:playing': [ number ];
-  'autoplay:pause': [];
-  'lazyload:loaded': [ HTMLImageElement, SlideComponent ];
+  'mounted': () => void;
+  'ready': () => void;
+  'click': ( Slide: SlideComponent, e: MouseEvent ) => void;
+  'move': ( index: number, prev: number, dest: number ) => void;
+  'moved': ( index: number, prev: number, dest: number ) => void;
+  'active': ( Slide: SlideComponent ) => void;
+  'inactive': ( Slide: SlideComponent ) => void;
+  'visible': ( Slide: SlideComponent ) => void;
+  'hidden': ( Slide: SlideComponent ) => void;
+  'slide:keydown': ( Slide: SlideComponent, e: KeyboardEvent ) => void;
+  'refresh': () => void;
+  'updated': ( options: Options ) => void;
+  'resize': () => void;
+  'resized': () => void;
+  'drag': () => void;
+  'dragging': () => void;
+  'dragged': () => void;
+  'scroll': () => void;
+  'scrolled': () => void;
+  'destroy': () => void;
+  'arrows:mounted': ( prev: HTMLButtonElement, next: HTMLButtonElement ) => void;
+  'arrows:updated': ( prev: HTMLButtonElement, next: HTMLButtonElement, prevIndex: number, nextIndex: number ) => void;
+  'pagination:mounted': ( data: PaginationData, item: PaginationItem ) => void;
+  'pagination:updated': ( data: PaginationData, prev: PaginationItem, curr: PaginationItem ) => void;
+  'navigation:mounted': ( splides: Splide[] ) => void;
+  'autoplay:play': () => void;
+  'autoplay:playing': ( rate: number ) => void;
+  'autoplay:pause': () => void;
+  'lazyload:loaded': ( img: HTMLImageElement, Slide: SlideComponent ) => void;
 }
+
 

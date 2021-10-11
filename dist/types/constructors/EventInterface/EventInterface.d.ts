@@ -7,10 +7,10 @@ import { EventBusCallback } from '../EventBus/EventBus';
  * @since 3.0.0
  */
 export interface EventInterfaceObject {
-    on<K extends keyof EventMap>(event: K, callback: (...args: EventMap[K]) => void, priority?: number): void;
+    on<K extends keyof EventMap>(event: K, callback: EventMap[K], priority?: number): void;
     on(events: string | string[], callback: EventBusCallback, priority?: number): void;
     off<K extends keyof EventMap>(events: K | K[] | string | string[]): void;
-    emit<K extends keyof EventMap>(event: K, ...args: EventMap[K]): void;
+    emit<K extends keyof EventMap>(event: K, ...args: Parameters<EventMap[K]>): void;
     emit(event: string, ...args: any[]): void;
     bind(target: Element | Window | Document | Array<Element | Window | Document>, events: string, callback: AnyFunction, options?: AddEventListenerOptions): void;
     unbind(target: Element | Window | Document | Array<Element | Window | Document>, events: string, callback?: AnyFunction): void;

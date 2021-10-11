@@ -35,46 +35,21 @@ $settings = get_settings();
         },
       } );
 
-      // splide.on( 'moved', () => {
-      //   console.log( 'moved' );
-      // } );
-      //
-      // splide.on( 'visible', Slide => {
-      //   console.log( 'visible', Slide.index );
-      // } );
-      //
-      // splide.on( 'hidden', Slide => {
-      //   console.log( 'hidden', Slide.index );
-      // } );
-      //
-      // splide.on( 'click', () => {
-      //   console.log( 'click' );
-      // } );
+      splide.on( 'moved', () => {
+        console.log( 'moved' );
+      } );
 
+      splide.on( 'visible', Slide => {
+        console.log( 'visible', Slide.index );
+      } );
 
-      // let prevType;
-      //
-      // splide.on( 'update', function onUpdate( options ) {
-      //   if ( prevType && prevType !== options.type ) {
-      //     splide.destroy();
-      //     splide.mount();
-      //     splide.on( 'update', onUpdate );
-      //
-      //     console.log( 'remount' );
-      //   }
-      //
-      //   prevType = options.type;
-      // } );
+      splide.on( 'hidden', Slide => {
+        console.log( 'hidden', Slide.index );
+      } );
 
-      // let direction;
-
-      // splide.on( 'updated', options => {
-      //   if ( direction !== options.direction ) {
-      //     splide.refresh();
-      //     direction = options.direction;
-      //   }
-      // } );
-
+      splide.on( 'click', () => {
+        console.log( 'click' );
+      } );
 
       splide.mount();
     } );

@@ -216,7 +216,7 @@ export class Splide {
    *
    * @return `this`
    */
-  on<K extends keyof EventMap>( events: K, callback: ( ...args: EventMap[ K ] ) => void ): this;
+  on<K extends keyof EventMap>( events: K, callback: EventMap[ K ] ): this;
   on( events: string | string[], callback: EventBusCallback ): this {
     this.event.on( events, callback, null, DEFAULT_USER_EVENT_PRIORITY );
     return this;
@@ -254,7 +254,7 @@ export class Splide {
    *
    * @return `this`
    */
-  emit<K extends keyof EventMap>( event: K, ...args: EventMap[ K ] ): this;
+  emit<K extends keyof EventMap>( event: K, ...args: Parameters<EventMap[ K ]> ): this;
   emit( event: string, ...args: any[] ): this;
   emit( event: string ): this {
     // eslint-disable-next-line prefer-rest-params, prefer-spread
