@@ -1,7 +1,6 @@
 import { SlideMatcher } from '../../components/Slides/Slides';
 import { EventBusObject, StateObject } from '../../constructors';
-import { ComponentConstructor, Components, Options } from '../../types';
-import { EventMap } from '../../types/events';
+import { ComponentConstructor, Components, EventMap, Options } from '../../types';
 /**
  * The frontend class for the Splide slider.
  *

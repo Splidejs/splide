@@ -8,8 +8,7 @@ import { CREATED, DESTROYED, IDLE, STATES } from '../../constants/states';
 import { FADE } from '../../constants/types';
 import { EventBus, EventBusCallback, EventBusObject, State, StateObject } from '../../constructors';
 import { Fade, Slide } from '../../transitions';
-import { ComponentConstructor, Components, Options } from '../../types';
-import { EventMap } from '../../types/events';
+import { ComponentConstructor, Components, EventMap, Options } from '../../types';
 import { addClass, assert, assign, empty, forOwn, isString, merge, query, slice } from '../../utils';
 
 

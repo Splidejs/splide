@@ -16,7 +16,7 @@ export interface EventMap {
   'hidden': [ SlideComponent ];
   'slide:keydown': [ SlideComponent, KeyboardEvent ];
   'refresh': [];
-  'undated': [ Options ];
+  'updated': [ Options ];
   'resize': [];
   'resized': [];
   'drag': [];

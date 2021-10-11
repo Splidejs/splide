@@ -1,7 +1,6 @@
 import { EVENT_DESTROY } from '../../constants/events';
 import { Splide } from '../../core/Splide/Splide';
-import { AnyFunction } from '../../types';
-import { EventMap } from '../../types/events';
+import { AnyFunction, EventMap } from '../../types';
 import { forEach } from '../../utils';
 import { EventBusCallback } from '../EventBus/EventBus';
 

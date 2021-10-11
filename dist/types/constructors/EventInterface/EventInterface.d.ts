@@ -1,6 +1,5 @@
 import { Splide } from '../../core/Splide/Splide';
-import { AnyFunction } from '../../types';
-import { EventMap } from '../../types/events';
+import { AnyFunction, EventMap } from '../../types';
 import { EventBusCallback } from '../EventBus/EventBus';
 /**
  * The interface for the EventInterface object.
