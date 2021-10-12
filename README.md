@@ -51,6 +51,10 @@ No dependencies, no Lighthouse errors.
 - Accessibility friendly
 - Internet Explorer 10
 
+## Integration
+- [React Splide](https://github.com/Splidejs/react-splide)
+- Vue (I'm updating the old version)
+
 ## No Lighthouse Errors
 
 Here is the mobile version result of the [Splide front page](https://splidejs.com):
