@@ -22,6 +22,12 @@ $settings = get_settings();
         heightRatio: 0.3,
         perPage    : 2,
         // cover      : true,
+
+        breakpoints: {
+          1000: {
+            destroy: true,
+          }
+        },
       } );
 
       var splide02 = new Splide( '#splide02', {

@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.1.5
+ * Version  : 3.1.6
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -2366,7 +2366,7 @@ const _Splide = class {
       });
       event.emit(EVENT_DESTROY);
       event.destroy();
-      empty(this.splides);
+      completely && empty(this.splides);
       state.set(DESTROYED);
     }
     return this;

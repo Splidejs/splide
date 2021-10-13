@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.1.5
+ * Version  : 3.1.6
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -2898,7 +2898,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         });
         event.emit(EVENT_DESTROY);
         event.destroy();
-        empty(this.splides);
+        completely && empty(this.splides);
         state.set(DESTROYED);
       }
 

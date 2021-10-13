@@ -339,7 +339,7 @@ export class Splide {
 
       event.emit( EVENT_DESTROY );
       event.destroy();
-      empty( this.splides );
+      completely && empty( this.splides );
       state.set( DESTROYED );
     }
 
