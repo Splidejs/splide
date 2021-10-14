@@ -27,7 +27,9 @@ No dependencies, no Lighthouse errors.
 </p>
 
 <p>
-  Other entrances<br>
+  Other packages
+</p>
+<p>
   <a href="https://splidejs.com/integration/react-splide/" target="_blank">
     <img alt="React Splide" src="./images/react-logo.svg" width="40">
   </a>
