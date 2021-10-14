@@ -53,7 +53,7 @@ No dependencies, no Lighthouse errors.
 
 ## Integration
 - [React Splide](https://github.com/Splidejs/react-splide)
-- Vue (I'm updating the old version)
+- [Vue Splide](https://github.com/Splidejs/vue-splide)
 
 ## No Lighthouse Errors
 
