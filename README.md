@@ -6,7 +6,7 @@
 <h1>Splide</h1>
 
 <p>
-Splide is a lightweight, flexible and accessible slider and carousel written in TypeScript.<br>
+Splide is a lightweight, flexible and accessible slider and carousel.<br>
 No dependencies, no Lighthouse errors.
 </p>
 
@@ -27,11 +27,12 @@ No dependencies, no Lighthouse errors.
 </p>
 
 <p>
+  Other entrances<br>
   <a href="https://splidejs.com/integration/react-splide/" target="_blank">
-    <img alt="Splide" src="./images/react-logo.svg" width="40">
+    <img alt="React Splide" src="./images/react-logo.svg" width="40">
   </a>
   <a href="https://splidejs.com/integration/vue-splide/" target="_blank">
-    <img alt="Splide" src="./images/vue-logo.svg" width="40">
+    <img alt="Vue Splide" src="./images/vue-logo.svg" width="40">
   </a>
 </p>
 </div>
