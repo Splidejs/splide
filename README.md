@@ -52,8 +52,8 @@ No dependencies, no Lighthouse errors.
 - Internet Explorer 10
 
 ## Integration
-- [React Splide](https://github.com/Splidejs/react-splide)
-- [Vue Splide](https://github.com/Splidejs/vue-splide)
+- [React Splide](https://splidejs.com/integration/react-splide/)
+- [Vue Splide](https://splidejs.com/integration/vue-splide/)
 
 ## No Lighthouse Errors
 
