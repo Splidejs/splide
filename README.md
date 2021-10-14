@@ -27,7 +27,7 @@ No dependencies, no Lighthouse errors.
 </p>
 
 <p>
-  Other packages
+  Other Packages
 </p>
 <p>
   <a href="https://splidejs.com/integration/react-splide/" target="_blank">
