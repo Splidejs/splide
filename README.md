@@ -60,9 +60,6 @@ No dependencies, no Lighthouse errors.
 - Accessibility friendly
 - Internet Explorer 10
 
-## Integration
-- [React Splide](https://splidejs.com/integration/react-splide/)
-- [Vue Splide](https://splidejs.com/integration/vue-splide/)
 
 ## No Lighthouse Errors
 
@@ -71,6 +68,7 @@ Here is the mobile version result of the [Splide front page](https://splidejs.co
 <img alt="Lighthouse result of the Splide frontpage" src="./images/lighthouse-mobile.png" width="500">
 
 The Splide slider does not degrade Accessibility, Best Practices and SEO 🎉
+
 
 ## License
 
