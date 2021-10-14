@@ -13,17 +13,26 @@ No dependencies, no Lighthouse errors.
 [![](https://data.jsdelivr.com/v1/package/npm/@splidejs/splide/badge)](https://www.jsdelivr.com/package/npm/@splidejs/splide)
 
 <p>
-  <a href="https://splidejs.com/guides/getting-started/">Getting Started</a>
+  <a href="https://splidejs.com/guides/getting-started/" target="_blank">Getting Started</a>
   <br>
-  <a href="https://splidejs.com/">Demo</a>
+  <a href="https://splidejs.com/" target="_blank">Demo</a>
   <br>
-  <a href="https://splidejs.com/documents/">Documents</a>
+  <a href="https://splidejs.com/documents/" target="_blank">Documents</a>
   <br>
-  <a href="https://splidejs.com/guides/themes/">Themes</a>
+  <a href="https://splidejs.com/guides/themes/" target="_blank">Themes</a>
   <br>
-  <a href="https://splidejs.com/guides/version3/">About v3</a>
+  <a href="https://splidejs.com/guides/version3/" target="_blank">About v3</a>
   <br>
-  <a href="https://github.com/Splidejs/splide/discussions">Discussions</a>
+  <a href="https://github.com/Splidejs/splide/discussions">Discussions/Q&A</a>
+</p>
+
+<p>
+  <a href="https://splidejs.com/integration/react-splide/" target="_blank">
+    <img alt="Splide" src="./images/react-logo.svg" width="40">
+  </a>
+  <a href="https://splidejs.com/integration/vue-splide/" target="_blank">
+    <img alt="Splide" src="./images/vue-logo.svg" width="40">
+  </a>
 </p>
 </div>
 
