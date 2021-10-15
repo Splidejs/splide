@@ -13,15 +13,17 @@ No dependencies, no Lighthouse errors.
 [![](https://data.jsdelivr.com/v1/package/npm/@splidejs/splide/badge)](https://www.jsdelivr.com/package/npm/@splidejs/splide)
 
 <p>
-  <a href="https://splidejs.com/guides/getting-started/" target="_blank">Getting Started</a>
+  <a href="https://github.com/Splidejs/splide/releases/latest">Download</a>
   <br>
-  <a href="https://splidejs.com/" target="_blank">Demo</a>
+  <a href="https://splidejs.com/guides/getting-started/">Getting Started</a>
   <br>
-  <a href="https://splidejs.com/documents/" target="_blank">Documents</a>
+  <a href="https://splidejs.com/">Demo</a>
   <br>
-  <a href="https://splidejs.com/guides/themes/" target="_blank">Themes</a>
+  <a href="https://splidejs.com/documents/">Documents</a>
   <br>
-  <a href="https://splidejs.com/guides/version3/" target="_blank">About v3</a>
+  <a href="https://splidejs.com/guides/themes/">Themes</a>
+  <br>
+  <a href="https://splidejs.com/guides/version3/">About v3</a>
   <br>
   <a href="https://github.com/Splidejs/splide/discussions">Discussions/Q&A</a>
 </p>
@@ -30,10 +32,10 @@ No dependencies, no Lighthouse errors.
   Other Packages
 </p>
 <p>
-  <a href="https://splidejs.com/integration/react-splide/" target="_blank">
+  <a href="https://splidejs.com/integration/react-splide/">
     <img alt="React Splide" src="./images/react-logo.svg" width="40">
   </a>
-  <a href="https://splidejs.com/integration/vue-splide/" target="_blank">
+  <a href="https://splidejs.com/integration/vue-splide/">
     <img alt="Vue Splide" src="./images/vue-logo.svg" width="40">
   </a>
 </p>
