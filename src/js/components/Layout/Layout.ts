@@ -212,7 +212,6 @@ export function Layout( Splide: Splide, Components: Components, options: Options
   /**
    * Returns the gap value.
    *
-   *
    * @return The gap value in pixel.
    */
   function getGap(): number {

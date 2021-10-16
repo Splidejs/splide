@@ -141,6 +141,8 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    * Parses the control and returns a slide index.
    *
    * @param control - A control pattern to parse.
+   *
+   * @return A `dest` index.
    */
   function parse( control: number | string ): number {
     let index = currIndex;

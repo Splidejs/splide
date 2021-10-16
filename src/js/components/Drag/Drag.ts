@@ -293,17 +293,6 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
   }
 
   /**
-   * Checks if the provided event is TouchEvent or MouseEvent.
-   *
-   * @param e - An event to check.
-   *
-   * @return `true` if the `e` is TouchEvent.
-   */
-  function isTouchEvent( e: TouchEvent | MouseEvent ): e is TouchEvent {
-    return typeof TouchEvent !== 'undefined' && e instanceof TouchEvent;
-  }
-
-  /**
    * Returns the time stamp in the provided event object.
    *
    * @param e - A TouchEvent or MouseEvent object.
@@ -312,6 +301,17 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    */
   function timeOf( e: TouchEvent | MouseEvent ): number {
     return e.timeStamp;
+  }
+
+  /**
+   * Checks if the provided event is TouchEvent or MouseEvent.
+   *
+   * @param e - An event to check.
+   *
+   * @return `true` if the `e` is TouchEvent.
+   */
+  function isTouchEvent( e: TouchEvent | MouseEvent ): e is TouchEvent {
+    return typeof TouchEvent !== 'undefined' && e instanceof TouchEvent;
   }
 
   /**
