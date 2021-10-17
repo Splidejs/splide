@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.1.6
+ * Version  : 3.1.7
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -198,6 +198,10 @@ function style(elm, prop, value) {
 
 function display(elm, display2) {
   style(elm, "display", display2);
+}
+
+function focus(elm) {
+  elm["setActive"] && elm["setActive"]() || elm.focus({ preventScroll: true });
 }
 
 function getAttribute(elm, attr) {
@@ -1854,11 +1858,11 @@ function Drag(Splide2, Components2, options) {
   function coordOf(e, orthogonal) {
     return (isTouchEvent(e) ? e.touches[0] : e)[`page${resolve(orthogonal ? "Y" : "X")}`];
   }
-  function isTouchEvent(e) {
-    return typeof TouchEvent !== "undefined" && e instanceof TouchEvent;
-  }
   function timeOf(e) {
     return e.timeStamp;
+  }
+  function isTouchEvent(e) {
+    return typeof TouchEvent !== "undefined" && e instanceof TouchEvent;
   }
   function constrain(diff) {
     return diff / (hasExceeded && Splide2.is(SLIDE) ? FRICTION : 1);
@@ -2056,7 +2060,7 @@ function Pagination(Splide2, Components2, options) {
   function onClick(page) {
     Controller.go(`>${page}`, true, () => {
       const Slide = Slides.getAt(Controller.toIndex(page));
-      Slide && Slide.slide.focus();
+      Slide && focus(Slide.slide);
     });
   }
   function getAt(index) {

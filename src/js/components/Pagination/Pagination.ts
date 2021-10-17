@@ -11,7 +11,18 @@ import {
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { addClass, ceil, create, empty, format, remove, removeAttribute, removeClass, setAttribute } from '../../utils';
+import {
+  addClass,
+  ceil,
+  create,
+  empty,
+  focus,
+  format,
+  remove,
+  removeAttribute,
+  removeClass,
+  setAttribute,
+} from '../../utils';
 
 
 /**
@@ -142,7 +153,7 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
   function onClick( page: number ): void {
     Controller.go( `>${ page }`, true, () => {
       const Slide = Slides.getAt( Controller.toIndex( page ) );
-      Slide && Slide.slide.focus();
+      Slide && focus( Slide.slide );
     } );
   }
 

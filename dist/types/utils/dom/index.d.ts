@@ -5,6 +5,7 @@ export { child } from './child/child';
 export { children } from './children/children';
 export { create } from './create/create';
 export { display } from './display/display';
+export { focus } from './focus/focus';
 export { getAttribute } from './getAttribute/getAttribute';
 export { hasClass } from './hasClass/hasClass';
 export { matches } from './matches/matches';
