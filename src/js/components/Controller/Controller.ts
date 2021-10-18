@@ -151,7 +151,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
       const [ , indicator, number ] = control.match( /([+\-<>])(\d+)?/ ) || [];
 
       if ( indicator === '+' || indicator === '-' ) {
-        index = computeDestIndex( currIndex + (+`${ indicator }${ +number || 1 }`), currIndex, true );
+        index = computeDestIndex( currIndex + ( +`${ indicator }${ +number || 1 }` ), currIndex, true );
       } else if ( indicator === '>' ) {
         index = number ? toIndex( +number ) : getNext( true );
       } else if ( indicator === '<' ) {
