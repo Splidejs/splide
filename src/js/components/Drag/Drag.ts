@@ -13,7 +13,8 @@ import { FRICTION, LOG_INTERVAL, POINTER_DOWN_EVENTS, POINTER_MOVE_EVENTS, POINT
  * @since 3.0.0
  */
 export interface DragComponent extends BaseComponent {
-  disable( disabled: boolean ): void
+  disable( disabled: boolean ): void;
+  isDragging(): boolean;
 }
 
 /**
@@ -63,7 +64,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
   /**
    * Indicates whether the user is dragging the slider or not.
    */
-  let isDragging: boolean;
+  let dragging: boolean;
 
   /**
    * Indicates whether the slider exceeds limits or not.
@@ -151,7 +152,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
     lastEvent = e;
 
     if ( e.cancelable ) {
-      if ( isDragging ) {
+      if ( dragging ) {
         const expired  = timeOf( e ) - timeOf( baseEvent ) > LOG_INTERVAL;
         const exceeded = hasExceeded !== ( hasExceeded = exceededLimit() );
 
@@ -167,7 +168,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
         const diff = abs( coordOf( e ) - coordOf( baseEvent ) );
         let { dragMinThreshold: thresholds } = options;
         thresholds = isObject( thresholds ) ? thresholds : { mouse: 0, touch: +thresholds || 10 };
-        isDragging = diff > ( isTouchEvent( e ) ? thresholds.touch : thresholds.mouse );
+        dragging   = diff > ( isTouchEvent( e ) ? thresholds.touch : thresholds.mouse );
 
         if ( isSliderDirection() ) {
           prevent( e );
@@ -188,7 +189,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
     unbind( target, POINTER_UP_EVENTS, onPointerUp );
 
     if ( lastEvent ) {
-      if ( isDragging || ( e.cancelable && isSliderDirection() ) ) {
+      if ( dragging || ( e.cancelable && isSliderDirection() ) ) {
         const velocity    = computeVelocity( e );
         const destination = computeDestination( velocity );
 
@@ -206,7 +207,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
       emit( EVENT_DRAGGED );
     }
 
-    isDragging = false;
+    dragging = false;
   }
 
   /**
@@ -304,6 +305,18 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
   }
 
   /**
+   * Reduces the distance to move by the predefined friction.
+   * This does nothing when the slider type is not `slide`, or the position is inside borders.
+   *
+   * @param diff - Diff to constrain.
+   *
+   * @return The constrained diff.
+   */
+  function constrain( diff: number ): number {
+    return diff / ( hasExceeded && Splide.is( SLIDE ) ? FRICTION : 1 );
+  }
+
+  /**
    * Checks if the provided event is TouchEvent or MouseEvent.
    *
    * @param e - An event to check.
@@ -315,15 +328,12 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
   }
 
   /**
-   * Reduces the distance to move by the predefined friction.
-   * This does nothing when the slider type is not `slide`, or the position is inside borders.
+   * Checks if now the user is dragging the slider or not.
    *
-   * @param diff - Diff to constrain.
-   *
-   * @return The constrained diff.
+   * @return `true` if the user is dragging the slider or otherwise `false`.
    */
-  function constrain( diff: number ): number {
-    return diff / ( hasExceeded && Splide.is( SLIDE ) ? FRICTION : 1 );
+  function isDragging(): boolean {
+    return dragging;
   }
 
   /**
@@ -338,5 +348,6 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
   return {
     mount,
     disable,
+    isDragging,
   };
 }

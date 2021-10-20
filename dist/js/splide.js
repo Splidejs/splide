@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.1.8
+ * Version  : 3.1.9
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1390,9 +1390,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function reposition() {
-      Components2.Scroll.cancel();
-      jump(Splide2.index);
-      emit(EVENT_REPOSITIONED);
+      if (!Components2.Drag.isDragging()) {
+        Components2.Scroll.cancel();
+        jump(Splide2.index);
+        emit(EVENT_REPOSITIONED);
+      }
     }
 
     function move(dest, index, prev, callback) {
@@ -2096,7 +2098,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var prevBaseEvent;
     var lastEvent;
     var isFree;
-    var isDragging;
+    var dragging;
     var hasExceeded = false;
     var clickPrevented;
     var disabled;
@@ -2149,7 +2151,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       lastEvent = e;
 
       if (e.cancelable) {
-        if (isDragging) {
+        if (dragging) {
           var expired = timeOf(e) - timeOf(baseEvent) > LOG_INTERVAL;
           var exceeded = hasExceeded !== (hasExceeded = exceededLimit());
 
@@ -2168,7 +2170,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
             mouse: 0,
             touch: +thresholds || 10
           };
-          isDragging = diff > (isTouchEvent(e) ? thresholds.touch : thresholds.mouse);
+          dragging = diff > (isTouchEvent(e) ? thresholds.touch : thresholds.mouse);
 
           if (isSliderDirection()) {
             prevent(e);
@@ -2182,7 +2184,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       unbind(target, POINTER_UP_EVENTS, onPointerUp);
 
       if (lastEvent) {
-        if (isDragging || e.cancelable && isSliderDirection()) {
+        if (dragging || e.cancelable && isSliderDirection()) {
           var velocity = computeVelocity(e);
           var destination = computeDestination(velocity);
 
@@ -2200,7 +2202,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         emit(EVENT_DRAGGED);
       }
 
-      isDragging = false;
+      dragging = false;
     }
 
     function save(e) {
@@ -2248,12 +2250,16 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       return e.timeStamp;
     }
 
+    function constrain(diff) {
+      return diff / (hasExceeded && Splide2.is(SLIDE) ? FRICTION : 1);
+    }
+
     function isTouchEvent(e) {
       return typeof TouchEvent !== "undefined" && e instanceof TouchEvent;
     }
 
-    function constrain(diff) {
-      return diff / (hasExceeded && Splide2.is(SLIDE) ? FRICTION : 1);
+    function isDragging() {
+      return dragging;
     }
 
     function disable(value) {
@@ -2262,7 +2268,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     return {
       mount: mount,
-      disable: disable
+      disable: disable,
+      isDragging: isDragging
     };
   }
 

@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.1.8
+ * Version  : 3.1.9
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1169,9 +1169,11 @@ function Move(Splide2, Components2, options) {
     removeAttribute(list, "style");
   }
   function reposition() {
-    Components2.Scroll.cancel();
-    jump(Splide2.index);
-    emit(EVENT_REPOSITIONED);
+    if (!Components2.Drag.isDragging()) {
+      Components2.Scroll.cancel();
+      jump(Splide2.index);
+      emit(EVENT_REPOSITIONED);
+    }
   }
   function move(dest, index, prev, callback) {
     if (!isBusy()) {
@@ -1737,7 +1739,7 @@ function Drag(Splide2, Components2, options) {
   let prevBaseEvent;
   let lastEvent;
   let isFree;
-  let isDragging;
+  let dragging;
   let hasExceeded = false;
   let clickPrevented;
   let disabled;
@@ -1781,7 +1783,7 @@ function Drag(Splide2, Components2, options) {
     }
     lastEvent = e;
     if (e.cancelable) {
-      if (isDragging) {
+      if (dragging) {
         const expired = timeOf(e) - timeOf(baseEvent) > LOG_INTERVAL;
         const exceeded = hasExceeded !== (hasExceeded = exceededLimit());
         if (expired || exceeded) {
@@ -1795,7 +1797,7 @@ function Drag(Splide2, Components2, options) {
         const diff = abs(coordOf(e) - coordOf(baseEvent));
         let { dragMinThreshold: thresholds } = options;
         thresholds = isObject(thresholds) ? thresholds : { mouse: 0, touch: +thresholds || 10 };
-        isDragging = diff > (isTouchEvent(e) ? thresholds.touch : thresholds.mouse);
+        dragging = diff > (isTouchEvent(e) ? thresholds.touch : thresholds.mouse);
         if (isSliderDirection()) {
           prevent(e);
         }
@@ -1806,7 +1808,7 @@ function Drag(Splide2, Components2, options) {
     unbind(target, POINTER_MOVE_EVENTS, onPointerMove);
     unbind(target, POINTER_UP_EVENTS, onPointerUp);
     if (lastEvent) {
-      if (isDragging || e.cancelable && isSliderDirection()) {
+      if (dragging || e.cancelable && isSliderDirection()) {
         const velocity = computeVelocity(e);
         const destination = computeDestination(velocity);
         if (isFree) {
@@ -1820,7 +1822,7 @@ function Drag(Splide2, Components2, options) {
       }
       emit(EVENT_DRAGGED);
     }
-    isDragging = false;
+    dragging = false;
   }
   function save(e) {
     prevBaseEvent = baseEvent;
@@ -1858,18 +1860,22 @@ function Drag(Splide2, Components2, options) {
   function timeOf(e) {
     return e.timeStamp;
   }
+  function constrain(diff) {
+    return diff / (hasExceeded && Splide2.is(SLIDE) ? FRICTION : 1);
+  }
   function isTouchEvent(e) {
     return typeof TouchEvent !== "undefined" && e instanceof TouchEvent;
   }
-  function constrain(diff) {
-    return diff / (hasExceeded && Splide2.is(SLIDE) ? FRICTION : 1);
+  function isDragging() {
+    return dragging;
   }
   function disable(value) {
     disabled = value;
   }
   return {
     mount,
-    disable
+    disable,
+    isDragging
   };
 }
 

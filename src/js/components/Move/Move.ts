@@ -72,13 +72,16 @@ export function Move( Splide: Splide, Components: Components, options: Options )
 
   /**
    * Repositions the slider.
-   * This must be called before the Slide component checks the visibility.
-   * Do not call `cancel()` here because LazyLoad may emit resize while transitioning.
+   * - This must be called before the Slide component checks the visibility.
+   * - Do not call `cancel()` here because LazyLoad may emit resize while transitioning.
+   * - iOS Safari emits window resize event while the user swipes the slider because of the bottom bar.
    */
   function reposition(): void {
-    Components.Scroll.cancel();
-    jump( Splide.index );
-    emit( EVENT_REPOSITIONED );
+    if ( ! Components.Drag.isDragging() ) {
+      Components.Scroll.cancel();
+      jump( Splide.index );
+      emit( EVENT_REPOSITIONED );
+    }
   }
 
   /**
