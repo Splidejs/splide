@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.1.7
+ * Version  : 3.1.8
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -131,9 +131,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     return selector ? children(parent, selector)[0] : parent.firstElementChild;
   }
 
-  function forOwn(object, iteratee) {
+  function forOwn(object, iteratee, right) {
     if (object) {
       var keys = Object.keys(object);
+      keys = right ? keys.reverse() : keys;
 
       for (var i = 0; i < keys.length; i++) {
         var key = keys[i];
@@ -2901,7 +2902,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       } else {
         forOwn(this._Components, function (component) {
           component.destroy && component.destroy(completely);
-        });
+        }, true);
         event.emit(EVENT_DESTROY);
         event.destroy();
         completely && empty(this.splides);

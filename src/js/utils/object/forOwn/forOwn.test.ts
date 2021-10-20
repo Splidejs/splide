@@ -14,6 +14,17 @@ describe( 'forOwn', () => {
     expect( counter ).toBe( Object.keys( object ).length );
   } );
 
+  test( 'can iterate an object from the end.', () => {
+    const object = { a: 1, b: 2, c: 3 };
+    const values: number[] = [];
+
+    forOwn( object, ( value ) => {
+      values.push( value );
+    }, true );
+
+    expect( values ).toEqual( [ 3, 2, 1 ] );
+  } );
+
   test( 'should not handle inherited properties.', () => {
     class Constructor {
       a = 1;

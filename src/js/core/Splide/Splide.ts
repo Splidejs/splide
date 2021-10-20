@@ -335,7 +335,7 @@ export class Splide {
     } else {
       forOwn( this._Components, component => {
         component.destroy && component.destroy( completely );
-      } );
+      }, true );
 
       event.emit( EVENT_DESTROY );
       event.destroy();
