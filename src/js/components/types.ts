@@ -17,3 +17,5 @@ export { LazyLoadComponent }   from './LazyLoad/LazyLoad';
 export { PaginationComponent } from './Pagination/Pagination';
 export { SyncComponent }       from './Sync/Sync';
 export { WheelComponent }      from './Wheel/Wheel';
+
+export { PaginationData, PaginationItem } from './Pagination/Pagination';
