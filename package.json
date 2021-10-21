@@ -67,5 +67,8 @@
   "browserslist": [
     "> 5%",
     "ie 10"
+  ],
+  "files": [
+    "dist"
   ]
 }

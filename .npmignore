@@ -1,7 +1,0 @@
-node_modules/
-images/
-
-.editorconfig
-
-tests/
-jest.config.js
