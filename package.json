@@ -73,6 +73,13 @@
   "files": [
     "dist",
     "src/css/",
+    "src/js/components",
+    "src/js/constants",
+    "src/js/constructors",
+    "src/js/core",
+    "src/js/renderer",
+    "src/js/transitions",
+    "src/js/types",
     "src/js/utils"
   ]
 }
