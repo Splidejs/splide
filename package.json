@@ -69,6 +69,8 @@
     "ie 10"
   ],
   "files": [
-    "dist"
+    "dist",
+    "src/css/",
+    "src/js/utils"
   ]
 }

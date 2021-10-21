@@ -1,0 +1,20 @@
+export { OptionsComponent } from './Options/Options';
+export { DirectionComponent } from './Direction/Direction';
+export { ElementsComponent } from './Elements/Elements';
+export { SlidesComponent } from './Slides/Slides';
+export { SlideComponent } from './Slides/Slide';
+export { LayoutComponent } from './Layout/Layout';
+export { ClonesComponent } from './Clones/Clones';
+export { MoveComponent } from './Move/Move';
+export { ControllerComponent } from './Controller/Controller';
+export { ArrowsComponent } from './Arrows/Arrows';
+export { AutoplayComponent } from './Autoplay/Autoplay';
+export { CoverComponent } from './Cover/Cover';
+export { ScrollComponent } from './Scroll/Scroll';
+export { DragComponent } from './Drag/Drag';
+export { KeyboardComponent } from './Keyboard/Keyboard';
+export { LazyLoadComponent } from './LazyLoad/LazyLoad';
+export { PaginationComponent } from './Pagination/Pagination';
+export { SyncComponent } from './Sync/Sync';
+export { WheelComponent } from './Wheel/Wheel';
+//# sourceMappingURL=../../../src/js/components/types.d.ts.map

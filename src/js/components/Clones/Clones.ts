@@ -11,7 +11,7 @@ import { addClass, append, before, ceil, empty, measure, pad, push, rect, remove
  *
  * @since 3.0.0
  */
-export interface CloneComponent extends BaseComponent {
+export interface ClonesComponent extends BaseComponent {
 }
 
 /**
@@ -25,7 +25,7 @@ export interface CloneComponent extends BaseComponent {
  *
  * @return A Clones component object.
  */
-export function Clones( Splide: Splide, Components: Components, options: Options ): CloneComponent {
+export function Clones( Splide: Splide, Components: Components, options: Options ): ClonesComponent {
   const { on, emit } = EventInterface( Splide );
   const { Elements, Slides } = Components;
   const { resolve } = Components.Direction;

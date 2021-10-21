@@ -5,7 +5,7 @@ import { BaseComponent, Components, Options } from '../../types';
  *
  * @since 3.0.0
  */
-export interface CloneComponent extends BaseComponent {
+export interface ClonesComponent extends BaseComponent {
 }
 /**
  * The component that generates clones for the loop slider.
@@ -18,5 +18,5 @@ export interface CloneComponent extends BaseComponent {
  *
  * @return A Clones component object.
  */
-export declare function Clones(Splide: Splide, Components: Components, options: Options): CloneComponent;
+export declare function Clones(Splide: Splide, Components: Components, options: Options): ClonesComponent;
 //# sourceMappingURL=../../../../src/js/components/Clones/Clones.d.ts.map
