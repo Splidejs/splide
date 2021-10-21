@@ -12,9 +12,11 @@
     "slider",
     "carousel",
     "slideshow",
+    "gallery",
     "lightweight",
     "touch",
-    "responsive"
+    "responsive",
+    "typescript"
   ],
   "repository": {
     "type": "git",
