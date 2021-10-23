@@ -38,6 +38,9 @@ No dependencies, no Lighthouse errors.
   <a href="https://splidejs.com/integration/vue-splide/">
     <img alt="Vue Splide" src="./images/vue-logo.svg" width="40">
   </a>
+  <a href="https://splidejs.com/integration/svelte-splide/">
+    <img alt="Vue Splide" src="./images/svelte-logo.svg" width="40">
+  </a>
 </p>
 </div>
 
