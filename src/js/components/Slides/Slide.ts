@@ -28,7 +28,7 @@ import {
   EVENT_SLIDE_KEYDOWN,
   EVENT_VISIBLE,
 } from '../../constants/events';
-import { FADE, SLIDE } from '../../constants/types';
+import { FADE, LOOP } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent } from '../../types';
@@ -262,7 +262,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   function isWithin( from: number, distance: number ): boolean {
     let diff = abs( from - index );
 
-    if ( ! Splide.is( SLIDE ) && ! isClone ) {
+    if ( ! isClone && ( options.rewind || Splide.is( LOOP ) ) ) {
       diff = min( diff, Splide.length - diff );
     }
 

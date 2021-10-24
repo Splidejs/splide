@@ -107,7 +107,7 @@ describe( 'LazyLoad in the `nearby` mode', () => {
     expect( images[ 3 ].src ).toBe( '' );
     expect( images[ 3 ].getAttribute( SRC_DATA_ATTRIBUTE ) ).not.toBeNull();
 
-    splide.go( 1 );
+    splide.go( 2 );
 
     expect( images[ 3 ].src ).toBe( `${ URL }/3.jpg` );
     expect( images[ 3 ].getAttribute( SRC_DATA_ATTRIBUTE ) ).toBeNull();
@@ -115,7 +115,7 @@ describe( 'LazyLoad in the `nearby` mode', () => {
     expect( images[ 4 ].src ).toBe( '' );
     expect( images[ 4 ].getAttribute( SRC_DATA_ATTRIBUTE ) ).not.toBeNull();
 
-    splide.go( 2 );
+    splide.go( 3 );
 
     expect( images[ 4 ].src ).toBe( `${ URL }/4.jpg` );
     expect( images[ 4 ].getAttribute( SRC_DATA_ATTRIBUTE ) ).toBeNull();
@@ -129,10 +129,10 @@ describe( 'LazyLoad in the `nearby` mode', () => {
     const last2  = splide.Components.Slides.getAt( splide.length - 2 );
 
     expect( prev1.slide.querySelector( 'img' ).src ).toBe( `${ URL }/${ splide.length - 1 }.jpg` );
-    expect( prev2.slide.querySelector( 'img' ).src ).toBe( `${ URL }/${ splide.length - 2 }.jpg` );
+    expect( prev2.slide.querySelector( 'img' ).src ).toBe( '' );
 
     expect( last1.slide.querySelector( 'img' ).src ).toBe( `${ URL }/${ splide.length - 1 }.jpg` );
-    expect( last2.slide.querySelector( 'img' ).src ).toBe( `${ URL }/${ splide.length - 2 }.jpg` );
+    expect( last2.slide.querySelector( 'img' ).src ).toBe( '' );
   } );
 
   test( 'should not start loading an image if the slide is not close to the current location.', () => {

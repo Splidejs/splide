@@ -276,4 +276,37 @@ describe( 'Slide', () => {
     splide.mount( { component } );
     expect( callback ).toHaveBeenCalled();
   } );
+
+  test( 'can check some slide is within the specified distance.', () => {
+    const splide = init( { perPage: 2, type: 'loop' } );
+    const { Slides } = splide.Components;
+    const Slide0 = Slides.getAt( 0 );
+    const Slide1 = Slides.getAt( 1 );
+    const Slide2 = Slides.getAt( 2 );
+    const Clone  = Slides.getAt( -1 );
+
+    expect( Slide0.isWithin( 0, 0 ) ).toBe( true );
+    expect( Slide0.isWithin( 0, 1 ) ).toBe( true );
+
+    expect( Slide1.isWithin( 0, 0 ) ).toBe( false );
+    expect( Slide1.isWithin( 0, 1 ) ).toBe( true );
+    expect( Slide1.isWithin( 0, 2 ) ).toBe( true );
+
+    expect( Slide2.isWithin( 0, 0 ) ).toBe( false );
+    expect( Slide2.isWithin( 0, 1 ) ).toBe( false );
+    expect( Slide2.isWithin( 0, 2 ) ).toBe( true );
+    expect( Slide2.isWithin( 0, 3 ) ).toBe( true );
+
+    expect( Slide0.isWithin( 2, 0 ) ).toBe( false );
+    expect( Slide0.isWithin( 2, 1 ) ).toBe( false );
+    expect( Slide0.isWithin( 2, 2 ) ).toBe( true );
+
+    expect( Slide1.isWithin( 2, 0 ) ).toBe( false );
+    expect( Slide1.isWithin( 2, 1 ) ).toBe( true );
+    expect( Slide1.isWithin( 2, 2 ) ).toBe( true );
+
+    expect( Clone.isWithin( 0, 0 ) ).toBe( false );
+    expect( Clone.isWithin( 0, 1 ) ).toBe( true );
+    expect( Clone.isWithin( 0, 2 ) ).toBe( true );
+  } );
 } );

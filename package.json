@@ -1,6 +1,6 @@
 {
   "name": "@splidejs/splide",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "Splide is a lightweight, flexible and accessible slider/carousel. No dependencies, no Lighthouse errors.",
   "author": "Naotoshi Fujita",
   "license": "MIT",
@@ -64,7 +64,8 @@
     "check:types": "tsc --noEmit",
     "jest": "jest --clearCache && jest",
     "eslint": "eslint src",
-    "stylelint": "npx stylelint --fix ./src/css/**/*.scss"
+    "stylelint": "npx stylelint --fix ./src/css/**/*.scss",
+    "beforecommit": "npm run eslint && npm run stylelint && npm run jest && npm run build:all"
   },
   "browserslist": [
     "> 5%",

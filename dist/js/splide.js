@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.2.0
+ * Version  : 3.2.1
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -990,7 +990,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function isWithin(from, distance) {
       var diff = abs(from - index);
 
-      if (!Splide2.is(SLIDE) && !isClone) {
+      if (!isClone && (options.rewind || Splide2.is(LOOP))) {
         diff = min(diff, Splide2.length - diff);
       }
 
@@ -1390,7 +1390,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function reposition() {
-      if (!Components2.Drag.isDragging()) {
+      if (!isBusy() && !Components2.Drag.isDragging()) {
         Components2.Scroll.cancel();
         jump(Splide2.index);
         emit(EVENT_REPOSITIONED);
@@ -2379,7 +2379,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
               srcset: srcset,
               _spinner: _spinner
             });
-            display(_img, "none");
+            !_img.src && display(_img, "none");
           }
         });
       });
@@ -2396,7 +2396,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function observe() {
       images = images.filter(function (data) {
-        if (data._Slide.isWithin(Splide2.index, options.perPage * ((options.preloadPages || 1) + 1))) {
+        var distance = options.perPage * ((options.preloadPages || 1) + 1) - 1;
+
+        if (data._Slide.isWithin(Splide2.index, distance)) {
           return load(data);
         }
 

@@ -100,7 +100,7 @@ export function LazyLoad( Splide: Splide, Components: Components, options: Optio
           const _spinner = create( 'span', options.classes.spinner, _img.parentElement );
           setAttribute( _spinner, ROLE, 'presentation' );
           images.push( { _img, _Slide, src, srcset, _spinner } );
-          display( _img, 'none' );
+          ! _img.src && display( _img, 'none' );
         }
       } );
     } );
@@ -124,7 +124,9 @@ export function LazyLoad( Splide: Splide, Components: Components, options: Optio
    */
   function observe(): void {
     images = images.filter( data => {
-      if ( data._Slide.isWithin( Splide.index, options.perPage * ( ( options.preloadPages || 1 ) + 1 ) ) ) {
+      const distance = options.perPage * ( ( options.preloadPages || 1 ) + 1 ) - 1;
+
+      if ( data._Slide.isWithin( Splide.index, distance ) ) {
         return load( data );
       }
 

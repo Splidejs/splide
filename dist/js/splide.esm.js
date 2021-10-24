@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.2.0
+ * Version  : 3.2.1
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -865,7 +865,7 @@ function Slide$1(Splide2, index, slideIndex, slide) {
   }
   function isWithin(from, distance) {
     let diff = abs(from - index);
-    if (!Splide2.is(SLIDE) && !isClone) {
+    if (!isClone && (options.rewind || Splide2.is(LOOP))) {
       diff = min(diff, Splide2.length - diff);
     }
     return diff <= distance;
@@ -1169,7 +1169,7 @@ function Move(Splide2, Components2, options) {
     removeAttribute(list, "style");
   }
   function reposition() {
-    if (!Components2.Drag.isDragging()) {
+    if (!isBusy() && !Components2.Drag.isDragging()) {
       Components2.Scroll.cancel();
       jump(Splide2.index);
       emit(EVENT_REPOSITIONED);
@@ -1954,7 +1954,7 @@ function LazyLoad(Splide2, Components2, options) {
           const _spinner = create("span", options.classes.spinner, _img.parentElement);
           setAttribute(_spinner, ROLE, "presentation");
           images.push({ _img, _Slide, src, srcset, _spinner });
-          display(_img, "none");
+          !_img.src && display(_img, "none");
         }
       });
     });
@@ -1968,7 +1968,8 @@ function LazyLoad(Splide2, Components2, options) {
   }
   function observe() {
     images = images.filter((data) => {
-      if (data._Slide.isWithin(Splide2.index, options.perPage * ((options.preloadPages || 1) + 1))) {
+      const distance = options.perPage * ((options.preloadPages || 1) + 1) - 1;
+      if (data._Slide.isWithin(Splide2.index, distance)) {
         return load(data);
       }
       return true;
