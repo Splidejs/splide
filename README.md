@@ -29,17 +29,23 @@ No dependencies, no Lighthouse errors.
 </p>
 
 <p>
-  Other Packages
+  Ready For
 </p>
 <p>
+  <a href="https://splidejs.com/guides/getting-started/">
+    <img alt="React Splide" src="./images/javascript-logo.svg" width="30">
+  </a>
+  <a href="https://splidejs.com/guides/getting-started/">
+    <img alt="React Splide" src="./images/typescript-logo.svg" width="30">
+  </a>
   <a href="https://splidejs.com/integration/react-splide/">
-    <img alt="React Splide" src="./images/react-logo.svg" width="40">
+    <img alt="React Splide" src="./images/react-logo.svg" width="30">
   </a>
   <a href="https://splidejs.com/integration/vue-splide/">
-    <img alt="Vue Splide" src="./images/vue-logo.svg" width="40">
+    <img alt="Vue Splide" src="./images/vue-logo.svg" width="30">
   </a>
   <a href="https://splidejs.com/integration/svelte-splide/">
-    <img alt="Vue Splide" src="./images/svelte-logo.svg" width="40">
+    <img alt="Vue Splide" src="./images/svelte-logo.svg" width="30">
   </a>
 </p>
 </div>
