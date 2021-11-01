@@ -48,6 +48,14 @@ No dependencies, no Lighthouse errors.
     <img alt="Vue Splide" src="./images/svelte-logo.svg" width="30">
   </a>
 </p>
+
+<p>
+  Translation
+</p>
+
+<p>
+  <a href="https://ja.splidejs.com">日本語</a>
+</p>
 </div>
 
 ## Features
