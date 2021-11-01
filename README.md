@@ -28,9 +28,9 @@ No dependencies, no Lighthouse errors.
   <a href="https://github.com/Splidejs/splide/discussions">Discussions/Q&A</a>
 </p>
 
-<p>
+<h3>
   Ready For
-</p>
+</h3>
 <p>
   <a href="https://splidejs.com/guides/getting-started/">
     <img alt="React Splide" src="./images/javascript-logo.svg" width="30">
@@ -49,9 +49,9 @@ No dependencies, no Lighthouse errors.
   </a>
 </p>
 
-<p>
+<h3>
   Translation
-</p>
+</h3>
 
 <p>
   <a href="https://ja.splidejs.com">日本語</a>
