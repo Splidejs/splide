@@ -62,7 +62,7 @@ No dependencies, no Lighthouse errors.
 
 - Written in TypeScript
 - No dependencies
-- Lightweight, 26kB (11kB gzipped)
+- Lightweight, 27kB (11kB gzipped)
 - Flexible and extensible
 - Protected by 300+ test cases
 - Multiple slides
