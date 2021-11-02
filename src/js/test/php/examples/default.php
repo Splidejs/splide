@@ -27,6 +27,7 @@ $settings = get_settings();
           right: 0,
           left: 40,
         },
+        noDrag: 'button',
         breakpoints: {
           1000: {
             destroy: true,

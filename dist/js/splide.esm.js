@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.2.1
+ * Version  : 3.2.2
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1759,8 +1759,10 @@ function Drag(Splide2, Components2, options) {
   }
   function onPointerDown(e) {
     if (!disabled) {
+      const { noDrag } = options;
       const isTouch = isTouchEvent(e);
-      if (isTouch || !e.button) {
+      const isDraggable = !noDrag || isHTMLElement(e.target) && !matches(e.target, noDrag);
+      if (isDraggable && (isTouch || !e.button)) {
         if (!Move.isBusy()) {
           target = isTouch ? track : window;
           prevBaseEvent = null;

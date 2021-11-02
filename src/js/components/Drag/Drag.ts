@@ -3,7 +3,7 @@ import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { abs, isObject, min, noop, prevent, sign } from '../../utils';
+import { abs, isHTMLElement, isObject, matches, min, noop, prevent, sign } from '../../utils';
 import { FRICTION, LOG_INTERVAL, POINTER_DOWN_EVENTS, POINTER_MOVE_EVENTS, POINTER_UP_EVENTS } from './constants';
 
 
@@ -118,9 +118,11 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    */
   function onPointerDown( e: TouchEvent | MouseEvent ): void {
     if ( ! disabled ) {
-      const isTouch = isTouchEvent( e );
+      const { noDrag } = options;
+      const isTouch     = isTouchEvent( e );
+      const isDraggable = ! noDrag || ( isHTMLElement( e.target ) && ! matches( e.target, noDrag ) );
 
-      if ( isTouch || ! e.button ) {
+      if ( isDraggable && ( isTouch || ! e.button ) ) {
         if ( ! Move.isBusy() ) {
           target         = isTouch ? track : window;
           prevBaseEvent  = null;

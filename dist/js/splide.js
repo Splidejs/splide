@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.2.1
+ * Version  : 3.2.2
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -2123,9 +2123,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function onPointerDown(e) {
       if (!disabled) {
+        var noDrag = options.noDrag;
         var isTouch = isTouchEvent(e);
+        var isDraggable = !noDrag || isHTMLElement(e.target) && !matches(e.target, noDrag);
 
-        if (isTouch || !e.button) {
+        if (isDraggable && (isTouch || !e.button)) {
           if (!Move.isBusy()) {
             target = isTouch ? track : window;
             prevBaseEvent = null;

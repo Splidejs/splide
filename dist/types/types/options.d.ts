@@ -125,6 +125,10 @@ export interface Options extends ResponsiveOptions {
      */
     focusableNodes?: string;
     /**
+     * The selector for nodes that cannot be dragged.
+     */
+    noDrag?: string;
+    /**
      * Determines whether to use the Transition component or not.
      */
     useScroll?: boolean;
