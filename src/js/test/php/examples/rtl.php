@@ -10,7 +10,7 @@ $settings = get_settings();
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Default</title>
+  <title>RTL</title>
 
   <link rel="stylesheet" href="../../../../../dist/css/themes/splide-<?php echo $settings['theme'] ?>.min.css">
   <link rel="stylesheet" href="../../assets/css/styles.css">
@@ -19,35 +19,14 @@ $settings = get_settings();
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
-        type   : 'slide',
-        perPage: 3,
-        perMove: 2,
-        rewind: true,
-        padding: {
-          right: 0,
+        type     : 'slide',
+        perPage  : 3,
+        direction: 'rtl',
+        rewind   : true,
+        padding  : {
           left: 40,
+          right: 0,
         },
-        breakpoints: {
-          1000: {
-            destroy: true,
-          },
-        },
-      } );
-
-      splide.on( 'moved', () => {
-        console.log( 'moved' );
-      } );
-
-      splide.on( 'visible', Slide => {
-        console.log( 'visible', Slide.index );
-      } );
-
-      splide.on( 'hidden', Slide => {
-        console.log( 'hidden', Slide.index );
-      } );
-
-      splide.on( 'click', () => {
-        console.log( 'click' );
       } );
 
       splide.mount();
@@ -55,9 +34,6 @@ $settings = get_settings();
   </script>
 
   <style>
-    body {
-      margin: 50em 0;
-    }
   </style>
 </head>
 <body>

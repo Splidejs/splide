@@ -1025,7 +1025,7 @@ function Layout(Splide2, Components2, options) {
   }
   function cssPadding(right) {
     const { padding } = options;
-    const prop = resolve(right ? "right" : "left", true);
+    const prop = resolve(right ? "right" : "left");
     return padding && unit(padding[prop] || (isObject(padding) ? 0 : padding)) || "0px";
   }
   function cssTrackHeight() {
@@ -1074,7 +1074,7 @@ function Layout(Splide2, Components2, options) {
     return Slide && parseFloat(style(Slide.slide, resolve("marginRight"))) || 0;
   }
   function getPadding(right) {
-    return parseFloat(style(track, resolve(`padding${right ? "Right" : "Left"}`, true))) || 0;
+    return parseFloat(style(track, resolve(`padding${right ? "Right" : "Left"}`))) || 0;
   }
   return {
     mount,

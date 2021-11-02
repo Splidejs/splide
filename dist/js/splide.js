@@ -1198,7 +1198,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function cssPadding(right) {
       var padding = options.padding;
-      var prop = resolve(right ? "right" : "left", true);
+      var prop = resolve(right ? "right" : "left");
       return padding && unit(padding[prop] || (isObject(padding) ? 0 : padding)) || "0px";
     }
 
@@ -1262,7 +1262,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function getPadding(right) {
-      return parseFloat(style(track, resolve("padding" + (right ? "Right" : "Left"), true))) || 0;
+      return parseFloat(style(track, resolve("padding" + (right ? "Right" : "Left")))) || 0;
     }
 
     return {

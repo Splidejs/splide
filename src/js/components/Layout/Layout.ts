@@ -96,7 +96,7 @@ export function Layout( Splide: Splide, Components: Components, options: Options
    */
   function cssPadding( right: boolean ): string {
     const { padding } = options;
-    const prop = resolve( right ? 'right' : 'left', true );
+    const prop = resolve( right ? 'right' : 'left' );
     return padding && unit( padding[ prop ] || ( isObject( padding ) ? 0 : padding ) ) || '0px';
   }
 
@@ -221,13 +221,14 @@ export function Layout( Splide: Splide, Components: Components, options: Options
 
   /**
    * Returns the padding value.
+   * This method resolves the difference of the direction.
    *
    * @param right - Determines whether to get `paddingRight/Bottom` or `paddingLeft/Top`.
    *
    * @return The padding value in pixel.
    */
   function getPadding( right: boolean ): number {
-    return parseFloat( style( track, resolve( `padding${ right ? 'Right' : 'Left' }`, true ) ) ) || 0;
+    return parseFloat( style( track, resolve( `padding${ right ? 'Right' : 'Left' }` ) ) ) || 0;
   }
 
   return {
