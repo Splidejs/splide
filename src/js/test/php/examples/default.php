@@ -28,11 +28,6 @@ $settings = get_settings();
           left: 40,
         },
         noDrag: 'button',
-        breakpoints: {
-          1000: {
-            destroy: true,
-          },
-        },
       } );
 
       splide.on( 'moved', () => {

@@ -29,7 +29,7 @@ describe( 'Layout', () => {
 
     expect( style.maxWidth ).toBe( '100px' );
 
-    splide.options.width = 200;
+    splide.options = { width: 200 };
     splide.refresh();
 
     expect( style.maxWidth ).toBe( '200px' );
@@ -43,7 +43,7 @@ describe( 'Layout', () => {
 
     expect( style.height ).toBe( '500px' );
 
-    splide.options.heightRatio = 0.2;
+    splide.options = { heightRatio: 0.2 };
     splide.emit( EVENT_RESIZE );
 
     expect( style.height ).toBe( '200px' );

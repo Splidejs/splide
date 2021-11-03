@@ -77,7 +77,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * - iOS Safari emits window resize event while the user swipes the slider because of the bottom bar.
    */
   function reposition(): void {
-    if ( ! isBusy() && ! Components.Drag.isDragging() ) {
+    if ( ! isBusy() ) {
       Components.Scroll.cancel();
       jump( Splide.index );
       emit( EVENT_REPOSITIONED );

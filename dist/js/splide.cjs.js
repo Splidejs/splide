@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.2.3
+ * Version  : 3.2.4
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1001,9 +1001,10 @@ function Layout(Splide2, Components2, options) {
   const { on, bind, emit } = EventInterface(Splide2);
   const { Slides } = Components2;
   const { resolve } = Components2.Direction;
-  const { track, list } = Components2.Elements;
+  const { root, track, list } = Components2.Elements;
   const { getAt } = Slides;
   let vertical;
+  let rootRect;
   function mount() {
     init();
     bind(window, "resize load", Throttle(emit.bind(this, EVENT_RESIZE)));
@@ -1011,18 +1012,23 @@ function Layout(Splide2, Components2, options) {
     on(EVENT_RESIZE, resize);
   }
   function init() {
+    rootRect = null;
     vertical = options.direction === TTB;
-    style(Splide2.root, "maxWidth", unit(options.width));
+    style(root, "maxWidth", unit(options.width));
     style(track, resolve("paddingLeft"), cssPadding(false));
     style(track, resolve("paddingRight"), cssPadding(true));
     resize();
   }
   function resize() {
-    style(track, "height", cssTrackHeight());
-    Slides.style(resolve("marginRight"), unit(options.gap));
-    Slides.style("width", cssSlideWidth() || null);
-    setSlidesHeight();
-    emit(EVENT_RESIZED);
+    const newRect = rect(root);
+    if (!rootRect || rootRect.width !== newRect.width || rootRect.height !== newRect.height) {
+      style(track, "height", cssTrackHeight());
+      Slides.style(resolve("marginRight"), unit(options.gap));
+      Slides.style("width", cssSlideWidth() || null);
+      setSlidesHeight();
+      rootRect = newRect;
+      emit(EVENT_RESIZED);
+    }
   }
   function setSlidesHeight() {
     Slides.style("height", cssSlideHeight() || null, true);
@@ -1173,7 +1179,7 @@ function Move(Splide2, Components2, options) {
     removeAttribute(list, "style");
   }
   function reposition() {
-    if (!isBusy() && !Components2.Drag.isDragging()) {
+    if (!isBusy()) {
       Components2.Scroll.cancel();
       jump(Splide2.index);
       emit(EVENT_REPOSITIONED);
