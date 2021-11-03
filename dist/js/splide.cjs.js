@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.2.2
+ * Version  : 3.2.3
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1789,21 +1789,21 @@ function Drag(Splide2, Components2, options) {
     }
     lastEvent = e;
     if (e.cancelable) {
+      const diff = coordOf(e) - coordOf(baseEvent);
       if (dragging) {
+        Move.translate(basePosition + constrain(diff));
         const expired = timeOf(e) - timeOf(baseEvent) > LOG_INTERVAL;
         const exceeded = hasExceeded !== (hasExceeded = exceededLimit());
         if (expired || exceeded) {
           save(e);
         }
-        Move.translate(basePosition + constrain(coordOf(e) - coordOf(baseEvent)));
         emit(EVENT_DRAGGING);
         clickPrevented = true;
         prevent(e);
       } else {
-        const diff = abs(coordOf(e) - coordOf(baseEvent));
         let { dragMinThreshold: thresholds } = options;
         thresholds = isObject(thresholds) ? thresholds : { mouse: 0, touch: +thresholds || 10 };
-        dragging = diff > (isTouchEvent(e) ? thresholds.touch : thresholds.mouse);
+        dragging = abs(diff) > (isTouchEvent(e) ? thresholds.touch : thresholds.mouse);
         if (isSliderDirection()) {
           prevent(e);
         }
