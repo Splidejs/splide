@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.2.4
+ * Version  : 3.2.5
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1392,7 +1392,7 @@ function Controller(Splide2, Components2, options) {
           }
         }
       } else {
-        if (!isLoop && !incremental && dest !== from) {
+        if (!incremental && dest !== from) {
           dest = perMove ? dest : toIndex(toPage(from) + (dest < from ? -1 : 1));
         }
       }

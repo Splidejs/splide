@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.2.4
+ * Version  : 3.2.5
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1657,7 +1657,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
             }
           }
         } else {
-          if (!isLoop && !incremental && dest !== from) {
+          if (!incremental && dest !== from) {
             dest = perMove ? dest : toIndex(toPage(from) + (dest < from ? -1 : 1));
           }
         }

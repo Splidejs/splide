@@ -19,14 +19,14 @@ $settings = get_settings();
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
-        type   : 'slide',
-        perPage: 3,
-        perMove: 2,
+        type   : 'loop',
+        perPage: 5,
+        // perMove: 2,
         rewind: true,
-        padding: {
-          right: 0,
-          left: 40,
-        },
+        // padding: {
+        //   right: 0,
+        //   left: 40,
+        // },
         noDrag: 'button',
       } );
 
@@ -58,7 +58,7 @@ $settings = get_settings();
 </head>
 <body>
 
-<?php render(); ?>
+<?php render( 'splide01', 12, true ); ?>
 
 <pre></pre>
 
