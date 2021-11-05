@@ -33,6 +33,7 @@ $settings = get_settings();
         heightRatio: 0.4,
         breakpoints: {
           1000: {
+            heightRatio: 0.2,
             // perPage: 3,
             // gap: 10,
             // padding: '5rem',

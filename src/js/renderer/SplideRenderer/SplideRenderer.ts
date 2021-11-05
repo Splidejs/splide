@@ -186,6 +186,10 @@ export class SplideRenderer {
 
     this.breakpoints.forEach( ( [ width, options ] ) => {
       Style.rule( selector, 'transform', this.buildTranslate( options ), width );
+
+      if ( ! this.cssSlideHeight( options ) ) {
+        Style.rule( selector, 'aspect-ratio', this.cssAspectRatio( options ), width );
+      }
     } );
   }
 
@@ -198,16 +202,8 @@ export class SplideRenderer {
 
     this.breakpoints.forEach( ( [ width, options ] ) => {
       Style.rule( selector, 'width', this.cssSlideWidth( options ), width );
+      Style.rule( selector, 'height', this.cssSlideHeight( options ) || '100%', width );
       Style.rule( selector, this.resolve( 'marginRight' ), unit( options.gap ) || '0px', width );
-
-      const height = this.cssSlideHeight( options );
-
-      if ( height ) {
-        Style.rule( selector, 'height', height, width );
-      } else {
-        Style.rule( selector, 'padding-top', this.cssSlidePadding( options ), width );
-      }
-
       Style.rule( `${ selector } > img`, 'display', options.cover ? 'none' : 'inline', width );
     } );
   }
@@ -414,15 +410,15 @@ export class SplideRenderer {
   }
 
   /**
-   * Returns the paddingTop value to simulate the height of each slide.
+   * Returns the aspectRatio value to simulate the `heightRatio` option.
    *
    * @param options - Options.
    *
-   * @return paddingTop in the CSS format.
+   * @return aspectRatio in the CSS format.
    */
-  private cssSlidePadding( options: Options ): string {
+  private cssAspectRatio( options: Options ): string {
     const { heightRatio } = options;
-    return heightRatio ? `${ heightRatio * 100 }%` : '';
+    return heightRatio ? `${ 1 / heightRatio }` : '';
   }
 
   /**
