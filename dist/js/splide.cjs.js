@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.2.5
+ * Version  : 3.2.6
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1352,11 +1352,7 @@ function Controller(Splide2, Components2, options) {
         index = getPrev(true);
       }
     } else {
-      if (isLoop) {
-        index = clamp(control, -perPage, slideCount + perPage - 1);
-      } else {
-        index = clamp(control, 0, getEnd());
-      }
+      index = isLoop ? control : clamp(control, 0, getEnd());
     }
     return index;
   }
@@ -1897,12 +1893,11 @@ function Keyboard(Splide2, Components2, options) {
   const { root } = Components2.Elements;
   const { resolve } = Components2.Direction;
   let target;
+  let disabled;
   function mount() {
     init();
-    on(EVENT_UPDATED, () => {
-      destroy();
-      init();
-    });
+    on(EVENT_UPDATED, onUpdated);
+    on(EVENT_MOVE, onMove);
   }
   function init() {
     const { keyboard = "global" } = options;
@@ -1922,13 +1917,25 @@ function Keyboard(Splide2, Components2, options) {
       removeAttribute(target, TAB_INDEX);
     }
   }
+  function onMove() {
+    disabled = true;
+    nextTick(() => {
+      disabled = false;
+    });
+  }
+  function onUpdated() {
+    destroy();
+    init();
+  }
   function onKeydown(e) {
-    const { key } = e;
-    const normalizedKey = includes(IE_ARROW_KEYS, key) ? `Arrow${key}` : key;
-    if (normalizedKey === resolve("ArrowLeft")) {
-      Splide2.go("<");
-    } else if (normalizedKey === resolve("ArrowRight")) {
-      Splide2.go(">");
+    if (!disabled) {
+      const { key } = e;
+      const normalizedKey = includes(IE_ARROW_KEYS, key) ? `Arrow${key}` : key;
+      if (normalizedKey === resolve("ArrowLeft")) {
+        Splide2.go("<");
+      } else if (normalizedKey === resolve("ArrowRight")) {
+        Splide2.go(">");
+      }
     }
   }
   return {
@@ -2120,10 +2127,12 @@ function Sync(Splide2, Components2, options) {
   function sync() {
     const processed = [];
     splides.concat(Splide2).forEach((splide, index, instances) => {
-      EventInterface(splide).on(EVENT_MOVE, (index2, prev, dest) => {
+      const { on } = EventInterface(splide);
+      on(EVENT_MOVE, (index2, prev, dest) => {
         instances.forEach((instance) => {
           if (instance !== splide && !includes(processed, splide)) {
             processed.push(instance);
+            instance.Components.Move.cancel();
             instance.go(instance.is(LOOP) ? dest : index2);
           }
         });
@@ -2448,7 +2457,8 @@ class Style {
   buildSelectors(selectors) {
     let css = "";
     forOwn(selectors, (styles, selector) => {
-      css += `#${this.id} ${selector} {`;
+      selector = `#${this.id} ${selector}`.trim();
+      css += `${selector} {`;
       forOwn(styles, (value, prop) => {
         if (value || value === 0) {
           css += `${prop}: ${value};`;
@@ -2528,6 +2538,9 @@ class SplideRenderer {
     const selector = `.${CLASS_LIST}`;
     this.breakpoints.forEach(([width, options]) => {
       Style2.rule(selector, "transform", this.buildTranslate(options), width);
+      if (!this.cssSlideHeight(options)) {
+        Style2.rule(selector, "aspect-ratio", this.cssAspectRatio(options), width);
+      }
     });
   }
   registerSlideStyles() {
@@ -2535,13 +2548,8 @@ class SplideRenderer {
     const selector = `.${CLASS_SLIDE}`;
     this.breakpoints.forEach(([width, options]) => {
       Style2.rule(selector, "width", this.cssSlideWidth(options), width);
+      Style2.rule(selector, "height", this.cssSlideHeight(options) || "100%", width);
       Style2.rule(selector, this.resolve("marginRight"), unit(options.gap) || "0px", width);
-      const height = this.cssSlideHeight(options);
-      if (height) {
-        Style2.rule(selector, "height", height, width);
-      } else {
-        Style2.rule(selector, "padding-top", this.cssSlidePadding(options), width);
-      }
       Style2.rule(`${selector} > img`, "display", options.cover ? "none" : "inline", width);
     });
   }
@@ -2626,9 +2634,9 @@ class SplideRenderer {
     const gap = unit(options.gap);
     return `calc((100%${gap && ` + ${gap}`})/${options.perPage || 1}${gap && ` - ${gap}`})`;
   }
-  cssSlidePadding(options) {
+  cssAspectRatio(options) {
     const { heightRatio } = options;
-    return heightRatio ? `${heightRatio * 100}%` : "";
+    return heightRatio ? `${1 / heightRatio}` : "";
   }
   buildCssValue(value, unit2) {
     return `${value}${unit2}`;

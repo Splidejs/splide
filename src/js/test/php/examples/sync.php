@@ -21,7 +21,7 @@ $settings = get_settings();
         type       : 'loop',
         heightRatio: 0.3,
         perPage    : 2,
-        // cover      : true,
+        // waitForTransition: false,
 
         breakpoints: {
           1000: {
@@ -31,14 +31,15 @@ $settings = get_settings();
       } );
 
       var splide02 = new Splide( '#splide02', {
-        width       : 600,
-        fixedWidth  : 100,
-        fixedHeight : 56,
-        gap         : '.7em',
-        isNavigation: true,
-        focus       : 'center',
-        pagination  : false,
-        // type        : 'loop',
+        width            : 600,
+        fixedWidth       : 100,
+        fixedHeight      : 56,
+        gap              : '.7em',
+        isNavigation     : true,
+        focus            : 'center',
+        pagination       : false,
+        rewind           : true,
+        waitForTransition: true,
         dragMinThreshold: {
           mouse: 10,
           touch: 10,

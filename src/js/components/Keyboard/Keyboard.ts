@@ -1,9 +1,9 @@
 import { TAB_INDEX } from '../../constants/attributes';
-import { EVENT_UPDATED } from '../../constants/events';
+import { EVENT_UPDATED, EVENT_MOVE } from '../../constants/events';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { includes, isHTMLElement, removeAttribute, setAttribute } from '../../utils';
+import { includes, isHTMLElement, nextTick, removeAttribute, setAttribute } from '../../utils';
 
 
 /**
@@ -43,15 +43,17 @@ export function Keyboard( Splide: Splide, Components: Components, options: Optio
   let target: Window | HTMLElement;
 
   /**
+   * Indicates whether the component is currently disabled or not.
+   */
+  let disabled: boolean;
+
+  /**
    * Called when the component is mounted.
    */
   function mount(): void {
     init();
-
-    on( EVENT_UPDATED, () => {
-      destroy();
-      init();
-    } );
+    on( EVENT_UPDATED, onUpdated );
+    on( EVENT_MOVE, onMove );
   }
 
   /**
@@ -75,7 +77,7 @@ export function Keyboard( Splide: Splide, Components: Components, options: Optio
   /**
    * Destroys the component.
    */
-  function destroy() {
+  function destroy(): void {
     unbind( target, 'keydown' );
 
     if ( isHTMLElement( target ) ) {
@@ -84,18 +86,37 @@ export function Keyboard( Splide: Splide, Components: Components, options: Optio
   }
 
   /**
+   * Called when the slider moves.
+   * To avoid the slider from moving twice, wait for a tick.
+   */
+  function onMove(): void {
+    disabled = true;
+    nextTick( () => { disabled = false } );
+  }
+
+  /**
+   * Called when options are update.
+   */
+  function onUpdated(): void {
+    destroy();
+    init();
+  }
+
+  /**
    * Called when any key is pressed on the target.
    *
    * @param e - A KeyboardEvent object.
    */
   function onKeydown( e: KeyboardEvent ): void {
-    const { key } = e;
-    const normalizedKey = includes( IE_ARROW_KEYS, key ) ? `Arrow${ key }` : key;
+    if ( ! disabled ) {
+      const { key } = e;
+      const normalizedKey = includes( IE_ARROW_KEYS, key ) ? `Arrow${ key }` : key;
 
-    if ( normalizedKey === resolve( 'ArrowLeft' ) ) {
-      Splide.go( '<' );
-    } else if ( normalizedKey === resolve( 'ArrowRight' ) ) {
-      Splide.go( '>' );
+      if ( normalizedKey === resolve( 'ArrowLeft' ) ) {
+        Splide.go( '<' );
+      } else if ( normalizedKey === resolve( 'ArrowRight' ) ) {
+        Splide.go( '>' );
+      }
     }
   }
 

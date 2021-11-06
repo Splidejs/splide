@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.2.5
+ * Version  : 3.2.6
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1609,11 +1609,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           index = getPrev(true);
         }
       } else {
-        if (isLoop) {
-          index = clamp(control, -perPage, slideCount + perPage - 1);
-        } else {
-          index = clamp(control, 0, getEnd());
-        }
+        index = isLoop ? control : clamp(control, 0, getEnd());
       }
 
       return index;
@@ -2295,13 +2291,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var root = Components2.Elements.root;
     var resolve = Components2.Direction.resolve;
     var target;
+    var disabled;
 
     function mount() {
       init();
-      on(EVENT_UPDATED, function () {
-        destroy();
-        init();
-      });
+      on(EVENT_UPDATED, onUpdated);
+      on(EVENT_MOVE, onMove);
     }
 
     function init() {
@@ -2328,14 +2323,28 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }
     }
 
-    function onKeydown(e) {
-      var key = e.key;
-      var normalizedKey = includes(IE_ARROW_KEYS, key) ? "Arrow" + key : key;
+    function onMove() {
+      disabled = true;
+      nextTick(function () {
+        disabled = false;
+      });
+    }
 
-      if (normalizedKey === resolve("ArrowLeft")) {
-        Splide2.go("<");
-      } else if (normalizedKey === resolve("ArrowRight")) {
-        Splide2.go(">");
+    function onUpdated() {
+      destroy();
+      init();
+    }
+
+    function onKeydown(e) {
+      if (!disabled) {
+        var key = e.key;
+        var normalizedKey = includes(IE_ARROW_KEYS, key) ? "Arrow" + key : key;
+
+        if (normalizedKey === resolve("ArrowLeft")) {
+          Splide2.go("<");
+        } else if (normalizedKey === resolve("ArrowRight")) {
+          Splide2.go(">");
+        }
       }
     }
 
@@ -2598,10 +2607,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function sync() {
       var processed = [];
       splides.concat(Splide2).forEach(function (splide, index, instances) {
-        EventInterface(splide).on(EVENT_MOVE, function (index2, prev, dest) {
+        var _EventInterface16 = EventInterface(splide),
+            on = _EventInterface16.on;
+
+        on(EVENT_MOVE, function (index2, prev, dest) {
           instances.forEach(function (instance) {
             if (instance !== splide && !includes(processed, splide)) {
               processed.push(instance);
+              instance.Components.Move.cancel();
               instance.go(instance.is(LOOP) ? dest : index2);
             }
           });
@@ -2611,9 +2624,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function navigate() {
-      var _EventInterface16 = EventInterface(Splide2),
-          on = _EventInterface16.on,
-          emit = _EventInterface16.emit;
+      var _EventInterface17 = EventInterface(Splide2),
+          on = _EventInterface17.on,
+          emit = _EventInterface17.emit;
 
       on(EVENT_CLICK, onClick);
       on(EVENT_SLIDE_KEYDOWN, onKeydown);
@@ -2644,8 +2657,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   function Wheel(Splide2, Components2, options) {
-    var _EventInterface17 = EventInterface(Splide2),
-        bind = _EventInterface17.bind;
+    var _EventInterface18 = EventInterface(Splide2),
+        bind = _EventInterface18.bind;
 
     function mount() {
       if (options.wheel) {
@@ -2723,8 +2736,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   };
 
   function Fade(Splide2, Components2, options) {
-    var _EventInterface18 = EventInterface(Splide2),
-        on = _EventInterface18.on;
+    var _EventInterface19 = EventInterface(Splide2),
+        on = _EventInterface19.on;
 
     function mount() {
       on([EVENT_MOUNTED, EVENT_REFRESH], function () {
@@ -2751,8 +2764,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   function Slide(Splide2, Components2, options) {
-    var _EventInterface19 = EventInterface(Splide2),
-        bind = _EventInterface19.bind;
+    var _EventInterface20 = EventInterface(Splide2),
+        bind = _EventInterface20.bind;
 
     var Move = Components2.Move,
         Controller = Components2.Controller;

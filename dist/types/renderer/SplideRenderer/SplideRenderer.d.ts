@@ -174,13 +174,13 @@ export declare class SplideRenderer {
      */
     private cssSlideSize;
     /**
-     * Returns the paddingTop value to simulate the height of each slide.
+     * Returns the aspectRatio value to simulate the `heightRatio` option.
      *
      * @param options - Options.
      *
-     * @return paddingTop in the CSS format.
+     * @return aspectRatio in the CSS format.
      */
-    private cssSlidePadding;
+    private cssAspectRatio;
     /**
      * Builds the css value by the provided value and unit.
      *

@@ -72,10 +72,13 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
     const processed: Splide[] = [];
 
     splides.concat( Splide ).forEach( ( splide, index, instances ) => {
-      EventInterface( splide ).on( EVENT_MOVE, ( index, prev, dest ) => {
+      const { on } = EventInterface( splide );
+
+      on( EVENT_MOVE, ( index, prev, dest ) => {
         instances.forEach( instance => {
           if ( instance !== splide && ! includes( processed, splide ) ) {
             processed.push( instance );
+            instance.Components.Move.cancel();
             instance.go( instance.is( LOOP ) ? dest : index );
           }
         } );

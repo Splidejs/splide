@@ -51,6 +51,6 @@ export declare function keydown(key: string, target?: Window | Element): void;
  *
  * @return A Promise instance.
  */
-export declare function wait(duration: number): Promise<void>;
+export declare function wait(duration?: number): Promise<void>;
 export {};
 //# sourceMappingURL=../../../../src/js/test/utils/utils.d.ts.map

@@ -158,11 +158,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
         index = getPrev( true );
       }
     } else {
-      if ( isLoop ) {
-        index = clamp( control, -perPage, slideCount + perPage - 1 );
-      } else {
-        index = clamp( control, 0, getEnd() );
-      }
+      index = isLoop ? control : clamp( control, 0, getEnd() );
     }
 
     return index;

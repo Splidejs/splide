@@ -176,7 +176,7 @@ export function keydown( key: string, target: Window | Element = window ): void 
  *
  * @return A Promise instance.
  */
-export function wait( duration: number ): Promise<void> {
+export function wait( duration = 0 ): Promise<void> {
   return new Promise( resolve => {
     setTimeout( resolve, duration );
   } );
