@@ -150,6 +150,12 @@ export class Splide {
   sync( splide: Splide ): this {
     this.splides.push( splide );
     splide.splides.push( this );
+
+    if ( this.state.is( IDLE ) ) {
+      this._Components.Sync.remount();
+      splide.Components.Sync.remount();
+    }
+
     return this;
   }
 

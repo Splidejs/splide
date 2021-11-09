@@ -59,10 +59,14 @@ $settings = get_settings();
       } );
 
       splide01.sync( splide02 );
-      splide01.sync( splide03 );
+      // splide01.sync( splide03 );
+
       splide01.mount();
       splide02.mount();
       splide03.mount();
+
+      // Attempts to sync after mount.
+      splide01.sync( splide03 );
     } );
   </script>
 </head>

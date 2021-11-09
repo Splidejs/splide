@@ -31,6 +31,23 @@ describe( 'Sync#sync()', () => {
     expect( secondary.index ).toBe( 5 );
   } );
 
+  test( 'can sync Splide sliders after mount.', () => {
+    const primary   = init( { speed: 0 }, { id: 'primary', mount: false } );
+    const secondary = init( { speed: 0 }, { id: 'secondary', insertHtml: true, mount: false } );
+
+    primary.mount();
+    secondary.mount();
+    primary.sync( secondary );
+
+    primary.go( 1 );
+    expect( primary.index ).toBe( 1 );
+    expect( secondary.index ).toBe( 1 );
+
+    primary.go( 4 );
+    expect( primary.index ).toBe( 4 );
+    expect( secondary.index ).toBe( 4 );
+  } );
+
   test( 'can sync multiple Splide sliders.', () => {
     const primary = init( { speed: 0 }, { id: 'primary', mount: false } );
     const splides: Splide[] = [];

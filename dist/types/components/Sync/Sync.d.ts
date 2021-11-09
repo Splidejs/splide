@@ -6,6 +6,7 @@ import { BaseComponent, Components, Options } from '../../types';
  * @since 3.0.0
  */
 export interface SyncComponent extends BaseComponent {
+    remount(): void;
 }
 /**
  * The component for syncing multiple sliders.

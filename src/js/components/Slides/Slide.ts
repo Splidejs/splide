@@ -21,7 +21,7 @@ import {
   EVENT_HIDDEN,
   EVENT_INACTIVE,
   EVENT_MOVE,
-  EVENT_MOVED,
+  EVENT_MOVED, EVENT_NAVIGATION_MOUNTED,
   EVENT_REFRESH,
   EVENT_REPOSITIONED,
   EVENT_SCROLLED,
@@ -98,35 +98,19 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    * Called when the component is mounted.
    */
   function mount( this: SlideComponent ): void {
-    init();
+    if ( ! isClone ) {
+      slide.id = `${ root.id }-slide${ pad( index + 1 ) }`;
+    }
 
     bind( slide, 'click keydown', e => {
       emit( e.type === 'click' ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, this, e );
     } );
 
     on( [ EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_MOVED, EVENT_SCROLLED ], update.bind( this ) );
+    on( EVENT_NAVIGATION_MOUNTED, initNavigation.bind( this ) );
 
     if ( updateOnMove ) {
       on( EVENT_MOVE, onMove.bind( this ) );
-    }
-  }
-
-  /**
-   * Initializes the component.
-   */
-  function init(): void {
-    if ( ! isClone ) {
-      slide.id = `${ root.id }-slide${ pad( index + 1 ) }`;
-    }
-
-    if ( isNavigation ) {
-      const idx      = isClone ? slideIndex : index;
-      const label    = format( options.i18n.slideX, idx + 1 );
-      const controls = Splide.splides.map( splide => splide.root.id ).join( ' ' );
-
-      setAttribute( slide, ARIA_LABEL, label );
-      setAttribute( slide, ARIA_CONTROLS, controls );
-      setAttribute( slide, ROLE, 'menuitem' );
     }
   }
 
@@ -139,6 +123,21 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
     removeClass( slide, STATUS_CLASSES );
     removeAttribute( slide, ALL_ATTRIBUTES );
     setAttribute( slide, 'style', styles );
+  }
+
+  /**
+   * Initializes slides as navigation.
+   */
+  function initNavigation( this: SlideComponent ): void {
+    const idx      = isClone ? slideIndex : index;
+    const label    = format( options.i18n.slideX, idx + 1 );
+    const controls = Splide.splides.map( splide => splide.root.id ).join( ' ' );
+
+    setAttribute( slide, ARIA_LABEL, label );
+    setAttribute( slide, ARIA_CONTROLS, controls );
+    setAttribute( slide, ROLE, 'menuitem' );
+
+    updateActivity.call( this, isActive() );
   }
 
   /**

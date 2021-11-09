@@ -9,7 +9,7 @@ import {
   EVENT_UPDATED,
 } from '../../constants/events';
 import { LOOP } from '../../constants/types';
-import { EventInterface } from '../../constructors';
+import { EventInterface, EventInterfaceObject } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import { empty, includes, prevent, removeAttribute, setAttribute } from '../../utils';
@@ -22,6 +22,7 @@ import { SlideComponent } from '../Slides/Slide';
  * @since 3.0.0
  */
 export interface SyncComponent extends BaseComponent {
+  remount(): void;
 }
 
 /**
@@ -45,6 +46,7 @@ const TRIGGER_KEYS = [ ' ', 'Enter', 'Spacebar' ];
 export function Sync( Splide: Splide, Components: Components, options: Options ): SyncComponent {
   const { splides } = Splide;
   const { list } = Components.Elements;
+  const events: EventInterfaceObject[] = [];
 
   /**
    * Called when the component is mounted.
@@ -53,7 +55,7 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
     if ( options.isNavigation ) {
       navigate();
     } else {
-      sync();
+      splides.length && sync();
     }
   }
 
@@ -62,6 +64,18 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
    */
   function destroy(): void {
     removeAttribute( list, ALL_ATTRIBUTES );
+    events.forEach( event => { event.destroy() } );
+    empty( events );
+  }
+
+  /**
+   * Remounts the component.
+   *
+   * @internal
+   */
+  function remount(): void {
+    destroy();
+    mount();
   }
 
   /**
@@ -72,9 +86,9 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
     const processed: Splide[] = [];
 
     splides.concat( Splide ).forEach( ( splide, index, instances ) => {
-      const { on } = EventInterface( splide );
+      const event = EventInterface( splide );
 
-      on( EVENT_MOVE, ( index, prev, dest ) => {
+      event.on( EVENT_MOVE, ( index, prev, dest ) => {
         instances.forEach( instance => {
           if ( instance !== splide && ! includes( processed, splide ) ) {
             processed.push( instance );
@@ -85,6 +99,8 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
 
         empty( processed );
       } );
+
+      events.push( event );
     } );
   }
 
@@ -93,15 +109,16 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
    * Note that the direction of `menu` is implicitly `vertical` as default.
    */
   function navigate(): void {
-    const { on, emit } = EventInterface( Splide );
+    const event = EventInterface( Splide );
+    const { on } = event;
 
     on( EVENT_CLICK, onClick );
     on( EVENT_SLIDE_KEYDOWN, onKeydown );
     on( [ EVENT_MOUNTED, EVENT_UPDATED ], update );
 
     setAttribute( list, ROLE, 'menu' );
-
-    emit( EVENT_NAVIGATION_MOUNTED, Splide.splides );
+    events.push( event );
+    event.emit( EVENT_NAVIGATION_MOUNTED, Splide.splides );
   }
 
   /**
@@ -136,5 +153,6 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
   return {
     mount,
     destroy,
+    remount,
   };
 }

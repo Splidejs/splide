@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.2.6
+ * Version  : 3.2.7
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -882,31 +882,18 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function mount() {
       var _this2 = this;
 
-      init();
-      bind(slide, "click keydown", function (e) {
-        emit(e.type === "click" ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, _this2, e);
-      });
-      on([EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_MOVED, EVENT_SCROLLED], update.bind(this));
-
-      if (updateOnMove) {
-        on(EVENT_MOVE, onMove.bind(this));
-      }
-    }
-
-    function init() {
       if (!isClone) {
         slide.id = root.id + "-slide" + pad(index + 1);
       }
 
-      if (isNavigation) {
-        var idx = isClone ? slideIndex : index;
-        var label = format(options.i18n.slideX, idx + 1);
-        var controls = Splide2.splides.map(function (splide) {
-          return splide.root.id;
-        }).join(" ");
-        setAttribute(slide, ARIA_LABEL, label);
-        setAttribute(slide, ARIA_CONTROLS, controls);
-        setAttribute(slide, ROLE, "menuitem");
+      bind(slide, "click keydown", function (e) {
+        emit(e.type === "click" ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, _this2, e);
+      });
+      on([EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_MOVED, EVENT_SCROLLED], update.bind(this));
+      on(EVENT_NAVIGATION_MOUNTED, initNavigation.bind(this));
+
+      if (updateOnMove) {
+        on(EVENT_MOVE, onMove.bind(this));
       }
     }
 
@@ -916,6 +903,18 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       removeClass(slide, STATUS_CLASSES);
       removeAttribute(slide, ALL_ATTRIBUTES);
       setAttribute(slide, "style", styles);
+    }
+
+    function initNavigation() {
+      var idx = isClone ? slideIndex : index;
+      var label = format(options.i18n.slideX, idx + 1);
+      var controls = Splide2.splides.map(function (splide) {
+        return splide.root.id;
+      }).join(" ");
+      setAttribute(slide, ARIA_LABEL, label);
+      setAttribute(slide, ARIA_CONTROLS, controls);
+      setAttribute(slide, ROLE, "menuitem");
+      updateActivity.call(this, isActive());
     }
 
     function onMove(next, prev, dest) {
@@ -2591,26 +2590,34 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   function Sync(Splide2, Components2, options) {
     var splides = Splide2.splides;
     var list = Components2.Elements.list;
+    var events = [];
 
     function mount() {
       if (options.isNavigation) {
         navigate();
       } else {
-        sync();
+        splides.length && sync();
       }
     }
 
     function destroy() {
       removeAttribute(list, ALL_ATTRIBUTES);
+      events.forEach(function (event) {
+        event.destroy();
+      });
+      empty(events);
+    }
+
+    function remount() {
+      destroy();
+      mount();
     }
 
     function sync() {
       var processed = [];
       splides.concat(Splide2).forEach(function (splide, index, instances) {
-        var _EventInterface16 = EventInterface(splide),
-            on = _EventInterface16.on;
-
-        on(EVENT_MOVE, function (index2, prev, dest) {
+        var event = EventInterface(splide);
+        event.on(EVENT_MOVE, function (index2, prev, dest) {
           instances.forEach(function (instance) {
             if (instance !== splide && !includes(processed, splide)) {
               processed.push(instance);
@@ -2620,19 +2627,19 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           });
           empty(processed);
         });
+        events.push(event);
       });
     }
 
     function navigate() {
-      var _EventInterface17 = EventInterface(Splide2),
-          on = _EventInterface17.on,
-          emit = _EventInterface17.emit;
-
+      var event = EventInterface(Splide2);
+      var on = event.on;
       on(EVENT_CLICK, onClick);
       on(EVENT_SLIDE_KEYDOWN, onKeydown);
       on([EVENT_MOUNTED, EVENT_UPDATED], update);
       setAttribute(list, ROLE, "menu");
-      emit(EVENT_NAVIGATION_MOUNTED, Splide2.splides);
+      events.push(event);
+      event.emit(EVENT_NAVIGATION_MOUNTED, Splide2.splides);
     }
 
     function update() {
@@ -2652,13 +2659,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     return {
       mount: mount,
-      destroy: destroy
+      destroy: destroy,
+      remount: remount
     };
   }
 
   function Wheel(Splide2, Components2, options) {
-    var _EventInterface18 = EventInterface(Splide2),
-        bind = _EventInterface18.bind;
+    var _EventInterface16 = EventInterface(Splide2),
+        bind = _EventInterface16.bind;
 
     function mount() {
       if (options.wheel) {
@@ -2736,8 +2744,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   };
 
   function Fade(Splide2, Components2, options) {
-    var _EventInterface19 = EventInterface(Splide2),
-        on = _EventInterface19.on;
+    var _EventInterface17 = EventInterface(Splide2),
+        on = _EventInterface17.on;
 
     function mount() {
       on([EVENT_MOUNTED, EVENT_REFRESH], function () {
@@ -2764,8 +2772,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   function Slide(Splide2, Components2, options) {
-    var _EventInterface20 = EventInterface(Splide2),
-        bind = _EventInterface20.bind;
+    var _EventInterface18 = EventInterface(Splide2),
+        bind = _EventInterface18.bind;
 
     var Move = Components2.Move,
         Controller = Components2.Controller;
@@ -2874,6 +2882,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     _proto.sync = function sync(splide) {
       this.splides.push(splide);
       splide.splides.push(this);
+
+      if (this.state.is(IDLE)) {
+        this._Components.Sync.remount();
+
+        splide.Components.Sync.remount();
+      }
+
       return this;
     };
 
