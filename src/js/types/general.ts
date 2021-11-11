@@ -56,5 +56,5 @@ export type Components = Record<string, BaseComponent>
  */
 export interface SyncTarget {
   splide: Splide;
-  isChild?: boolean;
+  isParent?: boolean;
 }

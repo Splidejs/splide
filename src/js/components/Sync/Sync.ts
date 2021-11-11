@@ -52,7 +52,7 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
    */
   function mount(): void {
     Splide.splides.forEach( target => {
-      ! target.isChild && sync( target.splide );
+      ! target.isParent && sync( target.splide );
     } );
 
     if ( options.isNavigation ) {

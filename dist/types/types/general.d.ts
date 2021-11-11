@@ -49,6 +49,6 @@ export declare type Components = Record<string, BaseComponent> & Partial<{
  */
 export interface SyncTarget {
     splide: Splide;
-    isChild?: boolean;
+    isParent?: boolean;
 }
 //# sourceMappingURL=../../../src/js/types/general.d.ts.map

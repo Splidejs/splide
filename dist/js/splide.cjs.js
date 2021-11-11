@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.3.0
+ * Version  : 3.3.1
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -2119,7 +2119,7 @@ function Sync(Splide2, Components2, options) {
   const events = [];
   function mount() {
     Splide2.splides.forEach((target) => {
-      !target.isChild && sync(target.splide);
+      !target.isParent && sync(target.splide);
     });
     if (options.isNavigation) {
       navigate();
@@ -2360,7 +2360,7 @@ const _Splide = class {
   }
   sync(splide) {
     this.splides.push({ splide });
-    splide.splides.push({ splide: this, isChild: true });
+    splide.splides.push({ splide: this, isParent: true });
     if (this.state.is(IDLE)) {
       this._Components.Sync.remount();
       splide.Components.Sync.remount();

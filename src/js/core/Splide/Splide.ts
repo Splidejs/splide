@@ -149,7 +149,7 @@ export class Splide {
    */
   sync( splide: Splide ): this {
     this.splides.push( { splide } );
-    splide.splides.push( { splide: this, isChild: true } );
+    splide.splides.push( { splide: this, isParent: true } );
 
     if ( this.state.is( IDLE ) ) {
       this._Components.Sync.remount();

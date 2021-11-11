@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.3.0
+ * Version  : 3.3.1
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -2599,7 +2599,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function mount() {
       Splide2.splides.forEach(function (target) {
-        !target.isChild && sync(target.splide);
+        !target.isParent && sync(target.splide);
       });
 
       if (options.isNavigation) {
@@ -2885,7 +2885,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       });
       splide.splides.push({
         splide: this,
-        isChild: true
+        isParent: true
       });
 
       if (this.state.is(IDLE)) {
