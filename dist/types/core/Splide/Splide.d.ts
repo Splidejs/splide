@@ -1,6 +1,6 @@
 import { SlideMatcher } from '../../components/Slides/Slides';
-import { EventBusObject, StateObject } from '../../constructors';
-import { ComponentConstructor, Components, EventMap, Options } from '../../types';
+import { EventBusCallback, EventBusObject, StateObject } from '../../constructors';
+import { ComponentConstructor, Components, EventMap, Options, SyncTarget } from '../../types';
 /**
  * The frontend class for the Splide slider.
  *
@@ -38,9 +38,9 @@ export declare class Splide {
      */
     readonly state: StateObject;
     /**
-     * Splide instances to sync with.
+     * An array with SyncTarget objects for splide instances to sync with.
      */
-    readonly splides: Splide[];
+    readonly splides: SyncTarget[];
     /**
      * The collection of options.
      */
@@ -152,6 +152,7 @@ export declare class Splide {
      * @return `this`
      */
     on<K extends keyof EventMap>(events: K, callback: EventMap[K]): this;
+    on(events: string | string[], callback: EventBusCallback): this;
     /**
      * Removes the registered all handlers for the specified event or events.
      * If you want to only remove a particular handler, use namespace to identify it.

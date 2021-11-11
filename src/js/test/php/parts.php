@@ -18,7 +18,7 @@ function render_slides( $number = 10, $text = false ) {
     if ( $text ) {
       printf( '<span>%s</span>', $i + 1 );
     } else {
-      printf( '<img src="../../assets/images/pics/slide%02d.jpg"><button>aaa</button>', $i + 1 );
+      printf( '<img src="../../assets/images/pics/slide%02d.jpg"><button>button</button>', $i + 1 );
     }
 
     echo '</li>' . PHP_EOL;

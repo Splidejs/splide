@@ -8,7 +8,7 @@ import { CREATED, DESTROYED, IDLE, STATES } from '../../constants/states';
 import { FADE } from '../../constants/types';
 import { EventBus, EventBusCallback, EventBusObject, State, StateObject } from '../../constructors';
 import { Fade, Slide } from '../../transitions';
-import { ComponentConstructor, Components, EventMap, Options } from '../../types';
+import { ComponentConstructor, Components, EventMap, Options, SyncTarget } from '../../types';
 import { addClass, assert, assign, empty, forOwn, isString, merge, query, slice } from '../../utils';
 
 
@@ -49,9 +49,9 @@ export class Splide {
   readonly state: StateObject = State( CREATED );
 
   /**
-   * Splide instances to sync with.
+   * An array with SyncTarget objects for splide instances to sync with.
    */
-  readonly splides: Splide[] = [];
+  readonly splides: SyncTarget[] = [];
 
   /**
    * The collection of options.
@@ -148,8 +148,8 @@ export class Splide {
    * @return `this`
    */
   sync( splide: Splide ): this {
-    this.splides.push( splide );
-    splide.splides.push( this );
+    this.splides.push( { splide } );
+    splide.splides.push( { splide: this, isChild: true } );
 
     if ( this.state.is( IDLE ) ) {
       this._Components.Sync.remount();
@@ -223,6 +223,7 @@ export class Splide {
    * @return `this`
    */
   on<K extends keyof EventMap>( events: K, callback: EventMap[ K ] ): this;
+  on( events: string | string[], callback: EventBusCallback ): this;
   on( events: string | string[], callback: EventBusCallback ): this {
     this.event.on( events, callback, null, DEFAULT_USER_EVENT_PRIORITY );
     return this;

@@ -21,8 +21,7 @@ $settings = get_settings();
         type       : 'loop',
         heightRatio: 0.3,
         perPage    : 2,
-        // waitForTransition: false,
-
+        waitForTransition: false,
         breakpoints: {
           1000: {
             destroy: true,
@@ -31,6 +30,7 @@ $settings = get_settings();
       } );
 
       var splide02 = new Splide( '#splide02', {
+        // type             : 'loop',
         width            : 600,
         fixedWidth       : 100,
         fixedHeight      : 56,
@@ -39,7 +39,7 @@ $settings = get_settings();
         focus            : 'center',
         pagination       : false,
         rewind           : true,
-        waitForTransition: true,
+        waitForTransition: false,
         dragMinThreshold: {
           mouse: 10,
           touch: 10,
@@ -47,23 +47,27 @@ $settings = get_settings();
       } );
 
       var splide03 = new Splide( '#splide03', {
-        width       : 100,
-        type        : 'loop',
-        direction   : 'ttb',
-        height      : 300,
-        fixedWidth  : 100,
-        fixedHeight : 56,
-        gap         : '.7em',
-        isNavigation: true,
-        pagination  : false,
+        width            : 100,
+        type             : 'loop',
+        direction        : 'ttb',
+        height           : 300,
+        fixedWidth       : 100,
+        fixedHeight      : 56,
+        gap              : '.7em',
+        isNavigation     : true,
+        pagination       : false,
+        waitForTransition: false,
       } );
 
       splide01.sync( splide02 );
-      // splide01.sync( splide03 );
 
       splide01.mount();
       splide02.mount();
       splide03.mount();
+
+      splide01.on( 'move', function () { console.log( 1 ) } );
+      splide02.on( 'move', function () { console.log( 2 ) } );
+      splide03.on( 'move', function () { console.log( 3 ) } );
 
       // Attempts to sync after mount.
       splide01.sync( splide03 );

@@ -209,6 +209,10 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
       }
 
       emit( EVENT_DRAGGED );
+    } else {
+      if ( ! isFree ) {
+        Controller.go( Splide.index, true );
+      }
     }
 
     dragging = false;

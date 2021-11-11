@@ -42,4 +42,13 @@ export declare type Components = Record<string, BaseComponent> & Partial<{
 }> & {
     Transition: TransitionComponent;
 };
+/**
+ * The interface for info of a splide instance to sync with.
+ *
+ * @since 3.2.8
+ */
+export interface SyncTarget {
+    splide: Splide;
+    isChild?: boolean;
+}
 //# sourceMappingURL=../../../src/js/types/general.d.ts.map

@@ -117,20 +117,4 @@ describe( 'Move', () => {
 
     splide.destroy();
   } );
-
-  test( 'should not move the slider while looping.', () => {
-    const splide   = init( { type: 'loop', width: 200, height: 100, waitForTransition: false } );
-    const { Move } = splide.Components;
-
-    expect( Move.isBusy() ).toBe( false );
-
-    // Designates the clone index.
-    Move.move( splide.length, 0, -1 );
-    expect( Move.isBusy() ).toBe( true );
-
-    fire( splide.Components.Elements.list, 'transitionend' );
-    expect( Move.isBusy() ).toBe( false );
-
-    splide.destroy();
-  } );
 } );

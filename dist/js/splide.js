@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.2.7
+ * Version  : 3.3.0
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -908,8 +908,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function initNavigation() {
       var idx = isClone ? slideIndex : index;
       var label = format(options.i18n.slideX, idx + 1);
-      var controls = Splide2.splides.map(function (splide) {
-        return splide.root.id;
+      var controls = Splide2.splides.map(function (target) {
+        return target.splide.root.id;
       }).join(" ");
       setAttribute(slide, ARIA_LABEL, label);
       setAttribute(slide, ARIA_CONTROLS, controls);
@@ -1386,9 +1386,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var _Components2$Elements3 = Components2.Elements,
         list = _Components2$Elements3.list,
         track = _Components2$Elements3.track;
-    var waiting;
+    var Transition;
 
     function mount() {
+      Transition = Components2.Transition;
       on([EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition);
     }
 
@@ -1408,13 +1409,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       if (!isBusy()) {
         var set = Splide2.state.set;
         var position = getPosition();
-        var looping = dest !== index;
-        waiting = looping || options.waitForTransition;
+
+        if (dest !== index) {
+          Transition.cancel();
+          translate(shift(position, dest > index), true);
+        }
+
         set(MOVING);
         emit(EVENT_MOVE, index, prev, dest);
-        Components2.Transition.start(dest, function () {
-          looping && jump(index);
-          waiting = false;
+        Transition.start(index, function () {
           set(IDLE);
           emit(EVENT_MOVED, index, prev, dest);
 
@@ -1438,7 +1441,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function loop(position) {
-      if (!waiting && Splide2.is(LOOP)) {
+      if (Splide2.is(LOOP)) {
         var diff = orient(position - getPosition());
         var exceededMin = exceededLimit(false, position) && diff < 0;
         var exceededMax = exceededLimit(true, position) && diff > 0;
@@ -1454,14 +1457,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function shift(position, backwards) {
       var excess = position - getLimit(backwards);
       var size = sliderSize();
-      position -= sign(excess) * size * ceil(abs(excess) / size);
+      position -= orient(size * (ceil(abs(excess) / size) || 1)) * (backwards ? 1 : -1);
       return position;
     }
 
     function cancel() {
-      waiting = false;
       translate(getPosition());
-      Components2.Transition.cancel();
+      Transition.cancel();
     }
 
     function toIndex(position) {
@@ -1512,7 +1514,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function isBusy() {
-      return !!waiting;
+      return Splide2.state.is(MOVING) && options.waitForTransition;
     }
 
     function exceededLimit(max, position) {
@@ -2206,6 +2208,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         }
 
         emit(EVENT_DRAGGED);
+      } else {
+        if (!isFree) {
+          Controller.go(Splide2.index, true);
+        }
       }
 
       dragging = false;
@@ -2588,15 +2594,16 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var TRIGGER_KEYS = [" ", "Enter", "Spacebar"];
 
   function Sync(Splide2, Components2, options) {
-    var splides = Splide2.splides;
     var list = Components2.Elements.list;
     var events = [];
 
     function mount() {
+      Splide2.splides.forEach(function (target) {
+        !target.isChild && sync(target.splide);
+      });
+
       if (options.isNavigation) {
         navigate();
-      } else {
-        splides.length && sync();
       }
     }
 
@@ -2613,19 +2620,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       mount();
     }
 
-    function sync() {
-      var processed = [];
-      splides.concat(Splide2).forEach(function (splide, index, instances) {
-        var event = EventInterface(splide);
-        event.on(EVENT_MOVE, function (index2, prev, dest) {
-          instances.forEach(function (instance) {
-            if (instance !== splide && !includes(processed, splide)) {
-              processed.push(instance);
-              instance.Components.Move.cancel();
-              instance.go(instance.is(LOOP) ? dest : index2);
-            }
-          });
-          empty(processed);
+    function sync(splide) {
+      [Splide2, splide].forEach(function (instance) {
+        var event = EventInterface(instance);
+        var target = instance === Splide2 ? splide : Splide2;
+        event.on(EVENT_MOVE, function (index, prev, dest) {
+          target.go(target.is(LOOP) ? dest : index);
         });
         events.push(event);
       });
@@ -2880,8 +2880,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     };
 
     _proto.sync = function sync(splide) {
-      this.splides.push(splide);
-      splide.splides.push(this);
+      this.splides.push({
+        splide: splide
+      });
+      splide.splides.push({
+        splide: this,
+        isChild: true
+      });
 
       if (this.state.is(IDLE)) {
         this._Components.Sync.remount();

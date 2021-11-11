@@ -11,8 +11,8 @@ import { IDLE, MOVING } from '../../constants/states';
 import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
-import { AnyFunction, BaseComponent, Components, Options } from '../../types';
-import { abs, ceil, clamp, isUndefined, rect, removeAttribute, sign } from '../../utils';
+import { AnyFunction, BaseComponent, Components, Options, TransitionComponent } from '../../types';
+import { abs, ceil, clamp, isUndefined, rect, removeAttribute } from '../../utils';
 
 
 /**
@@ -52,14 +52,15 @@ export function Move( Splide: Splide, Components: Components, options: Options )
   const { list, track } = Components.Elements;
 
   /**
-   * Indicates whether the component can move the slider or not.
+   * Holds the Transition component.
    */
-  let waiting: boolean;
+  let Transition: TransitionComponent;
 
   /**
    * Called when the component is mounted.
    */
   function mount(): void {
+    Transition = Components.Transition;
     on( [ EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH ], reposition );
   }
 
@@ -96,15 +97,16 @@ export function Move( Splide: Splide, Components: Components, options: Options )
     if ( ! isBusy() ) {
       const { set } = Splide.state;
       const position = getPosition();
-      const looping  = dest !== index;
 
-      waiting = looping || options.waitForTransition;
+      if ( dest !== index ) {
+        Transition.cancel();
+        translate( shift( position, dest > index ), true );
+      }
+
       set( MOVING );
       emit( EVENT_MOVE, index, prev, dest );
 
-      Components.Transition.start( dest, () => {
-        looping && jump( index );
-        waiting = false;
+      Transition.start( index, () => {
         set( IDLE );
         emit( EVENT_MOVED, index, prev, dest );
 
@@ -144,7 +146,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * @param position - A position to loop.
    */
   function loop( position: number ): number {
-    if ( ! waiting && Splide.is( LOOP ) ) {
+    if ( Splide.is( LOOP ) ) {
       const diff        = orient( position - getPosition() );
       const exceededMin = exceededLimit( false, position ) && diff < 0;
       const exceededMax = exceededLimit( true, position ) && diff > 0;
@@ -168,7 +170,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
   function shift( position: number, backwards: boolean ): number {
     const excess = position - getLimit( backwards );
     const size   = sliderSize();
-    position -= sign( excess ) * size * ceil( abs( excess ) / size );
+    position -= orient( size * ( ceil( abs( excess ) / size ) || 1 ) ) * ( backwards ? 1 : -1 );
     return position;
   }
 
@@ -176,9 +178,8 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * Cancels transition.
    */
   function cancel(): void {
-    waiting = false;
     translate( getPosition() );
-    Components.Transition.cancel();
+    Transition.cancel();
   }
 
   /**
@@ -274,7 +275,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * @return `true` if the slider can move, or otherwise `false`.
    */
   function isBusy(): boolean {
-    return !! waiting;
+    return Splide.state.is( MOVING ) && options.waitForTransition;
   }
 
   /**

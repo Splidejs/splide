@@ -48,3 +48,13 @@ export type Components = Record<string, BaseComponent>
     [ K in keyof typeof CoreComponents ]: ReturnType<typeof CoreComponents[ K ]>;
   }>
   & { Transition: TransitionComponent }
+
+/**
+ * The interface for info of a splide instance to sync with.
+ *
+ * @since 3.2.8
+ */
+export interface SyncTarget {
+  splide: Splide;
+  isChild?: boolean;
+}

@@ -44,7 +44,6 @@ const TRIGGER_KEYS = [ ' ', 'Enter', 'Spacebar' ];
  * @return A Sync component object.
  */
 export function Sync( Splide: Splide, Components: Components, options: Options ): SyncComponent {
-  const { splides } = Splide;
   const { list } = Components.Elements;
   const events: EventInterfaceObject[] = [];
 
@@ -52,10 +51,12 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
    * Called when the component is mounted.
    */
   function mount(): void {
+    Splide.splides.forEach( target => {
+      ! target.isChild && sync( target.splide );
+    } );
+
     if ( options.isNavigation ) {
       navigate();
-    } else {
-      splides.length && sync();
     }
   }
 
@@ -79,25 +80,17 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
   }
 
   /**
-   * Syncs the current index among all slides.
-   * The `processed` array prevents recursive call of handlers.
+   * Syncs the current index with a provided child splide instance.
+   *
+   * @param splide - A splide instance to sync with.
    */
-  function sync(): void {
-    const processed: Splide[] = [];
-
-    splides.concat( Splide ).forEach( ( splide, index, instances ) => {
-      const event = EventInterface( splide );
+  function sync( splide: Splide ): void {
+    [ Splide, splide ].forEach( instance => {
+      const event  = EventInterface( instance );
+      const target = instance === Splide ? splide : Splide;
 
       event.on( EVENT_MOVE, ( index, prev, dest ) => {
-        instances.forEach( instance => {
-          if ( instance !== splide && ! includes( processed, splide ) ) {
-            processed.push( instance );
-            instance.Components.Move.cancel();
-            instance.go( instance.is( LOOP ) ? dest : index );
-          }
-        } );
-
-        empty( processed );
+        target.go( target.is( LOOP ) ? dest : index );
       } );
 
       events.push( event );

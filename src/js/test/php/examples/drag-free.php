@@ -25,6 +25,7 @@ $settings = get_settings();
         height : 200,
         type   : 'loop',
         // direction: 'rtl',
+        waitForTransition: false,
       } );
 
       splide.mount();
