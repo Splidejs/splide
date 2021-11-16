@@ -1,3 +1,4 @@
+import { SCROLL_LISTENER_OPTIONS } from '../../constants/listener-options';
 import { MOVING } from '../../constants/states';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
@@ -32,7 +33,7 @@ export function Wheel( Splide: Splide, Components: Components, options: Options 
    */
   function mount(): void {
     if ( options.wheel ) {
-      bind( Components.Elements.track, 'wheel', onWheel, { passive: false, capture: true } );
+      bind( Components.Elements.track, 'wheel', onWheel, SCROLL_LISTENER_OPTIONS );
     }
   }
 
@@ -42,12 +43,14 @@ export function Wheel( Splide: Splide, Components: Components, options: Options 
    * @param e - A WheelEvent object.
    */
   function onWheel( e: WheelEvent ): void {
-    const { deltaY } = e;
+    if ( e.cancelable ) {
+      const { deltaY } = e;
 
-    if ( deltaY ) {
-      const backwards = deltaY < 0;
-      Splide.go( backwards ? '<' : '>' );
-      shouldPrevent( backwards ) && prevent( e );
+      if ( deltaY ) {
+        const backwards = deltaY < 0;
+        Splide.go( backwards ? '<' : '>' );
+        shouldPrevent( backwards ) && prevent( e );
+      }
     }
   }
 

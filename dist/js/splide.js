@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.4.0
+ * Version  : 3.4.1
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -118,7 +118,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   function matches(elm, selector) {
-    return (elm["msMatchesSelector"] || elm.matches).call(elm, selector);
+    return isHTMLElement(elm) && (elm["msMatchesSelector"] || elm.matches).call(elm, selector);
   }
 
   function children(parent, selector) {
@@ -2073,6 +2073,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     };
   }
 
+  var SCROLL_LISTENER_OPTIONS = {
+    passive: false,
+    capture: true
+  };
   var FRICTION = 5;
   var LOG_INTERVAL = 200;
   var POINTER_DOWN_EVENTS = "touchstart mousedown";
@@ -2095,10 +2099,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         orient = _Components2$Directio2.orient;
     var getPosition = Move.getPosition,
         exceededLimit = Move.exceededLimit;
-    var listenerOptions = {
-      passive: false,
-      capture: true
-    };
     var basePosition;
     var baseEvent;
     var prevBaseEvent;
@@ -2111,9 +2111,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var target;
 
     function mount() {
-      bind(track, POINTER_MOVE_EVENTS, noop, listenerOptions);
-      bind(track, POINTER_UP_EVENTS, noop, listenerOptions);
-      bind(track, POINTER_DOWN_EVENTS, onPointerDown, listenerOptions);
+      bind(track, POINTER_MOVE_EVENTS, noop, SCROLL_LISTENER_OPTIONS);
+      bind(track, POINTER_UP_EVENTS, noop, SCROLL_LISTENER_OPTIONS);
+      bind(track, POINTER_DOWN_EVENTS, onPointerDown, SCROLL_LISTENER_OPTIONS);
       bind(track, "click", onClick, {
         capture: true
       });
@@ -2131,7 +2131,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       if (!disabled) {
         var noDrag = options.noDrag;
         var isTouch = isTouchEvent(e);
-        var isDraggable = !noDrag || isHTMLElement(e.target) && !matches(e.target, noDrag);
+        var isDraggable = !noDrag || !matches(e.target, noDrag);
 
         if (isDraggable && (isTouch || !e.button)) {
           if (!Move.isBusy()) {
@@ -2139,8 +2139,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
             prevBaseEvent = null;
             lastEvent = null;
             clickPrevented = false;
-            bind(target, POINTER_MOVE_EVENTS, onPointerMove, listenerOptions);
-            bind(target, POINTER_UP_EVENTS, onPointerUp, listenerOptions);
+            bind(target, POINTER_MOVE_EVENTS, onPointerMove, SCROLL_LISTENER_OPTIONS);
+            bind(target, POINTER_UP_EVENTS, onPointerUp, SCROLL_LISTENER_OPTIONS);
             Move.cancel();
             Scroll.cancel();
             save(e);
@@ -2671,20 +2671,19 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function mount() {
       if (options.wheel) {
-        bind(Components2.Elements.track, "wheel", onWheel, {
-          passive: false,
-          capture: true
-        });
+        bind(Components2.Elements.track, "wheel", onWheel, SCROLL_LISTENER_OPTIONS);
       }
     }
 
     function onWheel(e) {
-      var deltaY = e.deltaY;
+      if (e.cancelable) {
+        var deltaY = e.deltaY;
 
-      if (deltaY) {
-        var backwards = deltaY < 0;
-        Splide2.go(backwards ? "<" : ">");
-        shouldPrevent(backwards) && prevent(e);
+        if (deltaY) {
+          var backwards = deltaY < 0;
+          Splide2.go(backwards ? "<" : ">");
+          shouldPrevent(backwards) && prevent(e);
+        }
       }
     }
 

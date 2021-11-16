@@ -19,16 +19,16 @@ $settings = get_settings();
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
-        width    : 400,
+        width       : 400,
         // type     : 'loop',
-        perPage  : 2,
-        padding  : '3rem',
-        gap      : 5,
-        direction: 'ttb',
-        height   : '90vh',
-        cover    : true,
-        wheel    : true,
-        // releaseWheel: true,
+        perPage     : 2,
+        padding     : '3rem',
+        gap         : 5,
+        direction   : 'ttb',
+        height      : '90vh',
+        cover       : true,
+        wheel       : true,
+        releaseWheel: true,
       } );
 
       splide.mount();

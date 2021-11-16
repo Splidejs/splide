@@ -1,3 +1,6 @@
+import { isHTMLElement } from '../../type/type';
+
+
 /**
  * Checks if the element can be selected by the provided selector or not.
  *
@@ -6,6 +9,6 @@
  *
  * @return `true` if the selector matches the element, or otherwise `false`.
  */
-export function matches( elm: Element, selector: string ): boolean {
-  return ( elm[ 'msMatchesSelector' ] || elm.matches ).call( elm, selector );
+export function matches( elm: Element | EventTarget, selector: string ): boolean {
+  return isHTMLElement( elm ) && ( elm[ 'msMatchesSelector' ] || elm.matches ).call( elm, selector );
 }

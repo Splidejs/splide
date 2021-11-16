@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.4.0
+ * Version  : 3.4.1
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -108,7 +108,7 @@ function before(nodes, ref) {
 }
 
 function matches(elm, selector) {
-  return (elm["msMatchesSelector"] || elm.matches).call(elm, selector);
+  return isHTMLElement(elm) && (elm["msMatchesSelector"] || elm.matches).call(elm, selector);
 }
 
 function children(parent, selector) {
@@ -1727,6 +1727,8 @@ function Scroll(Splide2, Components2, options) {
   };
 }
 
+const SCROLL_LISTENER_OPTIONS = { passive: false, capture: true };
+
 const FRICTION = 5;
 const LOG_INTERVAL = 200;
 const POINTER_DOWN_EVENTS = "touchstart mousedown";
@@ -1739,7 +1741,6 @@ function Drag(Splide2, Components2, options) {
   const { track } = Components2.Elements;
   const { resolve, orient } = Components2.Direction;
   const { getPosition, exceededLimit } = Move;
-  const listenerOptions = { passive: false, capture: true };
   let basePosition;
   let baseEvent;
   let prevBaseEvent;
@@ -1751,9 +1752,9 @@ function Drag(Splide2, Components2, options) {
   let disabled;
   let target;
   function mount() {
-    bind(track, POINTER_MOVE_EVENTS, noop, listenerOptions);
-    bind(track, POINTER_UP_EVENTS, noop, listenerOptions);
-    bind(track, POINTER_DOWN_EVENTS, onPointerDown, listenerOptions);
+    bind(track, POINTER_MOVE_EVENTS, noop, SCROLL_LISTENER_OPTIONS);
+    bind(track, POINTER_UP_EVENTS, noop, SCROLL_LISTENER_OPTIONS);
+    bind(track, POINTER_DOWN_EVENTS, onPointerDown, SCROLL_LISTENER_OPTIONS);
     bind(track, "click", onClick, { capture: true });
     bind(track, "dragstart", prevent);
     on([EVENT_MOUNTED, EVENT_UPDATED], init);
@@ -1767,15 +1768,15 @@ function Drag(Splide2, Components2, options) {
     if (!disabled) {
       const { noDrag } = options;
       const isTouch = isTouchEvent(e);
-      const isDraggable = !noDrag || isHTMLElement(e.target) && !matches(e.target, noDrag);
+      const isDraggable = !noDrag || !matches(e.target, noDrag);
       if (isDraggable && (isTouch || !e.button)) {
         if (!Move.isBusy()) {
           target = isTouch ? track : window;
           prevBaseEvent = null;
           lastEvent = null;
           clickPrevented = false;
-          bind(target, POINTER_MOVE_EVENTS, onPointerMove, listenerOptions);
-          bind(target, POINTER_UP_EVENTS, onPointerUp, listenerOptions);
+          bind(target, POINTER_MOVE_EVENTS, onPointerMove, SCROLL_LISTENER_OPTIONS);
+          bind(target, POINTER_UP_EVENTS, onPointerUp, SCROLL_LISTENER_OPTIONS);
           Move.cancel();
           Scroll.cancel();
           save(e);
@@ -2180,15 +2181,17 @@ function Wheel(Splide2, Components2, options) {
   const { bind } = EventInterface(Splide2);
   function mount() {
     if (options.wheel) {
-      bind(Components2.Elements.track, "wheel", onWheel, { passive: false, capture: true });
+      bind(Components2.Elements.track, "wheel", onWheel, SCROLL_LISTENER_OPTIONS);
     }
   }
   function onWheel(e) {
-    const { deltaY } = e;
-    if (deltaY) {
-      const backwards = deltaY < 0;
-      Splide2.go(backwards ? "<" : ">");
-      shouldPrevent(backwards) && prevent(e);
+    if (e.cancelable) {
+      const { deltaY } = e;
+      if (deltaY) {
+        const backwards = deltaY < 0;
+        Splide2.go(backwards ? "<" : ">");
+        shouldPrevent(backwards) && prevent(e);
+      }
     }
   }
   function shouldPrevent(backwards) {

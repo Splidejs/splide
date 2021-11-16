@@ -1,9 +1,10 @@
 import { EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_MOUNTED, EVENT_UPDATED } from '../../constants/events';
+import { SCROLL_LISTENER_OPTIONS } from '../../constants/listener-options';
 import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { abs, isHTMLElement, isObject, matches, min, noop, prevent, sign } from '../../utils';
+import { abs, isObject, matches, min, noop, prevent, sign } from '../../utils';
 import { FRICTION, LOG_INTERVAL, POINTER_DOWN_EVENTS, POINTER_MOVE_EVENTS, POINTER_UP_EVENTS } from './constants';
 
 
@@ -34,7 +35,6 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
   const { track } = Components.Elements;
   const { resolve, orient } = Components.Direction;
   const { getPosition, exceededLimit } = Move;
-  const listenerOptions = { passive: false, capture: true };
 
   /**
    * The base slider position to calculate the delta of coords.
@@ -91,9 +91,9 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    * Called when the component is mounted.
    */
   function mount(): void {
-    bind( track, POINTER_MOVE_EVENTS, noop, listenerOptions );
-    bind( track, POINTER_UP_EVENTS, noop, listenerOptions );
-    bind( track, POINTER_DOWN_EVENTS, onPointerDown, listenerOptions );
+    bind( track, POINTER_MOVE_EVENTS, noop, SCROLL_LISTENER_OPTIONS );
+    bind( track, POINTER_UP_EVENTS, noop, SCROLL_LISTENER_OPTIONS );
+    bind( track, POINTER_DOWN_EVENTS, onPointerDown, SCROLL_LISTENER_OPTIONS );
     bind( track, 'click', onClick, { capture: true } );
     bind( track, 'dragstart', prevent );
 
@@ -120,7 +120,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
     if ( ! disabled ) {
       const { noDrag } = options;
       const isTouch     = isTouchEvent( e );
-      const isDraggable = ! noDrag || ( isHTMLElement( e.target ) && ! matches( e.target, noDrag ) );
+      const isDraggable = ! noDrag || ! matches( e.target, noDrag );
 
       if ( isDraggable && ( isTouch || ! e.button ) ) {
         if ( ! Move.isBusy() ) {
@@ -129,8 +129,8 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
           lastEvent      = null;
           clickPrevented = false;
 
-          bind( target, POINTER_MOVE_EVENTS, onPointerMove, listenerOptions );
-          bind( target, POINTER_UP_EVENTS, onPointerUp, listenerOptions );
+          bind( target, POINTER_MOVE_EVENTS, onPointerMove, SCROLL_LISTENER_OPTIONS );
+          bind( target, POINTER_UP_EVENTS, onPointerUp, SCROLL_LISTENER_OPTIONS );
           Move.cancel();
           Scroll.cancel();
           save( e );

@@ -6,5 +6,5 @@
  *
  * @return `true` if the selector matches the element, or otherwise `false`.
  */
-export declare function matches(elm: Element, selector: string): boolean;
+export declare function matches(elm: Element | EventTarget, selector: string): boolean;
 //# sourceMappingURL=../../../../../src/js/utils/dom/matches/matches.d.ts.map
