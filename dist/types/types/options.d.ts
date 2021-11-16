@@ -85,6 +85,10 @@ export interface Options extends ResponsiveOptions {
      */
     wheel?: boolean;
     /**
+     * Determines whether to release the wheel event when the slider reaches the first or last slide.
+     */
+    releaseWheel?: boolean;
+    /**
      * The direction of the slider.
      * - 'ltr': Left to right
      * - 'rtl': Right to left

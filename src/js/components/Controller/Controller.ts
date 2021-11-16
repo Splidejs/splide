@@ -17,6 +17,7 @@ export interface ControllerComponent extends BaseComponent {
   scroll( destination: number, useIndex?: boolean, snap?: boolean, duration?: number, callback?: AnyFunction ): void;
   getNext( destination?: boolean ): number;
   getPrev( destination?: boolean ): number;
+  getAdjacent( prev: boolean, destination?: boolean ): number;
   getEnd(): number;
   setIndex( index: number ): void;
   getIndex( prev?: boolean ): number;
@@ -189,6 +190,8 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
   /**
    * Returns an adjacent destination index.
    *
+   * @internal
+   *
    * @param prev        - Determines whether to return a previous or next index.
    * @param destination - Optional. Determines whether to get a destination index or a slide one.
    *
@@ -355,6 +358,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
     scroll,
     getNext,
     getPrev,
+    getAdjacent,
     getEnd,
     setIndex,
     getIndex,

@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.3.1
+ * Version  : 3.4.0
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1441,6 +1441,7 @@ function Controller(Splide2, Components2, options) {
     scroll,
     getNext,
     getPrev,
+    getAdjacent,
     getEnd,
     setIndex,
     getIndex,
@@ -2185,9 +2186,13 @@ function Wheel(Splide2, Components2, options) {
   function onWheel(e) {
     const { deltaY } = e;
     if (deltaY) {
-      Splide2.go(deltaY < 0 ? "<" : ">");
-      prevent(e);
+      const backwards = deltaY < 0;
+      Splide2.go(backwards ? "<" : ">");
+      shouldPrevent(backwards) && prevent(e);
     }
+  }
+  function shouldPrevent(backwards) {
+    return !options.releaseWheel || Splide2.state.is(MOVING) || Components2.Controller.getAdjacent(backwards) !== -1;
   }
   return {
     mount

@@ -10,6 +10,7 @@ export interface ControllerComponent extends BaseComponent {
     scroll(destination: number, useIndex?: boolean, snap?: boolean, duration?: number, callback?: AnyFunction): void;
     getNext(destination?: boolean): number;
     getPrev(destination?: boolean): number;
+    getAdjacent(prev: boolean, destination?: boolean): number;
     getEnd(): number;
     setIndex(index: number): void;
     getIndex(prev?: boolean): number;

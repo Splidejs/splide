@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.3.1
+ * Version  : 3.4.0
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1722,6 +1722,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       scroll: scroll,
       getNext: getNext,
       getPrev: getPrev,
+      getAdjacent: getAdjacent,
       getEnd: getEnd,
       setIndex: setIndex,
       getIndex: getIndex,
@@ -2681,9 +2682,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var deltaY = e.deltaY;
 
       if (deltaY) {
-        Splide2.go(deltaY < 0 ? "<" : ">");
-        prevent(e);
+        var backwards = deltaY < 0;
+        Splide2.go(backwards ? "<" : ">");
+        shouldPrevent(backwards) && prevent(e);
       }
+    }
+
+    function shouldPrevent(backwards) {
+      return !options.releaseWheel || Splide2.state.is(MOVING) || Components2.Controller.getAdjacent(backwards) !== -1;
     }
 
     return {

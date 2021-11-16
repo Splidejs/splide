@@ -1,3 +1,4 @@
+import { MOVING } from '../../constants/states';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
@@ -36,7 +37,7 @@ export function Wheel( Splide: Splide, Components: Components, options: Options 
   }
 
   /**
-   * Called when the user rotates the mouse wheel.
+   * Called when the user rotates the mouse wheel on the slider.
    *
    * @param e - A WheelEvent object.
    */
@@ -44,9 +45,23 @@ export function Wheel( Splide: Splide, Components: Components, options: Options 
     const { deltaY } = e;
 
     if ( deltaY ) {
-      Splide.go( deltaY < 0 ? '<' : '>' );
-      prevent( e );
+      const backwards = deltaY < 0;
+      Splide.go( backwards ? '<' : '>' );
+      shouldPrevent( backwards ) && prevent( e );
     }
+  }
+
+  /**
+   * Checks whether the component should prevent the default action of the wheel event or not.
+   *
+   * @param backwards - Set this to `true` for backwards direction.
+   *
+   * @return `true` if the action should be prevented.
+   */
+  function shouldPrevent( backwards: boolean ): boolean {
+    return ! options.releaseWheel
+      || Splide.state.is( MOVING )
+      || Components.Controller.getAdjacent( backwards ) !== -1;
   }
 
   return {
