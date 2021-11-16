@@ -192,6 +192,8 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
     unbind( target, POINTER_MOVE_EVENTS, onPointerMove );
     unbind( target, POINTER_UP_EVENTS, onPointerUp );
 
+    const { index } = Splide;
+
     if ( lastEvent ) {
       if ( dragging || ( e.cancelable && isSliderDirection() ) ) {
         const velocity    = computeVelocity( e );
@@ -200,7 +202,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
         if ( isFree ) {
           Controller.scroll( destination );
         } else if ( Splide.is( FADE ) ) {
-          Controller.go( Splide.index + orient( sign( velocity ) ) );
+          Controller.go( index + orient( sign( velocity ) ) );
         } else {
           Controller.go( Controller.toDest( destination ), true );
         }
@@ -210,8 +212,8 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
 
       emit( EVENT_DRAGGED );
     } else {
-      if ( ! isFree ) {
-        Controller.go( Splide.index, true );
+      if ( ! isFree && getPosition() !== Move.toPosition( index ) ) {
+        Controller.go( index, true );
       }
     }
 

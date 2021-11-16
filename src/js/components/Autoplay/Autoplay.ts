@@ -10,7 +10,8 @@ import {
 import { EventInterface, RequestInterval } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { setAttribute, style } from '../../utils';
+import { getAttribute, setAttribute, style } from '../../utils';
+import { INTERVAL_DATA_ATTRIBUTE } from './constants';
 
 
 /**
@@ -37,9 +38,9 @@ export interface AutoplayComponent extends BaseComponent {
  */
 export function Autoplay( Splide: Splide, Components: Components, options: Options ): AutoplayComponent {
   const { on, bind, emit } = EventInterface( Splide );
-  const { Elements } = Components;
   const interval = RequestInterval( options.interval, Splide.go.bind( Splide, '>' ), update );
   const { isPaused } = interval;
+  const { Elements } = Components;
 
   /**
    * Indicates whether the slider is hovered or not.
@@ -111,6 +112,7 @@ export function Autoplay( Splide: Splide, Components: Components, options: Optio
     }
 
     on( [ EVENT_MOVE, EVENT_SCROLL, EVENT_REFRESH ], interval.rewind );
+    on( EVENT_MOVE, updateInterval );
   }
 
   /**
@@ -153,18 +155,22 @@ export function Autoplay( Splide: Splide, Components: Components, options: Optio
   }
 
   /**
-   * Called on every animation frame when auto playing.
+   * Called on every animation frame while autoplay is active.
    *
    * @param rate - The progress rate between 0 to 1.
    */
   function update( rate: number ): void {
     const { bar } = Elements;
-
-    if ( bar ) {
-      style( bar, 'width', `${ rate * 100 }%` );
-    }
-
+    bar && style( bar, 'width', `${ rate * 100 }%` );
     emit( EVENT_AUTOPLAY_PLAYING, rate );
+  }
+
+  /**
+   * Updates or restores the interval duration.
+   */
+  function updateInterval(): void {
+    const Slide = Components.Slides.getAt( Splide.index );
+    interval.set( Slide && +getAttribute( Slide.slide, INTERVAL_DATA_ATTRIBUTE ) || options.interval );
   }
 
   return {

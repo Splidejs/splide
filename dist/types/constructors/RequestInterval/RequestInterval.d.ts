@@ -8,6 +8,7 @@ export interface RequestIntervalInterface {
     pause(): void;
     rewind(): void;
     cancel(): void;
+    set(interval: number): void;
     isPaused(): boolean;
 }
 /**

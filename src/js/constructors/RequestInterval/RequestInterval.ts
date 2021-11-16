@@ -11,6 +11,7 @@ export interface RequestIntervalInterface {
   pause(): void;
   rewind(): void;
   cancel(): void;
+  set( interval: number ): void;
   isPaused(): boolean;
 }
 
@@ -129,6 +130,15 @@ export function RequestInterval(
   }
 
   /**
+   * Sets new interval duration.
+   *
+   * @param time - The interval duration in milliseconds.
+   */
+  function set( time: number ): void {
+    interval = time;
+  }
+
+  /**
    * Checks if the interval is paused or not.
    *
    * @return `true` if the interval is paused, or otherwise `false`.
@@ -142,6 +152,7 @@ export function RequestInterval(
     rewind,
     pause,
     cancel,
+    set,
     isPaused,
   };
 }

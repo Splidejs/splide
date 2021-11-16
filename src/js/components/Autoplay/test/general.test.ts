@@ -30,6 +30,28 @@ describe( 'Autoplay', () => {
     expect( splide.index ).toBe( 2 );
   } );
 
+  test( 'can use the interval duration provided by the data attribute.', async () => {
+    const interval = 1000;
+    const splide   = init(
+      { autoplay: true, interval, waitForTransition: false },
+      { dataInterval: [ 0, 2000 ] }
+    );
+
+    expect( splide.index ).toBe( 0 );
+
+    await wait( 1100 );
+    expect( splide.index ).toBe( 1 );
+
+    await wait( 1100 ); // Should be still 1 because using 2000
+    expect( splide.index ).toBe( 1 );
+
+    await wait( 1000 ); // 2100
+    expect( splide.index ).toBe( 2 );
+
+    await wait( 1100 ); // Should restore the interval to 1000
+    expect( splide.index ).toBe( 3 );
+  } );
+
   test( 'can play/pause autoplay manually.', async () => {
     const interval          = 1000;
     const intervalAndBuffer = 1100;

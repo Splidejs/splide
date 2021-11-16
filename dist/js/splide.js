@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.4.2
+ * Version  : 3.5.0
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -566,6 +566,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       paused = true;
     }
 
+    function set(time) {
+      interval = time;
+    }
+
     function isPaused() {
       return paused;
     }
@@ -575,6 +579,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       rewind: rewind,
       pause: pause,
       cancel: cancel,
+      set: set,
       isPaused: isPaused
     };
   }
@@ -1834,15 +1839,17 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     };
   }
 
+  var INTERVAL_DATA_ATTRIBUTE = DATA_ATTRIBUTE + "-interval";
+
   function Autoplay(Splide2, Components2, options) {
     var _EventInterface9 = EventInterface(Splide2),
         on = _EventInterface9.on,
         bind = _EventInterface9.bind,
         emit = _EventInterface9.emit;
 
-    var Elements = Components2.Elements;
     var interval = RequestInterval(options.interval, Splide2.go.bind(Splide2, ">"), update);
     var isPaused = interval.isPaused;
+    var Elements = Components2.Elements;
     var hovered;
     var focused;
     var paused;
@@ -1890,6 +1897,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }
 
       on([EVENT_MOVE, EVENT_SCROLL, EVENT_REFRESH], interval.rewind);
+      on(EVENT_MOVE, updateInterval);
     }
 
     function play() {
@@ -1925,12 +1933,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function update(rate) {
       var bar = Elements.bar;
-
-      if (bar) {
-        style(bar, "width", rate * 100 + "%");
-      }
-
+      bar && style(bar, "width", rate * 100 + "%");
       emit(EVENT_AUTOPLAY_PLAYING, rate);
+    }
+
+    function updateInterval() {
+      var Slide = Components2.Slides.getAt(Splide2.index);
+      interval.set(Slide && +getAttribute(Slide.slide, INTERVAL_DATA_ATTRIBUTE) || options.interval);
     }
 
     return {
@@ -2191,6 +2200,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function onPointerUp(e) {
       unbind(target, POINTER_MOVE_EVENTS, onPointerMove);
       unbind(target, POINTER_UP_EVENTS, onPointerUp);
+      var index = Splide2.index;
 
       if (lastEvent) {
         if (dragging || e.cancelable && isSliderDirection()) {
@@ -2200,7 +2210,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           if (isFree) {
             Controller.scroll(destination);
           } else if (Splide2.is(FADE)) {
-            Controller.go(Splide2.index + orient(sign(velocity)));
+            Controller.go(index + orient(sign(velocity)));
           } else {
             Controller.go(Controller.toDest(destination), true);
           }
@@ -2210,8 +2220,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
         emit(EVENT_DRAGGED);
       } else {
-        if (!isFree) {
-          Controller.go(Splide2.index, true);
+        if (!isFree && getPosition() !== Move.toPosition(index)) {
+          Controller.go(index, true);
         }
       }
 

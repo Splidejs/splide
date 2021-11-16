@@ -19,6 +19,7 @@ $settings = get_settings();
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
+        rewind       : true,
         autoplay     : true,
         pauseOnHover : false,
         resetProgress: false,
@@ -57,7 +58,19 @@ $settings = get_settings();
 <div id="splide01" class="splide">
   <div class="splide__track">
     <ul class="splide__list">
-      <?php render_slides(); ?>
+      <li class="splide__slide">
+        <img src="../../assets/images/pics/slide01.jpg">
+      </li>
+      <li class="splide__slide" data-splide-interval="1000">
+        <img src="../../assets/images/pics/slide02.jpg">
+      </li>
+      <li class="splide__slide" data-splide-interval="10000">
+        <img src="../../assets/images/pics/slide03.jpg">
+      </li>
+      <li class="splide__slide">
+        <img src="../../assets/images/pics/slide04.jpg">
+      </li>
+<!--      --><?php //render_slides(); ?>
     </ul>
   </div>
 

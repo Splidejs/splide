@@ -35,12 +35,13 @@ export function init( options: Options = {}, args: InitArgs = {} ): Splide {
     dataSrcset,
     json,
     insertHtml,
+    dataInterval,
   } = args;
 
   const slideWidth  = +width / ( options.perPage || 1 );
   const slideHeight = +height / ( options.perPage || 1 );
   const innerHtml   = html
-    || buildHtml( { length, arrows, autoplay, progress, src, dataSrc, dataSrcset, json, id } );
+    || buildHtml( { length, arrows, autoplay, progress, src, dataSrc, dataSrcset, json, id, dataInterval } );
 
   if ( insertHtml ) {
     if ( ! document.body.innerHTML ) {
