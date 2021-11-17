@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.5.0
+ * Version  : 3.5.1
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -2598,7 +2598,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       items: items,
       mount: mount,
       destroy: destroy,
-      getAt: getAt
+      getAt: getAt,
+      update: update
     };
   }
 

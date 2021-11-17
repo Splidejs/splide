@@ -33,6 +33,7 @@ import {
 export interface PaginationComponent extends BaseComponent {
   items: PaginationItem[];
   getAt( index: number ): PaginationItem;
+  update(): void;
 }
 
 /**
@@ -193,5 +194,6 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
     mount,
     destroy,
     getAt,
+    update,
   };
 }

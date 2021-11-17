@@ -8,6 +8,7 @@ import { BaseComponent, Components, Options } from '../../types';
 export interface PaginationComponent extends BaseComponent {
     items: PaginationItem[];
     getAt(index: number): PaginationItem;
+    update(): void;
 }
 /**
  * The interface for data of the pagination.
