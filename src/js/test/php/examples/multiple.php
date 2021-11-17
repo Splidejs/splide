@@ -148,16 +148,6 @@ $settings = get_settings();
     }, { threshold: 0.8 } );
     observer.observe( elm );
   } );
-
-  // for ( let i = 0; i < elms.length; i++ ) {
-  //   const elm = elms[ i ];
-  //   const splide = new Splide( elm, { ...... } ).mount();
-  //   const Autoplay = splide.Components.Autoplay;
-  //   const observer = new IntersectionObserver( ( [ entry ] ) => {
-  //     entry.isIntersecting ? Autoplay.play() : Autoplay.pause();
-  //   } );
-  //   observer.observe( elm );
-  // }
 </script>
 
 </body>
