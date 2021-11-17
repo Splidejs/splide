@@ -122,7 +122,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
       const isTouch     = isTouchEvent( e );
       const isDraggable = ! noDrag || ! matches( e.target, noDrag );
 
-      if ( isDraggable && ( isTouch || ! e.button ) ) {
+      if ( isDraggable && ( isTouch || ! (e as MouseEvent).button ) ) {
         if ( ! Move.isBusy() ) {
           target         = isTouch ? track : window;
           prevBaseEvent  = null;
