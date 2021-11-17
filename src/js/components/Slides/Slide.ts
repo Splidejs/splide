@@ -63,6 +63,7 @@ export interface  SlideComponent extends BaseComponent {
   slide: HTMLElement;
   container: HTMLElement;
   isClone: boolean;
+  update(): void;
   style( prop: string, value: string | number, useContainer?: boolean ): void
   isWithin( from: number, distance: number ): boolean;
 }
@@ -276,6 +277,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
     isClone,
     mount,
     destroy,
+    update,
     style,
     isWithin,
   };

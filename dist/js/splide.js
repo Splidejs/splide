@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.5.1
+ * Version  : 3.5.2
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1009,6 +1009,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       isClone: isClone,
       mount: mount,
       destroy: destroy,
+      update: update,
       style: style$1,
       isWithin: isWithin
     };
@@ -1051,6 +1052,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function refresh() {
       destroy();
       init();
+    }
+
+    function update() {
+      forEach$1(function (Slide2) {
+        Slide2.update();
+      });
     }
 
     function register(slide, index, slideIndex) {
@@ -1145,6 +1152,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     return {
       mount: mount,
       destroy: destroy,
+      update: update,
       register: register,
       get: get,
       getIn: getIn,

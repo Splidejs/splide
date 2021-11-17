@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.5.1
+ * Version  : 3.5.2
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -885,6 +885,7 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     isClone,
     mount,
     destroy,
+    update,
     style: style$1,
     isWithin
   };
@@ -915,6 +916,11 @@ function Slides(Splide2, Components2, options) {
   function refresh() {
     destroy();
     init();
+  }
+  function update() {
+    forEach$1((Slide2) => {
+      Slide2.update();
+    });
   }
   function register(slide, index, slideIndex) {
     const object = Slide$1(Splide2, index, slideIndex, slide);
@@ -986,6 +992,7 @@ function Slides(Splide2, Components2, options) {
   return {
     mount,
     destroy,
+    update,
     register,
     get,
     getIn,

@@ -28,6 +28,7 @@ import { Slide, SlideComponent } from './Slide';
  * @since 3.0.0
  */
 export interface  SlidesComponent extends BaseComponent {
+  update(): void;
   register( slide: HTMLElement, index: number, slideIndex: number ): void;
   get( excludeClones?: boolean ): SlideComponent[];
   getIn( page: number ): SlideComponent[];
@@ -114,6 +115,13 @@ export function Slides( Splide: Splide, Components: Components, options: Options
   function refresh(): void {
     destroy();
     init();
+  }
+
+  /**
+   * Manually updates the status of all slides.
+   */
+  function update(): void {
+    forEach( Slide => { Slide.update() } );
   }
 
   /**
@@ -283,6 +291,7 @@ export function Slides( Splide: Splide, Components: Components, options: Options
   return {
     mount,
     destroy,
+    update,
     register,
     get,
     getIn,

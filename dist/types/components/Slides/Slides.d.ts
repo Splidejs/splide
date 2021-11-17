@@ -7,6 +7,7 @@ import { SlideComponent } from './Slide';
  * @since 3.0.0
  */
 export interface SlidesComponent extends BaseComponent {
+    update(): void;
     register(slide: HTMLElement, index: number, slideIndex: number): void;
     get(excludeClones?: boolean): SlideComponent[];
     getIn(page: number): SlideComponent[];

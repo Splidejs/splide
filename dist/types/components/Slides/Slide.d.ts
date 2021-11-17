@@ -11,6 +11,7 @@ export interface SlideComponent extends BaseComponent {
     slide: HTMLElement;
     container: HTMLElement;
     isClone: boolean;
+    update(): void;
     style(prop: string, value: string | number, useContainer?: boolean): void;
     isWithin(from: number, distance: number): boolean;
 }
