@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.5.6
+ * Version  : 3.5.7
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1975,14 +1975,16 @@ function LazyLoad(Splide2, Components2, options) {
   let index = 0;
   function mount() {
     if (options.lazyLoad) {
-      on([EVENT_MOUNTED, EVENT_REFRESH], () => {
-        destroy();
-        init();
-      });
+      init();
+      on(EVENT_REFRESH, refresh);
       if (!isSequential) {
         on([EVENT_MOUNTED, EVENT_REFRESH, EVENT_MOVED], observe);
       }
     }
+  }
+  function refresh() {
+    destroy();
+    init();
   }
   function init() {
     Components2.Slides.forEach((_Slide) => {
@@ -1992,7 +1994,7 @@ function LazyLoad(Splide2, Components2, options) {
         if (src !== _img.src || srcset !== _img.srcset) {
           const className = options.classes.spinner;
           const parent = _img.parentElement;
-          const _spinner = child(parent, className) || create("span", className, parent);
+          const _spinner = child(parent, `.${className}`) || create("span", className, parent);
           setAttribute(_spinner, ROLE, "presentation");
           images.push({ _img, _Slide, src, srcset, _spinner });
           !_img.src && display(_img, "none");

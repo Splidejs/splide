@@ -76,15 +76,21 @@ export function LazyLoad( Splide: Splide, Components: Components, options: Optio
    */
   function mount(): void {
     if ( options.lazyLoad ) {
-      on( [ EVENT_MOUNTED, EVENT_REFRESH ], () => {
-        destroy();
-        init();
-      } );
+      init();
+      on( EVENT_REFRESH, refresh );
 
       if ( ! isSequential ) {
         on( [ EVENT_MOUNTED, EVENT_REFRESH, EVENT_MOVED ], observe );
       }
     }
+  }
+
+  /**
+   * Called when the slider is refreshed.
+   */
+  function refresh(): void {
+    destroy();
+    init();
   }
 
   /**
@@ -99,7 +105,7 @@ export function LazyLoad( Splide: Splide, Components: Components, options: Optio
         if ( src !== _img.src || srcset !== _img.srcset ) {
           const className = options.classes.spinner;
           const parent    = _img.parentElement;
-          const _spinner  = child( parent, className ) || create( 'span', className, parent );
+          const _spinner  = child( parent, `.${ className }` ) || create( 'span', className, parent );
 
           setAttribute( _spinner, ROLE, 'presentation' );
           images.push( { _img, _Slide, src, srcset, _spinner } );

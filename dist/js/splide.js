@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.5.6
+ * Version  : 3.5.7
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -2394,15 +2394,18 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function mount() {
       if (options.lazyLoad) {
-        on([EVENT_MOUNTED, EVENT_REFRESH], function () {
-          destroy();
-          init();
-        });
+        init();
+        on(EVENT_REFRESH, refresh);
 
         if (!isSequential) {
           on([EVENT_MOUNTED, EVENT_REFRESH, EVENT_MOVED], observe);
         }
       }
+    }
+
+    function refresh() {
+      destroy();
+      init();
     }
 
     function init() {
@@ -2415,7 +2418,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
             var className = options.classes.spinner;
             var parent = _img.parentElement;
 
-            var _spinner = child(parent, className) || create("span", className, parent);
+            var _spinner = child(parent, "." + className) || create("span", className, parent);
 
             setAttribute(_spinner, ROLE, "presentation");
             images.push({
