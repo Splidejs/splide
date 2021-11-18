@@ -18,9 +18,9 @@ $settings = get_settings();
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide01 = new Splide( '#splide01', {
         perPage    : 1,
-        type       : 'fade',
+        // type       : 'fade',
         lazyLoad   : 'nearby',
-        cover      : true,
+        // cover      : true,
         rewind     : true,
         heightRatio: ( 9 / 16 ) / 2,
       } );
@@ -35,6 +35,17 @@ $settings = get_settings();
       } );
 
       splide02.mount();
+
+      let sig = 20;
+
+      splide01.on( 'moved', ( index ) => {
+        if ( index === splide01.length - 1 ) {
+          splide01.add( [
+            `<li class="splide__slide"><img data-splide-lazy="https://source.unsplash.com/random/960x540?sig=${ ++sig }"></li>`,
+            `<li class="splide__slide"><img data-splide-lazy="https://source.unsplash.com/random/960x540?sig=${ ++sig }"></li>`,
+          ] );
+        }
+      } );
     } );
   </script>
 </head>

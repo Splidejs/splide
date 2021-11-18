@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.5.4
+ * Version  : 3.5.5
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -849,7 +849,7 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     }
     if (visible !== hasClass(slide, CLASS_VISIBLE)) {
       toggleClass(slide, CLASS_VISIBLE, visible);
-      !isClone && emit(visible ? EVENT_VISIBLE : EVENT_HIDDEN, self);
+      emit(visible ? EVENT_VISIBLE : EVENT_HIDDEN, self);
     }
   }
   function style$1(prop, value, useContainer) {
@@ -1995,7 +1995,9 @@ function LazyLoad(Splide2, Components2, options) {
         const src = getAttribute(_img, SRC_DATA_ATTRIBUTE);
         const srcset = getAttribute(_img, SRCSET_DATA_ATTRIBUTE);
         if (src !== _img.src || srcset !== _img.srcset) {
-          const _spinner = create("span", options.classes.spinner, _img.parentElement);
+          const className = options.classes.spinner;
+          const parent = _img.parentElement;
+          const _spinner = child(parent, className) || create("span", className, parent);
           setAttribute(_spinner, ROLE, "presentation");
           images.push({ _img, _Slide, src, srcset, _spinner });
           !_img.src && display(_img, "none");

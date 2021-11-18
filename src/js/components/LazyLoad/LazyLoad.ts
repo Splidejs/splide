@@ -11,7 +11,7 @@ import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import {
-  addClass,
+  addClass, child,
   create,
   display,
   getAttribute,
@@ -97,7 +97,10 @@ export function LazyLoad( Splide: Splide, Components: Components, options: Optio
         const srcset = getAttribute( _img, SRCSET_DATA_ATTRIBUTE );
 
         if ( src !== _img.src || srcset !== _img.srcset ) {
-          const _spinner = create( 'span', options.classes.spinner, _img.parentElement );
+          const className = options.classes.spinner;
+          const parent    = _img.parentElement;
+          const _spinner  = child( parent, className ) || create( 'span', className, parent );
+
           setAttribute( _spinner, ROLE, 'presentation' );
           images.push( { _img, _Slide, src, srcset, _spinner } );
           ! _img.src && display( _img, 'none' );

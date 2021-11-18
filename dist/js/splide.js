@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.5.3
+ * Version  : 3.5.5
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -2413,7 +2413,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           var srcset = getAttribute(_img, SRCSET_DATA_ATTRIBUTE);
 
           if (src !== _img.src || srcset !== _img.srcset) {
-            var _spinner = create("span", options.classes.spinner, _img.parentElement);
+            var className = options.classes.spinner;
+            var parent = _img.parentElement;
+
+            var _spinner = child(parent, className) || create("span", className, parent);
 
             setAttribute(_spinner, ROLE, "presentation");
             images.push({
