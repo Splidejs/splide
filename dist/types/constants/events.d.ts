@@ -2,6 +2,7 @@ export declare const EVENT_MOUNTED = "mounted";
 export declare const EVENT_READY = "ready";
 export declare const EVENT_MOVE = "move";
 export declare const EVENT_MOVED = "moved";
+export declare const EVENT_SHIFTED = "shifted";
 export declare const EVENT_CLICK = "click";
 export declare const EVENT_ACTIVE = "active";
 export declare const EVENT_INACTIVE = "inactive";

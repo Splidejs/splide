@@ -8,6 +8,7 @@ export interface EventMap {
     'click': (Slide: SlideComponent, e: MouseEvent) => void;
     'move': (index: number, prev: number, dest: number) => void;
     'moved': (index: number, prev: number, dest: number) => void;
+    'shifted': () => void;
     'active': (Slide: SlideComponent) => void;
     'inactive': (Slide: SlideComponent) => void;
     'visible': (Slide: SlideComponent) => void;

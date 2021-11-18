@@ -232,7 +232,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
           dest = toIndex( toPage( dest ) );
         } else {
           if ( isLoop ) {
-            dest = perMove
+            dest = perMove || hasFocus()
               ? dest
               : dest < 0 ? - ( slideCount % perPage || perPage ) : slideCount;
           } else if ( options.rewind ) {

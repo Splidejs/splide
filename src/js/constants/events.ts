@@ -2,6 +2,7 @@ export const EVENT_MOUNTED            = 'mounted';
 export const EVENT_READY              = 'ready';
 export const EVENT_MOVE               = 'move';
 export const EVENT_MOVED              = 'moved';
+export const EVENT_SHIFTED            = 'shifted';
 export const EVENT_CLICK              = 'click';
 export const EVENT_ACTIVE             = 'active';
 export const EVENT_INACTIVE           = 'inactive';

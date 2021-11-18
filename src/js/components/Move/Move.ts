@@ -5,6 +5,7 @@ import {
   EVENT_REFRESH,
   EVENT_REPOSITIONED,
   EVENT_RESIZED,
+  EVENT_SHIFTED,
   EVENT_UPDATED,
 } from '../../constants/events';
 import { IDLE, MOVING } from '../../constants/states';
@@ -101,6 +102,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
       if ( dest !== index ) {
         Transition.cancel();
         translate( shift( position, dest > index ), true );
+        emit( EVENT_SHIFTED );
       }
 
       set( MOVING );
@@ -136,7 +138,9 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    */
   function translate( position: number, preventLoop?: boolean ): void {
     if ( ! Splide.is( FADE ) ) {
-      list.style.transform = `translate${ resolve( 'X' ) }(${ preventLoop ? position : loop( position ) }px)`;
+      const destination = preventLoop ? position : loop( position );
+      list.style.transform = `translate${ resolve( 'X' ) }(${ destination }px)`;
+      position !== destination && emit( EVENT_SHIFTED );
     }
   }
 

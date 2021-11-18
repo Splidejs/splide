@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.5.3
+ * Version  : 3.5.4
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -371,6 +371,7 @@ const EVENT_MOUNTED = "mounted";
 const EVENT_READY = "ready";
 const EVENT_MOVE = "move";
 const EVENT_MOVED = "moved";
+const EVENT_SHIFTED = "shifted";
 const EVENT_CLICK = "click";
 const EVENT_ACTIVE = "active";
 const EVENT_INACTIVE = "inactive";
@@ -786,12 +787,12 @@ function Slide$1(Splide2, index, slideIndex, slide) {
       slide.id = `${root.id}-slide${pad(index + 1)}`;
     }
     bind(slide, "click keydown", (e) => {
-      emit(e.type === "click" ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, this, e);
+      emit(e.type === "click" ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, self, e);
     });
-    on([EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_MOVED, EVENT_SCROLLED], update.bind(this));
-    on(EVENT_NAVIGATION_MOUNTED, initNavigation.bind(this));
+    on([EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_SHIFTED, EVENT_MOVED, EVENT_SCROLLED], update);
+    on(EVENT_NAVIGATION_MOUNTED, initNavigation);
     if (updateOnMove) {
-      on(EVENT_MOVE, onMove.bind(this));
+      on(EVENT_MOVE, onMove);
     }
   }
   function destroy() {
@@ -808,21 +809,18 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     setAttribute(slide, ARIA_LABEL, label);
     setAttribute(slide, ARIA_CONTROLS, controls);
     setAttribute(slide, ROLE, "menuitem");
-    updateActivity.call(this, isActive());
+    updateActivity(isActive());
   }
-  function onMove(next, prev, dest) {
+  function onMove() {
     if (!destroyed) {
-      update.call(this);
-      if (dest === index) {
-        updateActivity.call(this, true);
-      }
+      update();
     }
   }
   function update() {
     if (!destroyed) {
       const { index: currIndex } = Splide2;
-      updateActivity.call(this, isActive());
-      updateVisibility.call(this, isVisible());
+      updateActivity(isActive());
+      updateVisibility(isVisible());
       toggleClass(slide, CLASS_PREV, index === currIndex - 1);
       toggleClass(slide, CLASS_NEXT, index === currIndex + 1);
     }
@@ -833,7 +831,7 @@ function Slide$1(Splide2, index, slideIndex, slide) {
       if (isNavigation) {
         setAttribute(slide, ARIA_CURRENT, active || null);
       }
-      emit(active ? EVENT_ACTIVE : EVENT_INACTIVE, this);
+      emit(active ? EVENT_ACTIVE : EVENT_INACTIVE, self);
     }
   }
   function updateVisibility(visible) {
@@ -847,14 +845,15 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     }
     if (visible !== hasClass(slide, CLASS_VISIBLE)) {
       toggleClass(slide, CLASS_VISIBLE, visible);
-      emit(visible ? EVENT_VISIBLE : EVENT_HIDDEN, this);
+      !isClone && emit(visible ? EVENT_VISIBLE : EVENT_HIDDEN, self);
     }
   }
   function style$1(prop, value, useContainer) {
     style(useContainer && container || slide, prop, value);
   }
   function isActive() {
-    return Splide2.index === index;
+    const { index: curr } = Splide2;
+    return curr === index || options.cloneStatus && curr === slideIndex;
   }
   function isVisible() {
     if (Splide2.is(FADE)) {
@@ -873,7 +872,7 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     }
     return diff <= distance;
   }
-  return {
+  const self = {
     index,
     slideIndex,
     slide,
@@ -885,6 +884,7 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     style: style$1,
     isWithin
   };
+  return self;
 }
 
 function Slides(Splide2, Components2, options) {
@@ -1199,6 +1199,7 @@ function Move(Splide2, Components2, options) {
       if (dest !== index) {
         Transition.cancel();
         translate(shift(position, dest > index), true);
+        emit(EVENT_SHIFTED);
       }
       set(MOVING);
       emit(EVENT_MOVE, index, prev, dest);
@@ -1218,7 +1219,9 @@ function Move(Splide2, Components2, options) {
   }
   function translate(position, preventLoop) {
     if (!Splide2.is(FADE)) {
-      list.style.transform = `translate${resolve("X")}(${preventLoop ? position : loop(position)}px)`;
+      const destination = preventLoop ? position : loop(position);
+      list.style.transform = `translate${resolve("X")}(${destination}px)`;
+      position !== destination && emit(EVENT_SHIFTED);
     }
   }
   function loop(position) {
@@ -1386,7 +1389,7 @@ function Controller(Splide2, Components2, options) {
           dest = toIndex(toPage(dest));
         } else {
           if (isLoop) {
-            dest = perMove ? dest : dest < 0 ? -(slideCount % perPage || perPage) : slideCount;
+            dest = perMove || hasFocus() ? dest : dest < 0 ? -(slideCount % perPage || perPage) : slideCount;
           } else if (options.rewind) {
             dest = dest < 0 ? end : 0;
           } else {
@@ -2254,6 +2257,7 @@ const DEFAULTS = {
   speed: 400,
   waitForTransition: true,
   perPage: 1,
+  cloneStatus: true,
   arrows: true,
   pagination: true,
   interval: 5e3,
@@ -2823,4 +2827,4 @@ class SplideRenderer {
   }
 }
 
-export { CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_AUTOPLAY, CLASS_CLONE, CLASS_CONTAINER, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PAUSE, CLASS_PLAY, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SLIDER, CLASS_SPINNER, CLASS_TRACK, CLASS_VISIBLE, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, EventBus, EventInterface, RequestInterval, STATUS_CLASSES, Splide, SplideRenderer, State, Throttle, Splide as default };
+export { CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_AUTOPLAY, CLASS_CLONE, CLASS_CONTAINER, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PAUSE, CLASS_PLAY, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SLIDER, CLASS_SPINNER, CLASS_TRACK, CLASS_VISIBLE, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, EventBus, EventInterface, RequestInterval, STATUS_CLASSES, Splide, SplideRenderer, State, Throttle, Splide as default };

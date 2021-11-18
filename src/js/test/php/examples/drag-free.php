@@ -40,7 +40,7 @@ $settings = get_settings();
 </head>
 <body>
 
-<?php render(); ?>
+<?php render( 'splide01', 4 ); ?>
 
 </body>
 </html>

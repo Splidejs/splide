@@ -21,12 +21,14 @@ $settings = get_settings();
       var splide = new Splide( '#splide01', {
         type   : 'loop',
         perPage: 3,
-        // perMove: 2,
-        rewind: true,
+        // perMove: 1,
+        // rewind: true,
         // padding: {
         //   right: 0,
         //   left: 40,
         // },
+        updateOnMove: true,
+        focus: 'center',
         noDrag: 'button',
       } );
 
@@ -46,6 +48,10 @@ $settings = get_settings();
         console.log( 'click' );
       } );
 
+      splide.on( 'shifted', () => {
+        console.log( 'shifted' );
+      } );
+
       splide.mount();
     } );
   </script>
@@ -58,7 +64,7 @@ $settings = get_settings();
 </head>
 <body>
 
-<?php render( 'splide01', 12, true ); ?>
+<?php render( 'splide01', 11 ); ?>
 
 <pre></pre>
 

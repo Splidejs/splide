@@ -263,6 +263,11 @@ export interface ResponsiveOptions {
   clones?: number;
 
   /**
+   * Determines whether to clone status classes for clones or not.
+   */
+  cloneStatus?: boolean;
+
+  /**
    * Determines which slide should be active if there are multiple slides in a page.
    * Numbers and `'center'` are acceptable.
    */

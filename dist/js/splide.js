@@ -418,6 +418,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var EVENT_READY = "ready";
   var EVENT_MOVE = "move";
   var EVENT_MOVED = "moved";
+  var EVENT_SHIFTED = "shifted";
   var EVENT_CLICK = "click";
   var EVENT_ACTIVE = "active";
   var EVENT_INACTIVE = "inactive";
@@ -885,20 +886,18 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var destroyed;
 
     function mount() {
-      var _this2 = this;
-
       if (!isClone) {
         slide.id = root.id + "-slide" + pad(index + 1);
       }
 
       bind(slide, "click keydown", function (e) {
-        emit(e.type === "click" ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, _this2, e);
+        emit(e.type === "click" ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, self, e);
       });
-      on([EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_MOVED, EVENT_SCROLLED], update.bind(this));
-      on(EVENT_NAVIGATION_MOUNTED, initNavigation.bind(this));
+      on([EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_SHIFTED, EVENT_MOVED, EVENT_SCROLLED], update);
+      on(EVENT_NAVIGATION_MOUNTED, initNavigation);
 
       if (updateOnMove) {
-        on(EVENT_MOVE, onMove.bind(this));
+        on(EVENT_MOVE, onMove);
       }
     }
 
@@ -919,24 +918,20 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       setAttribute(slide, ARIA_LABEL, label);
       setAttribute(slide, ARIA_CONTROLS, controls);
       setAttribute(slide, ROLE, "menuitem");
-      updateActivity.call(this, isActive());
+      updateActivity(isActive());
     }
 
-    function onMove(next, prev, dest) {
+    function onMove() {
       if (!destroyed) {
-        update.call(this);
-
-        if (dest === index) {
-          updateActivity.call(this, true);
-        }
+        update();
       }
     }
 
     function update() {
       if (!destroyed) {
         var currIndex = Splide2.index;
-        updateActivity.call(this, isActive());
-        updateVisibility.call(this, isVisible());
+        updateActivity(isActive());
+        updateVisibility(isVisible());
         toggleClass(slide, CLASS_PREV, index === currIndex - 1);
         toggleClass(slide, CLASS_NEXT, index === currIndex + 1);
       }
@@ -950,7 +945,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           setAttribute(slide, ARIA_CURRENT, active || null);
         }
 
-        emit(active ? EVENT_ACTIVE : EVENT_INACTIVE, this);
+        emit(active ? EVENT_ACTIVE : EVENT_INACTIVE, self);
       }
     }
 
@@ -967,7 +962,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       if (visible !== hasClass(slide, CLASS_VISIBLE)) {
         toggleClass(slide, CLASS_VISIBLE, visible);
-        emit(visible ? EVENT_VISIBLE : EVENT_HIDDEN, this);
+        emit(visible ? EVENT_VISIBLE : EVENT_HIDDEN, self);
       }
     }
 
@@ -976,7 +971,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function isActive() {
-      return Splide2.index === index;
+      var curr = Splide2.index;
+      return curr === index || options.cloneStatus && curr === slideIndex;
     }
 
     function isVisible() {
@@ -1001,7 +997,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       return diff <= distance;
     }
 
-    return {
+    var self = {
       index: index,
       slideIndex: slideIndex,
       slide: slide,
@@ -1013,6 +1009,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       style: style$1,
       isWithin: isWithin
     };
+    return self;
   }
 
   function Slides(Splide2, Components2, options) {
@@ -1426,6 +1423,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         if (dest !== index) {
           Transition.cancel();
           translate(shift(position, dest > index), true);
+          emit(EVENT_SHIFTED);
         }
 
         set(MOVING);
@@ -1449,7 +1447,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function translate(position, preventLoop) {
       if (!Splide2.is(FADE)) {
-        list.style.transform = "translate" + resolve("X") + "(" + (preventLoop ? position : loop(position)) + "px)";
+        var destination = preventLoop ? position : loop(position);
+        list.style.transform = "translate" + resolve("X") + "(" + destination + "px)";
+        position !== destination && emit(EVENT_SHIFTED);
       }
     }
 
@@ -1659,7 +1659,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
             dest = toIndex(toPage(dest));
           } else {
             if (isLoop) {
-              dest = perMove ? dest : dest < 0 ? -(slideCount % perPage || perPage) : slideCount;
+              dest = perMove || hasFocus() ? dest : dest < 0 ? -(slideCount % perPage || perPage) : slideCount;
             } else if (options.rewind) {
               dest = dest < 0 ? end : 0;
             } else {
@@ -2751,6 +2751,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     speed: 400,
     waitForTransition: true,
     perPage: 1,
+    cloneStatus: true,
     arrows: true,
     pagination: true,
     interval: 5e3,
@@ -2876,7 +2877,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var _proto = _Splide.prototype;
 
     _proto.mount = function mount(Extensions, Transition) {
-      var _this3 = this;
+      var _this2 = this;
 
       var state = this.state,
           Components2 = this.Components;
@@ -2889,7 +2890,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         Transition: this._Transition
       });
       forOwn(Constructors, function (Component, key) {
-        var component = Component(_this3, Components2, _this3._options);
+        var component = Component(_this2, Components2, _this2._options);
         Components2[key] = component;
         component.setup && component.setup();
       });

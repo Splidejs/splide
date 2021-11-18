@@ -14,6 +14,7 @@ export const DEFAULTS: Options = {
   speed            : 400,
   waitForTransition: true,
   perPage          : 1,
+  cloneStatus      : true,
   arrows           : true,
   pagination       : true,
   interval         : 5000,
