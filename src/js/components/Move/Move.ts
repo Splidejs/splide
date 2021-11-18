@@ -102,7 +102,6 @@ export function Move( Splide: Splide, Components: Components, options: Options )
       if ( dest !== index ) {
         Transition.cancel();
         translate( shift( position, dest > index ), true );
-        emit( EVENT_SHIFTED );
       }
 
       set( MOVING );

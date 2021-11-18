@@ -27,7 +27,7 @@ $settings = get_settings();
         //   right: 0,
         //   left: 40,
         // },
-        updateOnMove: true,
+        // updateOnMove: true,
         focus: 'center',
         noDrag: 'button',
       } );

@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.5.5
+ * Version  : 3.5.6
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1199,7 +1199,6 @@ function Move(Splide2, Components2, options) {
       if (dest !== index) {
         Transition.cancel();
         translate(shift(position, dest > index), true);
-        emit(EVENT_SHIFTED);
       }
       set(MOVING);
       emit(EVENT_MOVE, index, prev, dest);
