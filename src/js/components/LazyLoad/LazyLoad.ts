@@ -5,7 +5,7 @@ import {
   EVENT_MOUNTED,
   EVENT_MOVED,
   EVENT_REFRESH,
-  EVENT_RESIZE,
+  EVENT_RESIZE, EVENT_SCROLLED,
 } from '../../constants/events';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
@@ -80,7 +80,7 @@ export function LazyLoad( Splide: Splide, Components: Components, options: Optio
       on( EVENT_REFRESH, refresh );
 
       if ( ! isSequential ) {
-        on( [ EVENT_MOUNTED, EVENT_REFRESH, EVENT_MOVED ], observe );
+        on( [ EVENT_MOUNTED, EVENT_REFRESH, EVENT_MOVED, EVENT_SCROLLED ], observe );
       }
     }
   }

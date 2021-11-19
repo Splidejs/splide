@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.5.7
+ * Version  : 3.5.8
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1978,7 +1978,7 @@ function LazyLoad(Splide2, Components2, options) {
       init();
       on(EVENT_REFRESH, refresh);
       if (!isSequential) {
-        on([EVENT_MOUNTED, EVENT_REFRESH, EVENT_MOVED], observe);
+        on([EVENT_MOUNTED, EVENT_REFRESH, EVENT_MOVED, EVENT_SCROLLED], observe);
       }
     }
   }
