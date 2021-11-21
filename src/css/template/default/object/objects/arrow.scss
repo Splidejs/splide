@@ -70,7 +70,7 @@ $right: 1em !default;
       }
     }
 
-    &:focus {
+    &:focus:not(:focus-visible) {
       outline: none;
     }
 

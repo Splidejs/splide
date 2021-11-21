@@ -12,14 +12,22 @@ import { includes, isHTMLElement, nextTick, removeAttribute, setAttribute } from
  * @since 3.0.0
  */
 export interface KeyboardComponent extends BaseComponent {
+  disable( disabled: boolean ): void;
 }
 
 /**
- * The collection of arrow keys of IE.
+ * Arrow keys of IE.
  *
  * @since 3.0.0
  */
 const IE_ARROW_KEYS = [ 'Left', 'Right', 'Up', 'Down' ];
+
+/**
+ * The keyboard event name.
+ *
+ * @since 3.6.0
+ */
+const KEYBOARD_EVENT = 'keydown';
 
 /**
  * The component for controlling the slider by keyboards.
@@ -34,7 +42,7 @@ const IE_ARROW_KEYS = [ 'Left', 'Right', 'Up', 'Down' ];
  */
 export function Keyboard( Splide: Splide, Components: Components, options: Options ): KeyboardComponent {
   const { on, bind, unbind } = EventInterface( Splide );
-  const { root } = Components.Elements;
+  const { root } = Splide;
   const { resolve } = Components.Direction;
 
   /**
@@ -60,7 +68,7 @@ export function Keyboard( Splide: Splide, Components: Components, options: Optio
    * Initializes the component.
    */
   function init(): void {
-    const { keyboard = 'global' } = options;
+    const { keyboard } = options;
 
     if ( keyboard ) {
       if ( keyboard === 'focused' ) {
@@ -70,7 +78,7 @@ export function Keyboard( Splide: Splide, Components: Components, options: Optio
         target = window;
       }
 
-      bind( target, 'keydown', onKeydown );
+      bind( target, KEYBOARD_EVENT, onKeydown );
     }
   }
 
@@ -78,7 +86,7 @@ export function Keyboard( Splide: Splide, Components: Components, options: Optio
    * Destroys the component.
    */
   function destroy(): void {
-    unbind( target, 'keydown' );
+    unbind( target, KEYBOARD_EVENT );
 
     if ( isHTMLElement( target ) ) {
       removeAttribute( target, TAB_INDEX );
@@ -86,12 +94,22 @@ export function Keyboard( Splide: Splide, Components: Components, options: Optio
   }
 
   /**
+   * Disables the keyboard input.
+   *
+   * @param value - Toggles disabling/enabling the keyboard input.
+   */
+  function disable( value: boolean ): void {
+    disabled = value;
+  }
+
+  /**
    * Called when the slider moves.
    * To avoid the slider from moving twice, wait for a tick.
    */
   function onMove(): void {
+    const _disabled = disabled;
     disabled = true;
-    nextTick( () => { disabled = false } );
+    nextTick( () => { disabled = _disabled } );
   }
 
   /**
@@ -123,5 +141,6 @@ export function Keyboard( Splide: Splide, Components: Components, options: Optio
   return {
     mount,
     destroy,
+    disable,
   };
 }

@@ -6,6 +6,7 @@ import { BaseComponent, Components, Options } from '../../types';
  * @since 3.0.0
  */
 export interface KeyboardComponent extends BaseComponent {
+    disable(disabled: boolean): void;
 }
 /**
  * The component for controlling the slider by keyboards.

@@ -20,7 +20,7 @@ $settings = get_settings();
         width      : 800,
         type       : 'loop',
         heightRatio: 0.3,
-        perPage    : 2,
+        perPage    : 1,
         waitForTransition: false,
         breakpoints: {
           1000: {

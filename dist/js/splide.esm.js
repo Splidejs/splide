@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.5.8
+ * Version  : 3.6.0
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -1908,9 +1908,10 @@ function Drag(Splide2, Components2, options) {
 }
 
 const IE_ARROW_KEYS = ["Left", "Right", "Up", "Down"];
+const KEYBOARD_EVENT = "keydown";
 function Keyboard(Splide2, Components2, options) {
   const { on, bind, unbind } = EventInterface(Splide2);
-  const { root } = Components2.Elements;
+  const { root } = Splide2;
   const { resolve } = Components2.Direction;
   let target;
   let disabled;
@@ -1920,7 +1921,7 @@ function Keyboard(Splide2, Components2, options) {
     on(EVENT_MOVE, onMove);
   }
   function init() {
-    const { keyboard = "global" } = options;
+    const { keyboard } = options;
     if (keyboard) {
       if (keyboard === "focused") {
         target = root;
@@ -1928,19 +1929,23 @@ function Keyboard(Splide2, Components2, options) {
       } else {
         target = window;
       }
-      bind(target, "keydown", onKeydown);
+      bind(target, KEYBOARD_EVENT, onKeydown);
     }
   }
   function destroy() {
-    unbind(target, "keydown");
+    unbind(target, KEYBOARD_EVENT);
     if (isHTMLElement(target)) {
       removeAttribute(target, TAB_INDEX);
     }
   }
+  function disable(value) {
+    disabled = value;
+  }
   function onMove() {
+    const _disabled = disabled;
     disabled = true;
     nextTick(() => {
-      disabled = false;
+      disabled = _disabled;
     });
   }
   function onUpdated() {
@@ -1960,7 +1965,8 @@ function Keyboard(Splide2, Components2, options) {
   }
   return {
     mount,
-    destroy
+    destroy,
+    disable
   };
 }
 
@@ -2267,6 +2273,7 @@ const DEFAULTS = {
   pauseOnHover: true,
   pauseOnFocus: true,
   resetProgress: true,
+  keyboard: true,
   easing: "cubic-bezier(0.25, 1, 0.5, 1)",
   drag: true,
   direction: "ltr",

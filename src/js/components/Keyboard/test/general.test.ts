@@ -87,4 +87,31 @@ describe( 'Keyboard', () => {
     keydown( 'ArrowRight', root );
     expect( splide.index ).toBe( 1 );
   } );
+
+  test( 'can disable the keyboard input.', async () => {
+    const splide = init( { speed: 0 } );
+    const { disable } = splide.Components.Keyboard;
+
+    keydown( 'ArrowRight' );
+    expect( splide.index ).toBe( 1 );
+
+    await wait();
+
+    disable( true );
+
+    keydown( 'ArrowRight' );
+    expect( splide.index ).toBe( 1 );
+
+    await wait();
+
+    keydown( 'ArrowLeft' );
+    expect( splide.index ).toBe( 1 );
+
+    await wait();
+
+    disable( false );
+
+    keydown( 'ArrowLeft' );
+    expect( splide.index ).toBe( 0 );
+  } );
 } );

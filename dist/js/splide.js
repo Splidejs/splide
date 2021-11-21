@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.5.8
+ * Version  : 3.6.0
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -2304,6 +2304,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   var IE_ARROW_KEYS = ["Left", "Right", "Up", "Down"];
+  var KEYBOARD_EVENT = "keydown";
 
   function Keyboard(Splide2, Components2, options) {
     var _EventInterface13 = EventInterface(Splide2),
@@ -2311,7 +2312,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         bind = _EventInterface13.bind,
         unbind = _EventInterface13.unbind;
 
-    var root = Components2.Elements.root;
+    var root = Splide2.root;
     var resolve = Components2.Direction.resolve;
     var target;
     var disabled;
@@ -2323,8 +2324,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function init() {
-      var _options$keyboard = options.keyboard,
-          keyboard = _options$keyboard === void 0 ? "global" : _options$keyboard;
+      var keyboard = options.keyboard;
 
       if (keyboard) {
         if (keyboard === "focused") {
@@ -2334,22 +2334,27 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           target = window;
         }
 
-        bind(target, "keydown", onKeydown);
+        bind(target, KEYBOARD_EVENT, onKeydown);
       }
     }
 
     function destroy() {
-      unbind(target, "keydown");
+      unbind(target, KEYBOARD_EVENT);
 
       if (isHTMLElement(target)) {
         removeAttribute(target, TAB_INDEX);
       }
     }
 
+    function disable(value) {
+      disabled = value;
+    }
+
     function onMove() {
+      var _disabled = disabled;
       disabled = true;
       nextTick(function () {
-        disabled = false;
+        disabled = _disabled;
       });
     }
 
@@ -2373,7 +2378,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     return {
       mount: mount,
-      destroy: destroy
+      destroy: destroy,
+      disable: disable
     };
   }
 
@@ -2763,6 +2769,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     pauseOnHover: true,
     pauseOnFocus: true,
     resetProgress: true,
+    keyboard: true,
     easing: "cubic-bezier(0.25, 1, 0.5, 1)",
     drag: true,
     direction: "ltr",
