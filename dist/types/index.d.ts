@@ -7,3 +7,6 @@ export * from './types';
 export * from './constants/events';
 export * from './constants/classes';
 //# sourceMappingURL=../../src/js/index.d.ts.map
+declare module '@splidejs/splide' {
+  export * from './types';
+}
