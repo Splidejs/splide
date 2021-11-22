@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.6.1
+ * Version  : 3.6.3
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -2482,9 +2482,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function onLoad(data, error) {
       var _Slide = data._Slide;
       removeClass(_Slide.slide, CLASS_LOADING);
+      remove(data._spinner);
 
       if (!error) {
-        remove(data._spinner);
         display(data._img, "");
         emit(EVENT_LAZYLOAD_LOADED, data._img, _Slide);
         emit(EVENT_RESIZE);

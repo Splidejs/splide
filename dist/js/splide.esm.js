@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.6.1
+ * Version  : 3.6.3
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -2043,8 +2043,8 @@ function LazyLoad(Splide2, Components2, options) {
   function onLoad(data, error) {
     const { _Slide } = data;
     removeClass(_Slide.slide, CLASS_LOADING);
+    remove(data._spinner);
     if (!error) {
-      remove(data._spinner);
       display(data._img, "");
       emit(EVENT_LAZYLOAD_LOADED, data._img, _Slide);
       emit(EVENT_RESIZE);
