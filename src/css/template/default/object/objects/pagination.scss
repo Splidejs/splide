@@ -60,7 +60,13 @@ $dot-transform-active: scale( 1.4 ) !default;
       }
 
       &:focus:not(:focus-visible) {
-        outline: none;
+        outline: 0;
+      }
+
+      @media all and (-ms-high-contrast: none) {
+        &:focus {
+          outline: 0;
+        }
       }
     }
   }

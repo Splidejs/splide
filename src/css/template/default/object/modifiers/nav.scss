@@ -33,8 +33,14 @@ $opacity-active: false !default;
             }
           }
 
-          &:focus {
-            outline: none;
+          &:focus:not(:focus-visible) {
+            outline: 0;
+          }
+
+          @media all and (-ms-high-contrast: none) {
+            &:focus {
+              outline: 0;
+            }
           }
         }
       }
