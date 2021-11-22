@@ -190,14 +190,14 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    * @param visible - Set `true` if the slide is visible.
    */
   function updateVisibility( visible: boolean ): void {
-    const ariaHidden = ! visible && ! isActive();
+    const hidden = ! visible && ( ! isActive() || isClone );
 
-    setAttribute( slide, ARIA_HIDDEN, ariaHidden || null );
-    setAttribute( slide, TAB_INDEX, ! ariaHidden && options.slideFocus ? 0 : null );
+    setAttribute( slide, ARIA_HIDDEN, hidden || null );
+    setAttribute( slide, TAB_INDEX, ! hidden && options.slideFocus ? 0 : null );
 
     if ( focusableNodes ) {
       focusableNodes.forEach( node => {
-        setAttribute( node, TAB_INDEX, ariaHidden ? -1 : null );
+        setAttribute( node, TAB_INDEX, hidden ? -1 : null );
       } );
     }
 

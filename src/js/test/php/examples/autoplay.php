@@ -19,7 +19,8 @@ $settings = get_settings();
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
-        rewind       : true,
+        // rewind       : true,
+        type         : 'loop',
         autoplay     : true,
         pauseOnHover : false,
         resetProgress: false,

@@ -19,10 +19,10 @@ $settings = get_settings();
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
-        perPage: 2,
+        perPage: 4,
         gap    : '1.5rem',
         drag   : 'free',
-        height : 200,
+        // height : 400,
         type   : 'loop',
         // direction: 'rtl',
         waitForTransition: false,
@@ -40,7 +40,7 @@ $settings = get_settings();
 </head>
 <body>
 
-<?php render( 'splide01', 4 ); ?>
+<?php render( 'splide01', 10 ); ?>
 
 </body>
 </html>

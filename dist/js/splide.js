@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.6.0
+ * Version  : 3.6.1
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -950,13 +950,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function updateVisibility(visible) {
-      var ariaHidden = !visible && !isActive();
-      setAttribute(slide, ARIA_HIDDEN, ariaHidden || null);
-      setAttribute(slide, TAB_INDEX, !ariaHidden && options.slideFocus ? 0 : null);
+      var hidden = !visible && (!isActive() || isClone);
+      setAttribute(slide, ARIA_HIDDEN, hidden || null);
+      setAttribute(slide, TAB_INDEX, !hidden && options.slideFocus ? 0 : null);
 
       if (focusableNodes) {
         focusableNodes.forEach(function (node) {
-          setAttribute(node, TAB_INDEX, ariaHidden ? -1 : null);
+          setAttribute(node, TAB_INDEX, hidden ? -1 : null);
         });
       }
 

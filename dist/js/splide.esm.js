@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.6.0
+ * Version  : 3.6.1
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -835,12 +835,12 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     }
   }
   function updateVisibility(visible) {
-    const ariaHidden = !visible && !isActive();
-    setAttribute(slide, ARIA_HIDDEN, ariaHidden || null);
-    setAttribute(slide, TAB_INDEX, !ariaHidden && options.slideFocus ? 0 : null);
+    const hidden = !visible && (!isActive() || isClone);
+    setAttribute(slide, ARIA_HIDDEN, hidden || null);
+    setAttribute(slide, TAB_INDEX, !hidden && options.slideFocus ? 0 : null);
     if (focusableNodes) {
       focusableNodes.forEach((node) => {
-        setAttribute(node, TAB_INDEX, ariaHidden ? -1 : null);
+        setAttribute(node, TAB_INDEX, hidden ? -1 : null);
       });
     }
     if (visible !== hasClass(slide, CLASS_VISIBLE)) {
