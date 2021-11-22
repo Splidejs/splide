@@ -59,14 +59,8 @@ $dot-transform-active: scale( 1.4 ) !default;
         }
       }
 
-      &:focus:not(:focus-visible) {
-        outline: 0;
-      }
-
-      @media all and (-ms-high-contrast: none) {
-        &:focus {
-          outline: 0;
-        }
+      &:focus {
+        outline: none;
       }
     }
   }

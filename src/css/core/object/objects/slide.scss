@@ -5,17 +5,8 @@
     flex-shrink: 0;
     list-style-type: none !important;
     margin: 0;
+    outline: none;
     position: relative;
-
-    &:focus:not(:focus-visible) {
-      outline: 0;
-    }
-
-    @media all and (-ms-high-contrast: none) {
-      &:focus {
-        outline: 0;
-      }
-    }
 
     img {
       vertical-align: bottom;
