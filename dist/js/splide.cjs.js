@@ -2906,4 +2906,4 @@ exports.Splide = Splide;
 exports.SplideRenderer = SplideRenderer;
 exports.State = State;
 exports.Throttle = Throttle;
-exports['default'] = Splide;
+exports["default"] = Splide;

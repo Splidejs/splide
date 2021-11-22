@@ -1,6 +1,6 @@
 const rollup  = require( 'rollup' ).rollup;
 const resolve = require( '@rollup/plugin-node-resolve' ).nodeResolve;
-const esbuild = require( 'rollup-plugin-esbuild' );
+const esbuild = require( 'rollup-plugin-esbuild' ).default;
 const banner  = require( './constants/banner' );
 const name    = 'splide';
 
