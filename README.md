@@ -50,6 +50,18 @@ No dependencies, no Lighthouse errors.
 </p>
 
 <h3>
+  Extensions
+</h3>
+
+<p>
+  <a href="https://splidejs.com/extensions/auto-scroll/">Auto Scroll</a> ・
+  <a href="https://splidejs.com/extensions/intersection/">Intersection</a> ・
+  <a href="https://splidejs.com/extensions/grid/">Grid</a> ・
+  <a href="https://splidejs.com/extensions/video/">Video</a> ・
+  <a href="https://splidejs.com/extensions/url-hash/">URL Hash</a>
+</p>
+
+<h3>
   Translation
 </h3>
 
