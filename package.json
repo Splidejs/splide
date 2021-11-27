@@ -1,6 +1,6 @@
 {
   "name": "@splidejs/splide",
-  "version": "3.6.4",
+  "version": "3.6.5",
   "description": "Splide is a lightweight, flexible and accessible slider/carousel. No dependencies, no Lighthouse errors.",
   "author": "Naotoshi Fujita",
   "license": "MIT",
@@ -58,7 +58,7 @@
     "develop": "node scripts/develop.js",
     "build:js": "node scripts/build-script.js",
     "build:module": "node scripts/build-module.js",
-    "build:types": "node scripts/clean.js && tsc --emitDeclarationOnly && node scripts/copy.js",
+    "build:types": "node scripts/clean.js && tsc --emitDeclarationOnly",
     "build:css": "node scripts/build-css.js",
     "build:all": "npm run build:js && npm run build:module && npm run build:css && npm run build:types",
     "check:types": "tsc --noEmit",
