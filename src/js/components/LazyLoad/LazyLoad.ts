@@ -176,9 +176,9 @@ export function LazyLoad( Splide: Splide, Components: Components, options: Optio
     const { _Slide } = data;
 
     removeClass( _Slide.slide, CLASS_LOADING );
-    remove( data._spinner );
 
     if ( ! error ) {
+      remove( data._spinner );
       display( data._img, '' );
       emit( EVENT_LAZYLOAD_LOADED, data._img, _Slide );
       emit( EVENT_RESIZE );
