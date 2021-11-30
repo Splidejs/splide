@@ -1,5 +1,6 @@
 import { Splide } from '../core/Splide/Splide';
-import { Components, Options } from '@splidejs/splide';
+import { Components } from './components';
+import { Options } from './options';
 
 
 /**

@@ -11,8 +11,7 @@
     "suppressImplicitAnyIndexErrors": true,
     "allowJs": false,
     "declarationDir": "./dist/types",
-    "declaration"   : true,
-    "declarationMap": true,
+    "declaration": true,
     "lib": [
       "dom",
       "es6"
