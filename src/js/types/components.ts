@@ -19,30 +19,27 @@ import { WheelComponent } from '../components/Wheel/Wheel';
 import { BaseComponent, TransitionComponent } from './general';
 
 
-/**
- * The interface for components.
- *
- * @since 3.5.3
- */
-export interface Components {
-  [ key: string ]: BaseComponent;
-  Options: OptionsComponent;
-  Direction: DirectionComponent;
-  Elements: ElementsComponent;
-  Slides: SlidesComponent;
-  Layout: LayoutComponent;
-  Clones: ClonesComponent;
-  Move: MoveComponent;
-  Controller: ControllerComponent;
-  Arrows: ArrowsComponent;
-  Autoplay: AutoplayComponent;
-  Cover: CoverComponent;
-  Scroll: ScrollComponent;
-  Drag: DragComponent;
-  Keyboard: KeyboardComponent;
-  LazyLoad: LazyLoadComponent;
-  Pagination: PaginationComponent;
-  Sync: SyncComponent;
-  Wheel: WheelComponent;
-  Transition: TransitionComponent;
+declare module '@splidejs/splide' {
+  export interface Components {
+    [ key: string ]: BaseComponent;
+    Options: OptionsComponent;
+    Direction: DirectionComponent;
+    Elements: ElementsComponent;
+    Slides: SlidesComponent;
+    Layout: LayoutComponent;
+    Clones: ClonesComponent;
+    Move: MoveComponent;
+    Controller: ControllerComponent;
+    Arrows: ArrowsComponent;
+    Autoplay: AutoplayComponent;
+    Cover: CoverComponent;
+    Scroll: ScrollComponent;
+    Drag: DragComponent;
+    Keyboard: KeyboardComponent;
+    LazyLoad: LazyLoadComponent;
+    Pagination: PaginationComponent;
+    Sync: SyncComponent;
+    Wheel: WheelComponent;
+    Transition: TransitionComponent;
+  }
 }

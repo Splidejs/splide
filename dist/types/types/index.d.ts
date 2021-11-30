@@ -1,5 +1,9 @@
-export * from './components';
-export * from './events';
+export { Components, Options, ResponsiveOptions, EventMap } from '@splidejs/splide';
 export * from './general';
-export * from './options';
+/**
+ * Explicitly declares the module for extensions.
+ *
+ * @since 3.6.7
+ */
+declare module '@splidejs/splide' { }
 //# sourceMappingURL=../../../src/js/types/index.d.ts.map

@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.6.6
+ * Version  : 3.6.5
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
