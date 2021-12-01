@@ -19,6 +19,11 @@ import { WheelComponent } from '../components/Wheel/Wheel';
 import { BaseComponent, TransitionComponent } from './general';
 
 
+/**
+ * The interface for all components.
+ *
+ * @since 3.0.0
+ */
 export interface Components {
   [ key: string ]: BaseComponent;
   Options: OptionsComponent;

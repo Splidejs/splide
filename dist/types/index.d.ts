@@ -583,6 +583,11 @@ interface SyncTarget {
     isParent?: boolean;
 }
 
+/**
+ * The interface for all components.
+ *
+ * @since 3.0.0
+ */
 interface Components {
     [key: string]: BaseComponent;
     Options: OptionsComponent;
@@ -606,6 +611,11 @@ interface Components {
     Transition: TransitionComponent;
 }
 
+/**
+ * The interface for all internal events.
+ *
+ * @since 3.0.0
+ */
 interface EventMap {
     'mounted': () => void;
     'ready': () => void;
