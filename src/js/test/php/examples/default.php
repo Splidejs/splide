@@ -53,6 +53,10 @@ $settings = get_settings();
       } );
 
       splide.mount();
+
+			// Array.from( document.getElementsByTagName( 'button' ) ).forEach( button => {
+			// 	button.addEventListener( 'click', () => alert( 'click' ) );
+			// } );
     } );
   </script>
 

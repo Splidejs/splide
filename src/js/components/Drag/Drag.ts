@@ -122,12 +122,13 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
       const isTouch     = isTouchEvent( e );
       const isDraggable = ! noDrag || ! matches( e.target, noDrag );
 
+      clickPrevented = false;
+
       if ( isDraggable && ( isTouch || ! e.button ) ) {
         if ( ! Move.isBusy() ) {
-          target         = isTouch ? track : window;
-          prevBaseEvent  = null;
-          lastEvent      = null;
-          clickPrevented = false;
+          target        = isTouch ? track : window;
+          prevBaseEvent = null;
+          lastEvent     = null;
 
           bind( target, POINTER_MOVE_EVENTS, onPointerMove, SCROLL_LISTENER_OPTIONS );
           bind( target, POINTER_UP_EVENTS, onPointerUp, SCROLL_LISTENER_OPTIONS );

@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.6.8
+ * Version  : 3.6.9
  * License  : MIT
  * Copyright: 2021 Naotoshi Fujita
  */
@@ -2148,13 +2148,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         var noDrag = options.noDrag;
         var isTouch = isTouchEvent(e);
         var isDraggable = !noDrag || !matches(e.target, noDrag);
+        clickPrevented = false;
 
         if (isDraggable && (isTouch || !e.button)) {
           if (!Move.isBusy()) {
             target = isTouch ? track : window;
             prevBaseEvent = null;
             lastEvent = null;
-            clickPrevented = false;
             bind(target, POINTER_MOVE_EVENTS, onPointerMove, SCROLL_LISTENER_OPTIONS);
             bind(target, POINTER_UP_EVENTS, onPointerUp, SCROLL_LISTENER_OPTIONS);
             Move.cancel();
