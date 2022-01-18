@@ -106,4 +106,4 @@ The Splide slider does not degrade Accessibility, Best Practices and SEO 🎉
 
 ## License
 
-Splide is released under MIT license. © 2021 Naotoshi Fujita
+Splide is released under MIT license. © 2022 Naotoshi Fujita
