@@ -1,8 +1,8 @@
 /*!
  * Splide.js
- * Version  : 3.6.9
+ * Version  : 3.6.10
  * License  : MIT
- * Copyright: 2021 Naotoshi Fujita
+ * Copyright: 2022 Naotoshi Fujita
  */
 const PROJECT_CODE = "splide";
 const DATA_ATTRIBUTE = `data-${PROJECT_CODE}`;
