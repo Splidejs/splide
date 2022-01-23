@@ -1,5 +1,5 @@
 import { SCROLL_LISTENER_OPTIONS } from '../../constants/listener-options';
-import { MOVING } from '../../constants/states';
+import { MOVING, IDLE } from '../../constants/states';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
@@ -29,6 +29,22 @@ export function Wheel( Splide: Splide, Components: Components, options: Options 
   const { bind } = EventInterface( Splide );
 
   /**
+   * Threshold for detecting new scroll on trackpads
+   * @see https://github.com/Splidejs/splide/issues/618#issuecomment-1019341967
+   */
+  const wheelThrehold = 10;
+
+  /**
+   * The last wheel deltaY
+   */
+  let lastDeltaY = 0;
+
+  /**
+   * If the input device is a trackpad or not
+   */
+  let isTrackpad = false;
+
+  /**
    * Called when the component is mounted.
    */
   function mount(): void {
@@ -46,10 +62,29 @@ export function Wheel( Splide: Splide, Components: Components, options: Options 
     if ( e.cancelable ) {
       const { deltaY } = e;
 
-      if ( deltaY ) {
+      const diff = Math.abs( deltaY ) - Math.abs( lastDeltaY );
+
+      // additional check for trackpads
+      if ( !isTrackpad ) {
+        isTrackpad = diff !== 0;
+      }
+
+      const isNewScroll = isTrackpad ? diff > wheelThrehold : true;
+      const isDifferentDirection = deltaY * lastDeltaY < 0;
+
+      lastDeltaY = deltaY;
+
+      if (
+        deltaY &&
+        Splide.state.is( IDLE ) &&
+        ( isDifferentDirection || isNewScroll )
+      ) {
         const backwards = deltaY < 0;
         Splide.go( backwards ? '<' : '>' );
         shouldPrevent( backwards ) && prevent( e );
+
+        // reset the flag in case that the user changes devices
+        isTrackpad = false;
       }
     }
   }
