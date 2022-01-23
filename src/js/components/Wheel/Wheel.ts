@@ -74,17 +74,19 @@ export function Wheel( Splide: Splide, Components: Components, options: Options 
 
       lastDeltaY = deltaY;
 
-      if (
-        deltaY &&
-        Splide.state.is( IDLE ) &&
-        ( isDifferentDirection || isNewScroll )
-      ) {
+      if ( deltaY ) {
         const backwards = deltaY < 0;
-        Splide.go( backwards ? '<' : '>' );
-        shouldPrevent( backwards ) && prevent( e );
 
-        // reset the flag in case that the user changes devices
-        isTrackpad = false;
+        if (
+          Splide.state.is( IDLE ) &&
+          ( isDifferentDirection || isNewScroll )
+        ) {
+          Splide.go( backwards ? '<' : '>' );
+          // reset the flag in case that the user changes devices
+          isTrackpad = false;
+        }
+
+        shouldPrevent( backwards ) && prevent( e );
       }
     }
   }
