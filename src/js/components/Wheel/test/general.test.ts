@@ -36,10 +36,7 @@ describe( 'Wheel', () => {
     const splide = init( { speed: 0, wheel: true } );
     const { track } = splide.Components.Elements;
 
-    for ( let deltaY = 100; deltaY > 0; deltaY -= 10 ) {
-      fireCancelable( track, 'wheel', { deltaY } );
-    }
-
+    fireTrackpadScroll( track, 100 );
     await moved( splide );
     expect( splide.index ).toBe( 1 );
   } );
@@ -49,10 +46,7 @@ describe( 'Wheel', () => {
     const { track } = splide.Components.Elements;
 
     // trackpad
-    for ( let deltaY = 100; deltaY > 0; deltaY -= 10 ) {
-      fireCancelable( track, 'wheel', { deltaY } );
-    }
-
+    fireTrackpadScroll( track, 100 );
     await moved( splide );
     expect( splide.index ).toBe( 1 );
 
@@ -66,10 +60,7 @@ describe( 'Wheel', () => {
     expect( splide.index ).toBe( 3 );
 
     // trackpad again
-    for ( let deltaY = -100; deltaY < 0; deltaY += 10 ) {
-      fireCancelable( track, 'wheel', { deltaY } );
-    }
-
+    fireTrackpadScroll( track, -100 );
     await moved( splide );
     expect( splide.index ).toBe( 2 );
   } );
@@ -88,6 +79,15 @@ describe( 'Wheel', () => {
 
 function fireCancelable( elm: Element | Window, event: string, data: any = {} ): void {
   fire( elm, event, data, { cancelable: true } );
+}
+
+function fireTrackpadScroll( elm: Element | Window, initDelta: number ): void {
+  let remain = initDelta;
+
+  while ( remain !== 0 ) {
+    fireCancelable( elm, 'wheel', { deltaY: remain } );
+    remain = Math.trunc( remain * 0.9 );
+  }
 }
 
 async function moved( splide: Splide ): Promise<void> {
