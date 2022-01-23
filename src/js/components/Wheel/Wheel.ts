@@ -32,7 +32,7 @@ export function Wheel( Splide: Splide, Components: Components, options: Options 
    * Threshold for detecting new scroll on trackpads
    * @see https://github.com/Splidejs/splide/issues/618#issuecomment-1019341967
    */
-  const wheelThrehold = 10;
+  const trackpadThrehold = 10;
 
   /**
    * The last wheel deltaY
@@ -69,7 +69,7 @@ export function Wheel( Splide: Splide, Components: Components, options: Options 
         isTrackpad = diff !== 0;
       }
 
-      const isNewScroll = isTrackpad ? diff > wheelThrehold : true;
+      const isNewScroll = !isTrackpad || diff > trackpadThrehold;
       const isDifferentDirection = deltaY * lastDeltaY < 0;
 
       lastDeltaY = deltaY;
