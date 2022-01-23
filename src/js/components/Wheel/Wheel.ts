@@ -28,6 +28,12 @@ export interface WheelComponent extends BaseComponent {
 export function Wheel( Splide: Splide, Components: Components, options: Options ): WheelComponent {
   const { bind } = EventInterface( Splide );
 
+  enum DeviceType {
+    Unknown,
+    Mouse,
+    Trackpad,
+  }
+
   /**
    * Threshold for detecting new scroll on trackpads
    * @see https://github.com/Splidejs/splide/issues/618#issuecomment-1019341967
@@ -40,9 +46,9 @@ export function Wheel( Splide: Splide, Components: Components, options: Options 
   let lastDeltaY = 0;
 
   /**
-   * If the input device is a trackpad or not
+   * Input device type
    */
-  let isTrackpad = false;
+  let inputDevice = DeviceType.Unknown;
 
   /**
    * Called when the component is mounted.
@@ -64,12 +70,12 @@ export function Wheel( Splide: Splide, Components: Components, options: Options 
 
       const diff = Math.abs( deltaY ) - Math.abs( lastDeltaY );
 
-      // additional check for trackpads
-      if ( !isTrackpad ) {
-        isTrackpad = diff !== 0;
+      // check for input device (once per slider move)
+      if ( inputDevice === DeviceType.Unknown ) {
+        inputDevice = diff === 0 ? DeviceType.Mouse : DeviceType.Trackpad;
       }
 
-      const isNewScroll = !isTrackpad || diff > trackpadThrehold;
+      const isNewScroll = inputDevice === DeviceType.Mouse || diff > trackpadThrehold;
       const isDifferentDirection = deltaY * lastDeltaY < 0;
 
       lastDeltaY = deltaY;
@@ -82,8 +88,8 @@ export function Wheel( Splide: Splide, Components: Components, options: Options 
           ( isDifferentDirection || isNewScroll )
         ) {
           Splide.go( backwards ? '<' : '>' );
-          // reset the flag in case that the user changes devices
-          isTrackpad = false;
+          // reset input device type in case that the user changes device
+          inputDevice = DeviceType.Unknown;
         }
 
         shouldPrevent( backwards ) && prevent( e );
