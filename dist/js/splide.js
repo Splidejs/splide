@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.6.11
+ * Version  : 3.6.12
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
@@ -2471,7 +2471,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       bind(_img, "load error", function (e) {
         onLoad(data, e.type === "error");
       });
-      ["src", "srcset"].forEach(function (name) {
+      ["srcset", "src"].forEach(function (name) {
         if (data[name]) {
           setAttribute(_img, name, data[name]);
           removeAttribute(_img, name === "src" ? SRC_DATA_ATTRIBUTE : SRCSET_DATA_ATTRIBUTE);
