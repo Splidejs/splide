@@ -72,7 +72,7 @@ No dependencies, no Lighthouse errors.
 
 ## Support Splide
 
-Please support Splide to help me to maintain the project if you like it! 
+Please support the project if you like it! 
 - [GitHub Sponsors](https://github.com/sponsors/NaotoshiFujita)
 
 ## Features
