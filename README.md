@@ -70,6 +70,11 @@ No dependencies, no Lighthouse errors.
 </p>
 </div>
 
+## Support Splide
+
+Please support Splide to help me to maintain the project if you like it! 
+- [GitHub Sponsors](https://github.com/sponsors/NaotoshiFujita)
+
 ## Features
 
 - Written in TypeScript
