@@ -10,7 +10,7 @@ Splide is a lightweight, flexible and accessible slider and carousel.<br>
 No dependencies, no Lighthouse errors.
 </p>
 
-[![](https://data.jsdelivr.com/v1/package/npm/@splidejs/splide/badge)](https://www.jsdelivr.com/package/npm/@splidejs/splide)
+[![](https://data.jsdelivr.com/v1/package/npm/@splidejs/splide/badge?v=1)](https://www.jsdelivr.com/package/npm/@splidejs/splide)
 
 <p>
   <a href="https://github.com/Splidejs/splide/releases/latest">Download</a>
