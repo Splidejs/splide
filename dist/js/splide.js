@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.6.12
+ * Version  : 3.6.13
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
@@ -1781,9 +1781,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           arrows.next = next;
           listen();
           emit(EVENT_ARROWS_MOUNTED, prev, next);
-        } else {
-          display(wrapper, options.arrows === false ? "none" : "");
         }
+
+        display(wrapper, options.arrows === false ? "none" : "");
       }
     }
 

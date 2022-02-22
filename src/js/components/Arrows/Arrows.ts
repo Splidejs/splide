@@ -96,9 +96,9 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
         listen();
 
         emit( EVENT_ARROWS_MOUNTED, prev, next );
-      } else {
-        display( wrapper, options.arrows === false ? 'none' : '' );
       }
+
+      display( wrapper, options.arrows === false ? 'none' : '' );
     }
   }
 

@@ -21,7 +21,7 @@ $settings = get_settings();
       var splide = new Splide( '#splide01', {
         perPage    : 3,
         arrows     : false,
-        mediaQuery : 'min',
+        mediaQuery : 'max',
         breakpoints: {
           1200: {
             perPage: 1,
@@ -47,7 +47,22 @@ $settings = get_settings();
 </head>
 <body>
 
-<?php render(); ?>
+<div id="splide01" class="splide">
+	<div class="splide__track">
+		<div class="splide__list">
+			<?php render_slides(); ?>
+		</div>
+	</div>
+
+	<div class="splide__arrows">
+		<div class="splide__arrow splide__arrow--prev">
+			←
+		</div>
+		<div class="splide__arrow splide__arrow--next">
+			→
+		</div>
+	</div>
+</div>
 
 </body>
 </html>

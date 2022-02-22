@@ -1488,9 +1488,8 @@ function Arrows(Splide2, Components2, options) {
         arrows.next = next;
         listen();
         emit(EVENT_ARROWS_MOUNTED, prev, next);
-      } else {
-        display(wrapper, options.arrows === false ? "none" : "");
       }
+      display(wrapper, options.arrows === false ? "none" : "");
     }
   }
   function destroy() {
