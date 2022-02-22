@@ -13,8 +13,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 })(this, function () {
   'use strict';
 
-  var PROJECT_CODE = "splide";
-  var DATA_ATTRIBUTE = "data-" + PROJECT_CODE;
   var CREATED = 1;
   var MOUNTED = 2;
   var IDLE = 3;
@@ -286,6 +284,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   function unit(value) {
     return isString(value) ? value : value ? value + "px" : "";
   }
+
+  var PROJECT_CODE = "splide";
+  var DATA_ATTRIBUTE = "data-" + PROJECT_CODE;
 
   function assert(condition, message) {
     if (message === void 0) {
@@ -628,12 +629,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var currPoint;
 
     function setup() {
-      try {
-        merge(options, JSON.parse(getAttribute(Splide2.root, DATA_ATTRIBUTE)));
-      } catch (e) {
-        assert(false, e.message);
-      }
-
       initialOptions = merge({}, options);
       var breakpoints = options.breakpoints;
 
@@ -2884,6 +2879,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       this.root = root;
       merge(DEFAULTS, _Splide.defaults);
       merge(merge(this._options, DEFAULTS), options || {});
+
+      try {
+        merge(this._options, JSON.parse(getAttribute(root, DATA_ATTRIBUTE)));
+      } catch (e) {
+        assert(false, e.message);
+      }
     }
 
     var _proto = _Splide.prototype;

@@ -1,9 +1,8 @@
-import { DATA_ATTRIBUTE } from '../../constants/project';
 import { DESTROYED } from '../../constants/states';
 import { Throttle } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { assert, find, getAttribute, merge } from '../../utils';
+import { find, merge } from '../../utils';
 
 
 /**
@@ -50,12 +49,6 @@ export function Options( Splide: Splide, Components: Components, options: Option
    * Called when the component is constructed.
    */
   function setup(): void {
-    try {
-      merge( options, JSON.parse( getAttribute( Splide.root, DATA_ATTRIBUTE ) ) );
-    } catch ( e ) {
-      assert( false, e.message );
-    }
-
     initialOptions = merge( {}, options );
 
     const { breakpoints } = options;

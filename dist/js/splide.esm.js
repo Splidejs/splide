@@ -4,9 +4,6 @@
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
-const PROJECT_CODE = "splide";
-const DATA_ATTRIBUTE = `data-${PROJECT_CODE}`;
-
 const CREATED = 1;
 const MOUNTED = 2;
 const IDLE = 3;
@@ -257,6 +254,9 @@ function removeClass(elm, classes) {
 function unit(value) {
   return isString(value) ? value : value ? `${value}px` : "";
 }
+
+const PROJECT_CODE = "splide";
+const DATA_ATTRIBUTE = `data-${PROJECT_CODE}`;
 
 function assert(condition, message = "") {
   if (!condition) {
@@ -545,11 +545,6 @@ function Options(Splide2, Components2, options) {
   let points;
   let currPoint;
   function setup() {
-    try {
-      merge(options, JSON.parse(getAttribute(Splide2.root, DATA_ATTRIBUTE)));
-    } catch (e) {
-      assert(false, e.message);
-    }
     initialOptions = merge({}, options);
     const { breakpoints } = options;
     if (breakpoints) {
@@ -2371,6 +2366,11 @@ const _Splide = class {
     this.root = root;
     merge(DEFAULTS, _Splide.defaults);
     merge(merge(this._options, DEFAULTS), options || {});
+    try {
+      merge(this._options, JSON.parse(getAttribute(root, DATA_ATTRIBUTE)));
+    } catch (e) {
+      assert(false, e.message);
+    }
   }
   mount(Extensions, Transition) {
     const { state, Components: Components2 } = this;

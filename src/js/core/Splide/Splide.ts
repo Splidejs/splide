@@ -4,12 +4,13 @@ import { CLASS_INITIALIZED } from '../../constants/classes';
 import { DEFAULTS } from '../../constants/defaults';
 import { EVENT_DESTROY, EVENT_MOUNTED, EVENT_READY, EVENT_REFRESH, EVENT_UPDATED } from '../../constants/events';
 import { DEFAULT_USER_EVENT_PRIORITY } from '../../constants/priority';
+import { DATA_ATTRIBUTE } from '../../constants/project';
 import { CREATED, DESTROYED, IDLE, STATES } from '../../constants/states';
 import { FADE } from '../../constants/types';
 import { EventBus, EventBusCallback, EventBusObject, State, StateObject } from '../../constructors';
 import { Fade, Slide } from '../../transitions';
 import { ComponentConstructor, Components, EventMap, Options, SyncTarget } from '../../types';
-import { addClass, assert, assign, empty, forOwn, isString, merge, query, slice } from '../../utils';
+import { addClass, assert, assign, empty, forOwn, getAttribute, isString, merge, query, slice } from '../../utils';
 
 
 /**
@@ -87,6 +88,12 @@ export class Splide {
 
     merge( DEFAULTS, Splide.defaults );
     merge( merge( this._options, DEFAULTS ), options || {} );
+
+    try {
+      merge( this._options, JSON.parse( getAttribute( root, DATA_ATTRIBUTE ) ) );
+    } catch ( e ) {
+      assert( false, e.message );
+    }
   }
 
   /**
