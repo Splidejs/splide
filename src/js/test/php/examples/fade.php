@@ -21,6 +21,10 @@ $settings = get_settings();
       var splide = new Splide( '#splide01', {
         width: 800,
         type : 'fade',
+	      rewind: false,
+	      // rewindByDrag: true,
+	      autoplay: true,
+	      interval: 1000,
         breakpoints: {
           640: {
             width: '100%',

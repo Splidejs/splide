@@ -410,17 +410,22 @@ interface ResponsiveOptions {
      */
     [key: string]: any;
     /**
-     * Determines whether to rewind the slider or not.
-     */
-    rewind?: boolean;
-    /**
      * The transition speed in milliseconds.
      */
     speed?: number;
     /**
+     * Determines whether to rewind the slider or not.
+     */
+    rewind?: boolean;
+    /**
      * The transition speed on rewind in milliseconds.
      */
     rewindSpeed?: number;
+    /**
+     * Allows to rewind by drag.
+     * The slider `type` must be `slide` (or `undefined`) and the `drag` option must be enabled.
+     */
+    rewindByDrag?: boolean;
     /**
      * Defines the slider max width, accepting the CSS format such as 10em, 80vw.
      */
@@ -515,7 +520,7 @@ interface ResponsiveOptions {
      */
     easingFunc?: (t: number) => number;
     /**
-     * Determines whether to allow to drag the slider or not.
+     * Allows to drag the slider by a mouse or swipe.
      * If `free`, the slider does not snap to a slide after drag.
      */
     drag?: boolean | 'free';

@@ -124,8 +124,8 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
       if ( isDraggable && ( isTouch || ! e.button ) ) {
         if ( ! Move.isBusy() ) {
           target        = isTouch ? track : window;
-          prevBaseEvent = null;
           dragging      = state.is( MOVING );
+          prevBaseEvent = null;
 
           bind( target, POINTER_MOVE_EVENTS, onPointerMove, SCROLL_LISTENER_OPTIONS );
           bind( target, POINTER_UP_EVENTS, onPointerUp, SCROLL_LISTENER_OPTIONS );
@@ -186,17 +186,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
     }
 
     if ( dragging ) {
-      const velocity    = computeVelocity( e );
-      const destination = computeDestination( velocity );
-
-      if ( isFree ) {
-        Controller.scroll( destination );
-      } else if ( Splide.is( FADE ) ) {
-        Controller.go( Splide.index + orient( sign( velocity ) ) );
-      } else {
-        Controller.go( Controller.toDest( destination ), true );
-      }
-
+      move( e );
       prevent( e );
     }
 
@@ -220,12 +210,35 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
   /**
    * Saves data at the specific moment.
    *
-   * @param e - A TouchEvent or MouseEvent object
+   * @param e - A TouchEvent or MouseEvent object.
    */
   function save( e: TouchEvent | MouseEvent ): void {
     prevBaseEvent = baseEvent;
     baseEvent     = e;
     basePosition  = getPosition();
+  }
+
+  /**
+   * Moves the slider according to the drag result.
+   *
+   * @param e - A TouchEvent or MouseEvent object.
+   */
+  function move( e: TouchEvent | MouseEvent ): void {
+    const velocity    = computeVelocity( e );
+    const destination = computeDestination( velocity );
+    const rewind      = options.rewind && options.rewindByDrag;
+
+    if ( isFree ) {
+      Controller.scroll( destination );
+    } else if ( Splide.is( FADE ) ) {
+      const { length } = Splide;
+      const index = Splide.index + orient( sign( velocity ) );
+      Controller.go( rewind ? ( index + length ) % length : index );
+    } else if ( Splide.is( SLIDE ) && exceeded && rewind ) {
+      Controller.go( exceededLimit( true ) ? '>' : '<' );
+    } else {
+      Controller.go( Controller.toDest( destination ), true );
+    }
   }
 
   /**

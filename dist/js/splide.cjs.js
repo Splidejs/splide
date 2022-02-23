@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 3.6.12
+ * Version  : 3.6.14
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
@@ -12,12 +12,14 @@ const CREATED = 1;
 const MOUNTED = 2;
 const IDLE = 3;
 const MOVING = 4;
-const DESTROYED = 5;
+const DRAGGING = 5;
+const DESTROYED = 6;
 const STATES = {
   CREATED,
   MOUNTED,
   IDLE,
   MOVING,
+  DRAGGING,
   DESTROYED
 };
 
@@ -262,9 +264,9 @@ function unit(value) {
 const PROJECT_CODE = "splide";
 const DATA_ATTRIBUTE = `data-${PROJECT_CODE}`;
 
-function assert(condition, message = "") {
+function assert(condition, message) {
   if (!condition) {
-    throw new Error(`[${PROJECT_CODE}] ${message}`);
+    throw new Error(`[${PROJECT_CODE}] ${message || ""}`);
   }
 }
 
@@ -1749,6 +1751,7 @@ const POINTER_UP_EVENTS = "touchend touchcancel mouseup";
 
 function Drag(Splide2, Components2, options) {
   const { on, emit, bind, unbind } = EventInterface(Splide2);
+  const { state } = Splide2;
   const { Move, Scroll, Controller } = Components2;
   const { track } = Components2.Elements;
   const { resolve, orient } = Components2.Direction;
@@ -1756,10 +1759,9 @@ function Drag(Splide2, Components2, options) {
   let basePosition;
   let baseEvent;
   let prevBaseEvent;
-  let lastEvent;
   let isFree;
   let dragging;
-  let hasExceeded = false;
+  let exceeded = false;
   let clickPrevented;
   let disabled;
   let target;
@@ -1777,16 +1779,16 @@ function Drag(Splide2, Components2, options) {
     isFree = drag === "free";
   }
   function onPointerDown(e) {
+    clickPrevented = false;
     if (!disabled) {
       const { noDrag } = options;
       const isTouch = isTouchEvent(e);
       const isDraggable = !noDrag || !matches(e.target, noDrag);
-      clickPrevented = false;
       if (isDraggable && (isTouch || !e.button)) {
         if (!Move.isBusy()) {
           target = isTouch ? track : window;
+          dragging = state.is(MOVING);
           prevBaseEvent = null;
-          lastEvent = null;
           bind(target, POINTER_MOVE_EVENTS, onPointerMove, SCROLL_LISTENER_OPTIONS);
           bind(target, POINTER_UP_EVENTS, onPointerUp, SCROLL_LISTENER_OPTIONS);
           Move.cancel();
@@ -1799,80 +1801,81 @@ function Drag(Splide2, Components2, options) {
     }
   }
   function onPointerMove(e) {
-    if (!lastEvent) {
+    if (!state.is(DRAGGING)) {
+      state.set(DRAGGING);
       emit(EVENT_DRAG);
     }
-    lastEvent = e;
     if (e.cancelable) {
-      const diff = coordOf(e) - coordOf(baseEvent);
       if (dragging) {
-        Move.translate(basePosition + constrain(diff));
-        const expired = timeOf(e) - timeOf(baseEvent) > LOG_INTERVAL;
-        const exceeded = hasExceeded !== (hasExceeded = exceededLimit());
-        if (expired || exceeded) {
+        Move.translate(basePosition + constrain(diffCoord(e)));
+        const expired = diffTime(e) > LOG_INTERVAL;
+        const hasExceeded = exceeded !== (exceeded = exceededLimit());
+        if (expired || hasExceeded) {
           save(e);
         }
-        emit(EVENT_DRAGGING);
         clickPrevented = true;
+        emit(EVENT_DRAGGING);
         prevent(e);
-      } else {
-        let { dragMinThreshold: thresholds } = options;
-        thresholds = isObject(thresholds) ? thresholds : { mouse: 0, touch: +thresholds || 10 };
-        dragging = abs(diff) > (isTouchEvent(e) ? thresholds.touch : thresholds.mouse);
-        if (isSliderDirection()) {
-          prevent(e);
-        }
+      } else if (isSliderDirection(e)) {
+        dragging = shouldStart(e);
+        prevent(e);
       }
     }
   }
   function onPointerUp(e) {
+    if (state.is(DRAGGING)) {
+      state.set(IDLE);
+      emit(EVENT_DRAGGED);
+    }
+    if (dragging) {
+      move(e);
+      prevent(e);
+    }
     unbind(target, POINTER_MOVE_EVENTS, onPointerMove);
     unbind(target, POINTER_UP_EVENTS, onPointerUp);
-    const { index } = Splide2;
-    if (lastEvent) {
-      if (dragging || e.cancelable && isSliderDirection()) {
-        const velocity = computeVelocity(e);
-        const destination = computeDestination(velocity);
-        if (isFree) {
-          Controller.scroll(destination);
-        } else if (Splide2.is(FADE)) {
-          Controller.go(index + orient(sign(velocity)));
-        } else {
-          Controller.go(Controller.toDest(destination), true);
-        }
-        prevent(e);
-      }
-      emit(EVENT_DRAGGED);
-    } else {
-      if (!isFree && getPosition() !== Move.toPosition(index)) {
-        Controller.go(index, true);
-      }
-    }
     dragging = false;
-  }
-  function save(e) {
-    prevBaseEvent = baseEvent;
-    baseEvent = e;
-    basePosition = getPosition();
   }
   function onClick(e) {
     if (!disabled && clickPrevented) {
       prevent(e, true);
     }
   }
-  function isSliderDirection() {
-    const diffX = abs(coordOf(lastEvent) - coordOf(baseEvent));
-    const diffY = abs(coordOf(lastEvent, true) - coordOf(baseEvent, true));
-    return diffX > diffY;
+  function save(e) {
+    prevBaseEvent = baseEvent;
+    baseEvent = e;
+    basePosition = getPosition();
+  }
+  function move(e) {
+    const velocity = computeVelocity(e);
+    const destination = computeDestination(velocity);
+    const rewind = options.rewind && options.rewindByDrag;
+    if (isFree) {
+      Controller.scroll(destination);
+    } else if (Splide2.is(FADE)) {
+      const { length } = Splide2;
+      const index = Splide2.index + orient(sign(velocity));
+      Controller.go(rewind ? (index + length) % length : index);
+    } else if (Splide2.is(SLIDE) && exceeded && rewind) {
+      Controller.go(exceededLimit(true) ? ">" : "<");
+    } else {
+      Controller.go(Controller.toDest(destination), true);
+    }
+  }
+  function shouldStart(e) {
+    const { dragMinThreshold: thresholds } = options;
+    const isObj = isObject(thresholds);
+    const mouse = isObj && thresholds.mouse || 0;
+    const touch = (isObj ? thresholds.touch : +thresholds) || 10;
+    return abs(diffCoord(e)) > (isTouchEvent(e) ? touch : mouse);
+  }
+  function isSliderDirection(e) {
+    return abs(diffCoord(e)) > abs(diffCoord(e, true));
   }
   function computeVelocity(e) {
-    if (Splide2.is(LOOP) || !hasExceeded) {
-      const base = baseEvent === lastEvent && prevBaseEvent || baseEvent;
-      const diffCoord = coordOf(lastEvent) - coordOf(base);
-      const diffTime = timeOf(e) - timeOf(base);
-      const isFlick = timeOf(e) - timeOf(lastEvent) < LOG_INTERVAL;
-      if (diffTime && isFlick) {
-        return diffCoord / diffTime;
+    if (Splide2.is(LOOP) || !exceeded) {
+      const time = diffTime(e);
+      if (time && time < LOG_INTERVAL) {
+        return diffCoord(e) / time;
       }
     }
     return 0;
@@ -1880,14 +1883,20 @@ function Drag(Splide2, Components2, options) {
   function computeDestination(velocity) {
     return getPosition() + sign(velocity) * min(abs(velocity) * (options.flickPower || 600), isFree ? Infinity : Components2.Layout.listSize() * (options.flickMaxPages || 1));
   }
-  function coordOf(e, orthogonal) {
-    return (isTouchEvent(e) ? e.touches[0] : e)[`page${resolve(orthogonal ? "Y" : "X")}`];
+  function diffCoord(e, orthogonal) {
+    return coordOf(e, orthogonal) - coordOf(getBaseEvent(e), orthogonal);
   }
-  function timeOf(e) {
-    return e.timeStamp;
+  function diffTime(e) {
+    return e.timeStamp - getBaseEvent(e).timeStamp;
+  }
+  function getBaseEvent(e) {
+    return baseEvent === e && prevBaseEvent || baseEvent;
+  }
+  function coordOf(e, orthogonal) {
+    return (isTouchEvent(e) ? e.changedTouches[0] : e)[`page${resolve(orthogonal ? "Y" : "X")}`];
   }
   function constrain(diff) {
-    return diff / (hasExceeded && Splide2.is(SLIDE) ? FRICTION : 1);
+    return diff / (exceeded && Splide2.is(SLIDE) ? FRICTION : 1);
   }
   function isTouchEvent(e) {
     return typeof TouchEvent !== "undefined" && e instanceof TouchEvent;
