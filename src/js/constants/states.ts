@@ -19,9 +19,14 @@ export const IDLE = 3;
 export const MOVING = 4;
 
 /**
+ * The user is dragging the slider.
+ */
+export const DRAGGING = 5;
+
+/**
  * Splide has been destroyed.
  */
-export const DESTROYED = 5;
+export const DESTROYED = 6;
 
 /**
  * The collection of all states.
@@ -33,5 +38,6 @@ export const STATES = {
   MOUNTED,
   IDLE,
   MOVING,
+  DRAGGING,
   DESTROYED,
 };

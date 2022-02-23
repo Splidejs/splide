@@ -1,5 +1,6 @@
 import { EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_MOUNTED, EVENT_UPDATED } from '../../constants/events';
 import { SCROLL_LISTENER_OPTIONS } from '../../constants/listener-options';
+import { DRAGGING, IDLE, MOVING } from '../../constants/states';
 import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
@@ -31,6 +32,7 @@ export interface DragComponent extends BaseComponent {
  */
 export function Drag( Splide: Splide, Components: Components, options: Options ): DragComponent {
   const { on, emit, bind, unbind } = EventInterface( Splide );
+  const { state } = Splide;
   const { Move, Scroll, Controller } = Components;
   const { track } = Components.Elements;
   const { resolve, orient } = Components.Direction;
@@ -52,11 +54,6 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
   let prevBaseEvent: TouchEvent | MouseEvent;
 
   /**
-   * Keeps the last TouchEvent/MouseEvent object on pointermove.
-   */
-  let lastEvent: TouchEvent | MouseEvent;
-
-  /**
    * Indicates whether the drag mode is `free` or not.
    */
   let isFree: boolean;
@@ -70,7 +67,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    * Indicates whether the slider exceeds limits or not.
    * This must not be `undefined` for strict comparison.
    */
-  let hasExceeded = false;
+  let exceeded = false;
 
   /**
    * Turns into `true` when the user starts dragging the slider.
@@ -96,7 +93,6 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
     bind( track, POINTER_DOWN_EVENTS, onPointerDown, SCROLL_LISTENER_OPTIONS );
     bind( track, 'click', onClick, { capture: true } );
     bind( track, 'dragstart', prevent );
-
     on( [ EVENT_MOUNTED, EVENT_UPDATED ], init );
   }
 
@@ -111,24 +107,25 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
 
   /**
    * Called when the user clicks or touches the slider.
-   * Needs to prevent the default behaviour when the slider is busy to deny any action, such as dragging images.
-   * Note that IE does not support MouseEvent and TouchEvent constructors.
+   * - Needs to prevent the default behaviour when the slider is busy to deny any action, such as dragging images
+   * - IE does not support MouseEvent and TouchEvent constructors
+   * - The `dragging` state always becomes `true` when the user starts dragging while the slider is moving
    *
    * @param e - A TouchEvent or MouseEvent object
    */
   function onPointerDown( e: TouchEvent | MouseEvent ): void {
+    clickPrevented = false;
+
     if ( ! disabled ) {
       const { noDrag } = options;
       const isTouch     = isTouchEvent( e );
       const isDraggable = ! noDrag || ! matches( e.target, noDrag );
 
-      clickPrevented = false;
-
       if ( isDraggable && ( isTouch || ! e.button ) ) {
         if ( ! Move.isBusy() ) {
           target        = isTouch ? track : window;
           prevBaseEvent = null;
-          lastEvent     = null;
+          dragging      = state.is( MOVING );
 
           bind( target, POINTER_MOVE_EVENTS, onPointerMove, SCROLL_LISTENER_OPTIONS );
           bind( target, POINTER_UP_EVENTS, onPointerUp, SCROLL_LISTENER_OPTIONS );
@@ -148,88 +145,64 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    * @param e - A TouchEvent or MouseEvent object
    */
   function onPointerMove( e: TouchEvent | MouseEvent ): void {
-    if ( ! lastEvent ) {
+    if ( ! state.is( DRAGGING ) ) {
+      state.set( DRAGGING );
       emit( EVENT_DRAG );
     }
 
-    lastEvent = e;
-
     if ( e.cancelable ) {
-      const diff = coordOf( e ) - coordOf( baseEvent );
-
       if ( dragging ) {
-        Move.translate( basePosition + constrain( diff ) );
+        Move.translate( basePosition + constrain( diffCoord( e ) ) );
 
-        const expired  = timeOf( e ) - timeOf( baseEvent ) > LOG_INTERVAL;
-        const exceeded = hasExceeded !== ( hasExceeded = exceededLimit() );
+        const expired     = diffTime( e ) > LOG_INTERVAL;
+        const hasExceeded = exceeded !== ( exceeded = exceededLimit() );
 
-        if ( expired || exceeded ) {
+        if ( expired || hasExceeded ) {
           save( e );
         }
 
-        emit( EVENT_DRAGGING );
         clickPrevented = true;
+        emit( EVENT_DRAGGING );
         prevent( e );
-      } else {
-        let { dragMinThreshold: thresholds } = options;
-        thresholds = isObject( thresholds ) ? thresholds : { mouse: 0, touch: +thresholds || 10 };
-        dragging   = abs( diff ) > ( isTouchEvent( e ) ? thresholds.touch : thresholds.mouse );
-
-        if ( isSliderDirection() ) {
-          prevent( e );
-        }
+      } else if ( isSliderDirection( e ) ) {
+        dragging = shouldStart( e );
+        prevent( e );
       }
     }
   }
 
   /**
    * Called when the user releases pointing devices.
-   * Be aware that the TouchEvent object provided by the `touchend` does not contain `Touch` objects,
-   * which means the last touch position is not available.
+   * Needs to move the slider when:
+   * - The user drags the slider and the distance exceeds the threshold
+   * - The user aborted the slider moving by pointerdown and just released it without dragging the slider
    *
    * @param e - A TouchEvent or MouseEvent object
    */
   function onPointerUp( e: TouchEvent | MouseEvent ): void {
-    unbind( target, POINTER_MOVE_EVENTS, onPointerMove );
-    unbind( target, POINTER_UP_EVENTS, onPointerUp );
-
-    const { index } = Splide;
-
-    if ( lastEvent ) {
-      if ( dragging || ( e.cancelable && isSliderDirection() ) ) {
-        const velocity    = computeVelocity( e );
-        const destination = computeDestination( velocity );
-
-        if ( isFree ) {
-          Controller.scroll( destination );
-        } else if ( Splide.is( FADE ) ) {
-          Controller.go( index + orient( sign( velocity ) ) );
-        } else {
-          Controller.go( Controller.toDest( destination ), true );
-        }
-
-        prevent( e );
-      }
-
+    if ( state.is( DRAGGING ) ) {
+      state.set( IDLE );
       emit( EVENT_DRAGGED );
-    } else {
-      if ( ! isFree && getPosition() !== Move.toPosition( index ) ) {
-        Controller.go( index, true );
-      }
     }
 
-    dragging = false;
-  }
+    if ( dragging ) {
+      const velocity    = computeVelocity( e );
+      const destination = computeDestination( velocity );
 
-  /**
-   * Saves data at the specific moment.
-   *
-   * @param e  A TouchEvent or MouseEvent object
-   */
-  function save( e: TouchEvent | MouseEvent ): void {
-    prevBaseEvent = baseEvent;
-    baseEvent     = e;
-    basePosition  = getPosition();
+      if ( isFree ) {
+        Controller.scroll( destination );
+      } else if ( Splide.is( FADE ) ) {
+        Controller.go( Splide.index + orient( sign( velocity ) ) );
+      } else {
+        Controller.go( Controller.toDest( destination ), true );
+      }
+
+      prevent( e );
+    }
+
+    unbind( target, POINTER_MOVE_EVENTS, onPointerMove );
+    unbind( target, POINTER_UP_EVENTS, onPointerUp );
+    dragging = false;
   }
 
   /**
@@ -245,14 +218,40 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
   }
 
   /**
-   * Checks whether dragging towards the slider or scroll direction.
+   * Saves data at the specific moment.
    *
-   * @return `true` if going towards the slider direction, or otherwise `false`.
+   * @param e - A TouchEvent or MouseEvent object
    */
-  function isSliderDirection(): boolean {
-    const diffX = abs( coordOf( lastEvent ) - coordOf( baseEvent ) );
-    const diffY = abs( coordOf( lastEvent, true ) - coordOf( baseEvent, true ) );
-    return diffX > diffY;
+  function save( e: TouchEvent | MouseEvent ): void {
+    prevBaseEvent = baseEvent;
+    baseEvent     = e;
+    basePosition  = getPosition();
+  }
+
+  /**
+   * Checks if the drag distance exceeds the defined threshold.
+   *
+   * @param e - A TouchEvent or MouseEvent object.
+   *
+   * @return `true` if the distance exceeds the threshold, or `false` if not.
+   */
+  function shouldStart( e: TouchEvent | MouseEvent ): boolean {
+    const { dragMinThreshold: thresholds } = options;
+    const isObj = isObject( thresholds );
+    const mouse = isObj && thresholds.mouse || 0;
+    const touch = ( isObj ? thresholds.touch : +thresholds ) || 10;
+    return abs( diffCoord( e ) ) > ( isTouchEvent( e ) ? touch : mouse );
+  }
+
+  /**
+   * Checks whether dragging towards the slider or the scroll direction.
+   *
+   * @return `true` if dragging towards the slider direction, or otherwise `false`.
+   *
+   * @param e - A TouchEvent or MouseEvent object
+   */
+  function isSliderDirection( e: TouchEvent | MouseEvent ): boolean {
+    return abs( diffCoord( e ) ) > abs( diffCoord( e, true ) );
   }
 
   /**
@@ -263,14 +262,11 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    * @return The drag velocity.
    */
   function computeVelocity( e: TouchEvent | MouseEvent ): number {
-    if ( Splide.is( LOOP ) || ! hasExceeded ) {
-      const base      = baseEvent === lastEvent && prevBaseEvent || baseEvent;
-      const diffCoord = coordOf( lastEvent ) - coordOf( base );
-      const diffTime  = timeOf( e ) - timeOf( base );
-      const isFlick   = timeOf( e ) - timeOf( lastEvent ) < LOG_INTERVAL;
+    if ( Splide.is( LOOP ) || ! exceeded ) {
+      const time = diffTime( e );
 
-      if ( diffTime && isFlick ) {
-        return diffCoord / diffTime;
+      if ( time && time < LOG_INTERVAL ) {
+        return diffCoord( e ) / time;
       }
     }
 
@@ -292,6 +288,41 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
   }
 
   /**
+   * Returns the coord difference between the provided and base events.
+   *
+   * @param e          - A TouchEvent or MouseEvent object.
+   * @param orthogonal - Optional. If `true`, returns the coord of the orthogonal axis against the drag one.
+   *
+   * @return The difference of the coord.
+   */
+  function diffCoord( e: TouchEvent | MouseEvent, orthogonal?: boolean ): number {
+    return coordOf( e, orthogonal ) - coordOf( getBaseEvent( e ), orthogonal );
+  }
+
+  /**
+   * Returns the elapsed time from the base event to `e`.
+   *
+   * @param e - A TouchEvent or MouseEvent object.
+   *
+   * @return The elapsed time in milliseconds.
+   */
+  function diffTime( e: TouchEvent | MouseEvent ): number {
+    return e.timeStamp - getBaseEvent( e ).timeStamp;
+  }
+
+  /**
+   * Returns the base event.
+   * If the base event is same with `e`, returns previous one.
+   *
+   * @param e - A TouchEvent or MouseEvent object.
+   *
+   * @return A base event.
+   */
+  function getBaseEvent( e: TouchEvent | MouseEvent ): TouchEvent | MouseEvent {
+    return baseEvent === e && prevBaseEvent || baseEvent;
+  }
+
+  /**
    * Returns the `pageX` and `pageY` coordinates provided by the event.
    * Be aware that IE does not support both TouchEvent and MouseEvent constructors.
    *
@@ -301,18 +332,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    * @return A pageX or pageY coordinate.
    */
   function coordOf( e: TouchEvent | MouseEvent, orthogonal?: boolean ): number {
-    return ( isTouchEvent( e ) ? e.touches[ 0 ] : e )[ `page${ resolve( orthogonal ? 'Y' : 'X' ) }` ];
-  }
-
-  /**
-   * Returns the time stamp in the provided event object.
-   *
-   * @param e - A TouchEvent or MouseEvent object.
-   *
-   * @return A time stamp.
-   */
-  function timeOf( e: TouchEvent | MouseEvent ): number {
-    return e.timeStamp;
+    return ( isTouchEvent( e ) ? e.changedTouches[ 0 ] : e )[ `page${ resolve( orthogonal ? 'Y' : 'X' ) }` ];
   }
 
   /**
@@ -324,7 +344,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    * @return The constrained diff.
    */
   function constrain( diff: number ): number {
-    return diff / ( hasExceeded && Splide.is( SLIDE ) ? FRICTION : 1 );
+    return diff / ( exceeded && Splide.is( SLIDE ) ? FRICTION : 1 );
   }
 
   /**

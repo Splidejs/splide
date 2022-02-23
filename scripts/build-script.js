@@ -22,7 +22,7 @@ async function buildScript( compress, type = 'default' ) {
         configFile: path.resolve( __dirname, '../.babelrc' ),
         allowAllFormats: true,
       } ),
-      compress ? minify() : false,
+      compress ? minify( { minify: { sourceMap: true } } ) : false,
     ]
   } );
 
@@ -31,7 +31,7 @@ async function buildScript( compress, type = 'default' ) {
     file,
     format   : 'umd',
     name     : type === 'default' ? 'Splide' : 'SplideRenderer',
-    sourcemap: ! compress,
+    sourcemap: compress,
   } );
 
   if ( compress && type === 'default' ) {

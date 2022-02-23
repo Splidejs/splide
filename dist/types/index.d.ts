@@ -829,6 +829,7 @@ declare class Splide {
         MOUNTED: number;
         IDLE: number;
         MOVING: number;
+        DRAGGING: number;
         DESTROYED: number;
     };
     /**

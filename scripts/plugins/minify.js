@@ -1,8 +1,9 @@
 const uglify = require( 'uglify-js' );
+const plugin = require( 'rollup-plugin-dts' );
 
 const DEFAULTS = {
   minify: {
-    sourceMap: false,
+	  sourceMap: true,
     output: {
       comments: /^!/,
     },
@@ -27,7 +28,7 @@ function minify( pluginOptions = {} ) {
         throw new Error( result.error );
       }
 
-      return result.code;
+      return result;
     },
   }
 }
