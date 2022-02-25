@@ -3,7 +3,7 @@ import {
   ARIA_CONTROLS,
   ARIA_CURRENT,
   ARIA_HIDDEN,
-  ARIA_LABEL,
+  ARIA_LABEL, ARIA_ROLEDESCRIPTION,
   ROLE,
   TAB_INDEX,
 } from '../../constants/attributes';
@@ -103,8 +103,17 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   function mount( this: SlideComponent ): void {
     if ( ! isClone ) {
       slide.id = `${ root.id }-slide${ pad( index + 1 ) }`;
+      setAttribute( slide, ROLE, 'group' );
+      setAttribute( slide, ARIA_ROLEDESCRIPTION, 'slide' );
     }
 
+    listen();
+  }
+
+  /**
+   * Listens to some events.
+   */
+  function listen(): void {
     bind( slide, 'click keydown', e => {
       emit( e.type === 'click' ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, self, e );
     } );
@@ -194,12 +203,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
 
     setAttribute( slide, ARIA_HIDDEN, hidden || null );
     setAttribute( slide, TAB_INDEX, ! hidden && options.slideFocus ? 0 : null );
-
-    if ( focusableNodes ) {
-      focusableNodes.forEach( node => {
-        setAttribute( node, TAB_INDEX, hidden ? -1 : null );
-      } );
-    }
+    setAttribute( focusableNodes || [], TAB_INDEX, hidden ? -1 : null );
 
     if ( visible !== hasClass( slide, CLASS_VISIBLE ) ) {
       toggleClass( slide, CLASS_VISIBLE, visible );

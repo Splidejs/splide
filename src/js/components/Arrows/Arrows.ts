@@ -87,8 +87,7 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
       if ( ! arrows.prev ) {
         const { id } = Elements.track;
 
-        setAttribute( prev, ARIA_CONTROLS, id );
-        setAttribute( next, ARIA_CONTROLS, id );
+        setAttribute( [ prev, next ], ARIA_CONTROLS, id );
 
         arrows.prev = prev;
         arrows.next = next;
@@ -109,8 +108,7 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
     if ( created ) {
       remove( wrapper );
     } else {
-      removeAttribute( prev, ALL_ATTRIBUTES );
-      removeAttribute( next, ALL_ATTRIBUTES );
+      removeAttribute( [ prev, next ], ALL_ATTRIBUTES );
     }
   }
 

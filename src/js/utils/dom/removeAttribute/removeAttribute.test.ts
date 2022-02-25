@@ -2,32 +2,51 @@ import { removeAttribute } from './removeAttribute';
 
 
 describe( 'removeAttribute', () => {
-  beforeEach( () => {
-    document.body.innerHTML = '<div id="container"></div>';
-  } );
-
   test( 'can remove an attribute from an element.', () => {
-    const container = document.getElementById( 'container' );
+    const div = document.createElement( 'div' );
 
-    container.setAttribute( 'aria-hidden', 'true' );
-    container.setAttribute( 'tabindex', '-1' );
+    div.setAttribute( 'aria-hidden', 'true' );
+    div.setAttribute( 'tabindex', '-1' );
 
-    removeAttribute( container, 'aria-hidden' );
-    expect( container.getAttribute( 'aria-hidden' ) ).toBeNull();
-    expect( container.getAttribute( 'tabindex' ) ).not.toBeNull();
+    removeAttribute( div, 'aria-hidden' );
+    expect( div.getAttribute( 'aria-hidden' ) ).toBeNull();
+    expect( div.getAttribute( 'tabindex' ) ).not.toBeNull();
 
-    removeAttribute( container, 'tabindex' );
-    expect( container.getAttribute( 'tabindex' ) ).toBeNull();
+    removeAttribute( div, 'tabindex' );
+    expect( div.getAttribute( 'tabindex' ) ).toBeNull();
   } );
 
   test( 'can remove attributes from an element.', () => {
-    const container = document.getElementById( 'container' );
+    const div = document.createElement( 'div' );
 
-    container.setAttribute( 'aria-hidden', 'true' );
-    container.setAttribute( 'tabindex', '-1' );
+    div.setAttribute( 'aria-hidden', 'true' );
+    div.setAttribute( 'tabindex', '-1' );
 
-    removeAttribute( container, [ 'aria-hidden', 'tabindex' ] );
-    expect( container.getAttribute( 'aria-hidden' ) ).toBeNull();
-    expect( container.getAttribute( 'tabindex' ) ).toBeNull();
+    removeAttribute( div, [ 'aria-hidden', 'tabindex' ] );
+    expect( div.getAttribute( 'aria-hidden' ) ).toBeNull();
+    expect( div.getAttribute( 'tabindex' ) ).toBeNull();
+  } );
+
+  test( 'can remove attributes from elements.', () => {
+    const div1     = document.createElement( 'div1' );
+    const div2     = document.createElement( 'div2' );
+    const div3     = document.createElement( 'div2' );
+    const divs     = [ div1, div2, div3 ];
+    const callback = jest.fn();
+
+    divs.forEach( div => {
+      div.setAttribute( 'aria-hidden', 'true' );
+      div.setAttribute( 'tabindex', '-1' );
+    } );
+
+    removeAttribute( divs, [ 'aria-hidden', 'tabindex' ] );
+
+    divs.forEach( div => {
+      expect( div.getAttribute( 'aria-hidden' ) ).toBeNull();
+      expect( div.getAttribute( 'tabindex' ) ).toBeNull();
+      callback();
+    } );
+
+    expect( callback ).toHaveBeenCalledTimes( divs.length );
   } );
 } );

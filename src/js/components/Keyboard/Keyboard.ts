@@ -1,9 +1,9 @@
 import { TAB_INDEX } from '../../constants/attributes';
-import { EVENT_UPDATED, EVENT_MOVE } from '../../constants/events';
+import { EVENT_MOVE, EVENT_UPDATED } from '../../constants/events';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { includes, isHTMLElement, nextTick, removeAttribute, setAttribute } from '../../utils';
+import { includes, nextTick, setAttribute } from '../../utils';
 
 
 /**
@@ -87,10 +87,6 @@ export function Keyboard( Splide: Splide, Components: Components, options: Optio
    */
   function destroy(): void {
     unbind( target, KEYBOARD_EVENT );
-
-    if ( isHTMLElement( target ) ) {
-      removeAttribute( target, TAB_INDEX );
-    }
   }
 
   /**

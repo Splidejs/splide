@@ -1,11 +1,16 @@
-export const ROLE             = 'role';
-export const ARIA_CONTROLS    = 'aria-controls';
-export const ARIA_CURRENT     = 'aria-current';
-export const ARIA_LABEL       = 'aria-label';
-export const ARIA_HIDDEN      = 'aria-hidden';
-export const TAB_INDEX        = 'tabindex';
-export const DISABLED         = 'disabled';
-export const ARIA_ORIENTATION = 'aria-orientation';
+export const ROLE      = 'role';
+export const TAB_INDEX = 'tabindex';
+export const DISABLED  = 'disabled';
+
+export const ARIA_PREFIX          = 'aria-';
+export const ARIA_CONTROLS        = `${ ARIA_PREFIX }controls`;
+export const ARIA_CURRENT         = `${ ARIA_PREFIX }current`;
+export const ARIA_LABEL           = `${ ARIA_PREFIX }label`;
+export const ARIA_HIDDEN          = `${ ARIA_PREFIX }hidden`;
+export const ARIA_ORIENTATION     = `${ ARIA_PREFIX }orientation`;
+export const ARIA_ROLEDESCRIPTION = `${ ARIA_PREFIX }roledescription`;
+export const ARIA_ATOMIC          = `${ ARIA_PREFIX }atomic`;
+export const ARIA_LIVE            = `${ ARIA_PREFIX }live`;
 
 /**
  * The array with all attributes.
@@ -14,11 +19,14 @@ export const ARIA_ORIENTATION = 'aria-orientation';
  */
 export const ALL_ATTRIBUTES = [
   ROLE,
+  TAB_INDEX,
+  DISABLED,
   ARIA_CONTROLS,
   ARIA_CURRENT,
   ARIA_LABEL,
   ARIA_HIDDEN,
   ARIA_ORIENTATION,
-  TAB_INDEX,
-  DISABLED,
+  ARIA_ROLEDESCRIPTION,
+  ARIA_ATOMIC,
+  ARIA_LIVE,
 ];

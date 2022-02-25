@@ -4,13 +4,13 @@ import { forEach } from '../../array';
 /**
  * Removes attributes from the element.
  *
- * @param elm   - An element.
+ * @param elms  - An element or elements.
  * @param attrs - An attribute or attributes to remove.
  */
-export function removeAttribute( elm: Element, attrs: string | string[] ): void {
-  if ( elm ) {
+export function removeAttribute( elms: Element | Element[], attrs: string | string[] ): void {
+  forEach( elms, elm => {
     forEach( attrs, attr => {
-      elm.removeAttribute( attr );
+      elm && elm.removeAttribute( attr );
     } );
-  }
+  } );
 }

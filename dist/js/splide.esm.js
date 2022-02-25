@@ -152,21 +152,23 @@ function merge(object, source) {
   return object;
 }
 
-function removeAttribute(elm, attrs) {
-  if (elm) {
+function removeAttribute(elms, attrs) {
+  forEach(elms, (elm) => {
     forEach(attrs, (attr) => {
-      elm.removeAttribute(attr);
+      elm && elm.removeAttribute(attr);
     });
-  }
+  });
 }
 
-function setAttribute(elm, attrs, value) {
+function setAttribute(elms, attrs, value) {
   if (isObject(attrs)) {
     forOwn(attrs, (value2, name) => {
-      setAttribute(elm, name, value2);
+      setAttribute(elms, name, value2);
     });
   } else {
-    isNull(value) ? removeAttribute(elm, attrs) : elm.setAttribute(attrs, String(value));
+    forEach(elms, (elm) => {
+      isNull(value) ? removeAttribute(elm, attrs) : elm.setAttribute(attrs, String(value));
+    });
   }
 }
 
@@ -627,6 +629,32 @@ function Direction(Splide2, Components2, options) {
   };
 }
 
+const ROLE = "role";
+const TAB_INDEX = "tabindex";
+const DISABLED = "disabled";
+const ARIA_PREFIX = "aria-";
+const ARIA_CONTROLS = `${ARIA_PREFIX}controls`;
+const ARIA_CURRENT = `${ARIA_PREFIX}current`;
+const ARIA_LABEL = `${ARIA_PREFIX}label`;
+const ARIA_HIDDEN = `${ARIA_PREFIX}hidden`;
+const ARIA_ORIENTATION = `${ARIA_PREFIX}orientation`;
+const ARIA_ROLEDESCRIPTION = `${ARIA_PREFIX}roledescription`;
+const ARIA_ATOMIC = `${ARIA_PREFIX}atomic`;
+const ARIA_LIVE = `${ARIA_PREFIX}live`;
+const ALL_ATTRIBUTES = [
+  ROLE,
+  TAB_INDEX,
+  DISABLED,
+  ARIA_CONTROLS,
+  ARIA_CURRENT,
+  ARIA_LABEL,
+  ARIA_HIDDEN,
+  ARIA_ORIENTATION,
+  ARIA_ROLEDESCRIPTION,
+  ARIA_ATOMIC,
+  ARIA_LIVE
+];
+
 const CLASS_ROOT = PROJECT_CODE;
 const CLASS_SLIDER = `${PROJECT_CODE}__slider`;
 const CLASS_TRACK = `${PROJECT_CODE}__track`;
@@ -646,6 +674,7 @@ const CLASS_AUTOPLAY = `${PROJECT_CODE}__autoplay`;
 const CLASS_PLAY = `${PROJECT_CODE}__play`;
 const CLASS_PAUSE = `${PROJECT_CODE}__pause`;
 const CLASS_SPINNER = `${PROJECT_CODE}__spinner`;
+const CLASS_SR = `${PROJECT_CODE}__sr`;
 const CLASS_INITIALIZED = "is-initialized";
 const CLASS_ACTIVE = "is-active";
 const CLASS_PREV = "is-prev";
@@ -676,7 +705,7 @@ function Elements(Splide2, Components2, options) {
   let list;
   function setup() {
     collect();
-    identify();
+    init();
     addClass(root, classes = getClasses());
   }
   function mount() {
@@ -684,11 +713,9 @@ function Elements(Splide2, Components2, options) {
     on(EVENT_UPDATED, update);
   }
   function destroy() {
-    [root, track, list].forEach((elm) => {
-      removeAttribute(elm, "style");
-    });
     empty(slides);
     removeClass(root, classes);
+    removeAttribute([root, track, list], ALL_ATTRIBUTES.concat("style"));
   }
   function refresh() {
     destroy();
@@ -721,11 +748,12 @@ function Elements(Splide2, Components2, options) {
       pause: query(autoplay, `.${CLASS_PAUSE}`)
     });
   }
-  function identify() {
+  function init() {
     const id = root.id || uniqueId(PROJECT_CODE);
     root.id = id;
     track.id = track.id || `${id}-track`;
     list.id = list.id || `${id}-list`;
+    setAttribute(root, ARIA_ROLEDESCRIPTION, "carousel");
   }
   function find(selector) {
     return child(root, selector) || child(slider, selector);
@@ -746,25 +774,6 @@ function Elements(Splide2, Components2, options) {
   });
 }
 
-const ROLE = "role";
-const ARIA_CONTROLS = "aria-controls";
-const ARIA_CURRENT = "aria-current";
-const ARIA_LABEL = "aria-label";
-const ARIA_HIDDEN = "aria-hidden";
-const TAB_INDEX = "tabindex";
-const DISABLED = "disabled";
-const ARIA_ORIENTATION = "aria-orientation";
-const ALL_ATTRIBUTES = [
-  ROLE,
-  ARIA_CONTROLS,
-  ARIA_CURRENT,
-  ARIA_LABEL,
-  ARIA_HIDDEN,
-  ARIA_ORIENTATION,
-  TAB_INDEX,
-  DISABLED
-];
-
 const SLIDE = "slide";
 const LOOP = "loop";
 const FADE = "fade";
@@ -782,7 +791,12 @@ function Slide$1(Splide2, index, slideIndex, slide) {
   function mount() {
     if (!isClone) {
       slide.id = `${root.id}-slide${pad(index + 1)}`;
+      setAttribute(slide, ROLE, "group");
+      setAttribute(slide, ARIA_ROLEDESCRIPTION, "slide");
     }
+    listen();
+  }
+  function listen() {
     bind(slide, "click keydown", (e) => {
       emit(e.type === "click" ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, self, e);
     });
@@ -835,11 +849,7 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     const hidden = !visible && (!isActive() || isClone);
     setAttribute(slide, ARIA_HIDDEN, hidden || null);
     setAttribute(slide, TAB_INDEX, !hidden && options.slideFocus ? 0 : null);
-    if (focusableNodes) {
-      focusableNodes.forEach((node) => {
-        setAttribute(node, TAB_INDEX, hidden ? -1 : null);
-      });
-    }
+    setAttribute(focusableNodes || [], TAB_INDEX, hidden ? -1 : null);
     if (visible !== hasClass(slide, CLASS_VISIBLE)) {
       toggleClass(slide, CLASS_VISIBLE, visible);
       emit(visible ? EVENT_VISIBLE : EVENT_HIDDEN, self);
@@ -1484,8 +1494,7 @@ function Arrows(Splide2, Components2, options) {
     if (prev && next) {
       if (!arrows.prev) {
         const { id } = Elements.track;
-        setAttribute(prev, ARIA_CONTROLS, id);
-        setAttribute(next, ARIA_CONTROLS, id);
+        setAttribute([prev, next], ARIA_CONTROLS, id);
         arrows.prev = prev;
         arrows.next = next;
         listen();
@@ -1498,8 +1507,7 @@ function Arrows(Splide2, Components2, options) {
     if (created) {
       remove(wrapper);
     } else {
-      removeAttribute(prev, ALL_ATTRIBUTES);
-      removeAttribute(next, ALL_ATTRIBUTES);
+      removeAttribute([prev, next], ALL_ATTRIBUTES);
     }
   }
   function listen() {
@@ -1937,9 +1945,6 @@ function Keyboard(Splide2, Components2, options) {
   }
   function destroy() {
     unbind(target, KEYBOARD_EVENT);
-    if (isHTMLElement(target)) {
-      removeAttribute(target, TAB_INDEX);
-    }
   }
   function disable(value) {
     disabled = value;
@@ -2845,4 +2850,4 @@ class SplideRenderer {
   }
 }
 
-export { CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_AUTOPLAY, CLASS_CLONE, CLASS_CONTAINER, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PAUSE, CLASS_PLAY, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SLIDER, CLASS_SPINNER, CLASS_TRACK, CLASS_VISIBLE, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, EventBus, EventInterface, RequestInterval, STATUS_CLASSES, Splide, SplideRenderer, State, Throttle, Splide as default };
+export { CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_AUTOPLAY, CLASS_CLONE, CLASS_CONTAINER, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PAUSE, CLASS_PLAY, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SLIDER, CLASS_SPINNER, CLASS_SR, CLASS_TRACK, CLASS_VISIBLE, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, EventBus, EventInterface, RequestInterval, STATUS_CLASSES, Splide, SplideRenderer, State, Throttle, Splide as default };

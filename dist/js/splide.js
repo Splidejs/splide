@@ -172,21 +172,23 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     return object;
   }
 
-  function removeAttribute(elm, attrs) {
-    if (elm) {
+  function removeAttribute(elms, attrs) {
+    forEach(elms, function (elm) {
       forEach(attrs, function (attr) {
-        elm.removeAttribute(attr);
+        elm && elm.removeAttribute(attr);
       });
-    }
+    });
   }
 
-  function setAttribute(elm, attrs, value) {
+  function setAttribute(elms, attrs, value) {
     if (isObject(attrs)) {
       forOwn(attrs, function (value2, name) {
-        setAttribute(elm, name, value2);
+        setAttribute(elms, name, value2);
       });
     } else {
-      isNull(value) ? removeAttribute(elm, attrs) : elm.setAttribute(attrs, String(value));
+      forEach(elms, function (elm) {
+        isNull(value) ? removeAttribute(elm, attrs) : elm.setAttribute(attrs, String(value));
+      });
     }
   }
 
@@ -721,6 +723,19 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     };
   }
 
+  var ROLE = "role";
+  var TAB_INDEX = "tabindex";
+  var DISABLED = "disabled";
+  var ARIA_PREFIX = "aria-";
+  var ARIA_CONTROLS = ARIA_PREFIX + "controls";
+  var ARIA_CURRENT = ARIA_PREFIX + "current";
+  var ARIA_LABEL = ARIA_PREFIX + "label";
+  var ARIA_HIDDEN = ARIA_PREFIX + "hidden";
+  var ARIA_ORIENTATION = ARIA_PREFIX + "orientation";
+  var ARIA_ROLEDESCRIPTION = ARIA_PREFIX + "roledescription";
+  var ARIA_ATOMIC = ARIA_PREFIX + "atomic";
+  var ARIA_LIVE = ARIA_PREFIX + "live";
+  var ALL_ATTRIBUTES = [ROLE, TAB_INDEX, DISABLED, ARIA_CONTROLS, ARIA_CURRENT, ARIA_LABEL, ARIA_HIDDEN, ARIA_ORIENTATION, ARIA_ROLEDESCRIPTION, ARIA_ATOMIC, ARIA_LIVE];
   var CLASS_ROOT = PROJECT_CODE;
   var CLASS_SLIDER = PROJECT_CODE + "__slider";
   var CLASS_TRACK = PROJECT_CODE + "__track";
@@ -773,7 +788,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function setup() {
       collect();
-      identify();
+      init();
       addClass(root, classes = getClasses());
     }
 
@@ -783,11 +798,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function destroy() {
-      [root, track, list].forEach(function (elm) {
-        removeAttribute(elm, "style");
-      });
       empty(slides);
       removeClass(root, classes);
+      removeAttribute([root, track, list], ALL_ATTRIBUTES.concat("style"));
     }
 
     function refresh() {
@@ -824,11 +837,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       });
     }
 
-    function identify() {
+    function init() {
       var id = root.id || uniqueId(PROJECT_CODE);
       root.id = id;
       track.id = track.id || id + "-track";
       list.id = list.id || id + "-list";
+      setAttribute(root, ARIA_ROLEDESCRIPTION, "carousel");
     }
 
     function find(selector) {
@@ -846,15 +860,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     });
   }
 
-  var ROLE = "role";
-  var ARIA_CONTROLS = "aria-controls";
-  var ARIA_CURRENT = "aria-current";
-  var ARIA_LABEL = "aria-label";
-  var ARIA_HIDDEN = "aria-hidden";
-  var TAB_INDEX = "tabindex";
-  var DISABLED = "disabled";
-  var ARIA_ORIENTATION = "aria-orientation";
-  var ALL_ATTRIBUTES = [ROLE, ARIA_CONTROLS, ARIA_CURRENT, ARIA_LABEL, ARIA_HIDDEN, ARIA_ORIENTATION, TAB_INDEX, DISABLED];
   var SLIDE = "slide";
   var LOOP = "loop";
   var FADE = "fade";
@@ -881,8 +886,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function mount() {
       if (!isClone) {
         slide.id = root.id + "-slide" + pad(index + 1);
+        setAttribute(slide, ROLE, "group");
+        setAttribute(slide, ARIA_ROLEDESCRIPTION, "slide");
       }
 
+      listen();
+    }
+
+    function listen() {
       bind(slide, "click keydown", function (e) {
         emit(e.type === "click" ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, self, e);
       });
@@ -946,12 +957,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var hidden = !visible && (!isActive() || isClone);
       setAttribute(slide, ARIA_HIDDEN, hidden || null);
       setAttribute(slide, TAB_INDEX, !hidden && options.slideFocus ? 0 : null);
-
-      if (focusableNodes) {
-        focusableNodes.forEach(function (node) {
-          setAttribute(node, TAB_INDEX, hidden ? -1 : null);
-        });
-      }
+      setAttribute(focusableNodes || [], TAB_INDEX, hidden ? -1 : null);
 
       if (visible !== hasClass(slide, CLASS_VISIBLE)) {
         toggleClass(slide, CLASS_VISIBLE, visible);
@@ -1773,8 +1779,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       if (prev && next) {
         if (!arrows.prev) {
           var id = Elements.track.id;
-          setAttribute(prev, ARIA_CONTROLS, id);
-          setAttribute(next, ARIA_CONTROLS, id);
+          setAttribute([prev, next], ARIA_CONTROLS, id);
           arrows.prev = prev;
           arrows.next = next;
           listen();
@@ -1789,8 +1794,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       if (created) {
         remove(wrapper);
       } else {
-        removeAttribute(prev, ALL_ATTRIBUTES);
-        removeAttribute(next, ALL_ATTRIBUTES);
+        removeAttribute([prev, next], ALL_ATTRIBUTES);
       }
     }
 
@@ -2337,10 +2341,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function destroy() {
       unbind(target, KEYBOARD_EVENT);
-
-      if (isHTMLElement(target)) {
-        removeAttribute(target, TAB_INDEX);
-      }
     }
 
     function disable(value) {

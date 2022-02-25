@@ -1,3 +1,4 @@
+import { ALL_ATTRIBUTES, ARIA_ROLEDESCRIPTION } from '../../constants/attributes';
 import {
   CLASS_ACTIVE,
   CLASS_ARROW_NEXT,
@@ -32,6 +33,7 @@ import {
   query,
   removeAttribute,
   removeClass,
+  setAttribute,
   uniqueId,
 } from '../../utils';
 
@@ -110,7 +112,7 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
    */
   function setup(): void {
     collect();
-    identify();
+    init();
     addClass( root, ( classes = getClasses() ) );
   }
 
@@ -126,12 +128,9 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
    * Destroys the component.
    */
   function destroy(): void {
-    [ root, track, list ].forEach( elm => {
-      removeAttribute( elm, 'style' );
-    } );
-
     empty( slides );
     removeClass( root, classes );
+    removeAttribute( [ root, track, list ], ALL_ATTRIBUTES.concat( 'style' ) );
   }
 
   /**
@@ -182,13 +181,15 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
   }
 
   /**
-   * Assigns unique IDs to essential elements.
+   * Initializes essential elements.
    */
-  function identify(): void {
+  function init(): void {
     const id = root.id || uniqueId( PROJECT_CODE );
     root.id  = id;
     track.id = track.id || `${ id }-track`;
     list.id  = list.id || `${ id }-list`;
+
+    setAttribute( root, ARIA_ROLEDESCRIPTION, 'carousel' );
   }
 
   /**
