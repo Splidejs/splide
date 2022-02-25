@@ -2227,9 +2227,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       if (isFree) {
         Controller.scroll(destination);
       } else if (Splide2.is(FADE)) {
-        var length = Splide2.length;
-        var index = Splide2.index + orient(sign(velocity));
-        Controller.go(rewind ? (index + length) % length : index);
+        Controller.go(orient(sign(velocity)) < 0 ? rewind ? "<" : "-" : rewind ? ">" : "+");
       } else if (Splide2.is(SLIDE) && exceeded && rewind) {
         Controller.go(exceededLimit(true) ? ">" : "<");
       } else {

@@ -231,9 +231,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
     if ( isFree ) {
       Controller.scroll( destination );
     } else if ( Splide.is( FADE ) ) {
-      const { length } = Splide;
-      const index = Splide.index + orient( sign( velocity ) );
-      Controller.go( rewind ? ( index + length ) % length : index );
+      Controller.go( orient( sign( velocity ) ) < 0 ? ( rewind ? '<' : '-' ) : ( rewind ? '>' : '+' ) );
     } else if ( Splide.is( SLIDE ) && exceeded && rewind ) {
       Controller.go( exceededLimit( true ) ? '>' : '<' );
     } else {
