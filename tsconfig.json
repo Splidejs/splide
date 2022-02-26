@@ -7,9 +7,9 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "noImplicitAny": true,
+    "strict": true,
+    "strictNullChecks": false,
     "suppressImplicitAnyIndexErrors": true,
-    "allowJs": false,
     "declarationDir": "./dist/types",
     "declaration": true,
     "lib": [

@@ -1,4 +1,5 @@
 import { AnyFunction } from '../../types';
+import { slice } from '../../utils';
 import { RequestInterval, RequestIntervalInterface } from '../RequestInterval/RequestInterval';
 
 
@@ -27,9 +28,11 @@ export function Throttle<F extends AnyFunction>(
 
   function throttled( this: ThisParameterType<F> ): void {
     if ( ! interval ) {
+      const args = slice( arguments );
+
       interval = RequestInterval( duration || 0, () => {
         // eslint-disable-next-line prefer-rest-params
-        func.apply( this, arguments );
+        func.apply( this, args );
         interval = null;
       }, null, 1 );
 

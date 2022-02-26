@@ -1,4 +1,5 @@
-import { Cast } from '../../../types';
+import { Cast, Head, Push, Resolve, Shift } from '../../../types';
+import { slice } from '../../arrayLike';
 import { isArray, isObject } from '../../type/type';
 import { forOwn } from '../forOwn/forOwn';
 
@@ -18,30 +19,51 @@ export type Merge<T extends object, U extends object> = Omit<T, keyof U> & {
         ? Array<T[ K ][ number ] | U[ K ][ number ]>
         : U[ K ]
       : T[ K ] extends object
-        ? Merge<T[ K ], U[ K ]> extends infer A ? Cast<A, object> : never
+        ? Merge<T[ K ], U[ K ]> extends infer A ? Resolve<Cast<A, object>> : never
         : U[ K ]
     : U[ K ];
 } & Omit<U, keyof T>;
+
+/**
+ * Recursively merges U[] to T.
+ *
+ * @typeParam T - An object to assign to.
+ * @typeParam U - A tuple contains objects.
+ *
+ * @return An assigned object type.
+ */
+export type Merged<T extends object, U extends object[], N extends number, C extends any[] = []> = {
+  0: T,
+  1: Merged<Merge<T, Head<U>>, Shift<U>, N, Push<C>>,
+}[ C['length'] extends N ? 0 : 1 ] extends infer A ? Cast<A, any> : never;
+
+export function merge<T extends object>( object: T ): T;
+
+export function merge<T extends object, U extends object[]>(
+  object: T,
+  ...sources: U
+): Resolve<Merged<T, U, U['length']>>
 
 /**
  * Recursively merges source properties to the object.
  * Be aware that this method does not merge arrays. They are just duplicated by `slice()`.
  *
  * @param object - An object to merge properties to.
- * @param source - A source object to merge properties from.
  *
  * @return A new object with merged properties.
  */
-export function merge<T extends object, U extends object>( object: T, source: U ): Merge<T, U> {
-  forOwn( source, ( value, key ) => {
-    if ( isArray( value ) ) {
-      object[ key ] = value.slice();
-    } else if ( isObject( value ) ) {
-      object[ key ] = merge( isObject( object[ key ] ) ? object[ key ] : {}, value );
-    } else {
-      object[ key ] = value;
-    }
+export function merge<T extends object>( object: T ): any {
+  slice( arguments ).forEach( source => {
+    forOwn( source, ( value, key ) => {
+      if ( isArray( value ) ) {
+        object[ key ] = value.slice();
+      } else if ( isObject( value ) ) {
+        object[ key ] = merge( isObject( object[ key ] ) ? object[ key ] : {}, value );
+      } else {
+        object[ key ] = value;
+      }
+    } );
   } );
 
-  return object as Merge<T, U>;
+  return object;
 }

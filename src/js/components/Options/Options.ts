@@ -1,8 +1,8 @@
 import { DESTROYED } from '../../constants/states';
-import { Throttle } from '../../constructors';
+import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { find, merge } from '../../utils';
+import { find, isUndefined, merge, noop } from '../../utils';
 
 
 /**
@@ -11,6 +11,7 @@ import { find, merge } from '../../utils';
  * @since 3.0.0
  */
 export interface OptionsComponent extends BaseComponent {
+  fix<K extends keyof Options>( key: K, value?: Options[ K ] ): void;
 }
 
 /**
@@ -25,15 +26,18 @@ export interface OptionsComponent extends BaseComponent {
  * @return An Options component object.
  */
 export function Options( Splide: Splide, Components: Components, options: Options ): OptionsComponent {
-  /**
-   * The throttled `observe` function.
-   */
-  const throttledObserve = Throttle( observe );
+  const event = EventInterface( Splide, true );
+  const breakpoints = options.breakpoints || {};
 
   /**
    * Keeps the initial options to apply when no matched query exists.
    */
-  let initialOptions: Options;
+  const userOptions: Options = merge( {}, options );
+
+  /**
+   * Stores fixed options.
+   */
+  const fixedOptions: Options = {};
 
   /**
    * Stores breakpoints with the MediaQueryList object.
@@ -41,39 +45,20 @@ export function Options( Splide: Splide, Components: Components, options: Option
   let points: [ string, MediaQueryList ][];
 
   /**
-   * Holds the current breakpoint.
-   */
-  let currPoint: string | undefined;
-
-  /**
    * Called when the component is constructed.
    */
   function setup(): void {
-    initialOptions = merge( {}, options );
+    const isMin = options.mediaQuery === 'min';
 
-    const { breakpoints } = options;
+    points = Object.keys( breakpoints )
+      .sort( ( n, m ) => isMin ? +m - +n : +n - +m )
+      .map( point => {
+        const queryList = matchMedia( `(${ isMin ? 'min' : 'max' }-width:${ point }px)` );
+        event.bind( queryList, 'change', check );
+        return [ point, queryList ];
+      } );
 
-    if ( breakpoints ) {
-      const isMin = options.mediaQuery === 'min';
-
-      points = Object.keys( breakpoints )
-        .sort( ( n, m ) => isMin ? +m - +n : +n - +m )
-        .map( point => [
-          point,
-          matchMedia( `(${ isMin ? 'min' : 'max' }-width:${ point }px)` ),
-        ] );
-
-      observe();
-    }
-  }
-
-  /**
-   * Called when the component is mounted.
-   */
-  function mount(): void {
-    if ( points ) {
-      addEventListener( 'resize', throttledObserve );
-    }
+    check();
   }
 
   /**
@@ -83,46 +68,52 @@ export function Options( Splide: Splide, Components: Components, options: Option
    */
   function destroy( completely: boolean ): void {
     if ( completely ) {
-      removeEventListener( 'resize', throttledObserve );
+      event.destroy();
     }
   }
 
   /**
    * Observes breakpoints.
-   * The `currPoint` may be `undefined`.
    */
-  function observe(): void {
-    const item = find( points, item => item[ 1 ].matches ) || [];
-
-    if ( item[ 0 ] !== currPoint ) {
-      onMatch( ( currPoint = item[ 0 ] ) );
-    }
-  }
-
-  /**
-   * Called when the media query matches breakpoints.
-   *
-   * @param point - A matched point, or `undefined` that means no breakpoint matches a media query.
-   */
-  function onMatch( point: string | undefined ): void {
-    const newOptions = options.breakpoints[ point ] || initialOptions;
+  function check(): void {
+    const point      = ( find( points, item => item[ 1 ].matches ) || [] )[ 0 ];
+    const newOptions = merge( {}, breakpoints[ point ] || userOptions, fixedOptions );
 
     if ( newOptions.destroy ) {
-      Splide.options = initialOptions;
+      Splide.options = userOptions;
       Splide.destroy( newOptions.destroy === 'completely' );
     } else {
       if ( Splide.state.is( DESTROYED ) ) {
         destroy( true );
         Splide.mount();
+      } else {
+        Splide.options = newOptions;
+      }
+    }
+  }
+
+  /**
+   * Fixes options to prevent breakpoints from overwriting them.
+   *
+   * @param key   - A key.
+   * @param value - Optional. A value to fix. If omitted, the value will be restored.
+   */
+  function fix<K extends keyof Options>( key: K, value?: Options[ K ] ): void {
+    if ( fixedOptions[ key ] !== value ) {
+      if ( isUndefined( value ) ) {
+        delete fixedOptions[ key ];
+      } else {
+        fixedOptions[ key ] = value;
       }
 
-      Splide.options = newOptions;
+      check();
     }
   }
 
   return {
     setup,
-    mount,
+    mount: noop,
     destroy,
+    fix,
   };
 }

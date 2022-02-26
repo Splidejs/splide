@@ -3,7 +3,7 @@ import { EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_UPDATED } from '../..
 import { EventInterface, Throttle } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { abs, assert, isObject, rect, style, unit } from '../../utils';
+import { abs, apply, assert, isObject, rect, style, unit } from '../../utils';
 
 
 /**
@@ -52,7 +52,7 @@ export function Layout( Splide: Splide, Components: Components, options: Options
    */
   function mount(): void {
     init();
-    bind( window, 'resize load', Throttle( emit.bind( this, EVENT_RESIZE ) ) );
+    bind( window, 'resize load', Throttle( apply( emit, EVENT_RESIZE ) ) );
     on( [ EVENT_UPDATED, EVENT_REFRESH ], init );
     on( EVENT_RESIZE, resize );
   }

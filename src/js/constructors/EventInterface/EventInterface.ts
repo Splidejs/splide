@@ -6,6 +6,13 @@ import { EventBusCallback } from '../EventBus/EventBus';
 
 
 /**
+ * The type for an EventTarget or an array with EventTarget objects.
+ *
+ * @since 3.7.0
+ */
+type EventTargets = EventTarget | EventTarget[];
+
+/**
  * The interface for the EventInterface object.
  *
  * @since 3.0.0
@@ -16,26 +23,10 @@ export interface EventInterfaceObject {
   off<K extends keyof EventMap>( events: K | K[] | string | string[] ): void;
   emit<K extends keyof EventMap>( event: K, ...args: Parameters<EventMap[ K ]> ): void
   emit( event: string, ...args: any[] ): void;
-  bind(
-    target: Element | Window | Document | Array<Element | Window | Document>,
-    events: string,
-    callback: AnyFunction,
-    options?: AddEventListenerOptions
-  ): void
-  unbind(
-    target: Element | Window | Document | Array<Element | Window | Document>,
-    events: string,
-    callback?: AnyFunction,
-  ): void;
+  bind( target: EventTargets, events: string, callback: AnyFunction, options?: AddEventListenerOptions ): void
+  unbind( target: EventTarget | EventTarget[], events: string, callback?: AnyFunction ): void;
   destroy(): void;
 }
-
-/**
- * The type for event targets.
- *
- * @since 3.0.0
- */
-type EventTarget = Element | Window | Document;
 
 /**
  * The function that provides interface for internal and native events.
@@ -43,10 +34,11 @@ type EventTarget = Element | Window | Document;
  * @since 3.0.0
  *
  * @param Splide - A Splide instance.
+ * @param manual - Optional. Whether to destroy the interface manually or not.
  *
  * @return A collection of interface functions.
  */
-export function EventInterface( Splide: Splide ): EventInterfaceObject {
+export function EventInterface( Splide: Splide, manual?: boolean ): EventInterfaceObject {
   /**
    * Holds the event object.
    */
@@ -60,7 +52,7 @@ export function EventInterface( Splide: Splide ): EventInterfaceObject {
   /**
    * Stores all handlers that listen to native events.
    */
-  let listeners: [ EventTarget, string, AnyFunction, AddEventListenerOptions? ][] = [];
+  let listeners: [ EventTarget, string, AnyFunction, () => void ][] = [];
 
   /**
    * Registers an event handler with an unique key.
@@ -87,21 +79,23 @@ export function EventInterface( Splide: Splide ): EventInterfaceObject {
   /**
    * Listens to native events.
    * Splide#destory() will remove all registered listeners.
+   * In IE and Safari, mediaQueryList does not inherit EventTarget,
+   * and only supports deprecated `addListener` and `removeListener`.
    *
    * @param targets  - A target element, the window object or the document object.
    * @param events   - An event or events to listen to.
    * @param callback - A callback function.
    * @param options  - Optional. The options to pass to the `addEventListener` function.
    */
-  function bind(
-    targets: EventTarget | EventTarget[],
-    events: string,
-    callback: AnyFunction,
-    options?: AddEventListenerOptions
-  ): void {
+  function bind( targets: EventTargets, events: string, callback: AnyFunction, options?: AddEventListenerOptions ): void {
     forEachEvent( targets, events, ( target, event ) => {
-      listeners.push( [ target, event, callback, options ] );
-      target.addEventListener( event, callback, options );
+      const isEventTarget = 'addEventListener' in target;
+      const remover = isEventTarget
+        ? target.removeEventListener.bind( target, event, callback, options )
+        : target[ 'removeListener' ].bind( target, callback );
+
+      isEventTarget ? target.addEventListener( event, callback, options ) : target[ 'addListener' ]( callback );
+      listeners.push( [ target, event, callback, remover ] );
     } );
   }
 
@@ -112,11 +106,11 @@ export function EventInterface( Splide: Splide ): EventInterfaceObject {
    * @param events   - An event name or names to remove.
    * @param callback - Optional. Specify the callback to remove.
    */
-  function unbind( targets: EventTarget | EventTarget[], events: string, callback?: AnyFunction ): void {
+  function unbind( targets: EventTargets, events: string, callback?: AnyFunction ): void {
     forEachEvent( targets, events, ( target, event ) => {
       listeners = listeners.filter( listener => {
         if ( listener[ 0 ] === target && listener[ 1 ] === event && ( ! callback || listener[ 2 ] === callback ) ) {
-          target.removeEventListener( event, listener[ 2 ], listener[ 3 ] );
+          listener[ 3 ]();
           return false;
         }
 
@@ -133,7 +127,7 @@ export function EventInterface( Splide: Splide ): EventInterfaceObject {
    * @param iteratee - An iteratee function.
    */
   function forEachEvent(
-    targets: EventTarget | EventTarget[],
+    targets: EventTargets,
     events: string,
     iteratee: ( target: EventTarget, event: string ) => void
   ): void {
@@ -148,14 +142,14 @@ export function EventInterface( Splide: Splide ): EventInterfaceObject {
    * Removes all listeners.
    */
   function destroy(): void {
-    listeners = listeners.filter( data => unbind( data[ 0 ], data[ 1 ] ) );
+    listeners = listeners.filter( data => { data[ 3 ]() } );
     event.offBy( key );
   }
 
   /**
    * Invokes destroy when the slider is destroyed.
    */
-  event.on( EVENT_DESTROY, destroy, key );
+  ! manual && event.on( EVENT_DESTROY, destroy, key );
 
   return {
     on,

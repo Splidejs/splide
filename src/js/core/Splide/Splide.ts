@@ -86,13 +86,12 @@ export class Splide {
 
     this.root = root;
 
-    merge( DEFAULTS, Splide.defaults );
-    merge( merge( this._options, DEFAULTS ), options || {} );
+    merge( this._options, DEFAULTS, Splide.defaults, options || {} );
 
     try {
       merge( this._options, JSON.parse( getAttribute( root, DATA_ATTRIBUTE ) ) );
     } catch ( e ) {
-      assert( false, e.message );
+      assert( false, 'Invalid JSON' );
     }
   }
 

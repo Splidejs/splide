@@ -6,13 +6,13 @@ import { setAttribute } from '../setAttribute/setAttribute';
 
 export function create<K extends keyof HTMLElementTagNameMap>(
   tag: K,
-  attrs?: Record<string, string | number | boolean> | string | string[],
+  attrs?: Record<string, string | number | boolean> | string,
   parent?: HTMLElement
 ): HTMLElementTagNameMap[ K ];
 
 export function create(
   tag: string,
-  attrs?: Record<string, string | number | boolean> | string | string[],
+  attrs?: Record<string, string | number | boolean> | string,
   parent?: HTMLElement
 ): HTMLElement;
 

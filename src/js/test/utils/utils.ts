@@ -156,7 +156,7 @@ export function fire(
     delete data.timeStamp;
   }
 
-  target.dispatchEvent( assign( e, data ) );
+  target.dispatchEvent( Object.assign( e, data ) );
   return e;
 }
 

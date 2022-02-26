@@ -1,9 +1,10 @@
+import { Cast, Head, Push, Resolve, Shift } from '../../../types';
 import { slice } from '../../arrayLike';
 import { forOwn } from '../forOwn/forOwn';
 
 
 /**
- * Assign U to T.
+ * Assigns U to T.
  *
  * @typeParam T - An object to assign to.
  * @typeParam U - An object to assign.
@@ -12,18 +13,25 @@ import { forOwn } from '../forOwn/forOwn';
  */
 export type Assign<T, U> = Omit<T, keyof U> & U;
 
+/**
+ * Recursively assigns U[] to T.
+ *
+ * @typeParam T - An object to assign to.
+ * @typeParam U - A tuple contains objects.
+ *
+ * @return An assigned object type.
+ */
+export type Assigned<T extends object, U extends object[], N extends number, C extends any[] = []> = {
+  0: T,
+  1: Assigned<Assign<T, Head<U>>, Shift<U>, N, Push<C>>,
+}[ C['length'] extends N ? 0 : 1 ] extends infer A ? Cast<A, any> : never;
+
 export function assign<T extends object>( object: T ): T;
 
-// There is a way to type arguments recursively, but these fixed definitions are enough for this project.
-export function assign<T extends object, U extends object>( object: T, source: U ): Assign<T, U>;
-
-export function assign<T extends object, U1 extends object, U2 extends object>(
-  object: T, source1: U1, source2: U2
-): Assign<Assign<T, U1>, U2>;
-
-export function assign<T extends object, U1 extends object, U2 extends object, U3 extends object>(
-  object: T, source1: U1, source2: U2, source3: U3
-): Assign<Assign<Assign<T, U1>, U2>, U3>;
+export function assign<T extends object, U extends object[]>(
+  object: T,
+  ...sources: U
+): Resolve<Assigned<T, U, U['length']>>
 
 /**
  * Assigns all own enumerable properties of all source objects to the provided object.
