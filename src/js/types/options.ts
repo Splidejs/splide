@@ -1,3 +1,6 @@
+import { I18N } from '../constants/i18n';
+
+
 /**
  * The interface for options.
  *
@@ -11,6 +14,12 @@ export interface Options extends ResponsiveOptions {
    * - 'fade' : A slider with the fade transition. This does not support the perPage option.
    */
   type?: string;
+
+  /**
+   * The `role` attribute for the root element.
+   * If the tag is `<section>`, this value will not be used. The default value is `'region'`.
+   */
+  role?: string;
 
   /**
    * Determines whether to disable any actions while the slider is transitioning.
@@ -158,6 +167,12 @@ export interface Options extends ResponsiveOptions {
   noDrag?: string;
 
   /**
+   * Enables the live region by `aria-live`.
+   * If `true`, screen readers will read a content of each slide whenever slide changes.
+   */
+  live?: boolean;
+
+  /**
    * Determines whether to use the Transition component or not.
    */
   useScroll?: boolean;
@@ -189,7 +204,7 @@ export interface Options extends ResponsiveOptions {
   /**
    * The collection of i18n strings.
    */
-  i18n?: Record<string, string>;
+  i18n?: Record<keyof typeof I18N | string, string>;
 }
 
 /**

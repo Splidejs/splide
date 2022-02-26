@@ -79,20 +79,13 @@ export function LazyLoad( Splide: Splide, Components: Components, options: Optio
   function mount(): void {
     if ( options.lazyLoad ) {
       init();
-      on( EVENT_REFRESH, refresh );
+      on( EVENT_REFRESH, destroy );
+      on( EVENT_REFRESH, init );
 
       if ( ! isSequential ) {
         on( [ EVENT_MOUNTED, EVENT_REFRESH, EVENT_MOVED, EVENT_SCROLLED ], observe );
       }
     }
-  }
-
-  /**
-   * Called when the slider is refreshed.
-   */
-  function refresh(): void {
-    destroy();
-    init();
   }
 
   /**

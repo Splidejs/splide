@@ -268,9 +268,11 @@ function assert(condition, message) {
   }
 }
 
-function nextTick(callback) {
-  setTimeout(callback);
+function apply(func) {
+  return func.bind(null, ...slice(arguments, 1));
 }
+
+const nextTick = setTimeout;
 
 const noop = () => {
 };
@@ -433,7 +435,7 @@ function EventInterface(Splide2) {
   function forEachEvent(targets, events, iteratee) {
     forEach(targets, (target) => {
       if (target) {
-        events.split(" ").forEach(iteratee.bind(null, target));
+        events.split(" ").forEach(apply(iteratee, target));
       }
     });
   }
@@ -697,6 +699,7 @@ const CLASSES = {
 function Elements(Splide2, Components2, options) {
   const { on } = EventInterface(Splide2);
   const { root } = Splide2;
+  const { i18n } = options;
   const elements = {};
   const slides = [];
   let classes;
@@ -709,17 +712,15 @@ function Elements(Splide2, Components2, options) {
     addClass(root, classes = getClasses());
   }
   function mount() {
-    on(EVENT_REFRESH, refresh, DEFAULT_EVENT_PRIORITY - 2);
+    const priority = DEFAULT_EVENT_PRIORITY - 2;
+    on(EVENT_REFRESH, destroy, priority);
+    on(EVENT_REFRESH, setup, priority);
     on(EVENT_UPDATED, update);
   }
   function destroy() {
     empty(slides);
     removeClass(root, classes);
     removeAttribute([root, track, list], ALL_ATTRIBUTES.concat("style"));
-  }
-  function refresh() {
-    destroy();
-    setup();
   }
   function update() {
     removeClass(root, classes);
@@ -753,7 +754,9 @@ function Elements(Splide2, Components2, options) {
     root.id = id;
     track.id = track.id || `${id}-track`;
     list.id = list.id || `${id}-list`;
-    setAttribute(root, ARIA_ROLEDESCRIPTION, "carousel");
+    setAttribute(root, ARIA_ROLEDESCRIPTION, i18n.carousel);
+    setAttribute(root, ROLE, root.tagName !== "SECTION" && options.role || null);
+    setAttribute(list, ROLE, "none");
   }
   function find(selector) {
     return child(root, selector) || child(slider, selector);
@@ -781,7 +784,7 @@ const FADE = "fade";
 function Slide$1(Splide2, index, slideIndex, slide) {
   const { on, emit, bind, destroy: destroyEvents } = EventInterface(Splide2);
   const { Components, root, options } = Splide2;
-  const { isNavigation, updateOnMove } = options;
+  const { isNavigation, updateOnMove, i18n } = options;
   const { resolve } = Components.Direction;
   const styles = getAttribute(slide, "style");
   const isClone = slideIndex > -1;
@@ -792,7 +795,8 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     if (!isClone) {
       slide.id = `${root.id}-slide${pad(index + 1)}`;
       setAttribute(slide, ROLE, "group");
-      setAttribute(slide, ARIA_ROLEDESCRIPTION, "slide");
+      setAttribute(slide, ARIA_ROLEDESCRIPTION, i18n.slide);
+      setAttribute(slide, ARIA_LABEL, format(i18n.slideLabel, [index + 1, Splide2.length]));
     }
     listen();
   }
@@ -815,7 +819,7 @@ function Slide$1(Splide2, index, slideIndex, slide) {
   }
   function initNavigation() {
     const idx = isClone ? slideIndex : index;
-    const label = format(options.i18n.slideX, idx + 1);
+    const label = format(i18n.slideX, idx + 1);
     const controls = Splide2.splides.map((target) => target.splide.root.id).join(" ");
     setAttribute(slide, ARIA_LABEL, label);
     setAttribute(slide, ARIA_CONTROLS, controls);
@@ -900,7 +904,8 @@ function Slides(Splide2, Components2, options) {
   const Slides2 = [];
   function mount() {
     init();
-    on(EVENT_REFRESH, refresh);
+    on(EVENT_REFRESH, destroy);
+    on(EVENT_REFRESH, init);
     on([EVENT_MOUNTED, EVENT_REFRESH], () => {
       Slides2.sort((Slide1, Slide2) => Slide1.index - Slide2.index);
     });
@@ -915,10 +920,6 @@ function Slides(Splide2, Components2, options) {
       Slide2.destroy();
     });
     empty(Slides2);
-  }
-  function refresh() {
-    destroy();
-    init();
   }
   function update() {
     forEach$1((Slide2) => {
@@ -951,7 +952,7 @@ function Slides(Splide2, Components2, options) {
         const ref = slides[index];
         ref ? before(slide, ref) : append(list, slide);
         addClass(slide, options.classes.slide);
-        observeImages(slide, emit.bind(null, EVENT_RESIZE));
+        observeImages(slide, apply(emit, EVENT_RESIZE));
       }
     });
     emit(EVENT_REFRESH);
@@ -1117,7 +1118,8 @@ function Clones(Splide2, Components2, options) {
   let cloneCount;
   function mount() {
     init();
-    on(EVENT_REFRESH, refresh);
+    on(EVENT_REFRESH, destroy);
+    on(EVENT_REFRESH, init);
     on([EVENT_UPDATED, EVENT_RESIZE], observe);
   }
   function init() {
@@ -1129,10 +1131,6 @@ function Clones(Splide2, Components2, options) {
   function destroy() {
     remove(clones);
     empty(clones);
-  }
-  function refresh() {
-    destroy();
-    init();
   }
   function observe() {
     if (cloneCount < computeCloneCount()) {
@@ -1493,8 +1491,7 @@ function Arrows(Splide2, Components2, options) {
     }
     if (prev && next) {
       if (!arrows.prev) {
-        const { id } = Elements.track;
-        setAttribute([prev, next], ARIA_CONTROLS, id);
+        setAttribute([prev, next], ARIA_CONTROLS, Elements.list.id);
         arrows.prev = prev;
         arrows.next = next;
         listen();
@@ -1513,12 +1510,8 @@ function Arrows(Splide2, Components2, options) {
   function listen() {
     const { go } = Controller;
     on([EVENT_MOUNTED, EVENT_MOVED, EVENT_UPDATED, EVENT_REFRESH, EVENT_SCROLLED], update);
-    bind(next, "click", () => {
-      go(">", true);
-    });
-    bind(prev, "click", () => {
-      go("<", true);
-    });
+    bind(next, "click", apply(go, ">", true, void 0));
+    bind(prev, "click", apply(go, "<", true, void 0));
   }
   function createArrows() {
     wrapper = create("div", classes.arrows);
@@ -1643,30 +1636,25 @@ function Cover(Splide2, Components2, options) {
   const { on } = EventInterface(Splide2);
   function mount() {
     if (options.cover) {
-      on(EVENT_LAZYLOAD_LOADED, (img, Slide) => {
-        toggle(true, img, Slide);
-      });
-      on([EVENT_MOUNTED, EVENT_UPDATED, EVENT_REFRESH], apply.bind(null, true));
+      on(EVENT_LAZYLOAD_LOADED, apply(toggle, true));
+      on([EVENT_MOUNTED, EVENT_UPDATED, EVENT_REFRESH], apply(cover, true));
     }
   }
-  function destroy() {
-    apply(false);
-  }
-  function apply(cover) {
+  function cover(cover2) {
     Components2.Slides.forEach((Slide) => {
       const img = child(Slide.container || Slide.slide, "img");
       if (img && img.src) {
-        toggle(cover, img, Slide);
+        toggle(cover2, img, Slide);
       }
     });
   }
-  function toggle(cover, img, Slide) {
-    Slide.style("background", cover ? `center/cover no-repeat url("${img.src}")` : "", true);
-    display(img, cover ? "none" : "");
+  function toggle(cover2, img, Slide) {
+    Slide.style("background", cover2 ? `center/cover no-repeat url("${img.src}")` : "", true);
+    display(img, cover2 ? "none" : "");
   }
   return {
     mount,
-    destroy
+    destroy: apply(cover, false)
   };
 }
 
@@ -1856,9 +1844,7 @@ function Drag(Splide2, Components2, options) {
     if (isFree) {
       Controller.scroll(destination);
     } else if (Splide2.is(FADE)) {
-      const { length } = Splide2;
-      const index = Splide2.index + orient(sign(velocity));
-      Controller.go(rewind ? (index + length) % length : index);
+      Controller.go(orient(sign(velocity)) < 0 ? rewind ? "<" : "-" : rewind ? ">" : "+");
     } else if (Splide2.is(SLIDE) && exceeded && rewind) {
       Controller.go(exceededLimit(true) ? ">" : "<");
     } else {
@@ -1990,15 +1976,12 @@ function LazyLoad(Splide2, Components2, options) {
   function mount() {
     if (options.lazyLoad) {
       init();
-      on(EVENT_REFRESH, refresh);
+      on(EVENT_REFRESH, destroy);
+      on(EVENT_REFRESH, init);
       if (!isSequential) {
         on([EVENT_MOUNTED, EVENT_REFRESH, EVENT_MOVED, EVENT_SCROLLED], observe);
       }
     }
-  }
-  function refresh() {
-    destroy();
-    init();
   }
   function init() {
     Components2.Slides.forEach((_Slide) => {
@@ -2110,10 +2093,9 @@ function Pagination(Splide2, Components2, options) {
     for (let i = 0; i < max; i++) {
       const li = create("li", null, list);
       const button = create("button", { class: classes.page, type: "button" }, li);
-      const controls = Slides.getIn(i).map((Slide) => Slide.slide.id);
       const text = !hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
-      bind(button, "click", onClick.bind(null, i));
-      setAttribute(button, ARIA_CONTROLS, controls.join(" "));
+      bind(button, "click", apply(onClick, i));
+      setAttribute(button, ARIA_CONTROLS, Components2.Elements.list.id);
       setAttribute(button, ARIA_LABEL, format(text, i + 1));
       items.push({ li, button, page: i });
     }
@@ -2211,6 +2193,29 @@ function Sync(Splide2, Components2, options) {
   };
 }
 
+function Live(Splide2, Components2, options) {
+  const { on } = EventInterface(Splide2);
+  const { list } = Components2.Elements;
+  const { live } = options;
+  function mount() {
+    if (live) {
+      setAttribute(list, ARIA_ATOMIC, false);
+      disable(!Components2.Autoplay.isPaused());
+      on(EVENT_AUTOPLAY_PLAY, apply(disable, true));
+      on(EVENT_AUTOPLAY_PAUSE, apply(disable, false));
+    }
+  }
+  function disable(disabled) {
+    if (live) {
+      setAttribute(list, ARIA_LIVE, disabled ? "off" : "polite");
+    }
+  }
+  return {
+    mount,
+    disable
+  };
+}
+
 function Wheel(Splide2, Components2, options) {
   const { bind } = EventInterface(Splide2);
   function mount() {
@@ -2255,6 +2260,7 @@ var ComponentConstructors = /*#__PURE__*/Object.freeze({
   LazyLoad: LazyLoad,
   Pagination: Pagination,
   Sync: Sync,
+  Live: Live,
   Wheel: Wheel
 });
 
@@ -2266,11 +2272,15 @@ const I18N = {
   slideX: "Go to slide %s",
   pageX: "Go to page %s",
   play: "Start autoplay",
-  pause: "Pause autoplay"
+  pause: "Pause autoplay",
+  carousel: "carousel",
+  slide: "slide",
+  slideLabel: "%s of %s"
 };
 
 const DEFAULTS = {
   type: "slide",
+  role: "region",
   speed: 400,
   waitForTransition: true,
   perPage: 1,

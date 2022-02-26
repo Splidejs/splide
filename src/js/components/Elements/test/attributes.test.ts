@@ -1,11 +1,11 @@
-import { ARIA_ROLEDESCRIPTION, TAB_INDEX } from '../../../constants/attributes';
-import { init } from '../../../test';
+import { ALL_ATTRIBUTES, ARIA_ROLEDESCRIPTION, ROLE, TAB_INDEX } from '../../../constants/attributes';
+import { buildHtml, init } from '../../../test';
 
 
 describe( 'Elements', () => {
   test( 'can assign aria attributes.', () => {
     const splide = init();
-
+    expect( splide.root.getAttribute( ROLE ) ).toBe( 'region' );
     expect( splide.root.getAttribute( ARIA_ROLEDESCRIPTION ) ).toBe( 'carousel' );
   } );
 
@@ -17,10 +17,21 @@ describe( 'Elements', () => {
 
     splide.destroy();
 
-    expect( root.getAttribute( ARIA_ROLEDESCRIPTION ) ).toBeNull();
-    expect( root.getAttribute( TAB_INDEX ) ).toBeNull();
+    const attributes = ALL_ATTRIBUTES.concat( 'style' );
+    const callback   = jest.fn();
 
-    expect( track.getAttribute( 'style' ) ).toBeNull();
-    expect( list.getAttribute( 'style' ) ).toBeNull();
+    [ root, track, list ].forEach( elm => {
+      attributes.forEach( attr => {
+        expect( elm.getAttribute( attr ) ).toBeNull();
+        callback();
+      } );
+    } );
+
+    expect( callback ).toHaveBeenCalledTimes( attributes.length * 3 );
+  } );
+
+  test( 'should not assign the role if the root element is section.', () => {
+    const splide = init( {}, { html: buildHtml( { tag: 'section' } ) } );
+    expect( splide.root.getAttribute( ROLE ) ).toBeNull();
   } );
 } );

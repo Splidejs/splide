@@ -151,6 +151,15 @@ interface LazyLoadComponent extends BaseComponent {
 }
 
 /**
+ * The interface for the Live component.
+ *
+ * @since 3.7.0
+ */
+interface LiveComponent extends BaseComponent {
+    disable(disabled: boolean): void;
+}
+
+/**
  * The interface for the Move component.
  *
  * @since 3.0.0
@@ -235,6 +244,25 @@ interface WheelComponent extends BaseComponent {
 }
 
 /**
+ * The collection of i18n strings.
+ *
+ * @since 3.0.0
+ */
+declare const I18N: {
+    prev: string;
+    next: string;
+    first: string;
+    last: string;
+    slideX: string;
+    pageX: string;
+    play: string;
+    pause: string;
+    carousel: string;
+    slide: string;
+    slideLabel: string;
+};
+
+/**
  * The interface for options.
  *
  * @since 3.0.0
@@ -247,6 +275,11 @@ interface Options extends ResponsiveOptions {
      * - 'fade' : A slider with the fade transition. This does not support the perPage option.
      */
     type?: string;
+    /**
+     * The `role` attribute for the root element.
+     * If the tag is `<section>`, this value will not be used. The default value is `'region'`.
+     */
+    role?: string;
     /**
      * Determines whether to disable any actions while the slider is transitioning.
      * Even if `false`, the slider forcibly waits for transition on the loop points.
@@ -369,6 +402,11 @@ interface Options extends ResponsiveOptions {
      */
     noDrag?: string;
     /**
+     * Enables the live region by `aria-live`.
+     * If `true`, screen readers will read a content of each slide whenever slide changes.
+     */
+    live?: boolean;
+    /**
      * Determines whether to use the Transition component or not.
      */
     useScroll?: boolean;
@@ -397,7 +435,7 @@ interface Options extends ResponsiveOptions {
     /**
      * The collection of i18n strings.
      */
-    i18n?: Record<string, string>;
+    i18n?: Record<keyof typeof I18N | string, string>;
 }
 /**
  * The interface for options that can correspond with breakpoints.
@@ -613,6 +651,7 @@ interface Components {
     Pagination: PaginationComponent;
     Sync: SyncComponent;
     Wheel: WheelComponent;
+    Live: LiveComponent;
     Transition: TransitionComponent;
 }
 
@@ -653,6 +692,34 @@ interface EventMap {
     'autoplay:pause': () => void;
     'lazyload:loaded': (img: HTMLImageElement, Slide: SlideComponent) => void;
 }
+
+/**
+ * Casts T to U.
+ *
+ * @internal
+ */
+declare type Cast<T, U> = T extends U ? T : U;
+/**
+ * Pushes U to tuple T.
+ *
+ * @internal
+ */
+declare type Push<T extends any[], U = any> = [...T, U];
+/**
+ * Removes the first type from the tuple T.
+ *
+ * @internal
+ */
+declare type Shift<T extends any[]> = ((...args: T) => any) extends (arg: any, ...args: infer A) => any ? A : never;
+/**
+ * Removes the N types from the tuple T.
+ *
+ * @internal
+ */
+declare type ShiftN<T extends any[], N extends number, C extends any[] = []> = {
+    0: T;
+    1: ShiftN<Shift<T>, N, Push<C>>;
+}[C['length'] extends N ? 0 : 1] extends infer A ? Cast<A, any[]> : never;
 
 /**
  * The interface for the Slides component.
@@ -1521,4 +1588,4 @@ declare const CLASSES: {
     spinner: string;
 };
 
-export { AnyFunction, ArrowsComponent, AutoplayComponent, BaseComponent, CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_AUTOPLAY, CLASS_CLONE, CLASS_CONTAINER, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PAUSE, CLASS_PLAY, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SLIDER, CLASS_SPINNER, CLASS_SR, CLASS_TRACK, CLASS_VISIBLE, ClonesComponent, ComponentConstructor, Components, ControllerComponent, CoverComponent, DirectionComponent, DragComponent, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, ElementsComponent, EventBus, EventBusCallback, EventBusObject, EventHandler, EventInterface, EventInterfaceObject, EventMap, KeyboardComponent, LayoutComponent, LazyLoadComponent, MoveComponent, Options, OptionsComponent, PaginationComponent, PaginationData, PaginationItem, RequestInterval, RequestIntervalInterface, ResponsiveOptions, STATUS_CLASSES, ScrollComponent, SlideComponent, SlidesComponent, Splide, SplideRenderer, State, StateObject, SyncComponent, SyncTarget, Throttle, ThrottleInstance, TransitionComponent, WheelComponent, Splide as default };
+export { AnyFunction, ArrowsComponent, AutoplayComponent, BaseComponent, CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_AUTOPLAY, CLASS_CLONE, CLASS_CONTAINER, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PAUSE, CLASS_PLAY, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SLIDER, CLASS_SPINNER, CLASS_SR, CLASS_TRACK, CLASS_VISIBLE, Cast, ClonesComponent, ComponentConstructor, Components, ControllerComponent, CoverComponent, DirectionComponent, DragComponent, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, ElementsComponent, EventBus, EventBusCallback, EventBusObject, EventHandler, EventInterface, EventInterfaceObject, EventMap, KeyboardComponent, LayoutComponent, LazyLoadComponent, LiveComponent, MoveComponent, Options, OptionsComponent, PaginationComponent, PaginationData, PaginationItem, Push, RequestInterval, RequestIntervalInterface, ResponsiveOptions, STATUS_CLASSES, ScrollComponent, Shift, ShiftN, SlideComponent, SlidesComponent, Splide, SplideRenderer, State, StateObject, SyncComponent, SyncTarget, Throttle, ThrottleInstance, TransitionComponent, WheelComponent, Splide as default };

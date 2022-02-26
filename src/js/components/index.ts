@@ -15,4 +15,5 @@ export { Keyboard }   from './Keyboard/Keyboard';
 export { LazyLoad }   from './LazyLoad/LazyLoad';
 export { Pagination } from './Pagination/Pagination';
 export { Sync }       from './Sync/Sync';
+export { Live }       from './Live/Live';
 export { Wheel }      from './Wheel/Wheel';

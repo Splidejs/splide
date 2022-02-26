@@ -2,7 +2,7 @@ import { EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_REFRESH, EVENT_UPDATED } fr
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { child, display } from '../../utils';
+import { apply, child, display } from '../../utils';
 import { SlideComponent } from '../Slides/Slide';
 
 
@@ -33,16 +33,9 @@ export function Cover( Splide: Splide, Components: Components, options: Options 
    */
   function mount(): void {
     if ( options.cover ) {
-      on( EVENT_LAZYLOAD_LOADED, ( img, Slide ) => { toggle( true, img, Slide ) } );
-      on( [ EVENT_MOUNTED, EVENT_UPDATED, EVENT_REFRESH ], apply.bind( null, true ) );
+      on( EVENT_LAZYLOAD_LOADED, apply( toggle, true ) );
+      on( [ EVENT_MOUNTED, EVENT_UPDATED, EVENT_REFRESH ], apply( cover, true ) );
     }
-  }
-
-  /**
-   * Destroys the component.
-   */
-  function destroy(): void {
-    apply( false );
   }
 
   /**
@@ -50,7 +43,7 @@ export function Cover( Splide: Splide, Components: Components, options: Options 
    *
    * @param cover - If `false`, removes the background image.
    */
-  function apply( cover: boolean ): void {
+  function cover( cover: boolean ): void {
     Components.Slides.forEach( Slide => {
       const img = child<HTMLImageElement>( Slide.container || Slide.slide, 'img' );
 
@@ -74,6 +67,6 @@ export function Cover( Splide: Splide, Components: Components, options: Options 
 
   return {
     mount,
-    destroy,
+    destroy: apply( cover, false ),
   };
 }

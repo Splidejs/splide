@@ -1,4 +1,4 @@
-import { ALL_ATTRIBUTES, ARIA_ROLEDESCRIPTION } from '../../constants/attributes';
+import { ALL_ATTRIBUTES, ARIA_ROLEDESCRIPTION, ROLE } from '../../constants/attributes';
 import {
   CLASS_ACTIVE,
   CLASS_ARROW_NEXT,
@@ -80,6 +80,7 @@ export interface ElementsComponent extends BaseComponent, ElementCollection {
 export function Elements( Splide: Splide, Components: Components, options: Options ): ElementsComponent {
   const { on } = EventInterface( Splide );
   const { root } = Splide;
+  const { i18n } = options;
   const elements: ElementCollection = {} as ElementCollection;
 
   /**
@@ -120,7 +121,9 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
    * Called when the component is mounted.
    */
   function mount(): void {
-    on( EVENT_REFRESH, refresh, DEFAULT_EVENT_PRIORITY - 2 );
+    const priority = DEFAULT_EVENT_PRIORITY - 2;
+    on( EVENT_REFRESH, destroy, priority );
+    on( EVENT_REFRESH, setup, priority );
     on( EVENT_UPDATED, update );
   }
 
@@ -131,14 +134,6 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
     empty( slides );
     removeClass( root, classes );
     removeAttribute( [ root, track, list ], ALL_ATTRIBUTES.concat( 'style' ) );
-  }
-
-  /**
-   * Recollects slide elements.
-   */
-  function refresh(): void {
-    destroy();
-    setup();
   }
 
   /**
@@ -189,7 +184,9 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
     track.id = track.id || `${ id }-track`;
     list.id  = list.id || `${ id }-list`;
 
-    setAttribute( root, ARIA_ROLEDESCRIPTION, 'carousel' );
+    setAttribute( root, ARIA_ROLEDESCRIPTION, i18n.carousel );
+    setAttribute( root, ROLE, root.tagName !== 'SECTION' && options.role || null );
+    setAttribute( list, ROLE, 'none' );
   }
 
   /**

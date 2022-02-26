@@ -6,6 +6,4 @@ import { AnyFunction } from '../../../types';
  *
  * @param callback - A callback function.
  */
-export function nextTick( callback: AnyFunction ): void {
-  setTimeout( callback );
-}
+export const nextTick: ( callback: AnyFunction ) => ReturnType<typeof setTimeout> = setTimeout;

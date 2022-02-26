@@ -9,6 +9,7 @@ import { ElementsComponent } from '../components/Elements/Elements';
 import { KeyboardComponent } from '../components/Keyboard/Keyboard';
 import { LayoutComponent } from '../components/Layout/Layout';
 import { LazyLoadComponent } from '../components/LazyLoad/LazyLoad';
+import { LiveComponent } from '../components/Live/Live';
 import { MoveComponent } from '../components/Move/Move';
 import { OptionsComponent } from '../components/Options/Options';
 import { PaginationComponent } from '../components/Pagination/Pagination';
@@ -44,5 +45,6 @@ export interface Components {
   Pagination: PaginationComponent;
   Sync: SyncComponent;
   Wheel: WheelComponent;
+  Live: LiveComponent;
   Transition: TransitionComponent;
 }

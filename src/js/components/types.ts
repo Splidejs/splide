@@ -17,5 +17,6 @@ export type { LazyLoadComponent }   from './LazyLoad/LazyLoad';
 export type { PaginationComponent } from './Pagination/Pagination';
 export type { SyncComponent }       from './Sync/Sync';
 export type { WheelComponent }      from './Wheel/Wheel';
+export type { LiveComponent }       from './Live/Live';
 
 export type { PaginationData, PaginationItem } from './Pagination/Pagination';

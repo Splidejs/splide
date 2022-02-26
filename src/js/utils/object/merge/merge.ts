@@ -1,3 +1,4 @@
+import { Cast } from '../../../types';
 import { isArray, isObject } from '../../type/type';
 import { forOwn } from '../forOwn/forOwn';
 
@@ -21,8 +22,6 @@ export type Merge<T extends object, U extends object> = Omit<T, keyof U> & {
         : U[ K ]
     : U[ K ];
 } & Omit<U, keyof T>;
-
-type Cast<T, U> = T extends U ? T : U;
 
 /**
  * Recursively merges source properties to the object.

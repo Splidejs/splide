@@ -11,7 +11,18 @@ import {
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { append, before, child, create, display, parseHtml, remove, removeAttribute, setAttribute } from '../../utils';
+import {
+  append,
+  apply,
+  before,
+  child,
+  create,
+  display,
+  parseHtml,
+  remove,
+  removeAttribute,
+  setAttribute,
+} from '../../utils';
 import { PATH, SIZE, XML_NAME_SPACE } from './path';
 
 
@@ -85,9 +96,7 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
 
     if ( prev && next ) {
       if ( ! arrows.prev ) {
-        const { id } = Elements.track;
-
-        setAttribute( [ prev, next ], ARIA_CONTROLS, id );
+        setAttribute( [ prev, next ], ARIA_CONTROLS, Elements.list.id );
 
         arrows.prev = prev;
         arrows.next = next;
@@ -118,8 +127,8 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
   function listen(): void {
     const { go } = Controller;
     on( [ EVENT_MOUNTED, EVENT_MOVED, EVENT_UPDATED, EVENT_REFRESH, EVENT_SCROLLED ], update );
-    bind( next, 'click', () => { go( '>', true ) } );
-    bind( prev, 'click', () => { go( '<', true ) } );
+    bind( next, 'click', apply( go, '>', true, undefined ) );
+    bind( prev, 'click', apply( go, '<', true, undefined ) );
   }
 
   /**

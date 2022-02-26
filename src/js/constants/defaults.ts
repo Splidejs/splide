@@ -11,6 +11,7 @@ import { I18N } from './i18n';
  */
 export const DEFAULTS: Options = {
   type             : 'slide',
+  role             : 'region',
   speed            : 400,
   waitForTransition: true,
   perPage          : 1,

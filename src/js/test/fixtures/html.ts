@@ -4,6 +4,7 @@ import { URL } from './constants';
 
 
 export interface BuildHtmlArgs {
+  tag?: string;
   id?: string;
   length?: number;
   arrows?: boolean;
@@ -25,6 +26,7 @@ export interface BuildHtmlArgs {
  */
 export function buildHtml( args: BuildHtmlArgs = {} ): string {
   const {
+    tag = 'div',
     id,
     length = 10,
     arrows,
@@ -38,7 +40,7 @@ export function buildHtml( args: BuildHtmlArgs = {} ): string {
   } = args;
 
   return `
-<div class="splide"${ id ? ` id=${ id }` : '' }${ json ? ` data-splide='${ json }'` : '' }>
+<${ tag } class="splide"${ id ? ` id=${ id }` : '' }${ json ? ` data-splide='${ json }'` : '' }>
   <div class="splide__track">
     <ul class="splide__list">
       ${ generateSlides( length, src, dataSrc, dataSrcset, dataInterval ) }
@@ -48,7 +50,7 @@ export function buildHtml( args: BuildHtmlArgs = {} ): string {
   ${ arrows ? HTML_ARROWS : '' }
   ${ progress ? HTML_PROGRESS : '' }
   ${ autoplay ? HTML_AUTOPLAY : '' }
-</div>
+</${ tag }>
 `;
 }
 

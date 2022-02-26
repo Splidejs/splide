@@ -85,7 +85,7 @@ export interface  SlideComponent extends BaseComponent {
 export function Slide( Splide: Splide, index: number, slideIndex: number, slide: HTMLElement ): SlideComponent {
   const { on, emit, bind, destroy: destroyEvents } = EventInterface( Splide );
   const { Components, root, options } = Splide;
-  const { isNavigation, updateOnMove } = options;
+  const { isNavigation, updateOnMove, i18n } = options;
   const { resolve } = Components.Direction;
   const styles         = getAttribute( slide, 'style' );
   const isClone        = slideIndex > -1;
@@ -104,7 +104,8 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
     if ( ! isClone ) {
       slide.id = `${ root.id }-slide${ pad( index + 1 ) }`;
       setAttribute( slide, ROLE, 'group' );
-      setAttribute( slide, ARIA_ROLEDESCRIPTION, 'slide' );
+      setAttribute( slide, ARIA_ROLEDESCRIPTION, i18n.slide );
+      setAttribute( slide, ARIA_LABEL, format( i18n.slideLabel, [ index + 1, Splide.length ] ) );
     }
 
     listen();
@@ -142,7 +143,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    */
   function initNavigation(): void {
     const idx      = isClone ? slideIndex : index;
-    const label    = format( options.i18n.slideX, idx + 1 );
+    const label    = format( i18n.slideX, idx + 1 );
     const controls = Splide.splides.map( target => target.splide.root.id ).join( ' ' );
 
     setAttribute( slide, ARIA_LABEL, label );

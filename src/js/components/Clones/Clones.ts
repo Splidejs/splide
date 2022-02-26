@@ -45,7 +45,8 @@ export function Clones( Splide: Splide, Components: Components, options: Options
    */
   function mount(): void {
     init();
-    on( EVENT_REFRESH, refresh );
+    on( EVENT_REFRESH, destroy );
+    on( EVENT_REFRESH, init );
     on( [ EVENT_UPDATED, EVENT_RESIZE ], observe );
   }
 
@@ -65,15 +66,6 @@ export function Clones( Splide: Splide, Components: Components, options: Options
   function destroy(): void {
     remove( clones );
     empty( clones );
-  }
-
-  /**
-   * Discards all clones and regenerates them.
-   * Must do this before the Elements component collects slide elements.
-   */
-  function refresh(): void {
-    destroy();
-    init();
   }
 
   /**

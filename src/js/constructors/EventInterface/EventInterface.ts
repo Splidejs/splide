@@ -1,7 +1,7 @@
 import { EVENT_DESTROY } from '../../constants/events';
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, EventMap } from '../../types';
-import { forEach } from '../../utils';
+import { apply, forEach } from '../../utils';
 import { EventBusCallback } from '../EventBus/EventBus';
 
 
@@ -139,7 +139,7 @@ export function EventInterface( Splide: Splide ): EventInterfaceObject {
   ): void {
     forEach( targets, target => {
       if ( target ) {
-        events.split( ' ' ).forEach( iteratee.bind( null, target ) );
+        events.split( ' ' ).forEach( apply( iteratee, target ) );
       }
     } );
   }

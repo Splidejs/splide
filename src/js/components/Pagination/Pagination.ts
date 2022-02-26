@@ -12,7 +12,7 @@ import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import {
-  addClass,
+  addClass, apply,
   ceil,
   create,
   empty,
@@ -129,14 +129,13 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
     list = create( 'ul', classes.pagination, parent );
 
     for ( let i = 0; i < max; i++ ) {
-      const li       = create( 'li', null, list );
-      const button   = create( 'button', { class: classes.page, type: 'button' }, li );
-      const controls = Slides.getIn( i ).map( Slide => Slide.slide.id );
-      const text     = ! hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
+      const li     = create( 'li', null, list );
+      const button = create( 'button', { class: classes.page, type: 'button' }, li );
+      const text   = ! hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
 
-      bind( button, 'click', onClick.bind( null, i ) );
+      bind( button, 'click', apply( onClick, i ) );
 
-      setAttribute( button, ARIA_CONTROLS, controls.join( ' ' ) );
+      setAttribute( button, ARIA_CONTROLS, Components.Elements.list.id );
       setAttribute( button, ARIA_LABEL, format( text, i + 1 ) );
 
       items.push( { li, button, page: i } );
