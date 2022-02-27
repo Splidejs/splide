@@ -23,6 +23,7 @@ $settings = get_settings();
 	      rewind : true,
 	      perPage: 2,
 	      live   : true,
+	      speed: 1000
       } );
 
       splide.mount();

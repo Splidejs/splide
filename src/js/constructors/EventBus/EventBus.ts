@@ -1,6 +1,6 @@
 import { DEFAULT_EVENT_PRIORITY } from '../../constants/priority';
 import { AnyFunction } from '../../types';
-import { forOwn, push, slice, toArray } from '../../utils';
+import { forOwn, slice, toArray } from '../../utils';
 
 
 /**
@@ -21,12 +21,7 @@ export interface EventBusObject {
  *
  * @since 3.0.0
  */
-export interface EventHandler {
-  _callback: AnyFunction;
-  _namespace: string;
-  _priority: number;
-  _key?: object;
-}
+export type EventHandler = [ AnyFunction, string, number, object? ];
 
 /**
  * The type for a callback function of the EventBus.
@@ -64,14 +59,9 @@ export function EventBus(): EventBusObject {
     priority = DEFAULT_EVENT_PRIORITY
   ): void {
     forEachEvent( events, ( event, namespace ) => {
-      handlers[ event ] = handlers[ event ] || [];
-
-      push( handlers[ event ], {
-        _callback : callback,
-        _namespace: namespace,
-        _priority : priority,
-        _key      : key,
-      } ).sort( ( handler1, handler2 ) => handler1._priority - handler2._priority );
+      const events = ( handlers[ event ] = handlers[ event ] || [] );
+      events.push( [ callback, namespace, priority, key ] );
+      events.sort( ( handler1, handler2 ) => handler1[ 2 ] - handler2[ 2 ] );
     } );
   }
 
@@ -86,7 +76,7 @@ export function EventBus(): EventBusObject {
   function off( events: string | string[], key?: object ): void {
     forEachEvent( events, ( event, namespace ) => {
       handlers[ event ] = ( handlers[ event ] || [] ).filter( handler => {
-        return handler._key ? handler._key !== key : key || handler._namespace !== namespace;
+        return handler[ 3 ] ? handler[ 3 ] !== key : key || handler[ 1 ] !== namespace;
       } );
     } );
   }
@@ -111,7 +101,7 @@ export function EventBus(): EventBusObject {
   function emit( event: string ): void {
     ( handlers[ event ] || [] ).forEach( handler => {
       // eslint-disable-next-line prefer-rest-params, prefer-spread
-      handler._callback.apply( handler, slice( arguments, 1 ) );
+      handler[ 0 ].apply( handler, slice( arguments, 1 ) );
     } );
   }
 

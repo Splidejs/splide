@@ -1,6 +1,3 @@
-import { arrayProto } from '../../array';
-
-
 /**
  * The slice method for an array-like object.
  *
@@ -11,5 +8,5 @@ import { arrayProto } from '../../array';
  * @return An array with sliced elements.
  */
 export function slice<T>( arrayLike: ArrayLike<T>, start?: number, end?: number ): T[] {
-  return arrayProto.slice.call( arrayLike, start, end );
+  return Array.prototype.slice.call( arrayLike, start, end );
 }

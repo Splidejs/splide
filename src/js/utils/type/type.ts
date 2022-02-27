@@ -1,3 +1,19 @@
+import { AnyFunction } from '../../types';
+import { apply } from '../function';
+
+
+/**
+ * The alias of the type check function.
+ *
+ * @param type    - A type.
+ * @param subject - A subject to check.
+ *
+ * @return `true` if the subject is the specified type.
+ */
+function typeOf( type: string, subject: unknown ): boolean {
+  return typeof subject === type;
+}
+
 /**
  * Checks if the given subject is an object or not.
  *
@@ -6,7 +22,7 @@
  * @return `true` if the subject is an object, or otherwise `false`.
  */
 export function isObject( subject: unknown ): subject is object {
-  return ! isNull( subject ) && typeof subject === 'object';
+  return ! isNull( subject ) && typeOf( 'object', subject );
 }
 
 /**
@@ -16,9 +32,7 @@ export function isObject( subject: unknown ): subject is object {
  *
  * @return `true` if the subject is an array, or otherwise `false`.
  */
-export function isArray<T>( subject: unknown ): subject is T[] {
-  return Array.isArray( subject );
-}
+export const isArray: <T>( subject: unknown ) => subject is T[] = Array.isArray;
 
 /**
  * Checks if the given subject is a function or not.
@@ -27,9 +41,7 @@ export function isArray<T>( subject: unknown ): subject is T[] {
  *
  * @return `true` if the subject is a function, or otherwise `false`.
  */
-export function isFunction( subject: unknown ): subject is ( ...args: any[] ) => any {
-  return typeof subject === 'function';
-}
+export const isFunction = <( subject: unknown ) => subject is AnyFunction>apply( typeOf, 'function' );
 
 /**
  * Checks if the given subject is a string or not.
@@ -38,9 +50,7 @@ export function isFunction( subject: unknown ): subject is ( ...args: any[] ) =>
  *
  * @return `true` if the subject is a string, or otherwise `false`.
  */
-export function isString( subject: unknown ): subject is string {
-  return typeof subject === 'string';
-}
+export const isString = <( subject: unknown ) => subject is string>apply( typeOf, 'string' );
 
 /**
  * Checks if the given subject is `undefined` or not.
@@ -49,9 +59,7 @@ export function isString( subject: unknown ): subject is string {
  *
  * @return `true` if the subject is `undefined`, or otherwise `false`.
  */
-export function isUndefined( subject: unknown ): subject is undefined {
-  return typeof subject === 'undefined';
-}
+export const isUndefined = <( subject: unknown ) => subject is undefined>apply( typeOf, 'undefined' );
 
 /**
  * Checks if the given subject is `null` or not.

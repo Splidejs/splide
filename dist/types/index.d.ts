@@ -800,12 +800,7 @@ interface EventBusObject {
  *
  * @since 3.0.0
  */
-interface EventHandler {
-    _callback: AnyFunction;
-    _namespace: string;
-    _priority: number;
-    _key?: object;
-}
+declare type EventHandler = [AnyFunction, string, number, object?];
 /**
  * The type for a callback function of the EventBus.
  *

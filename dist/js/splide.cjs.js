@@ -63,21 +63,37 @@ function empty(array) {
   array.length = 0;
 }
 
+function slice(arrayLike, start, end) {
+  return Array.prototype.slice.call(arrayLike, start, end);
+}
+
+function find(arrayLike, predicate) {
+  return slice(arrayLike).filter(predicate)[0];
+}
+
+function apply(func) {
+  return func.bind(null, ...slice(arguments, 1));
+}
+
+const nextTick = setTimeout;
+
+const noop = () => {
+};
+
+function raf(func) {
+  return requestAnimationFrame(func);
+}
+
+function typeOf(type, subject) {
+  return typeof subject === type;
+}
 function isObject(subject) {
-  return !isNull(subject) && typeof subject === "object";
+  return !isNull(subject) && typeOf("object", subject);
 }
-function isArray(subject) {
-  return Array.isArray(subject);
-}
-function isFunction(subject) {
-  return typeof subject === "function";
-}
-function isString(subject) {
-  return typeof subject === "string";
-}
-function isUndefined(subject) {
-  return typeof subject === "undefined";
-}
+const isArray = Array.isArray;
+const isFunction = apply(typeOf, "function");
+const isString = apply(typeOf, "string");
+const isUndefined = apply(typeOf, "undefined");
 function isNull(subject) {
   return subject === null;
 }
@@ -100,16 +116,6 @@ function includes(array, value) {
 function push(array, items) {
   array.push(...toArray(items));
   return array;
-}
-
-const arrayProto = Array.prototype;
-
-function slice(arrayLike, start, end) {
-  return arrayProto.slice.call(arrayLike, start, end);
-}
-
-function find(arrayLike, predicate) {
-  return slice(arrayLike).filter(predicate)[0];
 }
 
 function toggleClass(elm, classes, add) {
@@ -311,19 +317,6 @@ function assert(condition, message) {
   }
 }
 
-function apply(func) {
-  return func.bind(null, ...slice(arguments, 1));
-}
-
-const nextTick = setTimeout;
-
-const noop = () => {
-};
-
-function raf(func) {
-  return requestAnimationFrame(func);
-}
-
 const { min, max, floor, ceil, abs } = Math;
 
 function approximatelyEqual(x, y, epsilon) {
@@ -370,19 +363,15 @@ function EventBus() {
   let handlers = {};
   function on(events, callback, key, priority = DEFAULT_EVENT_PRIORITY) {
     forEachEvent(events, (event, namespace) => {
-      handlers[event] = handlers[event] || [];
-      push(handlers[event], {
-        _callback: callback,
-        _namespace: namespace,
-        _priority: priority,
-        _key: key
-      }).sort((handler1, handler2) => handler1._priority - handler2._priority);
+      const events2 = handlers[event] = handlers[event] || [];
+      events2.push([callback, namespace, priority, key]);
+      events2.sort((handler1, handler2) => handler1[2] - handler2[2]);
     });
   }
   function off(events, key) {
     forEachEvent(events, (event, namespace) => {
       handlers[event] = (handlers[event] || []).filter((handler) => {
-        return handler._key ? handler._key !== key : key || handler._namespace !== namespace;
+        return handler[3] ? handler[3] !== key : key || handler[1] !== namespace;
       });
     });
   }
@@ -393,7 +382,7 @@ function EventBus() {
   }
   function emit(event) {
     (handlers[event] || []).forEach((handler) => {
-      handler._callback.apply(handler, slice(arguments, 1));
+      handler[0].apply(handler, slice(arguments, 1));
     });
   }
   function destroy() {

@@ -66,25 +66,38 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     array.length = 0;
   }
 
+  function slice(arrayLike, start, end) {
+    return Array.prototype.slice.call(arrayLike, start, end);
+  }
+
+  function find(arrayLike, predicate) {
+    return slice(arrayLike).filter(predicate)[0];
+  }
+
+  function apply(func) {
+    return func.bind.apply(func, [null].concat(slice(arguments, 1)));
+  }
+
+  var nextTick = setTimeout;
+
+  var noop = function noop() {};
+
+  function raf(func) {
+    return requestAnimationFrame(func);
+  }
+
+  function typeOf(type, subject) {
+    return typeof subject === type;
+  }
+
   function isObject(subject) {
-    return !isNull(subject) && typeof subject === "object";
+    return !isNull(subject) && typeOf("object", subject);
   }
 
-  function isArray(subject) {
-    return Array.isArray(subject);
-  }
-
-  function isFunction(subject) {
-    return typeof subject === "function";
-  }
-
-  function isString(subject) {
-    return typeof subject === "string";
-  }
-
-  function isUndefined(subject) {
-    return typeof subject === "undefined";
-  }
+  var isArray = Array.isArray;
+  var isFunction = apply(typeOf, "function");
+  var isString = apply(typeOf, "string");
+  var isUndefined = apply(typeOf, "undefined");
 
   function isNull(subject) {
     return subject === null;
@@ -109,16 +122,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   function push(array, items) {
     array.push.apply(array, toArray(items));
     return array;
-  }
-
-  var arrayProto = Array.prototype;
-
-  function slice(arrayLike, start, end) {
-    return arrayProto.slice.call(arrayLike, start, end);
-  }
-
-  function find(arrayLike, predicate) {
-    return slice(arrayLike).filter(predicate)[0];
   }
 
   function toggleClass(elm, classes, add) {
@@ -336,18 +339,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
   }
 
-  function apply(func) {
-    return func.bind.apply(func, [null].concat(slice(arguments, 1)));
-  }
-
-  var nextTick = setTimeout;
-
-  var noop = function noop() {};
-
-  function raf(func) {
-    return requestAnimationFrame(func);
-  }
-
   var min = Math.min,
       max = Math.max,
       floor = Math.floor,
@@ -400,14 +391,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }
 
       forEachEvent(events, function (event, namespace) {
-        handlers[event] = handlers[event] || [];
-        push(handlers[event], {
-          _callback: callback,
-          _namespace: namespace,
-          _priority: priority,
-          _key: key
-        }).sort(function (handler1, handler2) {
-          return handler1._priority - handler2._priority;
+        var events2 = handlers[event] = handlers[event] || [];
+        events2.push([callback, namespace, priority, key]);
+        events2.sort(function (handler1, handler2) {
+          return handler1[2] - handler2[2];
         });
       });
     }
@@ -415,7 +402,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function off(events, key) {
       forEachEvent(events, function (event, namespace) {
         handlers[event] = (handlers[event] || []).filter(function (handler) {
-          return handler._key ? handler._key !== key : key || handler._namespace !== namespace;
+          return handler[3] ? handler[3] !== key : key || handler[1] !== namespace;
         });
       });
     }
@@ -429,7 +416,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function emit(event) {
       var _arguments = arguments;
       (handlers[event] || []).forEach(function (handler) {
-        handler._callback.apply(handler, slice(_arguments, 1));
+        handler[0].apply(handler, slice(_arguments, 1));
       });
     }
 
