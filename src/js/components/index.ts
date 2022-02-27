@@ -1,4 +1,4 @@
-export { Options }    from './Options/Options';
+export { Media }      from './Media/Media';
 export { Direction }  from './Direction/Direction';
 export { Elements }   from './Elements/Elements';
 export { Slides }     from './Slides/Slides';
@@ -17,4 +17,3 @@ export { Pagination } from './Pagination/Pagination';
 export { Sync }       from './Sync/Sync';
 export { Wheel }      from './Wheel/Wheel';
 export { Live }       from './Live/Live';
-export { Motion }     from './Motion/Motion';

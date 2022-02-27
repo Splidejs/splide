@@ -4,6 +4,39 @@
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
+const EVENT_MOUNTED = "mounted";
+const EVENT_READY = "ready";
+const EVENT_MOVE = "move";
+const EVENT_MOVED = "moved";
+const EVENT_SHIFTED = "shifted";
+const EVENT_CLICK = "click";
+const EVENT_ACTIVE = "active";
+const EVENT_INACTIVE = "inactive";
+const EVENT_VISIBLE = "visible";
+const EVENT_HIDDEN = "hidden";
+const EVENT_SLIDE_KEYDOWN = "slide:keydown";
+const EVENT_REFRESH = "refresh";
+const EVENT_UPDATED = "updated";
+const EVENT_MEDIA = "media";
+const EVENT_RESIZE = "resize";
+const EVENT_RESIZED = "resized";
+const EVENT_REPOSITIONED = "repositioned";
+const EVENT_DRAG = "drag";
+const EVENT_DRAGGING = "dragging";
+const EVENT_DRAGGED = "dragged";
+const EVENT_SCROLL = "scroll";
+const EVENT_SCROLLED = "scrolled";
+const EVENT_DESTROY = "destroy";
+const EVENT_ARROWS_MOUNTED = "arrows:mounted";
+const EVENT_ARROWS_UPDATED = "arrows:updated";
+const EVENT_PAGINATION_MOUNTED = "pagination:mounted";
+const EVENT_PAGINATION_UPDATED = "pagination:updated";
+const EVENT_NAVIGATION_MOUNTED = "navigation:mounted";
+const EVENT_AUTOPLAY_PLAY = "autoplay:play";
+const EVENT_AUTOPLAY_PLAYING = "autoplay:playing";
+const EVENT_AUTOPLAY_PAUSE = "autoplay:pause";
+const EVENT_LAZYLOAD_LOADED = "lazyload:loaded";
+
 const CREATED = 1;
 const MOUNTED = 2;
 const IDLE = 3;
@@ -139,15 +172,17 @@ function assign(object) {
   return object;
 }
 
-function merge(object, source) {
-  forOwn(source, (value, key) => {
-    if (isArray(value)) {
-      object[key] = value.slice();
-    } else if (isObject(value)) {
-      object[key] = merge(isObject(object[key]) ? object[key] : {}, value);
-    } else {
-      object[key] = value;
-    }
+function merge(object) {
+  slice(arguments).forEach((source) => {
+    forOwn(source, (value, key) => {
+      if (isArray(value)) {
+        object[key] = value.slice();
+      } else if (isObject(value)) {
+        object[key] = merge(isObject(object[key]) ? object[key] : {}, value);
+      } else {
+        object[key] = value;
+      }
+    });
   });
   return object;
 }
@@ -329,7 +364,6 @@ function EventBus() {
     forEachEvent(events, (event, namespace) => {
       handlers[event] = handlers[event] || [];
       push(handlers[event], {
-        _event: event,
         _callback: callback,
         _namespace: namespace,
         _priority: priority,
@@ -339,8 +373,7 @@ function EventBus() {
   }
   function off(events, key) {
     forEachEvent(events, (event, namespace) => {
-      const eventHandlers = handlers[event];
-      handlers[event] = eventHandlers && eventHandlers.filter((handler) => {
+      handlers[event] = (handlers[event] || []).filter((handler) => {
         return handler._key ? handler._key !== key : key || handler._namespace !== namespace;
       });
     });
@@ -373,39 +406,7 @@ function EventBus() {
   };
 }
 
-const EVENT_MOUNTED = "mounted";
-const EVENT_READY = "ready";
-const EVENT_MOVE = "move";
-const EVENT_MOVED = "moved";
-const EVENT_SHIFTED = "shifted";
-const EVENT_CLICK = "click";
-const EVENT_ACTIVE = "active";
-const EVENT_INACTIVE = "inactive";
-const EVENT_VISIBLE = "visible";
-const EVENT_HIDDEN = "hidden";
-const EVENT_SLIDE_KEYDOWN = "slide:keydown";
-const EVENT_REFRESH = "refresh";
-const EVENT_UPDATED = "updated";
-const EVENT_RESIZE = "resize";
-const EVENT_RESIZED = "resized";
-const EVENT_REPOSITIONED = "repositioned";
-const EVENT_DRAG = "drag";
-const EVENT_DRAGGING = "dragging";
-const EVENT_DRAGGED = "dragged";
-const EVENT_SCROLL = "scroll";
-const EVENT_SCROLLED = "scrolled";
-const EVENT_DESTROY = "destroy";
-const EVENT_ARROWS_MOUNTED = "arrows:mounted";
-const EVENT_ARROWS_UPDATED = "arrows:updated";
-const EVENT_PAGINATION_MOUNTED = "pagination:mounted";
-const EVENT_PAGINATION_UPDATED = "pagination:updated";
-const EVENT_NAVIGATION_MOUNTED = "navigation:mounted";
-const EVENT_AUTOPLAY_PLAY = "autoplay:play";
-const EVENT_AUTOPLAY_PLAYING = "autoplay:playing";
-const EVENT_AUTOPLAY_PAUSE = "autoplay:pause";
-const EVENT_LAZYLOAD_LOADED = "lazyload:loaded";
-
-function EventInterface(Splide2) {
+function EventInterface(Splide2, manual) {
   const { event } = Splide2;
   const key = {};
   let listeners = [];
@@ -417,15 +418,17 @@ function EventInterface(Splide2) {
   }
   function bind(targets, events, callback, options) {
     forEachEvent(targets, events, (target, event2) => {
-      listeners.push([target, event2, callback, options]);
-      target.addEventListener(event2, callback, options);
+      const isEventTarget = "addEventListener" in target;
+      const remover = isEventTarget ? target.removeEventListener.bind(target, event2, callback, options) : target["removeListener"].bind(target, callback);
+      isEventTarget ? target.addEventListener(event2, callback, options) : target["addListener"](callback);
+      listeners.push([target, event2, callback, remover]);
     });
   }
   function unbind(targets, events, callback) {
     forEachEvent(targets, events, (target, event2) => {
       listeners = listeners.filter((listener) => {
         if (listener[0] === target && listener[1] === event2 && (!callback || listener[2] === callback)) {
-          target.removeEventListener(event2, listener[2], listener[3]);
+          listener[3]();
           return false;
         }
         return true;
@@ -440,10 +443,12 @@ function EventInterface(Splide2) {
     });
   }
   function destroy() {
-    listeners = listeners.filter((data) => unbind(data[0], data[1]));
+    listeners = listeners.filter((data) => {
+      data[3]();
+    });
     event.offBy(key);
   }
-  event.on(EVENT_DESTROY, destroy, key);
+  !manual && event.on(EVENT_DESTROY, destroy, key);
   return {
     on,
     off,
@@ -535,8 +540,9 @@ function Throttle(func, duration) {
   let interval;
   function throttled() {
     if (!interval) {
+      const args = slice(arguments);
       interval = RequestInterval(duration || 0, () => {
-        func.apply(this, arguments);
+        func.apply(this, args);
         interval = null;
       }, null, 1);
       interval.start();
@@ -545,55 +551,55 @@ function Throttle(func, duration) {
   return throttled;
 }
 
-function Options(Splide2, Components2, options) {
-  const throttledObserve = Throttle(observe);
-  let initialOptions;
-  let points;
-  let currPoint;
+function Media(Splide2, Components2, options) {
+  const event = EventInterface(Splide2, true);
+  const breakpoints = options.breakpoints || {};
+  const userOptions = merge({}, options);
+  const queries = [];
   function setup() {
-    initialOptions = merge({}, options);
-    const { breakpoints } = options;
-    if (breakpoints) {
-      const isMin = options.mediaQuery === "min";
-      points = Object.keys(breakpoints).sort((n, m) => isMin ? +m - +n : +n - +m).map((point) => [
-        point,
-        matchMedia(`(${isMin ? "min" : "max"}-width:${point}px)`)
-      ]);
-      observe();
-    }
-  }
-  function mount() {
-    if (points) {
-      addEventListener("resize", throttledObserve);
-    }
+    const isMin = options.mediaQuery === "min";
+    register(Object.keys(breakpoints).sort((n, m) => isMin ? +m - +n : +n - +m).map((key) => [breakpoints[key], `(${isMin ? "min" : "max"}-width:${key}px)`]).concat([[userOptions]]));
+    register([[{
+      speed: 0,
+      autoplay: "pause"
+    }, "(prefers-reduced-motion: reduce)"]]);
+    update();
   }
   function destroy(completely) {
     if (completely) {
-      removeEventListener("resize", throttledObserve);
+      event.destroy();
     }
   }
-  function observe() {
-    const item = find(points, (item2) => item2[1].matches) || [];
-    if (item[0] !== currPoint) {
-      onMatch(currPoint = item[0]);
-    }
+  function register(entries) {
+    queries.push(entries.map((entry) => {
+      const query = entry[1] && matchMedia(entry[1]);
+      query && event.bind(query, "change", update);
+      return [entry[0], query];
+    }));
   }
-  function onMatch(point) {
-    const newOptions = options.breakpoints[point] || initialOptions;
-    if (newOptions.destroy) {
-      Splide2.options = initialOptions;
-      Splide2.destroy(newOptions.destroy === "completely");
+  function update() {
+    const options2 = accumulate();
+    const { destroy: _destroy } = options2;
+    if (_destroy) {
+      Splide2.options = userOptions;
+      Splide2.destroy(_destroy === "completely");
+    } else if (Splide2.state.is(DESTROYED)) {
+      destroy(true);
+      Splide2.mount();
     } else {
-      if (Splide2.state.is(DESTROYED)) {
-        destroy(true);
-        Splide2.mount();
-      }
-      Splide2.options = newOptions;
+      Splide2.options = options2;
     }
+  }
+  function accumulate() {
+    return queries.reduce((merged, entries) => {
+      const entry = find(entries, (entry2) => !entry2[1] || entry2[1].matches) || [];
+      entry[1] && event.emit(EVENT_MEDIA, entry[1]);
+      return merge(merged, entry[0] || {});
+    }, merge({}, userOptions));
   }
   return {
     setup,
-    mount,
+    mount: noop,
     destroy
   };
 }
@@ -1021,7 +1027,7 @@ function Layout(Splide2, Components2, options) {
   let rootRect;
   function mount() {
     init();
-    bind(window, "resize load", Throttle(emit.bind(this, EVENT_RESIZE)));
+    bind(window, "resize load", Throttle(apply(emit, EVENT_RESIZE)));
     on([EVENT_UPDATED, EVENT_REFRESH], init);
     on(EVENT_RESIZE, resize);
   }
@@ -1551,18 +1557,16 @@ function Autoplay(Splide2, Components2, options) {
   const interval = RequestInterval(options.interval, Splide2.go.bind(Splide2, ">"), update);
   const { isPaused } = interval;
   const { Elements } = Components2;
+  const { autoplay } = options;
   let hovered;
   let focused;
-  let paused;
+  let paused = autoplay === "pause";
   function mount() {
-    const { autoplay } = options;
     if (autoplay) {
       initButton(true);
       initButton(false);
       listen();
-      if (autoplay !== "pause") {
-        play();
-      }
+      !paused && play();
     }
   }
   function initButton(forPause) {
@@ -2193,29 +2197,6 @@ function Sync(Splide2, Components2, options) {
   };
 }
 
-function Live(Splide2, Components2, options) {
-  const { on } = EventInterface(Splide2);
-  const { list } = Components2.Elements;
-  const { live } = options;
-  function mount() {
-    if (live) {
-      setAttribute(list, ARIA_ATOMIC, false);
-      disable(!Components2.Autoplay.isPaused());
-      on(EVENT_AUTOPLAY_PLAY, apply(disable, true));
-      on(EVENT_AUTOPLAY_PAUSE, apply(disable, false));
-    }
-  }
-  function disable(disabled) {
-    if (live) {
-      setAttribute(list, ARIA_LIVE, disabled ? "off" : "polite");
-    }
-  }
-  return {
-    mount,
-    disable
-  };
-}
-
 function Wheel(Splide2, Components2, options) {
   const { bind } = EventInterface(Splide2);
   function mount() {
@@ -2241,9 +2222,32 @@ function Wheel(Splide2, Components2, options) {
   };
 }
 
+function Live(Splide2, Components2, options) {
+  const { on } = EventInterface(Splide2);
+  const { list } = Components2.Elements;
+  const { live } = options;
+  function mount() {
+    if (live) {
+      setAttribute(list, ARIA_ATOMIC, false);
+      disable(!Components2.Autoplay.isPaused());
+      on(EVENT_AUTOPLAY_PLAY, apply(disable, true));
+      on(EVENT_AUTOPLAY_PAUSE, apply(disable, false));
+    }
+  }
+  function disable(disabled) {
+    if (live) {
+      setAttribute(list, ARIA_LIVE, disabled ? "off" : "polite");
+    }
+  }
+  return {
+    mount,
+    disable
+  };
+}
+
 var ComponentConstructors = /*#__PURE__*/Object.freeze({
   __proto__: null,
-  Options: Options,
+  Media: Media,
   Direction: Direction,
   Elements: Elements,
   Slides: Slides,
@@ -2260,8 +2264,8 @@ var ComponentConstructors = /*#__PURE__*/Object.freeze({
   LazyLoad: LazyLoad,
   Pagination: Pagination,
   Sync: Sync,
-  Live: Live,
-  Wheel: Wheel
+  Wheel: Wheel,
+  Live: Live
 });
 
 const I18N = {
@@ -2387,12 +2391,11 @@ const _Splide = class {
     const root = isString(target) ? query(document, target) : target;
     assert(root, `${root} is invalid.`);
     this.root = root;
-    merge(DEFAULTS, _Splide.defaults);
-    merge(merge(this._options, DEFAULTS), options || {});
+    merge(this._options, DEFAULTS, _Splide.defaults, options || {});
     try {
       merge(this._options, JSON.parse(getAttribute(root, DATA_ATTRIBUTE)));
     } catch (e) {
-      assert(false, e.message);
+      assert(false, "Invalid JSON");
     }
   }
   mount(Extensions, Transition) {
@@ -2860,4 +2863,4 @@ class SplideRenderer {
   }
 }
 
-export { CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_AUTOPLAY, CLASS_CLONE, CLASS_CONTAINER, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PAUSE, CLASS_PLAY, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SLIDER, CLASS_SPINNER, CLASS_SR, CLASS_TRACK, CLASS_VISIBLE, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, EventBus, EventInterface, RequestInterval, STATUS_CLASSES, Splide, SplideRenderer, State, Throttle, Splide as default };
+export { CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_AUTOPLAY, CLASS_CLONE, CLASS_CONTAINER, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PAUSE, CLASS_PLAY, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SLIDER, CLASS_SPINNER, CLASS_SR, CLASS_TRACK, CLASS_VISIBLE, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MEDIA, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, EventBus, EventInterface, RequestInterval, STATUS_CLASSES, Splide, SplideRenderer, State, Throttle, Splide as default };

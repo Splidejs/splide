@@ -13,6 +13,38 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 })(this, function () {
   'use strict';
 
+  var EVENT_MOUNTED = "mounted";
+  var EVENT_READY = "ready";
+  var EVENT_MOVE = "move";
+  var EVENT_MOVED = "moved";
+  var EVENT_SHIFTED = "shifted";
+  var EVENT_CLICK = "click";
+  var EVENT_ACTIVE = "active";
+  var EVENT_INACTIVE = "inactive";
+  var EVENT_VISIBLE = "visible";
+  var EVENT_HIDDEN = "hidden";
+  var EVENT_SLIDE_KEYDOWN = "slide:keydown";
+  var EVENT_REFRESH = "refresh";
+  var EVENT_UPDATED = "updated";
+  var EVENT_MEDIA = "media";
+  var EVENT_RESIZE = "resize";
+  var EVENT_RESIZED = "resized";
+  var EVENT_REPOSITIONED = "repositioned";
+  var EVENT_DRAG = "drag";
+  var EVENT_DRAGGING = "dragging";
+  var EVENT_DRAGGED = "dragged";
+  var EVENT_SCROLL = "scroll";
+  var EVENT_SCROLLED = "scrolled";
+  var EVENT_DESTROY = "destroy";
+  var EVENT_ARROWS_MOUNTED = "arrows:mounted";
+  var EVENT_ARROWS_UPDATED = "arrows:updated";
+  var EVENT_PAGINATION_MOUNTED = "pagination:mounted";
+  var EVENT_PAGINATION_UPDATED = "pagination:updated";
+  var EVENT_NAVIGATION_MOUNTED = "navigation:mounted";
+  var EVENT_AUTOPLAY_PLAY = "autoplay:play";
+  var EVENT_AUTOPLAY_PLAYING = "autoplay:playing";
+  var EVENT_AUTOPLAY_PAUSE = "autoplay:pause";
+  var EVENT_LAZYLOAD_LOADED = "lazyload:loaded";
   var CREATED = 1;
   var MOUNTED = 2;
   var IDLE = 3;
@@ -366,7 +398,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       forEachEvent(events, function (event, namespace) {
         handlers[event] = handlers[event] || [];
         push(handlers[event], {
-          _event: event,
           _callback: callback,
           _namespace: namespace,
           _priority: priority,
@@ -379,8 +410,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function off(events, key) {
       forEachEvent(events, function (event, namespace) {
-        var eventHandlers = handlers[event];
-        handlers[event] = eventHandlers && eventHandlers.filter(function (handler) {
+        handlers[event] = (handlers[event] || []).filter(function (handler) {
           return handler._key ? handler._key !== key : key || handler._namespace !== namespace;
         });
       });
@@ -418,38 +448,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       destroy: destroy
     };
   }
-
-  var EVENT_MOUNTED = "mounted";
-  var EVENT_READY = "ready";
-  var EVENT_MOVE = "move";
-  var EVENT_MOVED = "moved";
-  var EVENT_SHIFTED = "shifted";
-  var EVENT_CLICK = "click";
-  var EVENT_ACTIVE = "active";
-  var EVENT_INACTIVE = "inactive";
-  var EVENT_VISIBLE = "visible";
-  var EVENT_HIDDEN = "hidden";
-  var EVENT_SLIDE_KEYDOWN = "slide:keydown";
-  var EVENT_REFRESH = "refresh";
-  var EVENT_UPDATED = "updated";
-  var EVENT_RESIZE = "resize";
-  var EVENT_RESIZED = "resized";
-  var EVENT_REPOSITIONED = "repositioned";
-  var EVENT_DRAG = "drag";
-  var EVENT_DRAGGING = "dragging";
-  var EVENT_DRAGGED = "dragged";
-  var EVENT_SCROLL = "scroll";
-  var EVENT_SCROLLED = "scrolled";
-  var EVENT_DESTROY = "destroy";
-  var EVENT_ARROWS_MOUNTED = "arrows:mounted";
-  var EVENT_ARROWS_UPDATED = "arrows:updated";
-  var EVENT_PAGINATION_MOUNTED = "pagination:mounted";
-  var EVENT_PAGINATION_UPDATED = "pagination:updated";
-  var EVENT_NAVIGATION_MOUNTED = "navigation:mounted";
-  var EVENT_AUTOPLAY_PLAY = "autoplay:play";
-  var EVENT_AUTOPLAY_PLAYING = "autoplay:playing";
-  var EVENT_AUTOPLAY_PAUSE = "autoplay:pause";
-  var EVENT_LAZYLOAD_LOADED = "lazyload:loaded";
 
   function EventInterface(Splide2, manual) {
     var event = Splide2.event;
@@ -628,23 +626,24 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     return throttled;
   }
 
-  function Options(Splide2, Components2, options) {
+  function Media(Splide2, Components2, options) {
     var event = EventInterface(Splide2, true);
     var breakpoints = options.breakpoints || {};
     var userOptions = merge({}, options);
-    var fixedOptions = {};
-    var points;
+    var queries = [];
 
     function setup() {
       var isMin = options.mediaQuery === "min";
-      points = Object.keys(breakpoints).sort(function (n, m) {
+      register(Object.keys(breakpoints).sort(function (n, m) {
         return isMin ? +m - +n : +n - +m;
-      }).map(function (point) {
-        var queryList = matchMedia("(" + (isMin ? "min" : "max") + "-width:" + point + "px)");
-        event.bind(queryList, "change", check);
-        return [point, queryList];
-      });
-      check();
+      }).map(function (key) {
+        return [breakpoints[key], "(" + (isMin ? "min" : "max") + "-width:" + key + "px)"];
+      }).concat([[userOptions]]));
+      register([[{
+        speed: 0,
+        autoplay: "pause"
+      }, "(prefers-reduced-motion: reduce)"]]);
+      update();
     }
 
     function destroy(completely) {
@@ -653,42 +652,43 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }
     }
 
-    function check() {
-      var point = (find(points, function (item) {
-        return item[1].matches;
-      }) || [])[0];
-      var newOptions = merge({}, breakpoints[point] || userOptions, fixedOptions);
+    function register(entries) {
+      queries.push(entries.map(function (entry) {
+        var query = entry[1] && matchMedia(entry[1]);
+        query && event.bind(query, "change", update);
+        return [entry[0], query];
+      }));
+    }
 
-      if (newOptions.destroy) {
+    function update() {
+      var options2 = accumulate();
+      var _destroy = options2.destroy;
+
+      if (_destroy) {
         Splide2.options = userOptions;
-        Splide2.destroy(newOptions.destroy === "completely");
+        Splide2.destroy(_destroy === "completely");
+      } else if (Splide2.state.is(DESTROYED)) {
+        destroy(true);
+        Splide2.mount();
       } else {
-        if (Splide2.state.is(DESTROYED)) {
-          destroy(true);
-          Splide2.mount();
-        } else {
-          Splide2.options = newOptions;
-        }
+        Splide2.options = options2;
       }
     }
 
-    function fix(key, value) {
-      if (fixedOptions[key] !== value) {
-        if (isUndefined(value)) {
-          delete fixedOptions[key];
-        } else {
-          fixedOptions[key] = value;
-        }
-
-        check();
-      }
+    function accumulate() {
+      return queries.reduce(function (merged, entries) {
+        var entry = find(entries, function (entry2) {
+          return !entry2[1] || entry2[1].matches;
+        }) || [];
+        entry[1] && event.emit(EVENT_MEDIA, entry[1]);
+        return merge(merged, entry[0] || {});
+      }, merge({}, userOptions));
     }
 
     return {
       setup: setup,
       mount: noop,
-      destroy: destroy,
-      fix: fix
+      destroy: destroy
     };
   }
 
@@ -1847,21 +1847,17 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var interval = RequestInterval(options.interval, Splide2.go.bind(Splide2, ">"), update);
     var isPaused = interval.isPaused;
     var Elements = Components2.Elements;
+    var autoplay = options.autoplay;
     var hovered;
     var focused;
-    var paused;
+    var paused = autoplay === "pause";
 
     function mount() {
-      var autoplay = options.autoplay;
-
       if (autoplay) {
         initButton(true);
         initButton(false);
         listen();
-
-        if (autoplay !== "pause") {
-          play();
-        }
+        !paused && play();
       }
     }
 
@@ -2729,36 +2725,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     };
   }
 
-  function Motion(Splide2, Components2, options) {
-    var _EventInterface18 = EventInterface(Splide2),
-        bind = _EventInterface18.bind;
-
-    var query = matchMedia("(prefers-reduced-motion:reduce)");
-
-    function mount() {
-      bind(query, "change", check);
-      check();
-    }
-
-    function check() {
-      var reduced = isReduced();
-      Components2.Options.fix("speed", reduced ? 0 : void 0);
-      reduced && Components2.Autoplay.pause();
-    }
-
-    function isReduced() {
-      return query.matches;
-    }
-
-    return {
-      mount: mount,
-      isReduced: isReduced
-    };
-  }
-
   var ComponentConstructors = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    Options: Options,
+    Media: Media,
     Direction: Direction,
     Elements: Elements,
     Slides: Slides,
@@ -2776,8 +2745,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     Pagination: Pagination,
     Sync: Sync,
     Wheel: Wheel,
-    Live: Live,
-    Motion: Motion
+    Live: Live
   });
   var I18N = {
     prev: "Previous slide",
@@ -2817,8 +2785,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   };
 
   function Fade(Splide2, Components2, options) {
-    var _EventInterface19 = EventInterface(Splide2),
-        on = _EventInterface19.on;
+    var _EventInterface18 = EventInterface(Splide2),
+        on = _EventInterface18.on;
 
     function mount() {
       on([EVENT_MOUNTED, EVENT_REFRESH], function () {
@@ -2845,8 +2813,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   function Slide(Splide2, Components2, options) {
-    var _EventInterface20 = EventInterface(Splide2),
-        bind = _EventInterface20.bind;
+    var _EventInterface19 = EventInterface(Splide2),
+        bind = _EventInterface19.bind;
 
     var Move = Components2.Move,
         Controller = Components2.Controller;

@@ -29,7 +29,7 @@ describe( 'merge', () => {
     const source2 = { b: { d: '4', g: 6 }, h: [ 1, 2, 3 ] };
     const source3 = { h: [ 4, 5, 6 ], i: Infinity };
     const source4 = { a: '1' };
-    const merged  = merge( object, source1, source2, source3, source4 )
+    const merged  = merge( object, source1, source2, source3, source4 );
 
     expect( merged ).toStrictEqual( {
       a: '1',

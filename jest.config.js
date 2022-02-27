@@ -4,4 +4,7 @@ module.exports = {
     '^.+\\.(ts|tsx)$': 'ts-jest',
   },
   testEnvironment: 'jsdom',
+	setupFiles: [
+		'./js/test/jest/setup.ts',
+	],
 };

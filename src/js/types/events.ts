@@ -15,12 +15,10 @@ export interface EventMap {
   'click': ( Slide: SlideComponent, e: MouseEvent ) => void;
   'move': ( index: number, prev: number, dest: number ) => void;
   'moved': ( index: number, prev: number, dest: number ) => void;
-  'shifted': () => void;
   'active': ( Slide: SlideComponent ) => void;
   'inactive': ( Slide: SlideComponent ) => void;
   'visible': ( Slide: SlideComponent ) => void;
   'hidden': ( Slide: SlideComponent ) => void;
-  'slide:keydown': ( Slide: SlideComponent, e: KeyboardEvent ) => void;
   'refresh': () => void;
   'updated': ( options: Options ) => void;
   'resize': () => void;
@@ -40,4 +38,9 @@ export interface EventMap {
   'autoplay:playing': ( rate: number ) => void;
   'autoplay:pause': () => void;
   'lazyload:loaded': ( img: HTMLImageElement, Slide: SlideComponent ) => void;
+
+  /** @internal */
+  'shifted': () => void;
+  'slide:keydown': ( Slide: SlideComponent, e: KeyboardEvent ) => void;
+  'media': ( query: MediaQueryList ) => void;
 }

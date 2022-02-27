@@ -22,7 +22,6 @@ export interface EventBusObject {
  * @since 3.0.0
  */
 export interface EventHandler {
-  _event: string;
   _callback: AnyFunction;
   _namespace: string;
   _priority: number;
@@ -68,7 +67,6 @@ export function EventBus(): EventBusObject {
       handlers[ event ] = handlers[ event ] || [];
 
       push( handlers[ event ], {
-        _event    : event,
         _callback : callback,
         _namespace: namespace,
         _priority : priority,
@@ -87,9 +85,7 @@ export function EventBus(): EventBusObject {
    */
   function off( events: string | string[], key?: object ): void {
     forEachEvent( events, ( event, namespace ) => {
-      const eventHandlers = handlers[ event ];
-
-      handlers[ event ] = eventHandlers && eventHandlers.filter( handler => {
+      handlers[ event ] = ( handlers[ event ] || [] ).filter( handler => {
         return handler._key ? handler._key !== key : key || handler._namespace !== namespace;
       } );
     } );

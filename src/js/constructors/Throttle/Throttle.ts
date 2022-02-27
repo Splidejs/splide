@@ -28,10 +28,10 @@ export function Throttle<F extends AnyFunction>(
 
   function throttled( this: ThisParameterType<F> ): void {
     if ( ! interval ) {
+      // eslint-disable-next-line prefer-rest-params
       const args = slice( arguments );
 
       interval = RequestInterval( duration || 0, () => {
-        // eslint-disable-next-line prefer-rest-params
         func.apply( this, args );
         interval = null;
       }, null, 1 );

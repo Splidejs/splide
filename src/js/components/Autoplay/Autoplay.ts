@@ -41,6 +41,7 @@ export function Autoplay( Splide: Splide, Components: Components, options: Optio
   const interval = RequestInterval( options.interval, Splide.go.bind( Splide, '>' ), update );
   const { isPaused } = interval;
   const { Elements } = Components;
+  const { autoplay } = options;
 
   /**
    * Indicates whether the slider is hovered or not.
@@ -55,22 +56,17 @@ export function Autoplay( Splide: Splide, Components: Components, options: Optio
   /**
    * Turns into `true` when autoplay is manually paused.
    */
-  let paused: boolean;
+  let paused = autoplay === 'pause';
 
   /**
    * Called when the component is mounted.
    */
   function mount(): void {
-    const { autoplay } = options;
-
     if ( autoplay ) {
       initButton( true );
       initButton( false );
       listen();
-
-      if ( autoplay !== 'pause' ) {
-        play();
-      }
+      ! paused && play();
     }
   }
 
@@ -86,7 +82,6 @@ export function Autoplay( Splide: Splide, Components: Components, options: Optio
     if ( button ) {
       setAttribute( button, ARIA_CONTROLS, Elements.track.id );
       setAttribute( button, ARIA_LABEL, options.i18n[ prop ] );
-
       bind( button, 'click', forPause ? pause : play );
     }
   }

@@ -53,6 +53,7 @@ export function merge<T extends object, U extends object[]>(
  * @return A new object with merged properties.
  */
 export function merge<T extends object>( object: T ): any {
+  // eslint-disable-next-line prefer-rest-params
   slice( arguments ).forEach( source => {
     forOwn( source, ( value, key ) => {
       if ( isArray( value ) ) {
