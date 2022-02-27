@@ -35,7 +35,7 @@ export function Layout( Splide: Splide, Components: Components, options: Options
   const { Slides } = Components;
   const { resolve } = Components.Direction;
   const { root, track, list } = Components.Elements;
-  const { getAt } = Slides;
+  const { getAt, style: styleSlides } = Slides;
 
   /**
    * Indicates whether the slider direction is vertical or not.
@@ -81,20 +81,13 @@ export function Layout( Splide: Splide, Components: Components, options: Options
     if ( ! rootRect || rootRect.width !== newRect.width || rootRect.height !== newRect.height ) {
       style( track, 'height', cssTrackHeight() );
 
-      Slides.style( resolve( 'marginRight' ), unit( options.gap ) );
-      Slides.style( 'width', cssSlideWidth() || null );
-      setSlidesHeight();
+      styleSlides( resolve( 'marginRight' ), unit( options.gap ) );
+      styleSlides( 'width', cssSlideWidth() || null );
+      styleSlides( 'height', cssSlideHeight() || null, true );
 
       rootRect = newRect;
       emit( EVENT_RESIZED );
     }
-  }
-
-  /**
-   * Updates the height of slides or their container elements if available.
-   */
-  function setSlidesHeight(): void {
-    Slides.style( 'height', cssSlideHeight() || null, true );
   }
 
   /**

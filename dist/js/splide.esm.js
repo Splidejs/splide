@@ -1022,7 +1022,7 @@ function Layout(Splide2, Components2, options) {
   const { Slides } = Components2;
   const { resolve } = Components2.Direction;
   const { root, track, list } = Components2.Elements;
-  const { getAt } = Slides;
+  const { getAt, style: styleSlides } = Slides;
   let vertical;
   let rootRect;
   function mount() {
@@ -1043,15 +1043,12 @@ function Layout(Splide2, Components2, options) {
     const newRect = rect(root);
     if (!rootRect || rootRect.width !== newRect.width || rootRect.height !== newRect.height) {
       style(track, "height", cssTrackHeight());
-      Slides.style(resolve("marginRight"), unit(options.gap));
-      Slides.style("width", cssSlideWidth() || null);
-      setSlidesHeight();
+      styleSlides(resolve("marginRight"), unit(options.gap));
+      styleSlides("width", cssSlideWidth() || null);
+      styleSlides("height", cssSlideHeight() || null, true);
       rootRect = newRect;
       emit(EVENT_RESIZED);
     }
-  }
-  function setSlidesHeight() {
-    Slides.style("height", cssSlideHeight() || null, true);
   }
   function cssPadding(right) {
     const { padding } = options;
@@ -1193,9 +1190,6 @@ function Move(Splide2, Components2, options) {
     Transition = Components2.Transition;
     on([EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition);
   }
-  function destroy() {
-    removeAttribute(list, "style");
-  }
   function reposition() {
     if (!isBusy()) {
       Components2.Scroll.cancel();
@@ -1303,7 +1297,6 @@ function Move(Splide2, Components2, options) {
   }
   return {
     mount,
-    destroy,
     move,
     jump,
     translate,

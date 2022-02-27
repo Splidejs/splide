@@ -13,7 +13,7 @@ import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, BaseComponent, Components, Options, TransitionComponent } from '../../types';
-import { abs, ceil, clamp, isUndefined, rect, removeAttribute } from '../../utils';
+import { abs, ceil, clamp, isUndefined, rect } from '../../utils';
 
 
 /**
@@ -63,13 +63,6 @@ export function Move( Splide: Splide, Components: Components, options: Options )
   function mount(): void {
     Transition = Components.Transition;
     on( [ EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH ], reposition );
-  }
-
-  /**
-   * Destroys the component.
-   */
-  function destroy(): void {
-    removeAttribute( list, 'style' );
   }
 
   /**
@@ -298,7 +291,6 @@ export function Move( Splide: Splide, Components: Components, options: Options )
 
   return {
     mount,
-    destroy,
     move,
     jump,
     translate,

@@ -19,11 +19,10 @@ $settings = get_settings();
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
-        width: 800,
-	      rewind: true,
-	      // autoplay: true,
-	      // live: false,
-	      slideFocus: false,
+	      width  : 800,
+	      rewind : true,
+	      perPage: 2,
+	      live   : true,
       } );
 
       splide.mount();

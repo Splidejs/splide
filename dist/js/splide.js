@@ -1177,7 +1177,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         root = _Components2$Elements2.root,
         track = _Components2$Elements2.track,
         list = _Components2$Elements2.list;
-    var getAt = Slides.getAt;
+    var getAt = Slides.getAt,
+        styleSlides = Slides.style;
     var vertical;
     var rootRect;
 
@@ -1202,16 +1203,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       if (!rootRect || rootRect.width !== newRect.width || rootRect.height !== newRect.height) {
         style(track, "height", cssTrackHeight());
-        Slides.style(resolve("marginRight"), unit(options.gap));
-        Slides.style("width", cssSlideWidth() || null);
-        setSlidesHeight();
+        styleSlides(resolve("marginRight"), unit(options.gap));
+        styleSlides("width", cssSlideWidth() || null);
+        styleSlides("height", cssSlideHeight() || null, true);
         rootRect = newRect;
         emit(EVENT_RESIZED);
       }
-    }
-
-    function setSlidesHeight() {
-      Slides.style("height", cssSlideHeight() || null, true);
     }
 
     function cssPadding(right) {
@@ -1400,10 +1397,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       on([EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition);
     }
 
-    function destroy() {
-      removeAttribute(list, "style");
-    }
-
     function reposition() {
       if (!isBusy()) {
         Components2.Scroll.cancel();
@@ -1535,7 +1528,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     return {
       mount: mount,
-      destroy: destroy,
       move: move,
       jump: jump,
       translate: translate,
