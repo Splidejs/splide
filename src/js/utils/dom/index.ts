@@ -20,5 +20,6 @@ export { removeAttribute } from './removeAttribute/removeAttribute';
 export { removeClass }     from './removeClass/removeClass';
 export { setAttribute }    from './setAttribute/setAttribute';
 export { style }           from './style/style';
+export { timeOf }          from './timeOf/timeOf';
 export { toggleClass }     from './toggleClass/toggleClass';
 export { unit }            from './unit/unit';

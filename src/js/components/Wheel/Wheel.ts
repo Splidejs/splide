@@ -3,7 +3,7 @@ import { MOVING } from '../../constants/states';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { prevent } from '../../utils';
+import { abs, isObject, prevent, timeOf } from '../../utils';
 
 
 /**
@@ -27,12 +27,19 @@ export interface WheelComponent extends BaseComponent {
  */
 export function Wheel( Splide: Splide, Components: Components, options: Options ): WheelComponent {
   const { bind } = EventInterface( Splide );
+  const { wheel: wheelOption } = options;
+  const wheel = isObject( wheelOption ) ? wheelOption : wheelOption && {};
+
+  /**
+   * Holds the last time when the wheel moves the slider.
+   */
+  let lastTime = 0;
 
   /**
    * Called when the component is mounted.
    */
   function mount(): void {
-    if ( options.wheel ) {
+    if ( wheel ) {
       bind( Components.Elements.track, 'wheel', onWheel, SCROLL_LISTENER_OPTIONS );
     }
   }
@@ -45,12 +52,15 @@ export function Wheel( Splide: Splide, Components: Components, options: Options 
   function onWheel( e: WheelEvent ): void {
     if ( e.cancelable ) {
       const { deltaY } = e;
+      const backwards = deltaY < 0;
+      const timeStamp = timeOf( e );
 
-      if ( deltaY ) {
-        const backwards = deltaY < 0;
+      if ( abs( deltaY ) > ( wheel.min || 0 ) && timeStamp - lastTime > ( wheel.sleep || 0 ) ) {
         Splide.go( backwards ? '<' : '>' );
-        shouldPrevent( backwards ) && prevent( e );
+        lastTime = timeStamp;
       }
+
+      shouldPrevent( backwards ) && prevent( e );
     }
   }
 

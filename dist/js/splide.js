@@ -319,6 +319,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     toggleClass(elm, classes, false);
   }
 
+  function timeOf(e) {
+    return e.timeStamp;
+  }
+
   function unit(value) {
     return isString(value) ? value : value ? value + "px" : "";
   }
@@ -2243,7 +2247,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function diffTime(e) {
-      return e.timeStamp - getBaseEvent(e).timeStamp;
+      return timeOf(e) - timeOf(getBaseEvent(e));
     }
 
     function getBaseEvent(e) {
@@ -2662,8 +2666,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var _EventInterface16 = EventInterface(Splide2),
         bind = _EventInterface16.bind;
 
+    var wheelOption = options.wheel;
+    var wheel = isObject(wheelOption) ? wheelOption : wheelOption && {};
+    var lastTime = 0;
+
     function mount() {
-      if (options.wheel) {
+      if (wheel) {
         bind(Components2.Elements.track, "wheel", onWheel, SCROLL_LISTENER_OPTIONS);
       }
     }
@@ -2671,12 +2679,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function onWheel(e) {
       if (e.cancelable) {
         var deltaY = e.deltaY;
+        var backwards = deltaY < 0;
+        var timeStamp = timeOf(e);
 
-        if (deltaY) {
-          var backwards = deltaY < 0;
+        if (abs(deltaY) > (wheel.min || 0) && timeStamp - lastTime > (wheel.sleep || 0)) {
           Splide2.go(backwards ? "<" : ">");
-          shouldPrevent(backwards) && prevent(e);
+          lastTime = timeStamp;
         }
+
+        shouldPrevent(backwards) && prevent(e);
       }
     }
 

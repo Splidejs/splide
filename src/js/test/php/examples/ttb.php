@@ -27,8 +27,12 @@ $settings = get_settings();
         direction   : 'ttb',
         height      : '90vh',
         cover       : true,
-        wheel       : true,
+        // wheel       : true,
         releaseWheel: true,
+	      wheel       : {
+					// min: 99,
+		      sleep: 500,
+	      },
       } );
 
       splide.mount();

@@ -294,6 +294,10 @@ function removeClass(elm, classes) {
   toggleClass(elm, classes, false);
 }
 
+function timeOf(e) {
+  return e.timeStamp;
+}
+
 function unit(value) {
   return isString(value) ? value : value ? `${value}px` : "";
 }
@@ -1878,7 +1882,7 @@ function Drag(Splide2, Components2, options) {
     return coordOf(e, orthogonal) - coordOf(getBaseEvent(e), orthogonal);
   }
   function diffTime(e) {
-    return e.timeStamp - getBaseEvent(e).timeStamp;
+    return timeOf(e) - timeOf(getBaseEvent(e));
   }
   function getBaseEvent(e) {
     return baseEvent === e && prevBaseEvent || baseEvent;
@@ -2196,19 +2200,24 @@ function Sync(Splide2, Components2, options) {
 
 function Wheel(Splide2, Components2, options) {
   const { bind } = EventInterface(Splide2);
+  const { wheel: wheelOption } = options;
+  const wheel = isObject(wheelOption) ? wheelOption : wheelOption && {};
+  let lastTime = 0;
   function mount() {
-    if (options.wheel) {
+    if (wheel) {
       bind(Components2.Elements.track, "wheel", onWheel, SCROLL_LISTENER_OPTIONS);
     }
   }
   function onWheel(e) {
     if (e.cancelable) {
       const { deltaY } = e;
-      if (deltaY) {
-        const backwards = deltaY < 0;
+      const backwards = deltaY < 0;
+      const timeStamp = timeOf(e);
+      if (abs(deltaY) > (wheel.min || 0) && timeStamp - lastTime > (wheel.sleep || 0)) {
         Splide2.go(backwards ? "<" : ">");
-        shouldPrevent(backwards) && prevent(e);
+        lastTime = timeStamp;
       }
+      shouldPrevent(backwards) && prevent(e);
     }
   }
   function shouldPrevent(backwards) {

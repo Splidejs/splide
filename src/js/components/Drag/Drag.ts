@@ -5,7 +5,7 @@ import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { abs, isObject, matches, min, noop, prevent, sign } from '../../utils';
+import { abs, isObject, matches, min, noop, prevent, sign, timeOf } from '../../utils';
 import { FRICTION, LOG_INTERVAL, POINTER_DOWN_EVENTS, POINTER_MOVE_EVENTS, POINTER_UP_EVENTS } from './constants';
 
 
@@ -318,7 +318,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    * @return The elapsed time in milliseconds.
    */
   function diffTime( e: TouchEvent | MouseEvent ): number {
-    return e.timeStamp - getBaseEvent( e ).timeStamp;
+    return timeOf( e ) - timeOf( getBaseEvent( e ) );
   }
 
   /**

@@ -37,7 +37,7 @@ describe( 'Wheel', () => {
   } );
 } );
 
-function fireCancelable( elm: Element | Window, event: string, data: any = {} ): void {
+export function fireCancelable( elm: Element | Window, event: string, data: any = {} ): void {
   fire( elm, event, data, { cancelable: true } );
 }
 
