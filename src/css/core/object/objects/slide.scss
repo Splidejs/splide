@@ -11,5 +11,9 @@
     img {
       vertical-align: bottom;
     }
+
+    &.is-active {
+      display: block;
+    }
   }
 }
