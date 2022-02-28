@@ -594,7 +594,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   function Media(Splide2, Components2, options) {
     var binder = EventBinder();
     var breakpoints = options.breakpoints || {};
-    var userOptions = merge({}, options);
+    var initialOptions = merge({}, options);
     var queries = [];
 
     function setup() {
@@ -603,7 +603,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         return isMin ? +m - +n : +n - +m;
       }).map(function (key) {
         return [breakpoints[key], "(" + (isMin ? "min" : "max") + "-width:" + key + "px)"];
-      }).concat([[userOptions]]));
+      }));
       register([[{
         speed: 0,
         autoplay: "pause"
@@ -619,8 +619,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function register(entries) {
       queries.push(entries.map(function (entry) {
-        var query = entry[1] && matchMedia(entry[1]);
-        query && binder.bind(query, "change", update);
+        var query = matchMedia(entry[1]);
+        binder.bind(query, "change", update);
         return [entry[0], query];
       }));
     }
@@ -630,7 +630,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var _destroy = options2.destroy;
 
       if (_destroy) {
-        Splide2.options = userOptions;
+        Splide2.options = initialOptions;
         Splide2.destroy(_destroy === "completely");
       } else if (Splide2.state.is(DESTROYED)) {
         destroy(true);
@@ -643,11 +643,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function accumulate() {
       return queries.reduce(function (merged, entries) {
         var entry = find(entries, function (entry2) {
-          return !entry2[1] || entry2[1].matches;
+          return entry2[1].matches;
         }) || [];
         entry[1] && Splide2.emit(EVENT_MEDIA, entry[1]);
         return merge(merged, entry[0] || {});
-      }, merge({}, userOptions));
+      }, merge({}, initialOptions));
     }
 
     return {
@@ -2844,18 +2844,20 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       this.Components = {};
       this.state = State(CREATED);
       this.splides = [];
-      this._options = {};
-      this._Extensions = {};
+      this._o = {};
+      this._E = {};
       var root = isString(target) ? query(document, target) : target;
       assert(root, root + " is invalid.");
       this.root = root;
-      merge(this._options, DEFAULTS, _Splide.defaults, options || {});
+      options = merge({}, DEFAULTS, _Splide.defaults, options || {});
 
       try {
-        merge(this._options, JSON.parse(getAttribute(root, DATA_ATTRIBUTE)));
+        merge(options, JSON.parse(getAttribute(root, DATA_ATTRIBUTE)));
       } catch (e) {
         assert(false, "Invalid JSON");
       }
+
+      this._o = options;
     }
 
     var _proto = _Splide.prototype;
@@ -2867,14 +2869,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           Components2 = this.Components;
       assert(state.is([CREATED, DESTROYED]), "Already mounted!");
       state.set(CREATED);
-      this._Components = Components2;
-      this._Transition = Transition || this._Transition || (this.is(FADE) ? Fade : Slide);
-      this._Extensions = Extensions || this._Extensions;
-      var Constructors = assign({}, ComponentConstructors, this._Extensions, {
-        Transition: this._Transition
+      this._C = Components2;
+      this._T = Transition || this._T || (this.is(FADE) ? Fade : Slide);
+      this._E = Extensions || this._E;
+      var Constructors = assign({}, ComponentConstructors, this._E, {
+        Transition: this._T
       });
       forOwn(Constructors, function (Component, key) {
-        var component = Component(_this2, Components2, _this2._options);
+        var component = Component(_this2, Components2, _this2._o);
         Components2[key] = component;
         component.setup && component.setup();
       });
@@ -2898,7 +2900,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       });
 
       if (this.state.is(IDLE)) {
-        this._Components.Sync.remount();
+        this._C.Sync.remount();
 
         splide.Components.Sync.remount();
       }
@@ -2907,7 +2909,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     };
 
     _proto.go = function go(control) {
-      this._Components.Controller.go(control);
+      this._C.Controller.go(control);
 
       return this;
     };
@@ -2931,19 +2933,19 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     };
 
     _proto.add = function add(slides, index) {
-      this._Components.Slides.add(slides, index);
+      this._C.Slides.add(slides, index);
 
       return this;
     };
 
     _proto.remove = function remove(matcher) {
-      this._Components.Slides.remove(matcher);
+      this._C.Slides.remove(matcher);
 
       return this;
     };
 
     _proto.is = function is(type) {
-      return this._options.type === type;
+      return this._o.type === type;
     };
 
     _proto.refresh = function refresh() {
@@ -2962,7 +2964,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       if (state.is(CREATED)) {
         EventInterface(this).on(EVENT_READY, this.destroy.bind(this, completely));
       } else {
-        forOwn(this._Components, function (component) {
+        forOwn(this._C, function (component) {
           component.destroy && component.destroy(completely);
         }, true);
         event.emit(EVENT_DESTROY);
@@ -2977,25 +2979,25 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     _createClass(_Splide, [{
       key: "options",
       get: function get() {
-        return this._options;
+        return this._o;
       },
       set: function set(options) {
-        var _options = this._options;
-        merge(_options, options);
+        var _o = this._o;
+        merge(_o, options);
 
         if (!this.state.is(CREATED)) {
-          this.emit(EVENT_UPDATED, _options);
+          this.emit(EVENT_UPDATED, _o);
         }
       }
     }, {
       key: "length",
       get: function get() {
-        return this._Components.Slides.getLength(true);
+        return this._C.Slides.getLength(true);
       }
     }, {
       key: "index",
       get: function get() {
-        return this._Components.Controller.getIndex();
+        return this._C.Controller.getIndex();
       }
     }]);
 

@@ -32,12 +32,12 @@ export function Media( Splide: Splide, Components: Components, options: Options 
   /**
    * Keeps the initial options to apply when no matched query exists.
    */
-  const userOptions: Options = merge( {}, options );
+  const initialOptions = merge( {}, options );
 
   /**
    * Stores options and MediaQueryList object.
    */
-  const queries: Array<[ Options, MediaQueryList? ][]> = [];
+  const queries: Array<[ Options, MediaQueryList ][]> = [];
 
   /**
    * Called when the component is constructed.
@@ -47,8 +47,7 @@ export function Media( Splide: Splide, Components: Components, options: Options 
 
     register( Object.keys( breakpoints )
       .sort( ( n, m ) => isMin ? +m - +n : +n - +m )
-      .map<[ Options, string? ]>( key => [ breakpoints[ key ], `(${ isMin ? 'min' : 'max' }-width:${ key }px)` ] )
-      .concat( [ [ userOptions ] ] ) );
+      .map<[ Options, string ]>( key => [ breakpoints[ key ], `(${ isMin ? 'min' : 'max' }-width:${ key }px)` ] ) );
 
     register( [ [ {
       speed   : 0,
@@ -75,9 +74,9 @@ export function Media( Splide: Splide, Components: Components, options: Options 
    * @param entries - An array with entries.
    */
   function register( entries: [ Options, string? ][] ): void {
-    queries.push( entries.map<[ Options, MediaQueryList? ]>( entry => {
-      const query = entry[ 1 ] && matchMedia( entry[ 1 ] );
-      query && binder.bind( query, 'change', update );
+    queries.push( entries.map<[ Options, MediaQueryList ]>( entry => {
+      const query = matchMedia( entry[ 1 ] );
+      binder.bind( query, 'change', update );
       return [ entry[ 0 ], query ];
     } ) );
   }
@@ -90,7 +89,7 @@ export function Media( Splide: Splide, Components: Components, options: Options 
     const { destroy: _destroy } = options;
 
     if ( _destroy ) {
-      Splide.options = userOptions;
+      Splide.options = initialOptions;
       Splide.destroy( _destroy === 'completely' );
     } else if ( Splide.state.is( DESTROYED ) ) {
       destroy( true );
@@ -108,10 +107,10 @@ export function Media( Splide: Splide, Components: Components, options: Options 
    */
   function accumulate(): Options {
     return queries.reduce<Options>( ( merged, entries ) => {
-      const entry = ( find( entries, entry => ! entry[ 1 ] || entry[ 1 ].matches ) || [] );
+      const entry = find( entries, entry => entry[ 1 ].matches ) || [];
       entry[ 1 ] && Splide.emit( EVENT_MEDIA, entry[ 1 ] );
       return merge( merged, entry[ 0 ] || {} );
-    }, merge( {}, userOptions ) );
+    }, merge( {}, initialOptions ) );
   }
 
   return {

@@ -56,22 +56,22 @@ export class Splide {
   /**
    * The collection of options.
    */
-  private readonly _options: Options = {};
+  private readonly _o: Options = {};
 
   /**
    * The collection of all components.
    */
-  private _Components: Components;
+  private _C: Components;
 
   /**
    * The collection of extensions.
    */
-  private _Extensions: Record<string, ComponentConstructor> = {};
+  private _E: Record<string, ComponentConstructor> = {};
 
   /**
    * The Transition component.
    */
-  private _Transition: ComponentConstructor;
+  private _T: ComponentConstructor;
 
   /**
    * The Splide constructor.
@@ -85,13 +85,15 @@ export class Splide {
 
     this.root = root;
 
-    merge( this._options, DEFAULTS, Splide.defaults, options || {} );
+    options = merge( {}, DEFAULTS, Splide.defaults, options || {} );
 
     try {
-      merge( this._options, JSON.parse( getAttribute( root, DATA_ATTRIBUTE ) ) );
+      merge( options, JSON.parse( getAttribute( root, DATA_ATTRIBUTE ) ) );
     } catch ( e ) {
       assert( false, 'Invalid JSON' );
     }
+
+    this._o = options;
   }
 
   /**
@@ -108,14 +110,14 @@ export class Splide {
 
     state.set( CREATED );
 
-    this._Components = Components;
-    this._Transition = Transition || this._Transition || ( this.is( FADE ) ? Fade : Slide );
-    this._Extensions = Extensions || this._Extensions;
+    this._C = Components;
+    this._T = Transition || this._T || ( this.is( FADE ) ? Fade : Slide );
+    this._E = Extensions || this._E;
 
-    const Constructors = assign( {}, ComponentConstructors, this._Extensions, { Transition: this._Transition } );
+    const Constructors = assign( {}, ComponentConstructors, this._E, { Transition: this._T } );
 
     forOwn( Constructors, ( Component, key ) => {
-      const component = Component( this, Components, this._options );
+      const component = Component( this, Components, this._o );
       Components[ key ] = component;
       component.setup && component.setup();
     } );
@@ -157,7 +159,7 @@ export class Splide {
     splide.splides.push( { splide: this, isParent: true } );
 
     if ( this.state.is( IDLE ) ) {
-      this._Components.Sync.remount();
+      this._C.Sync.remount();
       splide.Components.Sync.remount();
     }
 
@@ -201,7 +203,7 @@ export class Splide {
    * @return `this`
    */
   go( control: number | string ): this {
-    this._Components.Controller.go( control );
+    this._C.Controller.go( control );
     return this;
   }
 
@@ -295,7 +297,7 @@ export class Splide {
    * @return `this`
    */
   add( slides: string | HTMLElement | Array<string | HTMLElement>, index?: number ): this {
-    this._Components.Slides.add( slides, index );
+    this._C.Slides.add( slides, index );
     return this;
   }
 
@@ -306,7 +308,7 @@ export class Splide {
    * @param matcher - An index, an array with indices, a selector string, or an iteratee function.
    */
   remove( matcher: SlideMatcher ): this {
-    this._Components.Slides.remove( matcher );
+    this._C.Slides.remove( matcher );
     return this;
   }
 
@@ -318,7 +320,7 @@ export class Splide {
    * @return `true` if the type matches the current one, or otherwise `false`.
    */
   is( type: string ): boolean {
-    return this._options.type === type;
+    return this._o.type === type;
   }
 
   /**
@@ -345,7 +347,7 @@ export class Splide {
       // Postpones destruction requested before the slider becomes ready.
       EventInterface( this ).on( EVENT_READY, this.destroy.bind( this, completely ) );
     } else {
-      forOwn( this._Components, component => {
+      forOwn( this._C, component => {
         component.destroy && component.destroy( completely );
       }, true );
 
@@ -364,7 +366,7 @@ export class Splide {
    * @return An object with the latest options.
    */
   get options(): Options {
-    return this._options;
+    return this._o;
   }
 
   /**
@@ -373,11 +375,11 @@ export class Splide {
    * @param options - An object with new options.
    */
   set options( options: Options ) {
-    const { _options } = this;
-    merge( _options, options );
+    const { _o } = this;
+    merge( _o, options );
 
     if ( ! this.state.is( CREATED ) ) {
-      this.emit( EVENT_UPDATED, _options );
+      this.emit( EVENT_UPDATED, _o );
     }
   }
 
@@ -387,7 +389,7 @@ export class Splide {
    * @return The number of slides.
    */
   get length(): number {
-    return this._Components.Slides.getLength( true );
+    return this._C.Slides.getLength( true );
   }
 
   /**
@@ -396,6 +398,6 @@ export class Splide {
    * @return The active slide index.
    */
   get index(): number {
-    return this._Components.Controller.getIndex();
+    return this._C.Controller.getIndex();
   }
 }
