@@ -13,53 +13,53 @@ $settings = get_settings();
   <title>Live Regions</title>
 
   <link rel="stylesheet" href="../../../../../dist/css/themes/splide-<?php echo $settings['theme'] ?>.min.css">
-  <link rel="stylesheet" href="../../assets/css/styles.css">
+  <link rel="stylesheet" href="../../assets/css/planet.css">
   <script src="../../../../../dist/js/splide.js"></script>
 
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
-	      width  : 800,
-	      rewind : true,
-	      perPage: 2,
-	      live   : true,
-	      speed: 1000
+	      width     : 600,
+	      rewind    : true,
+	      live      : true,
+	      speed     : 1000,
+	      pagination: false,
+	      arrowPath : 'm13.5 7.01 13 13m-13 13 13-13',
       } );
 
       splide.mount();
     } );
   </script>
-
-	<style>
-      .splide__slide {
-          /*display: none;*/
-      }
-
-		.splide__slide.is-active {
-				display: block;
-		}
-	</style>
 </head>
 <body>
 
-<div id="splide01" class="splide" aria-label="Slider With Live Region">
-	<div class="splide__track">
-		<ul class="splide__list">
-			<?php
-			for ( $i = 0; $i < 5; $i++ ) {
-				echo '<li class="splide__slide">';
-				printf( '<img src="../../assets/images/pics/slide%1$02d.jpg" alt="Alt text on image %1$d">', $i + 1 );
-				printf( '<h3>Slide %02d</h3>', $i + 1 );
-				print( '<p>Slide description</p>' );
-				echo '</li>' . PHP_EOL;
-			}
-			?>
-		</ul>
-	</div>
-
-	<div class="splide__autoplay">
-		<button class="splide__play">Play</button>
-		<button class="splide__pause">Pause</button>
+<div class="wrapper">
+	<div id="splide01" class="splide" aria-label="Planets gallery">
+		<div class="splide__track">
+			<ul class="splide__list">
+				<li class="splide__slide">
+					<img src="../../assets/images/planets/neptune.jpg" alt="Neptune as seen from Voyager 2 from 4.4 million miles">
+					<h3 class="splide__heading">Neptune</h3>
+					<div class="splide__desc">
+						Neptune is the eighth and farthest-known Solar planet from the Sun. In the Solar System, it is the fourth-largest planet by diameter, the third-most-massive planet, and the densest giant planet.
+					</div>
+				</li>
+				<li class="splide__slide">
+					<img src="../../assets/images/planets/saturn.jpg" alt="Saturn as seen from the Cassini–Huygens space-research mission">
+					<h3 class="splide__heading">Saturn</h3>
+					<div class="splide__desc">
+						Saturn is the sixth planet from the Sun and the second-largest in the Solar System, after Jupiter. It is a gas giant with an average radius of about nine and a half times that of Earth.
+					</div>
+				</li>
+				<li class="splide__slide">
+					<img src="../../assets/images/planets/mars.jpg" alt="A simulated view of Mars as it would be seen from the Mars Global Surveyor spacecraft">
+					<h3 class="splide__heading">Mars</h3>
+					<div class="splide__desc">
+						Mars is the fourth planet from the Sun and the second-smallest planet in the Solar System, being larger than only Mercury.
+					</div>
+				</li>
+			</ul>
+		</div>
 	</div>
 </div>
 

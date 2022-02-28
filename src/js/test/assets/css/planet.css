@@ -1,0 +1,70 @@
+body {
+  background: linear-gradient(0deg,#8cde1d,#c0e900);
+  height: 200vh;
+  font-family: SplideBody, sans-serif;
+  padding: 2rem;
+  color: #d7e9f5;
+  line-height: 1.8;
+  font-weight: normal;
+}
+
+img {
+  width: 100%;
+  height: auto;
+}
+
+button:focus {
+  outline: 2px solid yellowgreen;
+}
+
+.wrapper {
+  margin-top: 10rem;
+  display: flex;
+  justify-content: center;
+}
+
+.splide__track {
+  background: #000;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 15px 4px rgba( 0, 0, 0, .25 );
+}
+
+.splide__heading {
+  font-family: Splide Heading, sans-serif;
+  color: #fff;
+  margin: 0;
+  padding: 1rem 1.5rem .5rem;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.splide__desc {
+  margin: 0;
+  padding: .5rem 1.5rem 2rem;
+}
+
+.splide__arrow {
+  background: transparent;
+  opacity: 1;
+  width: 2rem;
+  height: 2rem;
+}
+
+.splide__arrow svg {
+  width: 2rem;
+  height: 2rem;
+  fill: none;
+  stroke: #fff;
+  stroke-linecap: square;
+  stroke-width: 8px;
+  vertical-align: middle;
+}
+
+.splide__arrow--prev {
+  left: -2.5rem;
+}
+
+.splide__arrow--next {
+  right: -2.5rem;
+}
