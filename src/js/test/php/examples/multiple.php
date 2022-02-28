@@ -19,104 +19,101 @@ $settings = get_settings();
 
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
-      new Splide( '#splide01', {
-        type             : 'slide',
-        perPage          : 1,
-        // gap              : '.5rem',
-        pagination: false,
-        // speed: 1000,
-        arrows: false,
-        classes: {
-          arrows: 'splide__arrows splide__test',
-        },
-      } ).mount();
+	    new Splide( '#splide01', {
+		    type      : 'slide',
+		    perPage   : 2,
+		    pagination: false,
+		    classes   : {
+			    arrows: 'splide__arrows splide__test',
+		    },
+	    } ).mount();
 
-      new Splide( '#splide02', {
-        perPage          : 1,
-        gap              : '1.5rem',
-        pagination: false,
-        arrows: false,
-        classes: {
-          arrows: 'splide__arrows splide__test',
-        },
-      } ).mount();
+	    new Splide( '#splide02', {
+		    perPage   : 1,
+		    gap       : '1.5rem',
+		    pagination: false,
+		    arrows    : false,
+		    classes   : {
+			    arrows: 'splide__arrows splide__test',
+		    },
+	    } ).mount();
 
-      new Splide( '#splide03', {
-        type             : 'slide',
-        perPage          : 3,
-        gap              : '1.5rem',
-        pagination: false,
-        arrows: false,
-        classes: {
-          arrows: 'splide__arrows splide__test',
-        },
-      } ).mount();
+	    new Splide( '#splide03', {
+		    type      : 'slide',
+		    perPage   : 3,
+		    gap       : '1.5rem',
+		    pagination: false,
+		    arrows    : false,
+		    classes   : {
+			    arrows: 'splide__arrows splide__test',
+		    },
+	    } ).mount();
 
-      new Splide( '#splide04', {
-        type             : 'slide',
-        perPage          : 1,
-        gap              : '1.5rem',
-        pagination: false,
-        arrows: false,
-        classes: {
-          arrows: 'splide__arrows splide__test',
-        },
-      } ).mount();
+	    new Splide( '#splide04', {
+		    type      : 'slide',
+		    perPage   : 1,
+		    gap       : '1.5rem',
+		    pagination: false,
+		    arrows    : false,
+		    classes   : {
+			    arrows: 'splide__arrows splide__test',
+		    },
+	    } ).mount();
 
-      new Splide( '#splide05', {
-        type             : 'slide',
-        perPage          : 2,
-        gap              : '1.5rem',
-        pagination: false,
-        arrows: false,
-        classes: {
-          arrows: 'splide__arrows splide__test',
-        },
-      } ).mount();
+	    new Splide( '#splide05', {
+		    type      : 'slide',
+		    perPage   : 2,
+		    gap       : '1.5rem',
+		    pagination: false,
+		    arrows    : false,
+		    classes   : {
+			    arrows: 'splide__arrows splide__test',
+		    },
+	    } ).mount();
 
-      new Splide( '#splide06', {
-        type             : 'slide',
-        perPage          : 4,
-        gap              : '1.5rem',
-        pagination: false,
-        arrows: false,
-        classes: {
-          arrows: 'splide__arrows splide__test',
-        },
-      } ).mount();
+	    new Splide( '#splide06', {
+		    type      : 'slide',
+		    perPage   : 4,
+		    gap       : '1.5rem',
+		    pagination: false,
+		    arrows    : false,
+		    classes   : {
+			    arrows: 'splide__arrows splide__test',
+		    },
+	    } ).mount();
 
-      new Splide( '#splide07', {
-        type             : 'slide',
-        perPage          : 1,
-        gap              : '1.5rem',
-        pagination: false,
-        arrows: false,
-        classes: {
-          arrows: 'splide__arrows splide__test',
-        },
-      } ).mount();
+	    new Splide( '#splide07', {
+		    type      : 'slide',
+		    perPage   : 1,
+		    gap       : '1.5rem',
+		    pagination: false,
+		    arrows    : false,
+		    classes   : {
+			    arrows: 'splide__arrows splide__test',
+		    },
+	    } ).mount();
 
-      new Splide( '#splide08', {
-        type             : 'slide',
-        perPage          : 3,
-        gap              : '1.5rem',
-        pagination: false,
-        arrows: false,
-        classes: {
-          arrows: 'splide__arrows splide__test',
-        },
-      } ).mount();
+	    new Splide( '#splide08', {
+		    type      : 'slide',
+		    perPage   : 3,
+		    gap       : '1.5rem',
+		    pagination: false,
+		    arrows    : false,
+		    classes   : {
+			    arrows: 'splide__arrows splide__test',
+		    },
+	    } ).mount();
 
-      new Splide( '#splide09', {
-        type             : 'slide',
-        perPage          : 3,
-        gap              : '1.5rem',
-        pagination: false,
-        arrows: false,
-        classes: {
-          arrows: 'splide__arrows splide__test',
-        },
-      } ).mount();
+	    new Splide( '#splide09', {
+		    type      : 'slide',
+		    perPage   : 3,
+		    gap       : '1.5rem',
+		    pagination: false,
+		    arrows    : false,
+		    classes   : {
+			    arrows: 'splide__arrows splide__test',
+		    },
+	    } ).mount();
     } );
   </script>
 
@@ -138,17 +135,6 @@ $settings = get_settings();
 <?php render( 'splide07' ); ?>
 <?php render( 'splide08' ); ?>
 <?php render( 'splide09' ); ?>
-
-<script>
-  Array.from( document.querySelectorAll( '.splide' ) ).forEach( elm => {
-    const splide   = new Splide( elm, { rewind: true, interval: 1000 } ).mount();
-    const Autoplay = splide.Components.Autoplay;
-    const observer = new IntersectionObserver( ( [ entry ] ) => {
-      entry.isIntersecting ? Autoplay.play() : Autoplay.pause();
-    }, { threshold: 0.8 } );
-    observer.observe( elm );
-  } );
-</script>
 
 </body>
 </html>

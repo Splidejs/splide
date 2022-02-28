@@ -1,4 +1,4 @@
-export * from './EventBus/EventBus';
+export * from './EventBinder/EventBinder';
 export * from './EventInterface/EventInterface';
 export * from './RequestInterval/RequestInterval';
 export * from './State/State';

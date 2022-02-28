@@ -17,7 +17,6 @@ import {
   CLASS_TRACK,
 } from '../../constants/classes';
 import { EVENT_REFRESH, EVENT_UPDATED } from '../../constants/events';
-import { DEFAULT_EVENT_PRIORITY } from '../../constants/priority';
 import { PROJECT_CODE } from '../../constants/project';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
@@ -121,9 +120,8 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
    * Called when the component is mounted.
    */
   function mount(): void {
-    const priority = DEFAULT_EVENT_PRIORITY - 2;
-    on( EVENT_REFRESH, destroy, priority );
-    on( EVENT_REFRESH, setup, priority );
+    on( EVENT_REFRESH, destroy );
+    on( EVENT_REFRESH, setup );
     on( EVENT_UPDATED, update );
   }
 

@@ -3,13 +3,12 @@ import { SlideMatcher } from '../../components/Slides/Slides';
 import { CLASS_INITIALIZED } from '../../constants/classes';
 import { DEFAULTS } from '../../constants/defaults';
 import { EVENT_DESTROY, EVENT_MOUNTED, EVENT_READY, EVENT_REFRESH, EVENT_UPDATED } from '../../constants/events';
-import { DEFAULT_USER_EVENT_PRIORITY } from '../../constants/priority';
 import { DATA_ATTRIBUTE } from '../../constants/project';
 import { CREATED, DESTROYED, IDLE, STATES } from '../../constants/states';
 import { FADE } from '../../constants/types';
-import { EventBus, EventBusCallback, EventBusObject, State, StateObject } from '../../constructors';
+import { EventInterface, EventInterfaceObject, State, StateObject } from '../../constructors';
 import { Fade, Slide } from '../../transitions';
-import { ComponentConstructor, Components, EventMap, Options, SyncTarget } from '../../types';
+import { AnyFunction, ComponentConstructor, Components, EventMap, Options, SyncTarget } from '../../types';
 import { addClass, assert, assign, empty, forOwn, getAttribute, isString, merge, query, slice } from '../../utils';
 
 
@@ -37,7 +36,7 @@ export class Splide {
   /**
    * The EventBusObject object.
    */
-  readonly event: EventBusObject = EventBus();
+  readonly event: EventInterfaceObject = EventInterface();
 
   /**
    * The collection of all component objects.
@@ -229,9 +228,9 @@ export class Splide {
    * @return `this`
    */
   on<K extends keyof EventMap>( events: K, callback: EventMap[ K ] ): this;
-  on( events: string | string[], callback: EventBusCallback ): this;
-  on( events: string | string[], callback: EventBusCallback ): this {
-    this.event.on( events, callback, null, DEFAULT_USER_EVENT_PRIORITY );
+  on( events: string | string[], callback: AnyFunction ): this;
+  on( events: string | string[], callback: AnyFunction ): this {
+    this.event.on( events, callback );
     return this;
   }
 
@@ -344,7 +343,7 @@ export class Splide {
 
     if ( state.is( CREATED ) ) {
       // Postpones destruction requested before the slider becomes ready.
-      event.on( EVENT_READY, this.destroy.bind( this, completely ), this );
+      EventInterface( this ).on( EVENT_READY, this.destroy.bind( this, completely ) );
     } else {
       forOwn( this._Components, component => {
         component.destroy && component.destroy( completely );

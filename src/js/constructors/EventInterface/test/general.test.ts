@@ -3,7 +3,7 @@ import { EventInterface } from '../EventInterface';
 
 
 describe( 'EventInterface', () => {
-  const splide = init();
+  const splide = init( { speed: 0 } );
 
   test( 'can provide `on` to listen to internal events and lock listeners.', () => {
     const { on } = EventInterface( splide );
@@ -28,6 +28,24 @@ describe( 'EventInterface', () => {
 
     expect( callback1 ).toHaveBeenCalledTimes( 2 );
     expect( callback2 ).toHaveBeenCalledTimes( 2 );
+  } );
+
+  test( 'can receive arguments passed by `emit`.', () => {
+    const { on } = EventInterface( splide );
+    const callback1 = jest.fn();
+    const callback2 = jest.fn();
+
+    const array  = [ 1, 2 ];
+    const object = { a: 1, b: 2 };
+
+    on( 'myEvent1', callback1 );
+    on( 'myEvent2', callback2 );
+
+    splide.emit( 'myEvent1', 1, 2, 3 );
+    splide.emit( 'myEvent2', array, object, Infinity );
+
+    expect( callback1 ).toHaveBeenCalledWith( 1, 2, 3 );
+    expect( callback2 ).toHaveBeenCalledWith( array, object, Infinity );
   } );
 
   test( 'can provide `off` to remove locked listeners.', () => {

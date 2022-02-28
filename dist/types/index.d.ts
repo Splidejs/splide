@@ -97,6 +97,8 @@ interface MoveComponent extends BaseComponent {
     getLimit(max: boolean): number;
     isBusy(): boolean;
     exceededLimit(max?: boolean | undefined, position?: number): boolean;
+    /** @internal */
+    reposition(): void;
 }
 
 /**

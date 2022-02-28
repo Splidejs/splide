@@ -715,9 +715,8 @@ function Elements(Splide2, Components2, options) {
     addClass(root, classes = getClasses());
   }
   function mount() {
-    const priority = DEFAULT_EVENT_PRIORITY - 2;
-    on(EVENT_REFRESH, destroy, priority);
-    on(EVENT_REFRESH, setup, priority);
+    on(EVENT_REFRESH, destroy);
+    on(EVENT_REFRESH, setup);
     on(EVENT_UPDATED, update);
   }
   function destroy() {
@@ -1304,7 +1303,8 @@ function Move(Splide2, Components2, options) {
     getPosition,
     getLimit,
     isBusy,
-    exceededLimit
+    exceededLimit,
+    reposition
   };
 }
 
@@ -1315,6 +1315,8 @@ function Controller(Splide2, Components2, options) {
   const { isEnough, getLength } = Components2.Slides;
   const isLoop = Splide2.is(LOOP);
   const isSlide = Splide2.is(SLIDE);
+  const getNext = apply(getAdjacent, false);
+  const getPrev = apply(getAdjacent, true);
   let currIndex = options.start || 0;
   let prevIndex = currIndex;
   let slideCount;
@@ -1322,13 +1324,17 @@ function Controller(Splide2, Components2, options) {
   let perPage;
   function mount() {
     init();
-    on([EVENT_UPDATED, EVENT_REFRESH], init, DEFAULT_EVENT_PRIORITY - 1);
+    on([EVENT_UPDATED, EVENT_REFRESH], init);
   }
   function init() {
     slideCount = getLength(true);
     perMove = options.perMove;
     perPage = options.perPage;
-    currIndex = clamp(currIndex, 0, slideCount - 1);
+    const index = clamp(currIndex, 0, slideCount - 1);
+    if (index !== currIndex) {
+      currIndex = index;
+      Move.reposition();
+    }
   }
   function go(control, allowSameIndex, callback) {
     const dest = parse(control);
@@ -1364,12 +1370,6 @@ function Controller(Splide2, Components2, options) {
       index = isLoop ? control : clamp(control, 0, getEnd());
     }
     return index;
-  }
-  function getNext(destination) {
-    return getAdjacent(false, destination);
-  }
-  function getPrev(destination) {
-    return getAdjacent(true, destination);
   }
   function getAdjacent(prev, destination) {
     const number = perMove || (hasFocus() ? 1 : perPage);

@@ -1,6 +1,6 @@
 import { EVENT_MEDIA } from '../../constants/events';
 import { DESTROYED } from '../../constants/states';
-import { EventInterface } from '../../constructors';
+import { EventBinder } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import { find, merge, noop } from '../../utils';
@@ -26,7 +26,7 @@ export interface MediaComponent extends BaseComponent {
  * @return A Media component object.
  */
 export function Media( Splide: Splide, Components: Components, options: Options ): MediaComponent {
-  const event       = EventInterface( Splide, true );
+  const binder      = EventBinder();
   const breakpoints = options.breakpoints || {};
 
   /**
@@ -65,7 +65,7 @@ export function Media( Splide: Splide, Components: Components, options: Options 
    */
   function destroy( completely: boolean ): void {
     if ( completely ) {
-      event.destroy();
+      binder.destroy();
     }
   }
 
@@ -77,7 +77,7 @@ export function Media( Splide: Splide, Components: Components, options: Options 
   function register( entries: [ Options, string? ][] ): void {
     queries.push( entries.map<[ Options, MediaQueryList? ]>( entry => {
       const query = entry[ 1 ] && matchMedia( entry[ 1 ] );
-      query && event.bind( query, 'change', update );
+      query && binder.bind( query, 'change', update );
       return [ entry[ 0 ], query ];
     } ) );
   }
@@ -109,7 +109,7 @@ export function Media( Splide: Splide, Components: Components, options: Options 
   function accumulate(): Options {
     return queries.reduce<Options>( ( merged, entries ) => {
       const entry = ( find( entries, entry => ! entry[ 1 ] || entry[ 1 ].matches ) || [] );
-      entry[ 1 ] && event.emit( EVENT_MEDIA, entry[ 1 ] );
+      entry[ 1 ] && Splide.emit( EVENT_MEDIA, entry[ 1 ] );
       return merge( merged, entry[ 0 ] || {} );
     }, merge( {}, userOptions ) );
   }

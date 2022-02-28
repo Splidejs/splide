@@ -59,8 +59,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     DRAGGING: DRAGGING,
     DESTROYED: DESTROYED
   };
-  var DEFAULT_EVENT_PRIORITY = 10;
-  var DEFAULT_USER_EVENT_PRIORITY = 20;
 
   function empty(array) {
     array.length = 0;
@@ -382,91 +380,23 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     return "" + prefix + pad(ids[prefix] = (ids[prefix] || 0) + 1);
   }
 
-  function EventBus() {
-    var handlers = {};
-
-    function on(events, callback, key, priority) {
-      if (priority === void 0) {
-        priority = DEFAULT_EVENT_PRIORITY;
-      }
-
-      forEachEvent(events, function (event, namespace) {
-        var events2 = handlers[event] = handlers[event] || [];
-        events2.push([callback, namespace, priority, key]);
-        events2.sort(function (handler1, handler2) {
-          return handler1[2] - handler2[2];
-        });
-      });
-    }
-
-    function off(events, key) {
-      forEachEvent(events, function (event, namespace) {
-        handlers[event] = (handlers[event] || []).filter(function (handler) {
-          return handler[3] ? handler[3] !== key : key || handler[1] !== namespace;
-        });
-      });
-    }
-
-    function offBy(key) {
-      forOwn(handlers, function (eventHandlers, event) {
-        off(event, key);
-      });
-    }
-
-    function emit(event) {
-      var _arguments = arguments;
-      (handlers[event] || []).forEach(function (handler) {
-        handler[0].apply(handler, slice(_arguments, 1));
-      });
-    }
-
-    function destroy() {
-      handlers = {};
-    }
-
-    function forEachEvent(events, iteratee) {
-      toArray(events).join(" ").split(" ").forEach(function (eventNS) {
-        var fragments = eventNS.split(".");
-        iteratee(fragments[0], fragments[1]);
-      });
-    }
-
-    return {
-      on: on,
-      off: off,
-      offBy: offBy,
-      emit: emit,
-      destroy: destroy
-    };
-  }
-
-  function EventInterface(Splide2, manual) {
-    var event = Splide2.event;
-    var key = {};
+  function EventBinder() {
     var listeners = [];
 
-    function on(events, callback, priority) {
-      event.on(events, callback, key, priority);
-    }
-
-    function off(events) {
-      event.off(events, key);
-    }
-
     function bind(targets, events, callback, options) {
-      forEachEvent(targets, events, function (target, event2) {
+      forEachEvent(targets, events, function (target, event, namespace) {
         var isEventTarget = ("addEventListener" in target);
-        var remover = isEventTarget ? target.removeEventListener.bind(target, event2, callback, options) : target["removeListener"].bind(target, callback);
-        isEventTarget ? target.addEventListener(event2, callback, options) : target["addListener"](callback);
-        listeners.push([target, event2, callback, remover]);
+        var remover = isEventTarget ? target.removeEventListener.bind(target, event, callback, options) : target["removeListener"].bind(target, callback);
+        isEventTarget ? target.addEventListener(event, callback, options) : target["addListener"](callback);
+        listeners.push([target, event, namespace, callback, remover]);
       });
     }
 
     function unbind(targets, events, callback) {
-      forEachEvent(targets, events, function (target, event2) {
+      forEachEvent(targets, events, function (target, event, namespace) {
         listeners = listeners.filter(function (listener) {
-          if (listener[0] === target && listener[1] === event2 && (!callback || listener[2] === callback)) {
-            listener[3]();
+          if (listener[0] === target && listener[1] === event && listener[2] === namespace && (!callback || listener[3] === callback)) {
+            listener[4]();
             return false;
           }
 
@@ -475,30 +405,74 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       });
     }
 
+    function dispatch(target, type, detail) {
+      var e;
+      var bubbles = true;
+
+      if (typeof CustomEvent === "function") {
+        e = new CustomEvent(type, {
+          bubbles: bubbles,
+          detail: detail
+        });
+      } else {
+        e = document.createEvent("CustomEvent");
+        e.initEvent(type, bubbles, false);
+      }
+
+      target.dispatchEvent(e);
+      return e;
+    }
+
     function forEachEvent(targets, events, iteratee) {
       forEach(targets, function (target) {
-        if (target) {
-          events.split(" ").forEach(apply(iteratee, target));
-        }
+        target && forEach(events, function (events2) {
+          events2.split(" ").forEach(function (eventNS) {
+            var fragment = eventNS.split(".");
+            iteratee(target, fragment[0], fragment[1]);
+          });
+        });
       });
     }
 
     function destroy() {
-      listeners = listeners.filter(function (data) {
-        data[3]();
+      listeners.forEach(function (data) {
+        data[4]();
       });
-      event.offBy(key);
+      empty(listeners);
     }
 
-    !manual && event.on(EVENT_DESTROY, destroy, key);
     return {
-      on: on,
-      off: off,
-      emit: event.emit,
       bind: bind,
       unbind: unbind,
+      dispatch: dispatch,
       destroy: destroy
     };
+  }
+
+  function EventInterface(Splide2) {
+    var bus = Splide2 ? Splide2.event.bus : document.createDocumentFragment();
+    var binder = EventBinder();
+
+    function on(events, callback) {
+      binder.bind(bus, toArray(events).join(" "), function (e) {
+        callback.apply(callback, isArray(e.detail) ? e.detail : []);
+      });
+    }
+
+    function emit(event) {
+      binder.dispatch(bus, event, slice(arguments, 1));
+    }
+
+    if (Splide2) {
+      Splide2.event.on(EVENT_DESTROY, binder.destroy);
+    }
+
+    return assign(binder, {
+      bus: bus,
+      on: on,
+      off: apply(binder.unbind, bus),
+      emit: emit
+    });
   }
 
   function RequestInterval(interval, onInterval, onUpdate, limit) {
@@ -618,7 +592,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   function Media(Splide2, Components2, options) {
-    var event = EventInterface(Splide2, true);
+    var binder = EventBinder();
     var breakpoints = options.breakpoints || {};
     var userOptions = merge({}, options);
     var queries = [];
@@ -639,14 +613,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function destroy(completely) {
       if (completely) {
-        event.destroy();
+        binder.destroy();
       }
     }
 
     function register(entries) {
       queries.push(entries.map(function (entry) {
         var query = entry[1] && matchMedia(entry[1]);
-        query && event.bind(query, "change", update);
+        query && binder.bind(query, "change", update);
         return [entry[0], query];
       }));
     }
@@ -671,7 +645,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         var entry = find(entries, function (entry2) {
           return !entry2[1] || entry2[1].matches;
         }) || [];
-        entry[1] && event.emit(EVENT_MEDIA, entry[1]);
+        entry[1] && Splide2.emit(EVENT_MEDIA, entry[1]);
         return merge(merged, entry[0] || {});
       }, merge({}, userOptions));
     }
@@ -789,9 +763,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function mount() {
-      var priority = DEFAULT_EVENT_PRIORITY - 2;
-      on(EVENT_REFRESH, destroy, priority);
-      on(EVENT_REFRESH, setup, priority);
+      on(EVENT_REFRESH, destroy);
+      on(EVENT_REFRESH, setup);
       on(EVENT_UPDATED, update);
     }
 
@@ -1529,7 +1502,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       getPosition: getPosition,
       getLimit: getLimit,
       isBusy: isBusy,
-      exceededLimit: exceededLimit
+      exceededLimit: exceededLimit,
+      reposition: reposition
     };
   }
 
@@ -1545,6 +1519,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         getLength = _Components2$Slides.getLength;
     var isLoop = Splide2.is(LOOP);
     var isSlide = Splide2.is(SLIDE);
+    var getNext = apply(getAdjacent, false);
+    var getPrev = apply(getAdjacent, true);
     var currIndex = options.start || 0;
     var prevIndex = currIndex;
     var slideCount;
@@ -1553,14 +1529,19 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function mount() {
       init();
-      on([EVENT_UPDATED, EVENT_REFRESH], init, DEFAULT_EVENT_PRIORITY - 1);
+      on([EVENT_UPDATED, EVENT_REFRESH], init);
     }
 
     function init() {
       slideCount = getLength(true);
       perMove = options.perMove;
       perPage = options.perPage;
-      currIndex = clamp(currIndex, 0, slideCount - 1);
+      var index = clamp(currIndex, 0, slideCount - 1);
+
+      if (index !== currIndex) {
+        currIndex = index;
+        Move.reposition();
+      }
     }
 
     function go(control, allowSameIndex, callback) {
@@ -1606,14 +1587,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }
 
       return index;
-    }
-
-    function getNext(destination) {
-      return getAdjacent(false, destination);
-    }
-
-    function getPrev(destination) {
-      return getAdjacent(true, destination);
     }
 
     function getAdjacent(prev, destination) {
@@ -2867,7 +2840,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
   var _Splide = /*#__PURE__*/function () {
     function _Splide(target, options) {
-      this.event = EventBus();
+      this.event = EventInterface();
       this.Components = {};
       this.state = State(CREATED);
       this.splides = [];
@@ -2940,7 +2913,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     };
 
     _proto.on = function on(events, callback) {
-      this.event.on(events, callback, null, DEFAULT_USER_EVENT_PRIORITY);
+      this.event.on(events, callback);
       return this;
     };
 
@@ -2987,7 +2960,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           state = this.state;
 
       if (state.is(CREATED)) {
-        event.on(EVENT_READY, this.destroy.bind(this, completely), this);
+        EventInterface(this).on(EVENT_READY, this.destroy.bind(this, completely));
       } else {
         forOwn(this._Components, function (component) {
           component.destroy && component.destroy(completely);

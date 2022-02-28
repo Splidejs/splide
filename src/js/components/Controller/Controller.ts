@@ -1,10 +1,9 @@
 import { EVENT_REFRESH, EVENT_UPDATED } from '../../constants/events';
-import { DEFAULT_EVENT_PRIORITY } from '../../constants/priority';
 import { LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, BaseComponent, Components, Options } from '../../types';
-import { approximatelyEqual, between, clamp, floor, isString, isUndefined, max } from '../../utils';
+import { apply, approximatelyEqual, between, clamp, floor, isString, isUndefined, max } from '../../utils';
 
 
 /**
@@ -45,6 +44,8 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
   const { isEnough, getLength } = Components.Slides;
   const isLoop  = Splide.is( LOOP );
   const isSlide = Splide.is( SLIDE );
+  const getNext = apply( getAdjacent, false );
+  const getPrev = apply( getAdjacent, true );
 
   /**
    * The current index.
@@ -76,18 +77,25 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    */
   function mount(): void {
     init();
-    on( [ EVENT_UPDATED, EVENT_REFRESH ], init, DEFAULT_EVENT_PRIORITY - 1 );
+    on( [ EVENT_UPDATED, EVENT_REFRESH ], init );
   }
 
   /**
    * Initializes some parameters.
    * Needs to check the slides length since the current index may be out of the range after refresh.
+   * The process order must be Elements -> Controller -> Move.
    */
   function init(): void {
     slideCount = getLength( true );
     perMove    = options.perMove;
     perPage    = options.perPage;
-    currIndex  = clamp( currIndex, 0, slideCount - 1 );
+
+    const index = clamp( currIndex, 0, slideCount - 1 );
+
+    if ( index !== currIndex ) {
+      currIndex = index;
+      Move.reposition();
+    }
   }
 
   /**
@@ -163,28 +171,6 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
     }
 
     return index;
-  }
-
-  /**
-   * Returns a next destination index.
-   *
-   * @param destination - Optional. Determines whether to get a destination index or a slide one.
-   *
-   * @return A next index if available, or otherwise `-1`.
-   */
-  function getNext( destination?: boolean ): number {
-    return getAdjacent( false, destination );
-  }
-
-  /**
-   * Returns a previous destination index.
-   *
-   * @param destination - Optional. Determines whether to get a destination index or a slide one.
-   *
-   * @return A previous index if available, or otherwise `-1`.
-   */
-  function getPrev( destination?: boolean ): number {
-    return getAdjacent( true, destination );
   }
 
   /**

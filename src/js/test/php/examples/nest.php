@@ -20,7 +20,7 @@ $settings = get_settings();
     document.addEventListener( 'DOMContentLoaded', function () {
       var primary = new Splide( '#splide01', {
         gap : '1.5rem',
-        drag: false,
+        // drag: false,
         height: 600,
       } );
 

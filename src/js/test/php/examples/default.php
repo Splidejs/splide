@@ -39,44 +39,44 @@ $settings = get_settings();
         // noDrag: 'button',
       } );
 
-	    // splide.on( 'move', () => {
-		  //   console.log( 'move' );
-	    // } );
-	    //
-      // splide.on( 'moved', () => {
-      //   console.log( 'moved' );
-      // } );
-	    //
-      // splide.on( 'visible', Slide => {
-      //   console.log( 'visible', Slide.index );
-      // } );
-	    //
-      // splide.on( 'hidden', Slide => {
-      //   console.log( 'hidden', Slide.index );
-      // } );
-	    //
-      // splide.on( 'click', () => {
-      //   console.log( 'click' );
-      // } );
-	    //
-      // splide.on( 'shifted', () => {
-      //   console.log( 'shifted' );
-      // } );
-	    //
-	    // splide.on( 'drag', () => {
-		  //   console.log( 'drag' );
-	    // } );
-	    //
-	    // splide.on( 'dragged', () => {
-		  //   console.log( 'dragged' );
-	    // } );
+	    splide.on( 'move', function () {
+		    console.log( 'move' );
+	    } );
+
+      splide.on( 'moved', function ( index, prev, dest ) {
+        console.log( 'moved', index, prev, dest );
+      } );
+
+      splide.on( 'visible', Slide => {
+        console.log( 'visible', Slide );
+      } );
+
+      splide.on( 'hidden', Slide => {
+        console.log( 'hidden', Slide );
+      } );
+
+      splide.on( 'click', function () {
+        console.log( 'click' );
+      } );
+
+      splide.on( 'shifted', function () {
+        console.log( 'shifted' );
+      } );
+
+	    splide.on( 'drag', function () {
+		    console.log( 'drag' );
+	    } );
+
+	    splide.on( 'dragged', function () {
+		    console.log( 'dragged' );
+	    } );
 
       splide.mount();
 
 	    const pre = document.querySelector( 'pre' );
 
 	    // Array.from( document.getElementsByTagName( 'button' ) ).forEach( button => {
-			// 	button.addEventListener( 'click', () => {
+			// 	button.addEventListener( 'click', function () {
 			// 		alert( 'click' );
 			// 	} );
 			// } );

@@ -25,7 +25,7 @@ $settings = get_settings();
 
 <script>
   var splide = new Splide( '#splide01', {
-    // type   : 'loop',
+    type   : 'loop',
     perPage: 3,
     gap    : '1rem',
   } );
@@ -39,11 +39,11 @@ $settings = get_settings();
     splide.add( [
       '<img src="../../assets/images/pics/slide15.jpg">',
       '<img src="../../assets/images/pics/slide16.jpg">',
-    ], 0 );
+    ] );
   } );
 
   remove.addEventListener( 'click', function() {
-    splide.remove( 0 );
+    splide.remove( splide.length - 1 );
   } );
 </script>
 
