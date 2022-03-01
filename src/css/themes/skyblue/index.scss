@@ -20,7 +20,7 @@ $main-light: lighten( $main, 20% ) !default;
   $opacity-hover: false,
   $fill-hover: $main-light,
   $transition: fill .2s linear,
-  $button-size: false,
+  $button-size: 2.5em,
   $button-background: transparent,
 );
 
@@ -28,7 +28,7 @@ $main-light: lighten( $main, 20% ) !default;
   $dot-width: 10px,
   $dot-height: 10px,
   $dot-opacity: false,
-  $dot-transition: all .2s linear,
+  $dot-transition: ( background-color .2s linear, transform .2s linear ),
   $dot-background-hover: $main-light,
 );
 

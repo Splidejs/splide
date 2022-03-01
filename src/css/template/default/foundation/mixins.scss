@@ -1,0 +1,9 @@
+@use './colors';
+
+$outline: colors.$focus 2px solid !default;
+$outline-offset: 2px !default;
+
+@mixin focus-outline {
+  outline: $outline;
+  outline-offset: $outline-offset;
+}

@@ -1,9 +1,18 @@
+@use '../../foundation/colors';
+@use '../../foundation/mixins';
+
 $border-radius: false !default;
+$outline-offset: -2px !default;
 
 .splide {
   &__slide {
     @if $border-radius {
       border-radius: $border-radius;
+    }
+
+    &:focus-visible {
+      @include mixins.focus-outline;
+      outline-offset: $outline-offset;
     }
   }
 }

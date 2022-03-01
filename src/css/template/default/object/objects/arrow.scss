@@ -1,4 +1,5 @@
 @use '../../foundation/colors';
+@use '../../foundation/mixins';
 
 $size: 1.2em !default;
 $fill: colors.$main !default;
@@ -72,6 +73,10 @@ $right: 1em !default;
 
     &:focus {
       outline: none;
+    }
+
+    &:focus-visible {
+      @include mixins.focus-outline;
     }
 
     &--prev {
