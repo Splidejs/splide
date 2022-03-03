@@ -56,22 +56,22 @@ export class Splide {
   /**
    * The collection of options.
    */
-  private readonly _o: Options = {};
+  private readonly _options: Options = {};
 
   /**
    * The collection of all components.
    */
-  private _C: Components;
+  private _Components: Components;
 
   /**
    * The collection of extensions.
    */
-  private _E: Record<string, ComponentConstructor> = {};
+  private _Extensions: Record<string, ComponentConstructor> = {};
 
   /**
    * The Transition component.
    */
-  private _T: ComponentConstructor;
+  private _Transition: ComponentConstructor;
 
   /**
    * The Splide constructor.
@@ -93,7 +93,7 @@ export class Splide {
       assert( false, 'Invalid JSON' );
     }
 
-    this._o = options;
+    this._options = options;
   }
 
   /**
@@ -110,14 +110,14 @@ export class Splide {
 
     state.set( CREATED );
 
-    this._C = Components;
-    this._T = Transition || this._T || ( this.is( FADE ) ? Fade : Slide );
-    this._E = Extensions || this._E;
+    this._Components = Components;
+    this._Transition = Transition || this._Transition || ( this.is( FADE ) ? Fade : Slide );
+    this._Extensions = Extensions || this._Extensions;
 
-    const Constructors = assign( {}, ComponentConstructors, this._E, { Transition: this._T } );
+    const Constructors = assign( {}, ComponentConstructors, this._Extensions, { Transition: this._Transition } );
 
     forOwn( Constructors, ( Component, key ) => {
-      const component = Component( this, Components, this._o );
+      const component = Component( this, Components, this._options );
       Components[ key ] = component;
       component.setup && component.setup();
     } );
@@ -159,7 +159,7 @@ export class Splide {
     splide.splides.push( { splide: this, isParent: true } );
 
     if ( this.state.is( IDLE ) ) {
-      this._C.Sync.remount();
+      this._Components.Sync.remount();
       splide.Components.Sync.remount();
     }
 
@@ -203,7 +203,7 @@ export class Splide {
    * @return `this`
    */
   go( control: number | string ): this {
-    this._C.Controller.go( control );
+    this._Components.Controller.go( control );
     return this;
   }
 
@@ -297,7 +297,7 @@ export class Splide {
    * @return `this`
    */
   add( slides: string | HTMLElement | Array<string | HTMLElement>, index?: number ): this {
-    this._C.Slides.add( slides, index );
+    this._Components.Slides.add( slides, index );
     return this;
   }
 
@@ -308,7 +308,7 @@ export class Splide {
    * @param matcher - An index, an array with indices, a selector string, or an iteratee function.
    */
   remove( matcher: SlideMatcher ): this {
-    this._C.Slides.remove( matcher );
+    this._Components.Slides.remove( matcher );
     return this;
   }
 
@@ -320,7 +320,7 @@ export class Splide {
    * @return `true` if the type matches the current one, or otherwise `false`.
    */
   is( type: string ): boolean {
-    return this._o.type === type;
+    return this._options.type === type;
   }
 
   /**
@@ -347,7 +347,7 @@ export class Splide {
       // Postpones destruction requested before the slider becomes ready.
       EventInterface( this ).on( EVENT_READY, this.destroy.bind( this, completely ) );
     } else {
-      forOwn( this._C, component => {
+      forOwn( this._Components, component => {
         component.destroy && component.destroy( completely );
       }, true );
 
@@ -366,7 +366,7 @@ export class Splide {
    * @return An object with the latest options.
    */
   get options(): Options {
-    return this._o;
+    return this._options;
   }
 
   /**
@@ -375,11 +375,11 @@ export class Splide {
    * @param options - An object with new options.
    */
   set options( options: Options ) {
-    const { _o } = this;
-    merge( _o, options );
+    const { _options } = this;
+    merge( _options, options );
 
     if ( ! this.state.is( CREATED ) ) {
-      this.emit( EVENT_UPDATED, _o );
+      this.emit( EVENT_UPDATED, _options );
     }
   }
 
@@ -389,7 +389,7 @@ export class Splide {
    * @return The number of slides.
    */
   get length(): number {
-    return this._C.Slides.getLength( true );
+    return this._Components.Slides.getLength( true );
   }
 
   /**
@@ -398,6 +398,6 @@ export class Splide {
    * @return The active slide index.
    */
   get index(): number {
-    return this._C.Controller.getIndex();
+    return this._Components.Controller.getIndex();
   }
 }

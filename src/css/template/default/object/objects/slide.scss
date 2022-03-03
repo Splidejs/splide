@@ -11,8 +11,7 @@ $outline-offset: -2px !default;
     }
 
     &:focus-visible {
-      @include mixins.focus-outline;
-      outline-offset: $outline-offset;
+      @include mixins.focus-outline-slide;
     }
   }
 }

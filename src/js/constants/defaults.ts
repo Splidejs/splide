@@ -29,6 +29,7 @@ export const DEFAULTS: Options = {
   slideFocus       : true,
   trimSpace        : true,
   focusableNodes   : 'a, button, textarea, input, select, iframe',
+  live             : true,
   classes          : CLASSES,
   i18n             : I18N,
 };

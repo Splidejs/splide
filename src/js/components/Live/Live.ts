@@ -34,13 +34,18 @@ export function Live( Splide: Splide, Components: Components, options: Options )
   const { live } = options;
 
   /**
+   * Indicates whether the live region is enabled or not.
+   */
+  const enabled = live && ! options.isNavigation;
+
+  /**
    * Called when the component is mounted.
    * Explicitly sets `aria-atomic` to avoid SR from reading the content twice.
    *
    * @link https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-atomic
    */
   function mount(): void {
-    if ( live ) {
+    if ( enabled ) {
       setAttribute( list, ARIA_ATOMIC, false );
       disable( ! Components.Autoplay.isPaused() );
       on( EVENT_AUTOPLAY_PLAY, apply( disable, true ) );
@@ -55,7 +60,7 @@ export function Live( Splide: Splide, Components: Components, options: Options )
    * @param disabled - `true` to disable the live region or `false` to enable it again.
    */
   function disable( disabled: boolean ): void {
-    if ( live ) {
+    if ( enabled ) {
       setAttribute( list, ARIA_LIVE, disabled ? 'off' : 'polite' );
     }
   }

@@ -1,4 +1,5 @@
 @use '../../foundation/colors';
+@use '../../foundation/mixins';
 
 $border: 3px solid transparent !default;
 $border-active: 3px solid colors.$main !default;
@@ -35,6 +36,10 @@ $opacity-active: false !default;
 
           &:focus {
             outline: none;
+          }
+
+          &:focus-visible {
+            @include mixins.focus-outline-slide;
           }
         }
       }

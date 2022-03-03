@@ -1,4 +1,4 @@
-import { ALL_ATTRIBUTES, ARIA_ORIENTATION, ROLE } from '../../constants/attributes';
+import { ARIA_ORIENTATION, ROLE } from '../../constants/attributes';
 import { TTB } from '../../constants/directions';
 import {
   EVENT_CLICK,
@@ -12,7 +12,7 @@ import { LOOP } from '../../constants/types';
 import { EventInterface, EventInterfaceObject } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { empty, includes, prevent, removeAttribute, setAttribute } from '../../utils';
+import { empty, includes, prevent, setAttribute } from '../../utils';
 import { SlideComponent } from '../Slides/Slide';
 
 
@@ -64,7 +64,6 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
    * Destroys the component.
    */
   function destroy(): void {
-    removeAttribute( list, ALL_ATTRIBUTES );
     events.forEach( event => { event.destroy() } );
     empty( events );
   }

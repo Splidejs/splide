@@ -1,9 +1,15 @@
 @use './colors';
 
-$outline: colors.$focus 2px solid !default;
-$outline-offset: 2px !default;
+$outline: colors.$focus 3px solid !default;
+$outline-offset: 3px !default;
+$outline-offset-slide: -3px !default;
 
 @mixin focus-outline {
   outline: $outline;
   outline-offset: $outline-offset;
+}
+
+@mixin focus-outline-slide {
+  @include focus-outline;
+  outline-offset: $outline-offset-slide;
 }

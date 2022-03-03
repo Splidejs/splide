@@ -6,7 +6,8 @@ $main-light: lighten( $main, 20% ) !default;
   $sub01: $main,
   $sub02: $main,
   $background: #ccc,
-  $background-active: $main
+  $background-active: $main,
+  $focus: $main,
 );
 
 @use '../../template/default/object/modifiers/nav' with (
@@ -21,6 +22,7 @@ $main-light: lighten( $main, 20% ) !default;
   $fill-hover: $main-light,
   $transition: fill .2s linear,
   $button-size: 2.5em,
+  $button-border-radius: 0,
   $button-background: transparent,
 );
 
