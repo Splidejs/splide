@@ -13,6 +13,7 @@ import { EventInterface, EventInterfaceObject } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import { empty, includes, prevent, setAttribute } from '../../utils';
+import { normalizeKey } from '../../utils/dom/normalizeKey/normalizeKey';
 import { SlideComponent } from '../Slides/Slide';
 
 
@@ -30,7 +31,7 @@ export interface SyncComponent extends BaseComponent {
  *
  * @since 3.0.0
  */
-const TRIGGER_KEYS = [ ' ', 'Enter', 'Spacebar' ];
+const TRIGGER_KEYS = [ ' ', 'Enter' ];
 
 /**
  * The component for syncing multiple sliders.
@@ -136,7 +137,7 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
    * @param e     - A KeyboardEvent object.
    */
   function onKeydown( Slide: SlideComponent, e: KeyboardEvent ): void {
-    if ( includes( TRIGGER_KEYS, e.key ) ) {
+    if ( includes( TRIGGER_KEYS, normalizeKey( e ) ) ) {
       onClick( Slide );
       prevent( e );
     }

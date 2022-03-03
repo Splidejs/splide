@@ -719,7 +719,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var CLASS_NEXT = "is-next";
   var CLASS_VISIBLE = "is-visible";
   var CLASS_LOADING = "is-loading";
-  var STATUS_CLASSES = [CLASS_ACTIVE, CLASS_VISIBLE, CLASS_PREV, CLASS_NEXT, CLASS_LOADING];
+  var CLASS_FOCUS = "has-focus";
+  var STATUS_CLASSES = [CLASS_ACTIVE, CLASS_VISIBLE, CLASS_PREV, CLASS_NEXT, CLASS_LOADING, CLASS_FOCUS];
   var CLASSES = {
     slide: CLASS_SLIDE,
     clone: CLASS_CLONE,
@@ -2236,7 +2237,19 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     };
   }
 
-  var IE_ARROW_KEYS = ["Left", "Right", "Up", "Down"];
+  var NORMALIZATION_MAP = {
+    spacebar: " ",
+    Right: "ArrowRight",
+    Left: "ArrowLeft",
+    Up: "ArrowUp",
+    Down: "ArrowDown"
+  };
+
+  function normalizeKey(key) {
+    key = isString(key) ? key : key.key;
+    return NORMALIZATION_MAP[key] || key;
+  }
+
   var KEYBOARD_EVENT = "keydown";
 
   function Keyboard(Splide2, Components2, options) {
@@ -2252,7 +2265,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function mount() {
       init();
-      on(EVENT_UPDATED, onUpdated);
+      on(EVENT_UPDATED, destroy);
+      on(EVENT_UPDATED, init);
       on(EVENT_MOVE, onMove);
     }
 
@@ -2287,19 +2301,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       });
     }
 
-    function onUpdated() {
-      destroy();
-      init();
-    }
-
     function onKeydown(e) {
       if (!disabled) {
-        var key = e.key;
-        var normalizedKey = includes(IE_ARROW_KEYS, key) ? "Arrow" + key : key;
+        var key = normalizeKey(e);
 
-        if (normalizedKey === resolve("ArrowLeft")) {
+        if (key === resolve("ArrowLeft")) {
           Splide2.go("<");
-        } else if (normalizedKey === resolve("ArrowRight")) {
+        } else if (key === resolve("ArrowRight")) {
           Splide2.go(">");
         }
       }
@@ -2443,7 +2451,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         Elements = Components2.Elements,
         Controller = Components2.Controller;
     var hasFocus = Controller.hasFocus,
-        getIndex = Controller.getIndex;
+        getIndex = Controller.getIndex,
+        go = Controller.go;
+    var resolve = Components2.Direction.resolve;
     var items = [];
     var list;
 
@@ -2470,7 +2480,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       if (list) {
         remove(list);
         items.forEach(function (item) {
-          unbind(item.button, "click");
+          unbind(item.button, "click keydown focus");
         });
         empty(items);
         list = null;
@@ -2485,6 +2495,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var parent = options.pagination === "slider" && Elements.slider || Elements.root;
       var max = hasFocus() ? length : ceil(length / perPage);
       list = create("ul", classes.pagination, parent);
+      bind(list, "focusin", apply(addClass, list, CLASS_FOCUS));
+      bind(list, "focusout", apply(removeClass, list, CLASS_FOCUS));
       setAttribute(list, ROLE, "tablist");
       setAttribute(list, ARIA_LABEL, i18n.select);
 
@@ -2499,10 +2511,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         });
         var text = !hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
         bind(button, "click", apply(onClick, i));
+        bind(button, "keydown", apply(onKeydown, i));
         setAttribute(li, ROLE, "none");
         setAttribute(button, ROLE, "tab");
         setAttribute(button, ARIA_CONTROLS, controls.join(" "));
         setAttribute(button, ARIA_LABEL, format(text, i + 1));
+        setAttribute(button, TAB_INDEX, -1);
         items.push({
           li: li,
           button: button,
@@ -2512,10 +2526,31 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function onClick(page) {
-      Controller.go(">" + page, true, function () {
-        var Slide = Slides.getAt(Controller.toIndex(page));
-        Slide && focus(Slide.slide);
-      });
+      go(">" + page, true);
+    }
+
+    function onKeydown(page, e) {
+      var length = items.length;
+      var key = normalizeKey(e);
+      var nextPage = -1;
+
+      if (key === resolve("ArrowRight")) {
+        nextPage = ++page % length;
+      } else if (key === resolve("ArrowLeft")) {
+        nextPage = (--page + length) % length;
+      } else if (key === "Home") {
+        nextPage = 0;
+      } else if (key === "End") {
+        nextPage = length - 1;
+      }
+
+      var item = items[nextPage];
+
+      if (item) {
+        focus(item.button);
+        go(">" + page);
+        prevent(e, true);
+      }
     }
 
     function getAt(index) {
@@ -2527,13 +2562,17 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var curr = getAt(getIndex());
 
       if (prev) {
-        removeClass(prev.button, CLASS_ACTIVE);
-        removeAttribute(prev.button, ARIA_SELECTED);
+        var button = prev.button;
+        removeClass(button, CLASS_ACTIVE);
+        removeAttribute(button, ARIA_SELECTED);
+        setAttribute(button, TAB_INDEX, -1);
       }
 
       if (curr) {
-        addClass(curr.button, CLASS_ACTIVE);
-        setAttribute(curr.button, ARIA_SELECTED, true);
+        var _button = curr.button;
+        addClass(_button, CLASS_ACTIVE);
+        setAttribute(_button, ARIA_SELECTED, true);
+        setAttribute(_button, TAB_INDEX, null);
       }
 
       emit(EVENT_PAGINATION_UPDATED, {
@@ -2551,7 +2590,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     };
   }
 
-  var TRIGGER_KEYS = [" ", "Enter", "Spacebar"];
+  var TRIGGER_KEYS = [" ", "Enter"];
 
   function Sync(Splide2, Components2, options) {
     var list = Components2.Elements.list;
@@ -2596,13 +2635,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       on(EVENT_CLICK, onClick);
       on(EVENT_SLIDE_KEYDOWN, onKeydown);
       on([EVENT_MOUNTED, EVENT_UPDATED], update);
-      setAttribute(list, ROLE, "menu");
+      setAttribute(list, ROLE, "tablist");
       events.push(event);
       event.emit(EVENT_NAVIGATION_MOUNTED, Splide2.splides);
     }
 
     function update() {
-      setAttribute(list, ARIA_ORIENTATION, options.direction !== TTB ? "horizontal" : null);
+      setAttribute(list, ARIA_ORIENTATION, options.direction === TTB ? "vertical" : null);
     }
 
     function onClick(Slide) {
@@ -2610,7 +2649,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function onKeydown(Slide, e) {
-      if (includes(TRIGGER_KEYS, e.key)) {
+      if (includes(TRIGGER_KEYS, normalizeKey(e))) {
         onClick(Slide);
         prevent(e);
       }
