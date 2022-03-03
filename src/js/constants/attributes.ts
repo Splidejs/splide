@@ -5,6 +5,7 @@ export const DISABLED  = 'disabled';
 export const ARIA_PREFIX          = 'aria-';
 export const ARIA_CONTROLS        = `${ ARIA_PREFIX }controls`;
 export const ARIA_CURRENT         = `${ ARIA_PREFIX }current`;
+export const ARIA_SELECTED        = `${ ARIA_PREFIX }selected`;
 export const ARIA_LABEL           = `${ ARIA_PREFIX }label`;
 export const ARIA_HIDDEN          = `${ ARIA_PREFIX }hidden`;
 export const ARIA_ORIENTATION     = `${ ARIA_PREFIX }orientation`;

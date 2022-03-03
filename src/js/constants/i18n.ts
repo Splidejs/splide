@@ -14,5 +14,6 @@ export const I18N = {
   pause     : 'Pause autoplay',
   carousel  : 'carousel',
   slide     : 'slide',
+  select    : 'Select slide to show',
   slideLabel: '%s of %s', // [ slide number ] / [ slide size ]
 };

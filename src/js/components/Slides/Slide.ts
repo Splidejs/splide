@@ -1,9 +1,10 @@
 import {
   ALL_ATTRIBUTES,
   ARIA_CONTROLS,
-  ARIA_CURRENT,
   ARIA_HIDDEN,
-  ARIA_LABEL, ARIA_ROLEDESCRIPTION,
+  ARIA_LABEL,
+  ARIA_ROLEDESCRIPTION,
+  ARIA_SELECTED,
   ROLE,
   TAB_INDEX,
 } from '../../constants/attributes';
@@ -86,6 +87,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   const { on, emit, bind, destroy: destroyEvents } = EventInterface( Splide );
   const { Components, root, options } = Splide;
   const { isNavigation, updateOnMove, i18n } = options;
+  const { isTab } = Components.Elements;
   const { resolve } = Components.Direction;
   const styles         = getAttribute( slide, 'style' );
   const isClone        = slideIndex > -1;
@@ -103,7 +105,8 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   function mount( this: SlideComponent ): void {
     if ( ! isClone ) {
       slide.id = `${ root.id }-slide${ pad( index + 1 ) }`;
-      setAttribute( slide, ROLE, 'group' );
+
+      setAttribute( slide, ROLE, isTab() ? 'tabpanel' : 'group' );
       setAttribute( slide, ARIA_ROLEDESCRIPTION, i18n.slide );
       setAttribute( slide, ARIA_LABEL, format( i18n.slideLabel, [ index + 1, Splide.length ] ) );
     }
@@ -142,13 +145,14 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    * Initializes slides as navigation.
    */
   function initNavigation(): void {
-    const idx      = isClone ? slideIndex : index;
-    const label    = format( i18n.slideX, idx + 1 );
-    const controls = Splide.splides.map( target => target.splide.root.id ).join( ' ' );
+    const controls = Splide.splides.map( target => {
+      const Slide = target.splide.Components.Slides.getAt( index );
+      return Slide ? Slide.slide.id : '';
+    } ).join( ' ' );
 
-    setAttribute( slide, ARIA_LABEL, label );
+    setAttribute( slide, ARIA_LABEL, format( i18n.slideX, ( isClone ? slideIndex : index ) + 1 ) );
     setAttribute( slide, ARIA_CONTROLS, controls );
-    setAttribute( slide, ROLE, 'menuitem' );
+    setAttribute( slide, ROLE, 'tab' )
 
     updateActivity( isActive() );
   }
@@ -187,7 +191,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
       toggleClass( slide, CLASS_ACTIVE, active );
 
       if ( isNavigation ) {
-        setAttribute( slide, ARIA_CURRENT, active || null );
+        setAttribute( slide, ARIA_SELECTED, active || null );
       }
 
       emit( active ? EVENT_ACTIVE : EVENT_INACTIVE, self );

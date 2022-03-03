@@ -686,6 +686,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var ARIA_PREFIX = "aria-";
   var ARIA_CONTROLS = ARIA_PREFIX + "controls";
   var ARIA_CURRENT = ARIA_PREFIX + "current";
+  var ARIA_SELECTED = ARIA_PREFIX + "selected";
   var ARIA_LABEL = ARIA_PREFIX + "label";
   var ARIA_HIDDEN = ARIA_PREFIX + "hidden";
   var ARIA_ORIENTATION = ARIA_PREFIX + "orientation";
@@ -809,10 +810,17 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       return [CLASS_ROOT + "--" + options.type, CLASS_ROOT + "--" + options.direction, options.drag && CLASS_ROOT + "--draggable", options.isNavigation && CLASS_ROOT + "--nav", CLASS_ACTIVE];
     }
 
+    function isTab() {
+      return !!(options.pagination || options.isNavigation || Splide2.splides.some(function (target) {
+        return !target.isParent && target.splide.options.isNavigation;
+      }));
+    }
+
     return assign(elements, {
       setup: setup,
       mount: mount,
-      destroy: destroy
+      destroy: destroy,
+      isTab: isTab
     });
   }
 
@@ -833,6 +841,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var isNavigation = options.isNavigation,
         updateOnMove = options.updateOnMove,
         i18n = options.i18n;
+    var isTab = Components.Elements.isTab;
     var resolve = Components.Direction.resolve;
     var styles = getAttribute(slide, "style");
     var isClone = slideIndex > -1;
@@ -843,7 +852,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function mount() {
       if (!isClone) {
         slide.id = root.id + "-slide" + pad(index + 1);
-        setAttribute(slide, ROLE, "group");
+        setAttribute(slide, ROLE, isTab() ? "tabpanel" : "group");
         setAttribute(slide, ARIA_ROLEDESCRIPTION, i18n.slide);
         setAttribute(slide, ARIA_LABEL, format(i18n.slideLabel, [index + 1, Splide2.length]));
       }
@@ -872,14 +881,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function initNavigation() {
-      var idx = isClone ? slideIndex : index;
-      var label = format(i18n.slideX, idx + 1);
       var controls = Splide2.splides.map(function (target) {
-        return target.splide.root.id;
+        var Slide2 = target.splide.Components.Slides.getAt(index);
+        return Slide2 ? Slide2.slide.id : "";
       }).join(" ");
-      setAttribute(slide, ARIA_LABEL, label);
+      setAttribute(slide, ARIA_LABEL, format(i18n.slideX, (isClone ? slideIndex : index) + 1));
       setAttribute(slide, ARIA_CONTROLS, controls);
-      setAttribute(slide, ROLE, "menuitem");
+      setAttribute(slide, ROLE, "tab");
       updateActivity(isActive());
     }
 
@@ -904,7 +912,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         toggleClass(slide, CLASS_ACTIVE, active);
 
         if (isNavigation) {
-          setAttribute(slide, ARIA_CURRENT, active || null);
+          setAttribute(slide, ARIA_SELECTED, active || null);
         }
 
         emit(active ? EVENT_ACTIVE : EVENT_INACTIVE, self);
@@ -2477,6 +2485,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var parent = options.pagination === "slider" && Elements.slider || Elements.root;
       var max = hasFocus() ? length : ceil(length / perPage);
       list = create("ul", classes.pagination, parent);
+      setAttribute(list, ROLE, "tablist");
+      setAttribute(list, ARIA_LABEL, i18n.select);
 
       for (var i = 0; i < max; i++) {
         var li = create("li", null, list);
@@ -2484,9 +2494,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           class: classes.page,
           type: "button"
         }, li);
+        var controls = Slides.getIn(i).map(function (Slide) {
+          return Slide.slide.id;
+        });
         var text = !hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
         bind(button, "click", apply(onClick, i));
-        setAttribute(button, ARIA_CONTROLS, Components2.Elements.list.id);
+        setAttribute(li, ROLE, "none");
+        setAttribute(button, ROLE, "tab");
+        setAttribute(button, ARIA_CONTROLS, controls.join(" "));
         setAttribute(button, ARIA_LABEL, format(text, i + 1));
         items.push({
           li: li,
@@ -2513,12 +2528,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       if (prev) {
         removeClass(prev.button, CLASS_ACTIVE);
-        removeAttribute(prev.button, ARIA_CURRENT);
+        removeAttribute(prev.button, ARIA_SELECTED);
       }
 
       if (curr) {
         addClass(curr.button, CLASS_ACTIVE);
-        setAttribute(curr.button, ARIA_CURRENT, true);
+        setAttribute(curr.button, ARIA_SELECTED, true);
       }
 
       emit(EVENT_PAGINATION_UPDATED, {
@@ -2708,6 +2723,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     pause: "Pause autoplay",
     carousel: "carousel",
     slide: "slide",
+    select: "Select slide to show",
     slideLabel: "%s of %s"
   };
   var DEFAULTS = {

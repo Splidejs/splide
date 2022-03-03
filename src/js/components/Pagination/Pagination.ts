@@ -1,4 +1,4 @@
-import { ARIA_CONTROLS, ARIA_CURRENT, ARIA_LABEL } from '../../constants/attributes';
+import { ARIA_CONTROLS, ARIA_LABEL, ARIA_SELECTED, ROLE } from '../../constants/attributes';
 import { CLASS_ACTIVE } from '../../constants/classes';
 import {
   EVENT_MOVE,
@@ -12,7 +12,8 @@ import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import {
-  addClass, apply,
+  addClass,
+  apply,
   ceil,
   create,
   empty,
@@ -58,20 +59,22 @@ export interface PaginationItem {
 }
 
 /**
- * The component for handling previous and next arrows.
+ * The component for the pagination UI (a slide picker).
  *
+ * @link https://www.w3.org/TR/2021/NOTE-wai-aria-practices-1.2-20211129/#grouped-carousel-elements
  * @since 3.0.0
  *
  * @param Splide     - A Splide instance.
  * @param Components - A collection of components.
  * @param options    - Options.
  *
- * @return A Arrows component object.
+ * @return A Pagination component object.
  */
 export function Pagination( Splide: Splide, Components: Components, options: Options ): PaginationComponent {
   const { on, emit, bind, unbind } = EventInterface( Splide );
   const { Slides, Elements, Controller } = Components;
   const { hasFocus, getIndex } = Controller;
+  const { isTab } = Elements;
 
   /**
    * Stores all pagination items.
@@ -127,15 +130,20 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
     const max    = hasFocus() ? length : ceil( length / perPage );
 
     list = create( 'ul', classes.pagination, parent );
+    setAttribute( list, ROLE, 'tablist' );
+    setAttribute( list, ARIA_LABEL, i18n.select );
 
     for ( let i = 0; i < max; i++ ) {
-      const li     = create( 'li', null, list );
-      const button = create( 'button', { class: classes.page, type: 'button' }, li );
-      const text   = ! hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
+      const li       = create( 'li', null, list );
+      const button   = create( 'button', { class: classes.page, type: 'button' }, li );
+      const controls = Slides.getIn( i ).map( Slide => Slide.slide.id );
+      const text     = ! hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
 
       bind( button, 'click', apply( onClick, i ) );
 
-      setAttribute( button, ARIA_CONTROLS, Components.Elements.list.id );
+      setAttribute( li, ROLE, 'none' );
+      setAttribute( button, ROLE, 'tab' );
+      setAttribute( button, ARIA_CONTROLS, controls.join( ' ' ) );
       setAttribute( button, ARIA_LABEL, format( text, i + 1 ) );
 
       items.push( { li, button, page: i } );
@@ -177,12 +185,12 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
 
     if ( prev ) {
       removeClass( prev.button, CLASS_ACTIVE );
-      removeAttribute( prev.button, ARIA_CURRENT );
+      removeAttribute( prev.button, ARIA_SELECTED );
     }
 
     if ( curr ) {
       addClass( curr.button, CLASS_ACTIVE );
-      setAttribute( curr.button, ARIA_CURRENT, true );
+      setAttribute( curr.button, ARIA_SELECTED, true );
     }
 
     emit( EVENT_PAGINATION_UPDATED, { list, items }, prev, curr );

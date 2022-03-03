@@ -63,6 +63,7 @@ export interface ElementCollection {
  * @since 3.0.0
  */
 export interface ElementsComponent extends BaseComponent, ElementCollection {
+  isTab(): boolean;
 }
 
 /**
@@ -211,9 +212,24 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
     ];
   }
 
+  /**
+   * Indicates whether the slide should be implemented as "Tabbed Carousel" or not.
+   * The last condition checks if one of sync targets behaves as a navigation for this slider or not.
+   *
+   * @todo hasNavigation
+   *
+   * @return `true` if the slider should be tabbed, or otherwise `false`.
+   */
+  function isTab(): boolean {
+    return !! ( options.pagination || options.isNavigation || Splide.splides.some( target => {
+      return ! target.isParent && target.splide.options.isNavigation;
+    } ) );
+  }
+
   return assign( elements, {
     setup,
     mount,
     destroy,
+    isTab,
   } );
 }
