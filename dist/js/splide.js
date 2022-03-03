@@ -283,18 +283,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     });
   }
 
-  function measure(parent, value) {
-    if (isString(value)) {
-      var div = create("div", {
-        style: "width: " + value + "; position: absolute;"
-      }, parent);
-      value = rect(div).width;
-      remove(div);
-    }
-
-    return value;
-  }
-
   function parseHtml(html) {
     return child(new DOMParser().parseFromString(html, "text/html").body);
   }
@@ -1322,10 +1310,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       if (!Splide2.is(LOOP)) {
         clones2 = 0;
       } else if (!clones2) {
-        var fixedSize = measure(Elements.list, options[resolve("fixedWidth")]);
+        var fixedSize = options[resolve("fixedWidth")] && Components2.Layout.slideSize(0);
         var fixedCount = fixedSize && ceil(rect(Elements.track)[resolve("width")] / fixedSize);
-        var baseCount = fixedCount || options[resolve("autoWidth")] && Splide2.length || options.perPage;
-        clones2 = baseCount * (options.drag ? (options.flickMaxPages || 1) + 1 : 2);
+        clones2 = fixedCount || options[resolve("autoWidth")] && Splide2.length || options.perPage;
       }
 
       return clones2;
