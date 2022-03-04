@@ -1,10 +1,9 @@
 import {
   ALL_ATTRIBUTES,
-  ARIA_CONTROLS,
+  ARIA_CONTROLS, ARIA_CURRENT,
   ARIA_HIDDEN,
   ARIA_LABEL,
   ARIA_ROLEDESCRIPTION,
-  ARIA_SELECTED,
   ROLE,
   TAB_INDEX,
 } from '../../constants/attributes';
@@ -40,10 +39,12 @@ import {
   ceil,
   child,
   floor,
+  focus,
   format,
   getAttribute,
   hasClass,
   min,
+  nextTick,
   pad,
   queryAll,
   rect,
@@ -87,12 +88,11 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   const { on, emit, bind, destroy: destroyEvents } = EventInterface( Splide );
   const { Components, root, options } = Splide;
   const { isNavigation, updateOnMove, i18n } = options;
-  const { isTab } = Components.Elements;
   const { resolve } = Components.Direction;
   const styles         = getAttribute( slide, 'style' );
   const isClone        = slideIndex > -1;
   const container      = child( slide, `.${ CLASS_CONTAINER }` );
-  const focusableNodes = options.focusableNodes && queryAll( slide, options.focusableNodes );
+  const focusableNodes = queryAll( slide, options.focusableNodes || '' );
 
   /**
    * Turns into `true` when the component is destroyed.
@@ -105,8 +105,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   function mount( this: SlideComponent ): void {
     if ( ! isClone ) {
       slide.id = `${ root.id }-slide${ pad( index + 1 ) }`;
-
-      setAttribute( slide, ROLE, isTab() ? 'tabpanel' : 'group' );
+      setAttribute( slide, ROLE, options.pagination ? 'tabpanel' : 'group' );
       setAttribute( slide, ARIA_ROLEDESCRIPTION, i18n.slide );
       setAttribute( slide, ARIA_LABEL, format( i18n.slideLabel, [ index + 1, Splide.length ] ) );
     }
@@ -152,7 +151,6 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
 
     setAttribute( slide, ARIA_LABEL, format( i18n.slideX, ( isClone ? slideIndex : index ) + 1 ) );
     setAttribute( slide, ARIA_CONTROLS, controls );
-
     updateActivity( isActive() );
   }
 
@@ -170,13 +168,13 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    */
   function update(): void {
     if ( ! destroyed ) {
-      const { index: currIndex } = Splide;
+      const { index: curr } = Splide;
 
       updateActivity( isActive() );
       updateVisibility( isVisible() );
 
-      toggleClass( slide, CLASS_PREV, index === currIndex - 1 );
-      toggleClass( slide, CLASS_NEXT, index === currIndex + 1 );
+      toggleClass( slide, CLASS_PREV, index === curr - 1 );
+      toggleClass( slide, CLASS_NEXT, index === curr + 1 );
     }
   }
 
@@ -188,11 +186,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   function updateActivity( active: boolean ): void {
     if ( active !== hasClass( slide, CLASS_ACTIVE ) ) {
       toggleClass( slide, CLASS_ACTIVE, active );
-
-      if ( isNavigation ) {
-        setAttribute( slide, ARIA_SELECTED, active || '' );
-      }
-
+      setAttribute( slide, ARIA_CURRENT, isNavigation && active || '' );
       emit( active ? EVENT_ACTIVE : EVENT_INACTIVE, self );
     }
   }
@@ -205,6 +199,10 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   function updateVisibility( visible: boolean ): void {
     const hidden = ! visible && ( ! isActive() || isClone );
 
+    if ( document.activeElement === slide && hidden ) {
+      nextTick( forwardFocus );
+    }
+
     setAttribute( slide, ARIA_HIDDEN, hidden || '' );
     setAttribute( slide, TAB_INDEX, ! hidden && options.slideFocus ? 0 : '' );
     setAttribute( focusableNodes || [], TAB_INDEX, hidden ? -1 : '' );
@@ -212,6 +210,18 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
     if ( visible !== hasClass( slide, CLASS_VISIBLE ) ) {
       toggleClass( slide, CLASS_VISIBLE, visible );
       emit( visible ? EVENT_VISIBLE : EVENT_HIDDEN, self );
+    }
+  }
+
+  /**
+   * Forwards the focus to the active element.
+   * Avoid losing focus from the slider when the focused slide gets hidden by slider move.
+   */
+  function forwardFocus(): void {
+    const Slide = Components.Slides.getAt( Splide.index );
+
+    if ( Slide ) {
+      focus( Slide.slide );
     }
   }
 

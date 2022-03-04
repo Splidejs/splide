@@ -10,5 +10,5 @@ import { slice } from '../../arrayLike';
  * @return An array with matched elements.
  */
 export function queryAll<E extends Element = Element>( parent: Element | Document, selector: string ): E[] {
-  return slice<E>( parent.querySelectorAll( selector ) );
+  return selector ? slice<E>( parent.querySelectorAll( selector ) ) : [];
 }

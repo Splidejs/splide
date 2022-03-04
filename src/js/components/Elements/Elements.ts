@@ -63,7 +63,6 @@ export interface ElementCollection {
  * @since 3.0.0
  */
 export interface ElementsComponent extends BaseComponent, ElementCollection {
-  isTab(): boolean;
 }
 
 /**
@@ -78,7 +77,7 @@ export interface ElementsComponent extends BaseComponent, ElementCollection {
  * @return An Elements component object.
  */
 export function Elements( Splide: Splide, Components: Components, options: Options ): ElementsComponent {
-  const { on } = EventInterface( Splide );
+  const { on, bind } = EventInterface( Splide );
   const { root } = Splide;
   const { i18n } = options;
   const elements: ElementCollection = {} as ElementCollection;
@@ -212,21 +211,9 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
     ];
   }
 
-  /**
-   * Indicates whether the slide should be implemented as "Tabbed Carousel" or not.
-   *
-   * @todo remove this
-   *
-   * @return `true` if the slider should be tabbed, or otherwise `false`.
-   */
-  function isTab(): boolean {
-    return !! options.pagination;
-  }
-
   return assign( elements, {
     setup,
     mount,
     destroy,
-    isTab,
   } );
 }

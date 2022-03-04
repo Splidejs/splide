@@ -26,14 +26,13 @@ export const CLASS_PREV            = 'is-prev';
 export const CLASS_NEXT            = 'is-next';
 export const CLASS_VISIBLE         = 'is-visible';
 export const CLASS_LOADING         = 'is-loading';
-export const CLASS_FOCUS           = 'has-focus';
 
 /**
  * The array with all status classes.
  *
  * @since 3.0.0
  */
-export const STATUS_CLASSES = [ CLASS_ACTIVE, CLASS_VISIBLE, CLASS_PREV, CLASS_NEXT, CLASS_LOADING, CLASS_FOCUS ];
+export const STATUS_CLASSES = [ CLASS_ACTIVE, CLASS_VISIBLE, CLASS_PREV, CLASS_NEXT, CLASS_LOADING ];
 
 /**
  * The collection of classes for elements that Splide dynamically creates.

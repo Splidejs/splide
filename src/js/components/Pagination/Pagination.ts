@@ -1,5 +1,5 @@
 import { ARIA_CONTROLS, ARIA_LABEL, ARIA_SELECTED, ROLE, TAB_INDEX } from '../../constants/attributes';
-import { CLASS_ACTIVE, CLASS_FOCUS } from '../../constants/classes';
+import { CLASS_ACTIVE } from '../../constants/classes';
 import {
   EVENT_MOVE,
   EVENT_PAGINATION_MOUNTED,
@@ -133,8 +133,6 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
 
     list = create( 'ul', classes.pagination, parent );
 
-    bind( list, 'focusin', apply( addClass, list, CLASS_FOCUS ) );
-    bind( list, 'focusout', apply( removeClass, list, CLASS_FOCUS ) );
     setAttribute( list, ROLE, 'tablist' );
     setAttribute( list, ARIA_LABEL, i18n.select );
 

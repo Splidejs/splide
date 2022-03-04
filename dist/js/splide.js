@@ -301,7 +301,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   function queryAll(parent, selector) {
-    return slice(parent.querySelectorAll(selector));
+    return selector ? slice(parent.querySelectorAll(selector)) : [];
   }
 
   function removeClass(elm, classes) {
@@ -719,8 +719,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var CLASS_NEXT = "is-next";
   var CLASS_VISIBLE = "is-visible";
   var CLASS_LOADING = "is-loading";
-  var CLASS_FOCUS = "has-focus";
-  var STATUS_CLASSES = [CLASS_ACTIVE, CLASS_VISIBLE, CLASS_PREV, CLASS_NEXT, CLASS_LOADING, CLASS_FOCUS];
+  var STATUS_CLASSES = [CLASS_ACTIVE, CLASS_VISIBLE, CLASS_PREV, CLASS_NEXT, CLASS_LOADING];
   var CLASSES = {
     slide: CLASS_SLIDE,
     clone: CLASS_CLONE,
@@ -735,7 +734,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
   function Elements(Splide2, Components2, options) {
     var _EventInterface = EventInterface(Splide2),
-        on = _EventInterface.on;
+        on = _EventInterface.on,
+        bind = _EventInterface.bind;
 
     var root = Splide2.root;
     var i18n = options.i18n;
@@ -811,15 +811,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       return [CLASS_ROOT + "--" + options.type, CLASS_ROOT + "--" + options.direction, options.drag && CLASS_ROOT + "--draggable", options.isNavigation && CLASS_ROOT + "--nav", CLASS_ACTIVE];
     }
 
-    function isTab() {
-      return !!options.pagination;
-    }
-
     return assign(elements, {
       setup: setup,
       mount: mount,
-      destroy: destroy,
-      isTab: isTab
+      destroy: destroy
     });
   }
 
@@ -840,18 +835,17 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var isNavigation = options.isNavigation,
         updateOnMove = options.updateOnMove,
         i18n = options.i18n;
-    var isTab = Components.Elements.isTab;
     var resolve = Components.Direction.resolve;
     var styles = getAttribute(slide, "style");
     var isClone = slideIndex > -1;
     var container = child(slide, "." + CLASS_CONTAINER);
-    var focusableNodes = options.focusableNodes && queryAll(slide, options.focusableNodes);
+    var focusableNodes = queryAll(slide, options.focusableNodes || "");
     var destroyed;
 
     function mount() {
       if (!isClone) {
         slide.id = root.id + "-slide" + pad(index + 1);
-        setAttribute(slide, ROLE, isTab() ? "tabpanel" : "group");
+        setAttribute(slide, ROLE, options.pagination ? "tabpanel" : "group");
         setAttribute(slide, ARIA_ROLEDESCRIPTION, i18n.slide);
         setAttribute(slide, ARIA_LABEL, format(i18n.slideLabel, [index + 1, Splide2.length]));
       }
@@ -897,28 +891,29 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function update() {
       if (!destroyed) {
-        var currIndex = Splide2.index;
+        var curr = Splide2.index;
         updateActivity(isActive());
         updateVisibility(isVisible());
-        toggleClass(slide, CLASS_PREV, index === currIndex - 1);
-        toggleClass(slide, CLASS_NEXT, index === currIndex + 1);
+        toggleClass(slide, CLASS_PREV, index === curr - 1);
+        toggleClass(slide, CLASS_NEXT, index === curr + 1);
       }
     }
 
     function updateActivity(active) {
       if (active !== hasClass(slide, CLASS_ACTIVE)) {
         toggleClass(slide, CLASS_ACTIVE, active);
-
-        if (isNavigation) {
-          setAttribute(slide, ARIA_SELECTED, active || "");
-        }
-
+        setAttribute(slide, ARIA_CURRENT, isNavigation && active || "");
         emit(active ? EVENT_ACTIVE : EVENT_INACTIVE, self);
       }
     }
 
     function updateVisibility(visible) {
       var hidden = !visible && (!isActive() || isClone);
+
+      if (document.activeElement === slide && hidden) {
+        nextTick(forwardFocus);
+      }
+
       setAttribute(slide, ARIA_HIDDEN, hidden || "");
       setAttribute(slide, TAB_INDEX, !hidden && options.slideFocus ? 0 : "");
       setAttribute(focusableNodes || [], TAB_INDEX, hidden ? -1 : "");
@@ -926,6 +921,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       if (visible !== hasClass(slide, CLASS_VISIBLE)) {
         toggleClass(slide, CLASS_VISIBLE, visible);
         emit(visible ? EVENT_VISIBLE : EVENT_HIDDEN, self);
+      }
+    }
+
+    function forwardFocus() {
+      var Slide2 = Components.Slides.getAt(Splide2.index);
+
+      if (Slide2) {
+        focus(Slide2.slide);
       }
     }
 
@@ -2492,8 +2495,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var parent = options.pagination === "slider" && Elements.slider || Elements.root;
       var max = hasFocus() ? length : ceil(length / perPage);
       list = create("ul", classes.pagination, parent);
-      bind(list, "focusin", apply(addClass, list, CLASS_FOCUS));
-      bind(list, "focusout", apply(removeClass, list, CLASS_FOCUS));
       setAttribute(list, ROLE, "tablist");
       setAttribute(list, ARIA_LABEL, i18n.select);
 
