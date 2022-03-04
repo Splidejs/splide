@@ -43,14 +43,14 @@ describe( 'Pagination', () => {
     const items  = document.getElementsByClassName( CLASS_PAGINATION_PAGE );
 
     expect( items[ 0 ].classList.contains( CLASS_ACTIVE ) ).toBe( true );
-    expect( items[ 0 ].getAttribute( 'aria-current' ) ).toBe( 'true' );
+    expect( items[ 0 ].getAttribute( 'aria-selected' ) ).toBe( 'true' );
 
     splide.go( 2 );
 
     expect( items[ 0 ].classList.contains( CLASS_ACTIVE ) ).toBe( false );
-    expect( items[ 0 ].getAttribute( 'aria-current' ) ).toBeNull();
+    expect( items[ 0 ].getAttribute( 'aria-selected' ) ).toBeNull();
     expect( items[ 2 ].classList.contains( CLASS_ACTIVE ) ).toBe( true );
-    expect( items[ 2 ].getAttribute( 'aria-current' ) ).toBe( 'true' );
+    expect( items[ 2 ].getAttribute( 'aria-selected' ) ).toBe( 'true' );
   } );
 
   test( 'can update status classes by the page.', () => {
@@ -60,23 +60,12 @@ describe( 'Pagination', () => {
     splide.go( 4 ); // page: 1
 
     expect( items[ 1 ].classList.contains( CLASS_ACTIVE ) ).toBe( true );
-    expect( items[ 1 ].getAttribute( 'aria-current' ) ).toBe( 'true' );
+    expect( items[ 1 ].getAttribute( 'aria-selected' ) ).toBe( 'true' );
 
     splide.go( 7 ); // end page
 
     expect( items[ 3 ].classList.contains( CLASS_ACTIVE ) ).toBe( true );
-    expect( items[ 3 ].getAttribute( 'aria-current' ) ).toBe( 'true' );
-  } );
-
-  test( 'can set focus to the selected slide.', () => {
-    const splide = init( { speed: 0 } );
-    const items  = document.getElementsByClassName( CLASS_PAGINATION_PAGE );
-
-    fire( items[ 0 ], 'click' );
-    expect( splide.Components.Slides.getAt( 0 ).slide ).toBe( document.activeElement );
-
-    fire( items[ 1 ], 'click' );
-    expect( splide.Components.Slides.getAt( 1 ).slide ).toBe( document.activeElement );
+    expect( items[ 3 ].getAttribute( 'aria-selected' ) ).toBe( 'true' );
   } );
 
   test( 'should not create pagination if slides are not enough to the perPage option.', () => {

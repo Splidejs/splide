@@ -77,7 +77,7 @@ export interface ElementsComponent extends BaseComponent, ElementCollection {
  * @return An Elements component object.
  */
 export function Elements( Splide: Splide, Components: Components, options: Options ): ElementsComponent {
-  const { on, bind } = EventInterface( Splide );
+  const { on } = EventInterface( Splide );
   const { root } = Splide;
   const { i18n } = options;
   const elements: ElementCollection = {} as ElementCollection;

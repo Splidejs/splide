@@ -1,5 +1,13 @@
-import { ARIA_CONTROLS, ARIA_LABEL, ARIA_SELECTED, ROLE, TAB_INDEX } from '../../constants/attributes';
+import {
+  ARIA_CONTROLS,
+  ARIA_LABEL,
+  ARIA_ORIENTATION,
+  ARIA_SELECTED,
+  ROLE,
+  TAB_INDEX,
+} from '../../constants/attributes';
 import { CLASS_ACTIVE } from '../../constants/classes';
+import { TTB } from '../../constants/directions';
 import {
   EVENT_MOVE,
   EVENT_PAGINATION_MOUNTED,
@@ -135,6 +143,7 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
 
     setAttribute( list, ROLE, 'tablist' );
     setAttribute( list, ARIA_LABEL, i18n.select );
+    setAttribute( list, ARIA_ORIENTATION, options.direction === TTB ? 'vertical' : '' );
 
     for ( let i = 0; i < max; i++ ) {
       const li       = create( 'li', null, list );
@@ -180,7 +189,7 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
     const { length } = items;
     const key = normalizeKey( e );
 
-    let nextPage = -1
+    let nextPage = -1;
 
     if ( key === resolve( 'ArrowRight' ) ) {
       nextPage = ++page % length;
@@ -196,7 +205,7 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
 
     if ( item ) {
       focus( item.button );
-      go( `>${ page }` );
+      go( `>${ nextPage }` );
       prevent( e, true );
     }
   }

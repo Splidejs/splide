@@ -3,7 +3,7 @@ import { EVENT_MOVE, EVENT_UPDATED } from '../../constants/events';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { includes, nextTick, setAttribute } from '../../utils';
+import { nextTick, setAttribute } from '../../utils';
 import { normalizeKey } from '../../utils/dom/normalizeKey/normalizeKey';
 
 

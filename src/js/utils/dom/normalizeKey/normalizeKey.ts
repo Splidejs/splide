@@ -7,7 +7,7 @@ import { isString } from '../../type/type';
  * @since 3.7.0
  */
 export const NORMALIZATION_MAP = {
-  spacebar: ' ',
+  Spacebar: ' ',
   Right   : 'ArrowRight',
   Left    : 'ArrowLeft',
   Up      : 'ArrowUp',

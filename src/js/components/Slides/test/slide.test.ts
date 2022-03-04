@@ -205,17 +205,41 @@ describe( 'Slide', () => {
     expect( Clone.isWithin( 0, 1 ) ).toBe( true );
   } );
 
-  test( 'can assign the role and aria attributes.', () => {
-    const splide = init( { speed: 0, isNavigation: true } );
+
+  test( 'should assign the tabpanel role without `aria-roledescription` if the pagination option is enabled.', () => {
+    const splide = init( { pagination: true } );
+
+    splide.Components.Slides.forEach( ( { slide } ) => {
+      expect( slide.getAttribute( 'role' ) ).toBe( 'tabpanel' );
+      expect( slide.getAttribute( 'aria-roledescription' ) ).toBeNull();
+    } );
+  } );
+
+  test( 'should assign assign group tab role with `aria-roledescription` if the pagination option is disabled.', () => {
+    const splide = init( { pagination: false } );
+
+    splide.Components.Slides.forEach( ( { slide } ) => {
+      expect( slide.getAttribute( 'role' ) ).toBe( 'group' );
+      expect( slide.getAttribute( 'aria-roledescription' ) ).toBe( splide.options.i18n.slide );
+    } );
+  } );
+
+  test( 'can assign and update role/aria attributes for navigation.', () => {
+    const splide = init( { speed: 0, isNavigation: true, pagination: false } );
     const { Slides } = splide.Components;
     const Slide0 = Slides.getAt( 0 );
     const Slide1 = Slides.getAt( 1 );
 
-    expect( Slide0.slide.getAttribute( 'role' ) ).toBe( 'menuitem' );
+    expect( Slide0.slide.getAttribute( 'aria-current' ) ).toBe( 'true' );
     expect( Slide0.slide.getAttribute( 'aria-label' ) ).toBe( format( splide.options.i18n.slideX, 1 ) );
 
-    expect( Slide1.slide.getAttribute( 'role' ) ).toBe( 'menuitem' );
+    expect( Slide1.slide.getAttribute( 'aria-current' ) ).toBeNull();
     expect( Slide1.slide.getAttribute( 'aria-label' ) ).toBe( format( splide.options.i18n.slideX, 2 ) );
+
+    splide.go( 1 );
+
+    expect( Slide0.slide.getAttribute( 'aria-current' ) ).toBeNull();
+    expect( Slide1.slide.getAttribute( 'aria-current' ) ).toBe( 'true' );
   } );
 
   test( 'can emit the `click` event on click.', done => {

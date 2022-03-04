@@ -122,17 +122,17 @@ describe( 'LazyLoad in the `nearby` mode', () => {
   } );
 
   test( 'can start loading images of previous slides in the loop mode.', () => {
-    const splide = init( { type: 'loop', lazyLoad: true }, { src: false, dataSrc: true } );
+    const splide = init( { type: 'loop', lazyLoad: true, perPage: 3 }, { src: false, dataSrc: true } );
     const prev1  = splide.Components.Slides.getAt( -1 );
     const prev2  = splide.Components.Slides.getAt( -2 );
     const last1  = splide.Components.Slides.getAt( splide.length - 1 );
     const last2  = splide.Components.Slides.getAt( splide.length - 2 );
 
     expect( prev1.slide.querySelector( 'img' ).src ).toBe( `${ URL }/${ splide.length - 1 }.jpg` );
-    expect( prev2.slide.querySelector( 'img' ).src ).toBe( '' );
+    expect( prev2.slide.querySelector( 'img' ).src ).toBe( `${ URL }/${ splide.length - 2 }.jpg` );
 
     expect( last1.slide.querySelector( 'img' ).src ).toBe( `${ URL }/${ splide.length - 1 }.jpg` );
-    expect( last2.slide.querySelector( 'img' ).src ).toBe( '' );
+    expect( last2.slide.querySelector( 'img' ).src ).toBe( `${ URL }/${ splide.length - 2 }.jpg` );
   } );
 
   test( 'should not start loading an image if the slide is not close to the current location.', () => {

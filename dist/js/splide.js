@@ -734,8 +734,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
   function Elements(Splide2, Components2, options) {
     var _EventInterface = EventInterface(Splide2),
-        on = _EventInterface.on,
-        bind = _EventInterface.bind;
+        on = _EventInterface.on;
 
     var root = Splide2.root;
     var i18n = options.i18n;
@@ -834,7 +833,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         options = Splide2.options;
     var isNavigation = options.isNavigation,
         updateOnMove = options.updateOnMove,
-        i18n = options.i18n;
+        i18n = options.i18n,
+        pagination = options.pagination;
     var resolve = Components.Direction.resolve;
     var styles = getAttribute(slide, "style");
     var isClone = slideIndex > -1;
@@ -844,8 +844,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function mount() {
       if (!isClone) {
         slide.id = root.id + "-slide" + pad(index + 1);
-        setAttribute(slide, ROLE, options.pagination ? "tabpanel" : "group");
-        setAttribute(slide, ARIA_ROLEDESCRIPTION, i18n.slide);
+        setAttribute(slide, ROLE, pagination ? "tabpanel" : "group");
+        setAttribute(slide, ARIA_ROLEDESCRIPTION, pagination ? "" : i18n.slide);
         setAttribute(slide, ARIA_LABEL, format(i18n.slideLabel, [index + 1, Splide2.length]));
       }
 
@@ -2237,7 +2237,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   var NORMALIZATION_MAP = {
-    spacebar: " ",
+    Spacebar: " ",
     Right: "ArrowRight",
     Left: "ArrowLeft",
     Up: "ArrowUp",
@@ -2496,6 +2496,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       list = create("ul", classes.pagination, parent);
       setAttribute(list, ROLE, "tablist");
       setAttribute(list, ARIA_LABEL, i18n.select);
+      setAttribute(list, ARIA_ORIENTATION, options.direction === TTB ? "vertical" : "");
 
       for (var i = 0; i < max; i++) {
         var li = create("li", null, list);
@@ -2545,7 +2546,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       if (item) {
         focus(item.button);
-        go(">" + page);
+        go(">" + nextPage);
         prevent(e, true);
       }
     }

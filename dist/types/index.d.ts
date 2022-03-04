@@ -261,6 +261,7 @@ declare const I18N: {
     pause: string;
     carousel: string;
     slide: string;
+    select: string;
     slideLabel: string;
 };
 
@@ -786,70 +787,57 @@ declare type SlidesPredicate = (Slide: SlideComponent, index: number, Slides: Sl
 declare type SlideMatcher = number | number[] | string | SlidesPredicate;
 
 /**
- * The interface for the EventBus instance.
- *
- * @since 3.0.0
- */
-interface EventBusObject {
-    on(events: string | string[], callback: EventBusCallback, key?: object, priority?: number): void;
-    off(events: string | string[], key?: object): void;
-    offBy(key: object): void;
-    emit(event: string, ...args: any[]): void;
-    destroy(): void;
-}
-/**
- * The interface for each event handler object.
- *
- * @since 3.0.0
- */
-declare type EventHandler = [AnyFunction, string, number, object?];
-/**
- * The type for a callback function of the EventBus.
- *
- * @since 3.0.0
- */
-declare type EventBusCallback = AnyFunction;
-/**
- * The constructor to provided a simple event system.
- *
- * @since 3.0.0
- *
- * @return An EventBus object.
- */
-declare function EventBus(): EventBusObject;
-
-/**
  * The type for an EventTarget or an array with EventTarget objects.
  *
  * @since 3.7.0
  */
 declare type EventTargets = EventTarget | EventTarget[];
 /**
+ * The interface for the EventBinder object.
+ *
+ * @since 3.0.0
+ */
+interface EventBinderObject {
+    bind(target: EventTargets, events: string | string[], callback: AnyFunction, options?: AddEventListenerOptions): void;
+    unbind(target: EventTarget | EventTarget[], events: string | string[], callback?: AnyFunction): void;
+    dispatch<T>(target: EventTarget, event: string, detail?: T): void;
+    destroy(): void;
+}
+/**
+ * The constructor function to provide methods to subscribe native events.
+ *
+ * @since 3.7.0
+ * @constructor
+ *
+ * @return An EventBinder object.
+ */
+declare function EventBinder(): EventBinderObject;
+
+/**
  * The interface for the EventInterface object.
  *
  * @since 3.0.0
  */
-interface EventInterfaceObject {
-    on<K extends keyof EventMap>(event: K, callback: EventMap[K], priority?: number): void;
-    on(events: string | string[], callback: EventBusCallback, priority?: number): void;
+interface EventInterfaceObject extends EventBinderObject {
+    on<K extends keyof EventMap>(event: K, callback: EventMap[K]): void;
+    on(events: string | string[], callback: AnyFunction): void;
     off<K extends keyof EventMap>(events: K | K[] | string | string[]): void;
     emit<K extends keyof EventMap>(event: K, ...args: Parameters<EventMap[K]>): void;
     emit(event: string, ...args: any[]): void;
-    bind(target: EventTargets, events: string, callback: AnyFunction, options?: AddEventListenerOptions): void;
-    unbind(target: EventTarget | EventTarget[], events: string, callback?: AnyFunction): void;
-    destroy(): void;
+    /** @internal */
+    bus: DocumentFragment;
 }
 /**
- * The function that provides interface for internal and native events.
+ * The constructor function that provides interface for internal and native events.
  *
  * @since 3.0.0
+ * @constructor
  *
  * @param Splide - A Splide instance.
- * @param manual - Optional. Whether to destroy the interface manually or not.
  *
  * @return A collection of interface functions.
  */
-declare function EventInterface(Splide: Splide, manual?: boolean): EventInterfaceObject;
+declare function EventInterface(Splide?: Splide): EventInterfaceObject;
 
 /**
  * The interface for the returning value of the RequestInterval.
@@ -938,7 +926,7 @@ declare class Splide {
     /**
      * The EventBusObject object.
      */
-    readonly event: EventBusObject;
+    readonly event: EventInterfaceObject;
     /**
      * The collection of all component objects.
      */
@@ -1062,7 +1050,7 @@ declare class Splide {
      * @return `this`
      */
     on<K extends keyof EventMap>(events: K, callback: EventMap[K]): this;
-    on(events: string | string[], callback: EventBusCallback): this;
+    on(events: string | string[], callback: AnyFunction): this;
     /**
      * Removes the registered all handlers for the specified event or events.
      * If you want to only remove a particular handler, use namespace to identify it.
@@ -1586,7 +1574,6 @@ declare const CLASS_AUTOPLAY: string;
 declare const CLASS_PLAY: string;
 declare const CLASS_PAUSE: string;
 declare const CLASS_SPINNER: string;
-declare const CLASS_SR: string;
 declare const CLASS_INITIALIZED = "is-initialized";
 declare const CLASS_ACTIVE = "is-active";
 declare const CLASS_PREV = "is-prev";
@@ -1616,4 +1603,4 @@ declare const CLASSES: {
     spinner: string;
 };
 
-export { AnyFunction, ArrowsComponent, AutoplayComponent, BaseComponent, CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_AUTOPLAY, CLASS_CLONE, CLASS_CONTAINER, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PAUSE, CLASS_PLAY, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SLIDER, CLASS_SPINNER, CLASS_SR, CLASS_TRACK, CLASS_VISIBLE, Cast, ClonesComponent, ComponentConstructor, Components, ControllerComponent, CoverComponent, DirectionComponent, DragComponent, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MEDIA, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, ElementsComponent, EventBus, EventBusCallback, EventBusObject, EventHandler, EventInterface, EventInterfaceObject, EventMap, Head, KeyboardComponent, LayoutComponent, LazyLoadComponent, LiveComponent, MediaComponent, MoveComponent, Options, PaginationComponent, PaginationData, PaginationItem, Push, RequestInterval, RequestIntervalInterface, Resolve, ResponsiveOptions, STATUS_CLASSES, ScrollComponent, Shift, ShiftN, SlideComponent, SlidesComponent, Splide, SplideRenderer, State, StateObject, SyncComponent, SyncTarget, Throttle, ThrottleInstance, TransitionComponent, WheelComponent, Splide as default };
+export { AnyFunction, ArrowsComponent, AutoplayComponent, BaseComponent, CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_AUTOPLAY, CLASS_CLONE, CLASS_CONTAINER, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PAUSE, CLASS_PLAY, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SLIDER, CLASS_SPINNER, CLASS_TRACK, CLASS_VISIBLE, Cast, ClonesComponent, ComponentConstructor, Components, ControllerComponent, CoverComponent, DirectionComponent, DragComponent, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MEDIA, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, ElementsComponent, EventBinder, EventBinderObject, EventInterface, EventInterfaceObject, EventMap, Head, KeyboardComponent, LayoutComponent, LazyLoadComponent, LiveComponent, MediaComponent, MoveComponent, Options, PaginationComponent, PaginationData, PaginationItem, Push, RequestInterval, RequestIntervalInterface, Resolve, ResponsiveOptions, STATUS_CLASSES, ScrollComponent, Shift, ShiftN, SlideComponent, SlidesComponent, Splide, SplideRenderer, State, StateObject, SyncComponent, SyncTarget, Throttle, ThrottleInstance, TransitionComponent, WheelComponent, Splide as default };
