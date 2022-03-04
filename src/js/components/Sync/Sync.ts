@@ -1,4 +1,4 @@
-import { ARIA_ORIENTATION, ROLE } from '../../constants/attributes';
+import { ARIA_ORIENTATION } from '../../constants/attributes';
 import { TTB } from '../../constants/directions';
 import {
   EVENT_CLICK,
@@ -109,7 +109,6 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
     on( EVENT_SLIDE_KEYDOWN, onKeydown );
     on( [ EVENT_MOUNTED, EVENT_UPDATED ], update );
 
-    setAttribute( list, ROLE, 'tablist' );
     events.push( event );
     event.emit( EVENT_NAVIGATION_MOUNTED, Splide.splides );
   }
@@ -118,7 +117,7 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
    * Update attributes.
    */
   function update(): void {
-    setAttribute( list, ARIA_ORIENTATION, options.direction === TTB ? 'vertical' : null );
+    setAttribute( list, ARIA_ORIENTATION, options.direction === TTB ? 'vertical' : '' );
   }
 
   /**

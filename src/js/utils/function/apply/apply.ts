@@ -11,7 +11,7 @@ import { slice } from '../../arrayLike';
  *
  * @return A function where arguments are bound.
  */
-export function apply<F extends AnyFunction, A extends any[]>(
+export function apply<F extends AnyFunction, A extends any[] = any[]>(
   func: F,
   ...args: A
 ): ( ...args: ShiftN<Parameters<F>, A["length"]> ) => ReturnType<F>;

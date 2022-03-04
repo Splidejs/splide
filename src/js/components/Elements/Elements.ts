@@ -184,7 +184,7 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
     list.id  = list.id || `${ id }-list`;
 
     setAttribute( root, ARIA_ROLEDESCRIPTION, i18n.carousel );
-    setAttribute( root, ROLE, root.tagName !== 'SECTION' && options.role || null );
+    setAttribute( root, ROLE, root.tagName !== 'SECTION' && options.role || '' );
     setAttribute( list, ROLE, 'none' );
   }
 
@@ -214,16 +214,13 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
 
   /**
    * Indicates whether the slide should be implemented as "Tabbed Carousel" or not.
-   * The last condition checks if one of sync targets behaves as a navigation for this slider or not.
    *
-   * @todo hasNavigation
+   * @todo remove this
    *
    * @return `true` if the slider should be tabbed, or otherwise `false`.
    */
   function isTab(): boolean {
-    return !! ( options.pagination || options.isNavigation || Splide.splides.some( target => {
-      return ! target.isParent && target.splide.options.isNavigation;
-    } ) );
+    return !! options.pagination;
   }
 
   return assign( elements, {

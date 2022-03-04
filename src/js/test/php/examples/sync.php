@@ -16,48 +16,50 @@ $settings = get_settings();
 
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
-      var splide01 = new Splide( '#splide01', {
-        width      : 800,
-        type       : 'loop',
-        heightRatio: 0.3,
-        perPage    : 1,
-        waitForTransition: false,
-        breakpoints: {
-          1000: {
-            destroy: true,
-          }
-        },
-      } );
+	    var splide01 = new Splide( '#splide01', {
+		    width      : 800,
+		    type       : 'loop',
+		    heightRatio: 0.3,
+		    perPage    : 1,
+		    pagination : false,
+		    keyboard   : false,
+		    cover: true,
+		    breakpoints: {
+			    1000: {
+				    destroy: true,
+			    },
+		    },
+	    } );
 
-      var splide02 = new Splide( '#splide02', {
-        // type             : 'loop',
-        width            : 600,
-        fixedWidth       : 100,
-        fixedHeight      : 56,
-        gap              : '.7em',
-        isNavigation     : true,
-        focus            : 'center',
-        pagination       : false,
-        rewind           : true,
-        waitForTransition: false,
-        dragMinThreshold: {
-          mouse: 10,
-          touch: 10,
-        },
-      } );
+	    var splide02 = new Splide( '#splide02', {
+		    // type             : 'loop',
+		    width           : 600,
+		    fixedWidth      : 100,
+		    fixedHeight     : 56,
+		    gap             : '.7em',
+		    isNavigation    : true,
+		    focus           : 'center',
+		    pagination      : false,
+		    rewind          : true,
+		    keyboard        : false,
+		    dragMinThreshold: {
+			    mouse: 10,
+			    touch: 10,
+		    },
+	    } );
 
-      var splide03 = new Splide( '#splide03', {
-        width            : 100,
-        type             : 'loop',
-        direction        : 'ttb',
-        height           : 300,
-        fixedWidth       : 100,
-        fixedHeight      : 56,
-        gap              : '.7em',
-        isNavigation     : true,
-        pagination       : false,
-        waitForTransition: false,
-      } );
+	    var splide03 = new Splide( '#splide03', {
+		    width       : 100,
+		    type        : 'loop',
+		    direction   : 'ttb',
+		    height      : 300,
+		    fixedWidth  : 100,
+		    fixedHeight : 56,
+		    gap         : '.7em',
+		    isNavigation: true,
+		    pagination  : false,
+		    keyboard    : false,
+	    } );
 
       splide01.sync( splide02 );
 
@@ -65,9 +67,9 @@ $settings = get_settings();
       splide02.mount();
       splide03.mount();
 
-      splide01.on( 'move', function () { console.log( 1 ) } );
-      splide02.on( 'move', function () { console.log( 2 ) } );
-      splide03.on( 'move', function () { console.log( 3 ) } );
+      // splide01.on( 'move', function () { console.log( 1 ) } );
+      // splide02.on( 'move', function () { console.log( 2 ) } );
+      // splide03.on( 'move', function () { console.log( 3 ) } );
 
       // Attempts to sync after mount.
       splide01.sync( splide03 );
@@ -82,7 +84,7 @@ $settings = get_settings();
       <?php
       for ( $i = 0; $i < 10; $i++ ) {
         echo '<li class="splide__slide">';
-        printf( '<img src="../../assets/images/pics/slide%02d.jpg">', $i + 1 );
+        printf( '<img src="../../assets/images/pics/slide%1$02d.jpg" alt="Alt Slide %1$d">%1$02d', $i + 1 );
         echo '</li>' . PHP_EOL;
       }
       ?>
@@ -96,7 +98,7 @@ $settings = get_settings();
       <?php
       for ( $i = 0; $i < 10; $i++ ) {
         echo '<li class="splide__slide">';
-        printf( '<img src="../../assets/images/pics/slide%02d.jpg">', $i + 1 );
+        printf( '<img src="../../assets/images/pics/slide%1$02d.jpg" alt="Thumbnail %1$d">', $i + 1 );
         echo '</li>' . PHP_EOL;
       }
       ?>
@@ -110,7 +112,7 @@ $settings = get_settings();
       <?php
       for ( $i = 0; $i < 10; $i++ ) {
         echo '<li class="splide__slide">';
-        printf( '<img src="../../assets/images/pics/slide%02d.jpg">', $i + 1 );
+        printf( '<img src="../../assets/images/pics/slide%1$02d.jpg" alt="Thumbnail %1$d">', $i + 1 );
         echo '</li>' . PHP_EOL;
       }
       ?>

@@ -2,10 +2,6 @@ import { setAttribute } from './setAttribute';
 
 
 describe( 'setAttribute', () => {
-  beforeEach( () => {
-    document.body.innerHTML = '<div id="div"></div>';
-  } );
-
   test( 'can set an attribute to an element.', () => {
     const div = document.createElement( 'div' );
 
@@ -48,5 +44,18 @@ describe( 'setAttribute', () => {
 
     expect( div.getAttribute( 'aria-role' ) ).toBe( 'presentation' );
     expect( div.getAttribute( 'contenteditable' ) ).toBe( 'true' );
+  } );
+
+  test( 'can remove an attribute by null or an empty string.', () => {
+    const div = document.createElement( 'div' );
+
+    div.setAttribute( 'aria-hidden', 'true' );
+    div.setAttribute( 'tabindex', '-1' );
+
+    setAttribute( div, 'aria-hidden', '' );
+    setAttribute( div, 'tabindex', null );
+
+    expect( div.getAttribute( 'aria-hidden' ) ).toBeNull();
+    expect( div.getAttribute( 'tabindex' ) ).toBeNull();
   } );
 } );

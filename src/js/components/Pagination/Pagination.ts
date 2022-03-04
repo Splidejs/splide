@@ -232,7 +232,7 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
       const { button } = curr;
       addClass( button, CLASS_ACTIVE );
       setAttribute( button, ARIA_SELECTED, true );
-      setAttribute( button, TAB_INDEX, null );
+      setAttribute( button, TAB_INDEX, '' );
     }
 
     emit( EVENT_PAGINATION_UPDATED, { list, items }, prev, curr );

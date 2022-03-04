@@ -222,7 +222,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       });
     } else {
       forEach(elms, function (elm) {
-        isNull(value) ? removeAttribute(elm, attrs) : elm.setAttribute(attrs, String(value));
+        isNull(value) || value === "" ? removeAttribute(elm, attrs) : elm.setAttribute(attrs, String(value));
       });
     }
   }
@@ -799,7 +799,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       track.id = track.id || id + "-track";
       list.id = list.id || id + "-list";
       setAttribute(root, ARIA_ROLEDESCRIPTION, i18n.carousel);
-      setAttribute(root, ROLE, root.tagName !== "SECTION" && options.role || null);
+      setAttribute(root, ROLE, root.tagName !== "SECTION" && options.role || "");
       setAttribute(list, ROLE, "none");
     }
 
@@ -812,9 +812,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function isTab() {
-      return !!(options.pagination || options.isNavigation || Splide2.splides.some(function (target) {
-        return !target.isParent && target.splide.options.isNavigation;
-      }));
+      return !!options.pagination;
     }
 
     return assign(elements, {
@@ -888,7 +886,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }).join(" ");
       setAttribute(slide, ARIA_LABEL, format(i18n.slideX, (isClone ? slideIndex : index) + 1));
       setAttribute(slide, ARIA_CONTROLS, controls);
-      setAttribute(slide, ROLE, "tab");
       updateActivity(isActive());
     }
 
@@ -913,7 +910,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         toggleClass(slide, CLASS_ACTIVE, active);
 
         if (isNavigation) {
-          setAttribute(slide, ARIA_SELECTED, active || null);
+          setAttribute(slide, ARIA_SELECTED, active || "");
         }
 
         emit(active ? EVENT_ACTIVE : EVENT_INACTIVE, self);
@@ -922,9 +919,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function updateVisibility(visible) {
       var hidden = !visible && (!isActive() || isClone);
-      setAttribute(slide, ARIA_HIDDEN, hidden || null);
-      setAttribute(slide, TAB_INDEX, !hidden && options.slideFocus ? 0 : null);
-      setAttribute(focusableNodes || [], TAB_INDEX, hidden ? -1 : null);
+      setAttribute(slide, ARIA_HIDDEN, hidden || "");
+      setAttribute(slide, TAB_INDEX, !hidden && options.slideFocus ? 0 : "");
+      setAttribute(focusableNodes || [], TAB_INDEX, hidden ? -1 : "");
 
       if (visible !== hasClass(slide, CLASS_VISIBLE)) {
         toggleClass(slide, CLASS_VISIBLE, visible);
@@ -2572,7 +2569,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         var _button = curr.button;
         addClass(_button, CLASS_ACTIVE);
         setAttribute(_button, ARIA_SELECTED, true);
-        setAttribute(_button, TAB_INDEX, null);
+        setAttribute(_button, TAB_INDEX, "");
       }
 
       emit(EVENT_PAGINATION_UPDATED, {
@@ -2635,13 +2632,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       on(EVENT_CLICK, onClick);
       on(EVENT_SLIDE_KEYDOWN, onKeydown);
       on([EVENT_MOUNTED, EVENT_UPDATED], update);
-      setAttribute(list, ROLE, "tablist");
       events.push(event);
       event.emit(EVENT_NAVIGATION_MOUNTED, Splide2.splides);
     }
 
     function update() {
-      setAttribute(list, ARIA_ORIENTATION, options.direction === TTB ? "vertical" : null);
+      setAttribute(list, ARIA_ORIENTATION, options.direction === TTB ? "vertical" : "");
     }
 
     function onClick(Slide) {

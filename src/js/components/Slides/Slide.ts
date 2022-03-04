@@ -152,7 +152,6 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
 
     setAttribute( slide, ARIA_LABEL, format( i18n.slideX, ( isClone ? slideIndex : index ) + 1 ) );
     setAttribute( slide, ARIA_CONTROLS, controls );
-    setAttribute( slide, ROLE, 'tab' )
 
     updateActivity( isActive() );
   }
@@ -191,7 +190,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
       toggleClass( slide, CLASS_ACTIVE, active );
 
       if ( isNavigation ) {
-        setAttribute( slide, ARIA_SELECTED, active || null );
+        setAttribute( slide, ARIA_SELECTED, active || '' );
       }
 
       emit( active ? EVENT_ACTIVE : EVENT_INACTIVE, self );
@@ -206,9 +205,9 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   function updateVisibility( visible: boolean ): void {
     const hidden = ! visible && ( ! isActive() || isClone );
 
-    setAttribute( slide, ARIA_HIDDEN, hidden || null );
-    setAttribute( slide, TAB_INDEX, ! hidden && options.slideFocus ? 0 : null );
-    setAttribute( focusableNodes || [], TAB_INDEX, hidden ? -1 : null );
+    setAttribute( slide, ARIA_HIDDEN, hidden || '' );
+    setAttribute( slide, TAB_INDEX, ! hidden && options.slideFocus ? 0 : '' );
+    setAttribute( focusableNodes || [], TAB_INDEX, hidden ? -1 : '' );
 
     if ( visible !== hasClass( slide, CLASS_VISIBLE ) ) {
       toggleClass( slide, CLASS_VISIBLE, visible );

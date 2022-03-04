@@ -23,7 +23,7 @@ $settings = get_settings();
 	      rewind    : true,
 	      live      : true,
 	      speed     : 1000,
-	      pagination: false,
+	      pagination: true,
 	      arrowPath : 'm13.5 7.01 13 13m-13 13 13-13',
       } );
 
