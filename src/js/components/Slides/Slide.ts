@@ -1,6 +1,7 @@
 import {
   ALL_ATTRIBUTES,
-  ARIA_CONTROLS, ARIA_CURRENT,
+  ARIA_CONTROLS,
+  ARIA_CURRENT,
   ARIA_HIDDEN,
   ARIA_LABEL,
   ARIA_ROLEDESCRIPTION,
@@ -89,10 +90,9 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   const { Components, root, options } = Splide;
   const { isNavigation, updateOnMove, i18n } = options;
   const { resolve } = Components.Direction;
-  const styles         = getAttribute( slide, 'style' );
-  const isClone        = slideIndex > -1;
-  const container      = child( slide, `.${ CLASS_CONTAINER }` );
-  const focusableNodes = queryAll( slide, options.focusableNodes || '' );
+  const styles    = getAttribute( slide, 'style' );
+  const isClone   = slideIndex > -1;
+  const container = child( slide, `.${ CLASS_CONTAINER }` );
 
   /**
    * Turns into `true` when the component is destroyed.
@@ -205,7 +205,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
 
     setAttribute( slide, ARIA_HIDDEN, hidden || '' );
     setAttribute( slide, TAB_INDEX, ! hidden && options.slideFocus ? 0 : '' );
-    setAttribute( focusableNodes || [], TAB_INDEX, hidden ? -1 : '' );
+    setAttribute( queryAll( slide, options.focusableNodes || '' ), TAB_INDEX, hidden ? -1 : '' );
 
     if ( visible !== hasClass( slide, CLASS_VISIBLE ) ) {
       toggleClass( slide, CLASS_VISIBLE, visible );

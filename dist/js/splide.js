@@ -839,7 +839,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var styles = getAttribute(slide, "style");
     var isClone = slideIndex > -1;
     var container = child(slide, "." + CLASS_CONTAINER);
-    var focusableNodes = queryAll(slide, options.focusableNodes || "");
     var destroyed;
 
     function mount() {
@@ -916,7 +915,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       setAttribute(slide, ARIA_HIDDEN, hidden || "");
       setAttribute(slide, TAB_INDEX, !hidden && options.slideFocus ? 0 : "");
-      setAttribute(focusableNodes || [], TAB_INDEX, hidden ? -1 : "");
+      setAttribute(queryAll(slide, options.focusableNodes || ""), TAB_INDEX, hidden ? -1 : "");
 
       if (visible !== hasClass(slide, CLASS_VISIBLE)) {
         toggleClass(slide, CLASS_VISIBLE, visible);
