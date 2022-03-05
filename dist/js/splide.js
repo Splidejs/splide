@@ -49,13 +49,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var MOUNTED = 2;
   var IDLE = 3;
   var MOVING = 4;
-  var DRAGGING = 5;
-  var DESTROYED = 6;
+  var SCROLLING = 5;
+  var DRAGGING = 6;
+  var DESTROYED = 7;
   var STATES = {
     CREATED: CREATED,
     MOUNTED: MOUNTED,
     IDLE: IDLE,
     MOVING: MOVING,
+    SCROLLING: SCROLLING,
     DRAGGING: DRAGGING,
     DESTROYED: DESTROYED
   };
@@ -1357,7 +1359,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function reposition() {
-      if (!isBusy()) {
+      if (!Components2.Controller.isBusy()) {
         Components2.Scroll.cancel();
         jump(Splide2.index);
         emit(EVENT_REPOSITIONED);
@@ -1365,28 +1367,26 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function move(dest, index, prev, callback) {
-      if (!isBusy()) {
-        var set = Splide2.state.set;
-        var position = getPosition();
+      var set = Splide2.state.set;
+      var position = getPosition();
 
-        if (dest !== index) {
-          Transition.cancel();
-          translate(shift(position, dest > index), true);
-        }
-
-        set(MOVING);
-        emit(EVENT_MOVE, index, prev, dest);
-        Transition.start(index, function () {
-          set(IDLE);
-          emit(EVENT_MOVED, index, prev, dest);
-
-          if (options.trimSpace === "move" && dest !== prev && position === getPosition()) {
-            Components2.Controller.go(dest > prev ? ">" : "<", false, callback);
-          } else {
-            callback && callback();
-          }
-        });
+      if (dest !== index) {
+        Transition.cancel();
+        translate(shift(position, dest > index), true);
       }
+
+      set(MOVING);
+      emit(EVENT_MOVE, index, prev, dest);
+      Transition.start(index, function () {
+        set(IDLE);
+        emit(EVENT_MOVED, index, prev, dest);
+
+        if (options.trimSpace === "move" && dest !== prev && position === getPosition()) {
+          Components2.Controller.go(dest > prev ? ">" : "<", false, callback);
+        } else {
+          callback && callback();
+        }
+      });
     }
 
     function jump(index) {
@@ -1474,10 +1474,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       return toPosition(max ? Components2.Controller.getEnd() : 0, !!options.trimSpace);
     }
 
-    function isBusy() {
-      return Splide2.state.is(MOVING) && options.waitForTransition;
-    }
-
     function exceededLimit(max, position) {
       position = isUndefined(position) ? getPosition() : position;
       var exceededMin = max !== true && orient(position) < orient(getLimit(false));
@@ -1496,9 +1492,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       toPosition: toPosition,
       getPosition: getPosition,
       getLimit: getLimit,
-      isBusy: isBusy,
       exceededLimit: exceededLimit,
-      reposition: reposition
+      reposition: reposition,
+      loop: loop
     };
   }
 
@@ -1508,7 +1504,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     var Move = Components2.Move;
     var getPosition = Move.getPosition,
-        getLimit = Move.getLimit;
+        getLimit = Move.getLimit,
+        toPosition = Move.toPosition;
     var _Components2$Slides = Components2.Slides,
         isEnough = _Components2$Slides.isEnough,
         getLength = _Components2$Slides.getLength;
@@ -1540,26 +1537,31 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function go(control, allowSameIndex, callback) {
-      var dest = parse(control);
+      if (!isBusy()) {
+        var dest = parse(control);
 
-      if (options.useScroll) {
-        scroll(dest, true, true, options.speed, callback);
-      } else {
-        var index = loop(dest);
+        if (options.useScroll) {
+          scrollTo(dest, options.speed, callback);
+        } else {
+          var index = loop(dest);
 
-        if (index > -1 && !Move.isBusy() && (allowSameIndex || index !== currIndex)) {
-          setIndex(index);
-          Move.move(dest, index, prevIndex, callback);
+          if (index > -1 && (allowSameIndex || index !== currIndex)) {
+            setIndex(index);
+            Move.move(dest, index, prevIndex, callback);
+          }
         }
       }
     }
 
-    function scroll(destination, useIndex, snap, duration, callback) {
-      var dest = useIndex ? destination : toDest(destination);
-      Components2.Scroll.scroll(useIndex || snap ? Move.toPosition(dest, true) : destination, duration, function () {
+    function scroll(destination, duration, snap, callback) {
+      Components2.Scroll.scroll(destination, duration, snap, function () {
         setIndex(Move.toIndex(Move.getPosition()));
         callback && callback();
       });
+    }
+
+    function scrollTo(index, duration, callback) {
+      scroll(toPosition(index), duration, false, callback);
     }
 
     function parse(control) {
@@ -1676,10 +1678,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       return !isUndefined(options.focus) || options.isNavigation;
     }
 
+    function isBusy() {
+      return Splide2.state.is([MOVING, SCROLLING]) && options.waitForTransition;
+    }
+
     return {
       mount: mount,
       go: go,
       scroll: scroll,
+      scrollTo: scrollTo,
       getNext: getNext,
       getPrev: getPrev,
       getAdjacent: getAdjacent,
@@ -1689,7 +1696,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       toIndex: toIndex,
       toPage: toPage,
       toDest: toDest,
-      hasFocus: hasFocus
+      hasFocus: hasFocus,
+      isBusy: isBusy
     };
   }
 
@@ -1938,60 +1946,66 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         on = _EventInterface11.on,
         emit = _EventInterface11.emit;
 
+    var set = Splide2.state.set;
     var Move = Components2.Move;
     var getPosition = Move.getPosition,
         getLimit = Move.getLimit,
-        exceededLimit = Move.exceededLimit;
+        exceededLimit = Move.exceededLimit,
+        translate = Move.translate;
     var interval;
-    var scrollCallback;
+    var callback;
+    var friction = 1;
 
     function mount() {
       on(EVENT_MOVE, clear);
       on([EVENT_UPDATED, EVENT_REFRESH], cancel);
     }
 
-    function scroll(destination, duration, callback, suppressConstraint) {
-      var start = getPosition();
-      var friction = 1;
-      duration = duration || computeDuration(abs(destination - start));
-      scrollCallback = callback;
+    function scroll(destination, duration, snap, onScrolled, noConstrain) {
+      var from = getPosition();
       clear();
-      interval = RequestInterval(duration, onScrolled, function (rate) {
-        var position = getPosition();
-        var target = start + (destination - start) * easing(rate);
-        var diff = (target - getPosition()) * friction;
-        Move.translate(position + diff);
 
-        if (Splide2.is(SLIDE) && !suppressConstraint && exceededLimit()) {
-          friction *= FRICTION_FACTOR;
+      if (snap) {
+        var size = Components2.Layout.sliderSize();
+        var offset = sign(destination) * size * floor(abs(destination) / size) || 0;
+        destination = Move.toPosition(Components2.Controller.toDest(destination % size)) + offset;
+      }
 
-          if (abs(diff) < BOUNCE_DIFF_THRESHOLD) {
-            bounce(exceededLimit(false));
-          }
-        }
-      }, 1);
+      friction = 1;
+      duration = duration || max(abs(destination - from) / BASE_VELOCITY, MIN_DURATION);
+      callback = onScrolled;
+      interval = RequestInterval(duration, onEnd, apply(update, from, destination, noConstrain), 1);
+      set(SCROLLING);
       emit(EVENT_SCROLL);
       interval.start();
     }
 
-    function bounce(backwards) {
-      scroll(getLimit(!backwards), BOUNCE_DURATION, null, true);
-    }
-
-    function onScrolled() {
+    function onEnd() {
       var position = getPosition();
       var index = Move.toIndex(position);
 
       if (!between(index, 0, Splide2.length - 1)) {
-        Move.translate(Move.shift(position, index > 0), true);
+        translate(Move.shift(position, index > 0), true);
       }
 
-      scrollCallback && scrollCallback();
+      set(IDLE);
+      callback && callback();
       emit(EVENT_SCROLLED);
     }
 
-    function computeDuration(distance) {
-      return max(distance / BASE_VELOCITY, MIN_DURATION);
+    function update(from, to, noConstrain, rate) {
+      var position = getPosition();
+      var target = from + (to - from) * easing(rate);
+      var diff = (target - position) * friction;
+      translate(position + diff);
+
+      if (Splide2.is(SLIDE) && !noConstrain && exceededLimit()) {
+        friction *= FRICTION_FACTOR;
+
+        if (abs(diff) < BOUNCE_DIFF_THRESHOLD) {
+          scroll(getLimit(exceededLimit(true)), BOUNCE_DURATION, false, void 0, true);
+        }
+      }
     }
 
     function clear() {
@@ -2003,7 +2017,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function cancel() {
       if (interval && !interval.isPaused()) {
         clear();
-        onScrolled();
+        onEnd();
       }
     }
 
@@ -2083,9 +2097,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         var isDraggable = !noDrag || !matches(e.target, noDrag);
 
         if (isDraggable && (isTouch || !e.button)) {
-          if (!Move.isBusy()) {
+          if (!Controller.isBusy()) {
             target = isTouch ? track : window;
-            dragging = state.is(MOVING);
+            dragging = state.is([MOVING, SCROLLING]);
             prevBaseEvent = null;
             bind(target, POINTER_MOVE_EVENTS, onPointerMove, SCROLL_LISTENER_OPTIONS);
             bind(target, POINTER_UP_EVENTS, onPointerUp, SCROLL_LISTENER_OPTIONS);
@@ -2159,7 +2173,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var rewind = options.rewind && options.rewindByDrag;
 
       if (isFree) {
-        Controller.scroll(destination);
+        Controller.scrollTo(destination);
       } else if (Splide2.is(FADE)) {
         Controller.go(orient(sign(velocity)) < 0 ? rewind ? "<" : "-" : rewind ? ">" : "+");
       } else if (Splide2.is(SLIDE) && exceeded && rewind) {
@@ -2775,7 +2789,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     pauseOnHover: true,
     pauseOnFocus: true,
     resetProgress: true,
-    keyboard: true,
     easing: "cubic-bezier(0.25, 1, 0.5, 1)",
     drag: true,
     direction: "ltr",

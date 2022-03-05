@@ -1,6 +1,6 @@
 import { EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_MOUNTED, EVENT_UPDATED } from '../../constants/events';
 import { SCROLL_LISTENER_OPTIONS } from '../../constants/listener-options';
-import { DRAGGING, IDLE, MOVING } from '../../constants/states';
+import { DRAGGING, IDLE, MOVING, SCROLLING } from '../../constants/states';
 import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
@@ -122,9 +122,9 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
       const isDraggable = ! noDrag || ! matches( e.target, noDrag );
 
       if ( isDraggable && ( isTouch || ! e.button ) ) {
-        if ( ! Move.isBusy() ) {
+        if ( ! Controller.isBusy() ) {
           target        = isTouch ? track : window;
-          dragging      = state.is( MOVING );
+          dragging      = state.is( [ MOVING, SCROLLING ] );
           prevBaseEvent = null;
 
           bind( target, POINTER_MOVE_EVENTS, onPointerMove, SCROLL_LISTENER_OPTIONS );
@@ -229,7 +229,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
     const rewind      = options.rewind && options.rewindByDrag;
 
     if ( isFree ) {
-      Controller.scroll( destination );
+      Controller.scrollTo( destination );
     } else if ( Splide.is( FADE ) ) {
       Controller.go( orient( sign( velocity ) ) < 0 ? ( rewind ? '<' : '-' ) : ( rewind ? '>' : '+' ) );
     } else if ( Splide.is( SLIDE ) && exceeded && rewind ) {

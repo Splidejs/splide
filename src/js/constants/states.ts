@@ -19,14 +19,19 @@ export const IDLE = 3;
 export const MOVING = 4;
 
 /**
+ * Splide is moving.
+ */
+export const SCROLLING = 5;
+
+/**
  * The user is dragging the slider.
  */
-export const DRAGGING = 5;
+export const DRAGGING = 6;
 
 /**
  * Splide has been destroyed.
  */
-export const DESTROYED = 6;
+export const DESTROYED = 7;
 
 /**
  * The collection of all states.
@@ -38,6 +43,7 @@ export const STATES = {
   MOUNTED,
   IDLE,
   MOVING,
+  SCROLLING,
   DRAGGING,
   DESTROYED,
 };

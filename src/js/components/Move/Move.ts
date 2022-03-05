@@ -31,11 +31,11 @@ export interface MoveComponent extends BaseComponent {
   toPosition( index: number, trimming?: boolean ): number;
   getPosition(): number;
   getLimit( max: boolean ): number;
-  isBusy(): boolean;
   exceededLimit( max?: boolean | undefined, position?: number ): boolean;
 
   /** @internal */
   reposition(): void;
+  loop( position: number ): number;
 }
 
 /**
@@ -75,7 +75,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * - Slide components listening to the internal repositioned event to update their visibility.
    */
   function reposition(): void {
-    if ( ! isBusy() ) {
+    if ( ! Components.Controller.isBusy() ) {
       Components.Scroll.cancel();
       jump( Splide.index );
       emit( EVENT_REPOSITIONED );
@@ -91,29 +91,29 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * @param callback - Optional. A callback function invoked after transition ends.
    */
   function move( dest: number, index: number, prev: number, callback?: AnyFunction ): void {
-    if ( ! isBusy() ) {
-      const { set } = Splide.state;
-      const position = getPosition();
+    const { set } = Splide.state;
+    const position = getPosition();
 
-      if ( dest !== index ) {
-        Transition.cancel();
-        translate( shift( position, dest > index ), true );
-      }
-
-      set( MOVING );
-      emit( EVENT_MOVE, index, prev, dest );
-
-      Transition.start( index, () => {
-        set( IDLE );
-        emit( EVENT_MOVED, index, prev, dest );
-
-        if ( options.trimSpace === 'move' && dest !== prev && position === getPosition() ) {
-          Components.Controller.go( dest > prev ? '>' : '<', false, callback );
-        } else {
-          callback && callback();
-        }
-      } );
+    // todo shift...
+    if ( dest !== index ) {
+      Transition.cancel();
+      translate( shift( position, dest > index ), true );
     }
+
+    set( MOVING );
+    emit( EVENT_MOVE, index, prev, dest );
+
+    // todo
+    Transition.start( index, () => {
+      set( IDLE );
+      emit( EVENT_MOVED, index, prev, dest );
+
+      if ( options.trimSpace === 'move' && dest !== prev && position === getPosition() ) {
+        Components.Controller.go( dest > prev ? '>' : '<', false, callback );
+      } else {
+        callback && callback();
+      }
+    } );
   }
 
   /**
@@ -269,15 +269,6 @@ export function Move( Splide: Splide, Components: Components, options: Options )
   }
 
   /**
-   * Checks if the slider can move now or not.
-   *
-   * @return `true` if the slider can move, or otherwise `false`.
-   */
-  function isBusy(): boolean {
-    return Splide.state.is( MOVING ) && options.waitForTransition;
-  }
-
-  /**
    * Checks if the provided position exceeds the minimum or maximum limit or not.
    *
    * @param max      - Optional. `true` for testing max, `false` for min, and `undefined` for both.
@@ -303,8 +294,8 @@ export function Move( Splide: Splide, Components: Components, options: Options )
     toPosition,
     getPosition,
     getLimit,
-    isBusy,
     exceededLimit,
     reposition,
+    loop,
   };
 }

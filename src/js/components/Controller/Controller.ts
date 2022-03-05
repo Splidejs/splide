@@ -1,4 +1,5 @@
 import { EVENT_REFRESH, EVENT_UPDATED } from '../../constants/events';
+import { MOVING, SCROLLING } from '../../constants/states';
 import { LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
@@ -13,7 +14,8 @@ import { apply, approximatelyEqual, between, clamp, floor, isString, isUndefined
  */
 export interface ControllerComponent extends BaseComponent {
   go( control: number | string, allowSameIndex?: boolean, callback?: AnyFunction ): void;
-  scroll( destination: number, useIndex?: boolean, snap?: boolean, duration?: number, callback?: AnyFunction ): void;
+  scrollTo( index: number, duration?: number, callback?: AnyFunction ): void;
+  scroll( destination: number, duration?: number, snap?: boolean, callback?: AnyFunction ): void;
   getNext( destination?: boolean ): number;
   getPrev( destination?: boolean ): number;
   getAdjacent( prev: boolean, destination?: boolean ): number;
@@ -24,6 +26,7 @@ export interface ControllerComponent extends BaseComponent {
   toPage( index: number ): number;
   toDest( position: number ): number;
   hasFocus(): boolean;
+  isBusy(): boolean;
 }
 
 /**
@@ -40,7 +43,7 @@ export interface ControllerComponent extends BaseComponent {
 export function Controller( Splide: Splide, Components: Components, options: Options ): ControllerComponent {
   const { on } = EventInterface( Splide );
   const { Move } = Components;
-  const { getPosition, getLimit } = Move;
+  const { getPosition, getLimit, toPosition } = Move;
   const { isEnough, getLength } = Components.Slides;
   const isLoop  = Splide.is( LOOP );
   const isSlide = Splide.is( SLIDE );
@@ -108,16 +111,18 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    * @param callback       - Optional. A callback function invoked after transition ends.
    */
   function go( control: number | string, allowSameIndex?: boolean, callback?: AnyFunction ): void {
-    const dest = parse( control );
+    if ( ! isBusy() ) {
+      const dest = parse( control );
 
-    if ( options.useScroll ) {
-      scroll( dest, true, true, options.speed, callback );
-    } else {
-      const index = loop( dest );
+      if ( options.useScroll ) {
+        scrollTo( dest, options.speed, callback );
+      } else {
+        const index = loop( dest );
 
-      if ( index > -1 && ! Move.isBusy() && ( allowSameIndex || index !== currIndex ) ) {
-        setIndex( index );
-        Move.move( dest, index, prevIndex, callback );
+        if ( index > -1 && ( allowSameIndex || index !== currIndex ) ) {
+          setIndex( index );
+          Move.move( dest, index, prevIndex, callback );
+        }
       }
     }
   }
@@ -125,25 +130,27 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
   /**
    * Scrolls the slider to the specified destination with updating indices.
    *
-   * @param destination - A position or an index to scroll to.
-   * @param useIndex    - Optional. Whether to use an index as a destination or not.
-   * @param snap        - Optional. Whether to snap the closest slide or not.
+   * @param destination - An index to scroll the slider to.
    * @param duration    - Optional. Specifies the scroll duration.
+   * @param snap        - Optional. Whether to snap the slider to the closest slide or not.
    * @param callback    - Optional. A callback function invoked after scroll ends.
    */
-  function scroll(
-    destination: number,
-    useIndex?: boolean,
-    snap?: boolean,
-    duration?: number,
-    callback?: AnyFunction
-  ): void {
-    const dest = useIndex ? destination : toDest( destination );
-
-    Components.Scroll.scroll( useIndex || snap ? Move.toPosition( dest, true ) : destination, duration, () => {
+  function scroll( destination: number, duration?: number, snap?: boolean, callback?: AnyFunction ): void {
+    Components.Scroll.scroll( destination, duration, snap, () => {
       setIndex( Move.toIndex( Move.getPosition() ) );
       callback && callback();
     } );
+  }
+
+  /**
+   * Scrolls the slider to the specified index with updating indices.
+   *
+   * @param index    - An index to scroll the slider to.
+   * @param duration - Optional. Specifies the scroll duration.
+   * @param callback - Optional. A callback function invoked after scroll ends.
+   */
+  function scrollTo( index: number, duration?: number, callback?: AnyFunction ): void {
+    scroll( toPosition( index ), duration, false, callback );
   }
 
   /**
@@ -299,6 +306,8 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
   /**
    * Converts the destination position to the dest index.
    *
+   * @todo
+   *
    * @param destination - A position to convert.
    *
    * @return A dest index.
@@ -338,10 +347,20 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
     return ! isUndefined( options.focus ) || options.isNavigation;
   }
 
+  /**
+   * Checks if the slider is moving/scrolling or not.
+   *
+   * @return `true` if the slider can move, or otherwise `false`.
+   */
+  function isBusy(): boolean {
+    return Splide.state.is( [ MOVING, SCROLLING ] ) && options.waitForTransition;
+  }
+
   return {
     mount,
     go,
     scroll,
+    scrollTo,
     getNext,
     getPrev,
     getAdjacent,
@@ -352,5 +371,6 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
     toPage,
     toDest,
     hasFocus,
+    isBusy,
   };
 }
