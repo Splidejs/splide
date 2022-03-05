@@ -90,21 +90,35 @@ $settings = get_settings();
       ?>
     </ul>
   </div>
+
+	<div id="splide02" class="splide">
+		<div class="splide__track">
+			<ul class="splide__list">
+				<?php
+				for ( $i = 0; $i < 10; $i++ ) {
+					echo '<li class="splide__slide">';
+					printf( '<img src="../../assets/images/pics/slide%1$02d.jpg" alt="Thumbnail %1$d">', $i + 1 );
+					echo '</li>' . PHP_EOL;
+				}
+				?>
+			</ul>
+		</div>
+	</div>
 </div>
 
-<div id="splide02" class="splide">
-  <div class="splide__track">
-    <ul class="splide__list">
-      <?php
-      for ( $i = 0; $i < 10; $i++ ) {
-        echo '<li class="splide__slide">';
-        printf( '<img src="../../assets/images/pics/slide%1$02d.jpg" alt="Thumbnail %1$d">', $i + 1 );
-        echo '</li>' . PHP_EOL;
-      }
-      ?>
-    </ul>
-  </div>
-</div>
+<!--<div id="splide02" class="splide">-->
+<!--  <div class="splide__track">-->
+<!--    <ul class="splide__list">-->
+<!--      --><?php
+//      for ( $i = 0; $i < 10; $i++ ) {
+//        echo '<li class="splide__slide">';
+//        printf( '<img src="../../assets/images/pics/slide%1$02d.jpg" alt="Thumbnail %1$d">', $i + 1 );
+//        echo '</li>' . PHP_EOL;
+//      }
+//      ?>
+<!--    </ul>-->
+<!--  </div>-->
+<!--</div>-->
 
 <div id="splide03" class="splide">
   <div class="splide__track">

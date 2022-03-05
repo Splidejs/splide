@@ -1339,6 +1339,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         on = _EventInterface6.on,
         emit = _EventInterface6.emit;
 
+    var set = Splide2.state.set;
     var _Components2$Layout = Components2.Layout,
         slideSize = _Components2$Layout.slideSize,
         getPadding = _Components2$Layout.getPadding,
@@ -1367,7 +1368,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function move(dest, index, prev, callback) {
-      var set = Splide2.state.set;
       var position = getPosition();
 
       if (dest !== index) {
@@ -1377,16 +1377,18 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       set(MOVING);
       emit(EVENT_MOVE, index, prev, dest);
-      Transition.start(index, function () {
-        set(IDLE);
-        emit(EVENT_MOVED, index, prev, dest);
+      Transition.start(index, apply(onTransitionEnd, position, dest, index, prev, callback));
+    }
 
-        if (options.trimSpace === "move" && dest !== prev && position === getPosition()) {
-          Components2.Controller.go(dest > prev ? ">" : "<", false, callback);
-        } else {
-          callback && callback();
-        }
-      });
+    function onTransitionEnd(from, dest, index, prev, callback) {
+      set(IDLE);
+      emit(EVENT_MOVED, index, prev, dest);
+
+      if (options.trimSpace === "move" && dest !== prev && from === getPosition()) {
+        Components2.Controller.go(dest > prev ? ">" : "<", false, callback);
+      } else {
+        callback && callback();
+      }
     }
 
     function jump(index) {

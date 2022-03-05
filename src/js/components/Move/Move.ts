@@ -13,7 +13,7 @@ import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, BaseComponent, Components, Options, TransitionComponent } from '../../types';
-import { abs, ceil, clamp, isUndefined, rect } from '../../utils';
+import { abs, apply, ceil, clamp, isUndefined, rect } from '../../utils';
 
 
 /**
@@ -51,6 +51,7 @@ export interface MoveComponent extends BaseComponent {
  */
 export function Move( Splide: Splide, Components: Components, options: Options ): MoveComponent {
   const { on, emit } = EventInterface( Splide );
+  const { set } = Splide.state;
   const { slideSize, getPadding, totalSize, listSize, sliderSize } = Components.Layout;
   const { resolve, orient } = Components.Direction;
   const { list, track } = Components.Elements;
@@ -91,7 +92,6 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * @param callback - Optional. A callback function invoked after transition ends.
    */
   function move( dest: number, index: number, prev: number, callback?: AnyFunction ): void {
-    const { set } = Splide.state;
     const position = getPosition();
 
     // todo shift...
@@ -103,17 +103,27 @@ export function Move( Splide: Splide, Components: Components, options: Options )
     set( MOVING );
     emit( EVENT_MOVE, index, prev, dest );
 
-    // todo
-    Transition.start( index, () => {
-      set( IDLE );
-      emit( EVENT_MOVED, index, prev, dest );
+    Transition.start( index, apply( onTransitionEnd, position, dest, index, prev, callback ) );
+  }
 
-      if ( options.trimSpace === 'move' && dest !== prev && position === getPosition() ) {
-        Components.Controller.go( dest > prev ? '>' : '<', false, callback );
-      } else {
-        callback && callback();
-      }
-    } );
+  /**
+   * Called just after the transition ends.
+   *
+   * @param from     - A position where transition starts.
+   * @param dest     - A destination index to go to, including clones'.
+   * @param prev     - A previous index.
+   * @param index    - A slide index.
+   * @param callback - Optional. A callback function invoked after transition ends.
+   */
+  function onTransitionEnd( from: number, dest: number, index: number, prev: number, callback?: AnyFunction ): void {
+    set( IDLE );
+    emit( EVENT_MOVED, index, prev, dest );
+
+    if ( options.trimSpace === 'move' && dest !== prev && from === getPosition() ) {
+      Components.Controller.go( dest > prev ? '>' : '<', false, callback );
+    } else {
+      callback && callback();
+    }
   }
 
   /**

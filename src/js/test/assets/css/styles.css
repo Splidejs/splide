@@ -31,7 +31,7 @@ button:focus {
 }
 
 .splide__slide.is-active {
-  border: 2px solid deepskyblue;
+  border: 2px solid yellowgreen;
 }
 
 /*.splide__slide:focus, .splide__arrow:focus, .splide__pagination__page:focus {*/

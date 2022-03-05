@@ -4,7 +4,7 @@ import { init, keydown, wait } from '../../../test';
 
 describe( 'Keyboard', () => {
   test( 'can control the slider by keyboards.', async () => {
-    const splide = init( { speed: 0 } );
+    const splide = init( { speed: 0, keyboard: true } );
 
     keydown( 'ArrowRight' );
     expect( splide.index ).toBe( 1 );
@@ -26,7 +26,7 @@ describe( 'Keyboard', () => {
   } );
 
   test( 'can control the slider by keyboards in TTB mode.', async () => {
-    const splide = init( { direction: TTB, height: 1, speed: 0 } );
+    const splide = init( { direction: TTB, height: 1, speed: 0, keyboard: true } );
 
     keydown( 'ArrowDown' );
     expect( splide.index ).toBe( 1 );
@@ -48,7 +48,7 @@ describe( 'Keyboard', () => {
   } );
 
   test( 'can control the slider by keyboards in RTL mode.', async () => {
-    const splide = init( { direction: RTL, speed: 0 } );
+    const splide = init( { direction: RTL, speed: 0, keyboard: true } );
 
     keydown( 'ArrowLeft' );
     expect( splide.index ).toBe( 1 );
@@ -89,7 +89,7 @@ describe( 'Keyboard', () => {
   } );
 
   test( 'can disable the keyboard input.', async () => {
-    const splide = init( { speed: 0 } );
+    const splide = init( { speed: 0, keyboard: true } );
     const { disable } = splide.Components.Keyboard;
 
     keydown( 'ArrowRight' );

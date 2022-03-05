@@ -21,22 +21,23 @@ $settings = get_settings();
       var splide = new Splide( '#splide01', {
 				width: 800,
         type   : 'loop',
-        // perPage: 2,
+        perPage: 3,
         // perMove: 1,
         rewind: true,
 	      rewindByDrag: true,
-        // padding: {
-        //   right: 0,
-        //   left: 40,
-        // },
+        padding: 40,
         // updateOnMove: true,
         // focus: 'center',
 	      // keyboard: false,
+	      waitForTransition: false,
+	      // flickPower: 1,
+	      // flickMaxSlides: 2,
 	      dragMinThreshold: {
 					mouse: 20,
 		      touch: 0,
 	      },
 	      speed: 1000,
+	      // useScroll: true,
 				// waitForTransition: false,
         // noDrag: 'button',
       } );
