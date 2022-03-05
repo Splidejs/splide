@@ -35,7 +35,6 @@ export interface MoveComponent extends BaseComponent {
 
   /** @internal */
   reposition(): void;
-  loop( position: number ): number;
 }
 
 /**
@@ -306,6 +305,5 @@ export function Move( Splide: Splide, Components: Components, options: Options )
     getLimit,
     exceededLimit,
     reposition,
-    loop,
   };
 }
