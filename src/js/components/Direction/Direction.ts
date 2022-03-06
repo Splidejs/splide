@@ -25,6 +25,7 @@ export const ORIENTATION_MAP = {
   paddingLeft : [ 'paddingTop', 'paddingRight' ],
   paddingRight: [ 'paddingBottom', 'paddingLeft' ],
   width       : [ 'height' ],
+  Width       : [ 'Height' ],
   left        : [ 'top', 'right' ],
   right       : [ 'bottom', 'left' ],
   x           : [ 'y' ],

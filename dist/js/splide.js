@@ -656,6 +656,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     paddingLeft: ["paddingTop", "paddingRight"],
     paddingRight: ["paddingBottom", "paddingLeft"],
     width: ["height"],
+    Width: ["Height"],
     left: ["top", "right"],
     right: ["bottom", "left"],
     x: ["y"],
@@ -1322,7 +1323,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       } else if (!clones2) {
         var fixedSize = options[resolve("fixedWidth")] && Components2.Layout.slideSize(0);
         var fixedCount = fixedSize && ceil(rect(Elements.track)[resolve("width")] / fixedSize);
-        clones2 = fixedCount || options[resolve("autoWidth")] && Splide2.length || options.perPage;
+        var baseCount = fixedCount || options[resolve("autoWidth")] && Splide2.length || options.perPage;
+        clones2 = baseCount * 2;
       }
 
       return clones2;
@@ -1370,8 +1372,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function move(dest, index, prev, callback) {
       var position = getPosition();
 
-      if (dest !== index) {
-        Transition.cancel();
+      if (dest !== index && canShift(dest > index)) {
+        cancel();
         translate(shift(position, dest > index), true);
       }
 
@@ -1398,7 +1400,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function translate(position, preventLoop) {
       if (!Splide2.is(FADE)) {
         var destination = preventLoop ? position : loop(position);
-        list.style.transform = "translate" + resolve("X") + "(" + destination + "px)";
+        style(list, "transform", "translate" + resolve("X") + "(" + destination + "px)");
         position !== destination && emit(EVENT_SHIFTED);
       }
     }
@@ -1476,6 +1478,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       return toPosition(max ? Components2.Controller.getEnd() : 0, !!options.trimSpace);
     }
 
+    function canShift(backwards) {
+      var shifted = orient(shift(getPosition(), backwards));
+      return backwards ? shifted >= 0 : shifted <= list["scroll" + resolve("Width")] - rect(track)[resolve("width")];
+    }
+
     function exceededLimit(max, position) {
       position = isUndefined(position) ? getPosition() : position;
       var exceededMin = max !== true && orient(position) < orient(getLimit(false));
@@ -1495,8 +1502,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       getPosition: getPosition,
       getLimit: getLimit,
       exceededLimit: exceededLimit,
-      reposition: reposition,
-      loop: loop
+      reposition: reposition
     };
   }
 

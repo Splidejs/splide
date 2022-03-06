@@ -70,6 +70,8 @@ export function Clones( Splide: Splide, Components: Components, options: Options
 
   /**
    * Observes the required clone count and refreshes the slider if necessary.
+   *
+   * @todo
    */
   function observe(): void {
     if ( cloneCount < computeCloneCount() ) {
@@ -130,7 +132,8 @@ export function Clones( Splide: Splide, Components: Components, options: Options
     } else if ( ! clones ) {
       const fixedSize  = options[ resolve( 'fixedWidth' ) ] && Components.Layout.slideSize( 0 );
       const fixedCount = fixedSize && ceil( rect( Elements.track )[ resolve( 'width' ) ] / fixedSize );
-      clones = fixedCount || ( options[ resolve( 'autoWidth' ) ] && Splide.length ) || options.perPage;
+      const baseCount  = fixedCount || ( options[ resolve( 'autoWidth' ) ] && Splide.length ) || options.perPage;
+      clones = baseCount * 2; // todo
     }
 
     return clones;

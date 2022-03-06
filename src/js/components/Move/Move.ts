@@ -13,7 +13,7 @@ import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, BaseComponent, Components, Options, TransitionComponent } from '../../types';
-import { abs, apply, ceil, clamp, isUndefined, rect } from '../../utils';
+import { abs, apply, ceil, clamp, isUndefined, rect, style } from '../../utils';
 
 
 /**
@@ -93,9 +93,8 @@ export function Move( Splide: Splide, Components: Components, options: Options )
   function move( dest: number, index: number, prev: number, callback?: AnyFunction ): void {
     const position = getPosition();
 
-    // todo shift...
-    if ( dest !== index ) {
-      Transition.cancel();
+    if ( dest !== index && canShift( dest > index ) ) {
+      cancel();
       translate( shift( position, dest > index ), true );
     }
 
@@ -118,6 +117,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
     set( IDLE );
     emit( EVENT_MOVED, index, prev, dest );
 
+    // todo can I optimize?
     if ( options.trimSpace === 'move' && dest !== prev && from === getPosition() ) {
       Components.Controller.go( dest > prev ? '>' : '<', false, callback );
     } else {
@@ -143,7 +143,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
   function translate( position: number, preventLoop?: boolean ): void {
     if ( ! Splide.is( FADE ) ) {
       const destination = preventLoop ? position : loop( position );
-      list.style.transform = `translate${ resolve( 'X' ) }(${ destination }px)`;
+      style( list, 'transform', `translate${ resolve( 'X' ) }(${ destination }px)` );
       position !== destination && emit( EVENT_SHIFTED );
     }
   }
@@ -275,6 +275,20 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    */
   function getLimit( max: boolean ): number {
     return toPosition( max ? Components.Controller.getEnd() : 0, !! options.trimSpace );
+  }
+
+  /**
+   * Checks if there is enough width to shift the slider.
+   *
+   * @param backwards - `true` for checking backwards, or `false` for doing forwards.
+   *
+   * @return `true` if the slider can be shifted for the specified direction, or otherwise `false`.
+   */
+  function canShift( backwards: boolean ): boolean {
+    const shifted = orient( shift( getPosition(), backwards ) );
+    return backwards
+      ? shifted >= 0
+      : shifted <= list[ `scroll${ resolve( 'Width' ) }` ] - rect( track )[ resolve( 'width' ) ];
   }
 
   /**
