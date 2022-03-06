@@ -95,7 +95,6 @@ interface MoveComponent extends BaseComponent {
     toPosition(index: number, trimming?: boolean): number;
     getPosition(): number;
     getLimit(max: boolean): number;
-    isBusy(): boolean;
     exceededLimit(max?: boolean | undefined, position?: number): boolean;
     /** @internal */
     reposition(): void;
@@ -108,7 +107,8 @@ interface MoveComponent extends BaseComponent {
  */
 interface ControllerComponent extends BaseComponent {
     go(control: number | string, allowSameIndex?: boolean, callback?: AnyFunction): void;
-    scroll(destination: number, useIndex?: boolean, snap?: boolean, duration?: number, callback?: AnyFunction): void;
+    scrollTo(index: number, duration?: number, callback?: AnyFunction): void;
+    scroll(destination: number, duration?: number, snap?: boolean, callback?: AnyFunction): void;
     getNext(destination?: boolean): number;
     getPrev(destination?: boolean): number;
     getAdjacent(prev: boolean, destination?: boolean): number;
@@ -119,6 +119,7 @@ interface ControllerComponent extends BaseComponent {
     toPage(index: number): number;
     toDest(position: number): number;
     hasFocus(): boolean;
+    isBusy(): boolean;
 }
 
 /**
@@ -158,7 +159,7 @@ interface CoverComponent extends BaseComponent {
  * @since 3.0.0
  */
 interface ScrollComponent extends BaseComponent {
-    scroll(position: number, duration?: number, callback?: AnyFunction): void;
+    scroll(position: number, duration?: number, snap?: boolean, callback?: AnyFunction): void;
     cancel(): void;
 }
 
@@ -916,6 +917,7 @@ declare class Splide {
         MOUNTED: number;
         IDLE: number;
         MOVING: number;
+        SCROLLING: number;
         DRAGGING: number;
         DESTROYED: number;
     };

@@ -152,7 +152,10 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
       const text     = ! hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
 
       bind( button, 'click', apply( onClick, i ) );
-      bind( button, 'keydown', apply( onKeydown, i ) );
+
+      if ( options.paginationKeyboard ) {
+        bind( button, 'keydown', apply( onKeydown, i ) );
+      }
 
       setAttribute( li, ROLE, 'none' );
       setAttribute( button, ROLE, 'tab' );

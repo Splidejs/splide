@@ -112,17 +112,12 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    */
   function go( control: number | string, allowSameIndex?: boolean, callback?: AnyFunction ): void {
     if ( ! isBusy() ) {
-      const dest = parse( control );
+      const dest  = parse( control );
+      const index = loop( dest );
 
-      if ( options.useScroll ) {
-        scrollTo( dest, options.speed, callback );
-      } else {
-        const index = loop( dest );
-
-        if ( index > -1 && ( allowSameIndex || index !== currIndex ) ) {
-          setIndex( index );
-          Move.move( dest, index, prevIndex, callback );
-        }
+      if ( index > -1 && ( allowSameIndex || index !== currIndex ) ) {
+        setIndex( index );
+        options.useScroll ? scrollTo( dest, options.speed, callback ) : Move.move( dest, index, prevIndex, callback );
       }
     }
   }
@@ -150,7 +145,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    * @param callback - Optional. A callback function invoked after scroll ends.
    */
   function scrollTo( index: number, duration?: number, callback?: AnyFunction ): void {
-    scroll( toPosition( index ), duration, false, callback );
+    scroll( toPosition( index, true ), duration, false, callback );
   }
 
   /**
@@ -254,13 +249,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    * @return An end index.
    */
   function getEnd(): number {
-    let end = slideCount - perPage;
-
-    if ( hasFocus() || ( isLoop && perMove ) ) {
-      end = slideCount - 1;
-    }
-
-    return max( end, 0 );
+    return max( slideCount - ( hasFocus() || ( isLoop && perMove ) ? 1 : perPage ), 0 );
   }
 
   /**
@@ -271,11 +260,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    * @return A looped index.
    */
   function loop( index: number ): number {
-    if ( isLoop ) {
-      return isEnough() ? index % slideCount + ( index < 0 ? slideCount : 0 ) : -1;
-    }
-
-    return index;
+    return isLoop ? ( index + slideCount ) % slideCount || 0 : index;
   }
 
   /**
@@ -295,18 +280,13 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    * @param index - An index to convert.
    */
   function toPage( index: number ): number {
-    if ( ! hasFocus() ) {
-      index = between( index, slideCount - perPage, slideCount - 1 ) ? slideCount - 1 : index;
-      index = floor( index / perPage );
-    }
-
-    return index;
+    return hasFocus()
+      ? index
+      : floor( ( index >= getEnd() ? slideCount - 1 : index ) / perPage );
   }
 
   /**
    * Converts the destination position to the dest index.
-   *
-   * @todo
    *
    * @param destination - A position to convert.
    *

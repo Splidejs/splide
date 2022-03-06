@@ -1,5 +1,6 @@
 import { CLASS_CLONE } from '../../../constants/classes';
 import { init } from '../../../test';
+import { MULTIPLIER } from '../Clones';
 
 
 describe( 'Clones', () => {
@@ -13,22 +14,23 @@ describe( 'Clones', () => {
     expect( clones[ 2 ].id ).toBe( 'splide01-clone03' );
   } );
 
-  test( 'can generate clones according to the flickMaxPages option.', () => {
+  test( 'can generate clones.', () => {
     const splide = init( { type: 'loop', perPage: 3 } );
     const clones = splide.root.getElementsByClassName( CLASS_CLONE );
     const Slides = splide.Components.Slides.get( true );
+    const count  = clones.length / 2; // each side.
 
-    expect( clones.length ).toBe( splide.options.perPage * 2 );
-    expect( clones[ 2 ].nextElementSibling ).toBe( Slides[ 0 ].slide );
-    expect( clones[ 3 ].previousElementSibling ).toBe( Slides[ Slides.length - 1 ].slide );
+    expect( count ).toBe( splide.options.perPage * MULTIPLIER );
+    expect( clones[ count - 1 ].nextElementSibling ).toBe( Slides[ 0 ].slide );
+    expect( clones[ count ].previousElementSibling ).toBe( Slides[ Slides.length - 1 ].slide );
   } );
 
   test( 'can generate clones according to the perPage option.', () => {
-    const splide = init( { type: 'loop', flickMaxPages: 1, perPage: 3 } );
+    const splide = init( { type: 'loop', perPage: 3 } );
     const clones = splide.root.getElementsByClassName( CLASS_CLONE );
     const { perPage } = splide.options;
 
-    expect( clones.length ).toBe( perPage * 2 );
+    expect( clones.length / 2 ).toBe( perPage * MULTIPLIER );
   } );
 
   test( 'should register clones to Slides component.', () => {

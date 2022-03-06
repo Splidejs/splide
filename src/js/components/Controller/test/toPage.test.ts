@@ -25,7 +25,7 @@ describe( 'Controller#toPage()', () => {
     expect( toPage( 3 ) ).toBe( 1 );
   } );
 
-  test( 'should return the slide index if the focus option is available.', () => {
+  test( 'should return the slide index as is if the focus option is available.', () => {
     const splide = init( { focus: 'center', perPage: 3 } );
     const { toPage } = splide.Components.Controller;
 

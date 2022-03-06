@@ -15,6 +15,13 @@ export interface ClonesComponent extends BaseComponent {
 }
 
 /**
+ * The multiplier to determine the number of clones.
+ *
+ * @since 3.7.0
+ */
+export const MULTIPLIER = 2;
+
+/**
  * The component that generates clones for the loop slider.
  *
  * @since 3.0.0
@@ -70,8 +77,6 @@ export function Clones( Splide: Splide, Components: Components, options: Options
 
   /**
    * Observes the required clone count and refreshes the slider if necessary.
-   *
-   * @todo
    */
   function observe(): void {
     if ( cloneCount < computeCloneCount() ) {
@@ -132,8 +137,7 @@ export function Clones( Splide: Splide, Components: Components, options: Options
     } else if ( ! clones ) {
       const fixedSize  = options[ resolve( 'fixedWidth' ) ] && Components.Layout.slideSize( 0 );
       const fixedCount = fixedSize && ceil( rect( Elements.track )[ resolve( 'width' ) ] / fixedSize );
-      const baseCount  = fixedCount || ( options[ resolve( 'autoWidth' ) ] && Splide.length ) || options.perPage;
-      clones = baseCount * 2; // todo
+      clones = fixedCount || ( options[ resolve( 'autoWidth' ) ] && Splide.length ) || options.perPage * MULTIPLIER;
     }
 
     return clones;

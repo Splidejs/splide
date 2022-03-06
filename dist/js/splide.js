@@ -1253,6 +1253,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     };
   }
 
+  var MULTIPLIER = 2;
+
   function Clones(Splide2, Components2, options) {
     var _EventInterface5 = EventInterface(Splide2),
         on = _EventInterface5.on,
@@ -1323,8 +1325,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       } else if (!clones2) {
         var fixedSize = options[resolve("fixedWidth")] && Components2.Layout.slideSize(0);
         var fixedCount = fixedSize && ceil(rect(Elements.track)[resolve("width")] / fixedSize);
-        var baseCount = fixedCount || options[resolve("autoWidth")] && Splide2.length || options.perPage;
-        clones2 = baseCount * 2;
+        clones2 = fixedCount || options[resolve("autoWidth")] && Splide2.length || options.perPage * MULTIPLIER;
       }
 
       return clones2;
@@ -1379,18 +1380,16 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       set(MOVING);
       emit(EVENT_MOVE, index, prev, dest);
-      Transition.start(index, apply(onTransitionEnd, position, dest, index, prev, callback));
-    }
+      Transition.start(index, function () {
+        set(IDLE);
+        emit(EVENT_MOVED, index, prev, dest);
 
-    function onTransitionEnd(from, dest, index, prev, callback) {
-      set(IDLE);
-      emit(EVENT_MOVED, index, prev, dest);
-
-      if (options.trimSpace === "move" && dest !== prev && from === getPosition()) {
-        Components2.Controller.go(dest > prev ? ">" : "<", false, callback);
-      } else {
-        callback && callback();
-      }
+        if (options.trimSpace === "move" && dest !== prev && position === getPosition()) {
+          Components2.Controller.go(dest > prev ? ">" : "<", false, callback);
+        } else {
+          callback && callback();
+        }
+      });
     }
 
     function jump(index) {
@@ -1547,16 +1546,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function go(control, allowSameIndex, callback) {
       if (!isBusy()) {
         var dest = parse(control);
+        var index = loop(dest);
 
-        if (options.useScroll) {
-          scrollTo(dest, options.speed, callback);
-        } else {
-          var index = loop(dest);
-
-          if (index > -1 && (allowSameIndex || index !== currIndex)) {
-            setIndex(index);
-            Move.move(dest, index, prevIndex, callback);
-          }
+        if (index > -1 && (allowSameIndex || index !== currIndex)) {
+          setIndex(index);
+          options.useScroll ? scrollTo(dest, options.speed, callback) : Move.move(dest, index, prevIndex, callback);
         }
       }
     }
@@ -1569,7 +1563,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function scrollTo(index, duration, callback) {
-      scroll(toPosition(index), duration, false, callback);
+      scroll(toPosition(index, true), duration, false, callback);
     }
 
     function parse(control) {
@@ -1636,21 +1630,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function getEnd() {
-      var end = slideCount - perPage;
-
-      if (hasFocus() || isLoop && perMove) {
-        end = slideCount - 1;
-      }
-
-      return max(end, 0);
+      return max(slideCount - (hasFocus() || isLoop && perMove ? 1 : perPage), 0);
     }
 
     function loop(index) {
-      if (isLoop) {
-        return isEnough() ? index % slideCount + (index < 0 ? slideCount : 0) : -1;
-      }
-
-      return index;
+      return isLoop ? (index + slideCount) % slideCount || 0 : index;
     }
 
     function toIndex(page) {
@@ -1658,12 +1642,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function toPage(index) {
-      if (!hasFocus()) {
-        index = between(index, slideCount - perPage, slideCount - 1) ? slideCount - 1 : index;
-        index = floor(index / perPage);
-      }
-
-      return index;
+      return hasFocus() ? index : floor((index >= getEnd() ? slideCount - 1 : index) / perPage);
     }
 
     function toDest(destination) {
@@ -2181,7 +2160,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var rewind = options.rewind && options.rewindByDrag;
 
       if (isFree) {
-        Controller.scrollTo(destination);
+        Controller.scroll(destination, 0, options.snap);
       } else if (Splide2.is(FADE)) {
         Controller.go(orient(sign(velocity)) < 0 ? rewind ? "<" : "-" : rewind ? ">" : "+");
       } else if (Splide2.is(SLIDE) && exceeded && rewind) {
@@ -2531,7 +2510,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         });
         var text = !hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
         bind(button, "click", apply(onClick, i));
-        bind(button, "keydown", apply(onKeydown, i));
+
+        if (options.paginationKeyboard) {
+          bind(button, "keydown", apply(onKeydown, i));
+        }
+
         setAttribute(li, ROLE, "none");
         setAttribute(button, ROLE, "tab");
         setAttribute(button, ARIA_CONTROLS, controls.join(" "));
@@ -2788,11 +2771,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     type: "slide",
     role: "region",
     speed: 400,
-    waitForTransition: true,
     perPage: 1,
     cloneStatus: true,
     arrows: true,
     pagination: true,
+    paginationKeyboard: true,
     interval: 5e3,
     pauseOnHover: true,
     pauseOnFocus: true,

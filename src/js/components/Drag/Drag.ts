@@ -229,7 +229,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
     const rewind      = options.rewind && options.rewindByDrag;
 
     if ( isFree ) {
-      Controller.scrollTo( destination );
+      Controller.scroll( destination, 0, options.snap );
     } else if ( Splide.is( FADE ) ) {
       Controller.go( orient( sign( velocity ) ) < 0 ? ( rewind ? '<' : '-' ) : ( rewind ? '>' : '+' ) );
     } else if ( Splide.is( SLIDE ) && exceeded && rewind ) {
