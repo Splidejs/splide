@@ -346,12 +346,17 @@ interface Options extends ResponsiveOptions {
      */
     preloadPages?: number;
     /**
-     * Determines whether to enable keyboard shortcuts or not.
+     * Enables keyboard shortcuts for the slider control.
      * - `true` or `'global'`: Listens to the `keydown` event of the document.
      * - 'focused': Listens to the `keydown` event of the slider root element with adding `tabindex="0"` to it.
-     * - `false`: Disables keyboard shortcuts.
+     * - `false`: Disables keyboard shortcuts (default).
      */
     keyboard?: boolean | string;
+    /**
+     * Enables keyboard shortcuts for the pagination, recommended by W3C.
+     * The default value is `true`.
+     */
+    paginationKeyboard?: boolean;
     /**
      * Enables navigation by the mouse wheel.
      * Set `waitForTransition` to `ture` or provide the `sleep` duration.
@@ -576,6 +581,10 @@ interface ResponsiveOptions {
      * If `free`, the slider does not snap to a slide after drag.
      */
     drag?: boolean | 'free';
+    /**
+     * Snaps the closest slide in the drag-free mode.
+     */
+    snap?: boolean;
     /**
      * The required distance to start moving the slider by the touch action.
      * If you want to define the threshold for the mouse, provide an object.

@@ -1383,12 +1383,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       Transition.start(index, function () {
         set(IDLE);
         emit(EVENT_MOVED, index, prev, dest);
-
-        if (options.trimSpace === "move" && dest !== prev && position === getPosition()) {
-          Components2.Controller.go(dest > prev ? ">" : "<", false, callback);
-        } else {
-          callback && callback();
-        }
+        callback && callback();
       });
     }
 
@@ -1546,7 +1541,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function go(control, allowSameIndex, callback) {
       if (!isBusy()) {
         var dest = parse(control);
-        var index = loop(dest);
+        var index = validate(dest);
 
         if (index > -1 && (allowSameIndex || index !== currIndex)) {
           setIndex(index);
@@ -1629,12 +1624,24 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       return dest;
     }
 
-    function getEnd() {
-      return max(slideCount - (hasFocus() || isLoop && perMove ? 1 : perPage), 0);
+    function validate(dest) {
+      if (options.trimSpace === "move" && dest !== currIndex) {
+        var position = getPosition();
+
+        while (position === toPosition(dest, true) && between(dest, 0, Splide2.length - 1, true)) {
+          dest < currIndex ? --dest : ++dest;
+        }
+      }
+
+      return loop(dest);
     }
 
     function loop(index) {
       return isLoop ? (index + slideCount) % slideCount || 0 : index;
+    }
+
+    function getEnd() {
+      return max(slideCount - (hasFocus() || isLoop && perMove ? 1 : perPage), 0);
     }
 
     function toIndex(page) {
@@ -1666,7 +1673,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function isBusy() {
-      return Splide2.state.is([MOVING, SCROLLING]) && options.waitForTransition;
+      return Splide2.state.is([MOVING, SCROLLING]) && !!options.waitForTransition;
     }
 
     return {

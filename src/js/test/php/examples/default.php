@@ -16,20 +16,22 @@ $settings = get_settings();
   <link rel="stylesheet" href="../../assets/css/styles.css">
   <script type="text/javascript" src="../../../../../dist/js/splide.js"></script>
 
+<!--	https://cdn.jsdelivr.net/npm/@splidejs/splide@3.6.12/dist/js/splide.min.js-->
+
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
 				width: 800,
-        type   : 'loop',
+        // type   : 'loop',
         perPage: 3,
         // perMove: 1,
         rewind: true,
 	      rewindByDrag: true,
         padding: 40,
+	      // focus: 'center',
         // updateOnMove: true,
-        // focus: 'center',
 	      // keyboard: false,
-	      waitForTransition: false,
+	      // waitForTransition: false,
 	      // flickPower: 1,
 	      // flickMaxSlides: 2,
 	      // direction: 'rtl',
@@ -37,11 +39,9 @@ $settings = get_settings();
 					mouse: 20,
 		      touch: 0,
 	      },
-	      // focus: 'center',
-	      trimSpace: 'move',
+	      // trimSpace: 'move',
 	      // speed: 3000,
 	      // useScroll: true,
-				// waitForTransition: false,
         // noDrag: 'button',
       } );
 

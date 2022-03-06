@@ -104,12 +104,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
     Transition.start( index, () => {
       set( IDLE );
       emit( EVENT_MOVED, index, prev, dest );
-
-      if ( options.trimSpace === 'move' && dest !== prev && position === getPosition() ) {
-        Components.Controller.go( dest > prev ? '>' : '<', false, callback );
-      } else {
-        callback && callback();
-      }
+      callback && callback();
     } );
   }
 

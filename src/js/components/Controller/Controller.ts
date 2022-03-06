@@ -113,7 +113,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
   function go( control: number | string, allowSameIndex?: boolean, callback?: AnyFunction ): void {
     if ( ! isBusy() ) {
       const dest  = parse( control );
-      const index = loop( dest );
+      const index = validate( dest );
 
       if ( index > -1 && ( allowSameIndex || index !== currIndex ) ) {
         setIndex( index );
@@ -242,14 +242,21 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
   }
 
   /**
-   * Returns the end index where the slider can go.
-   * For example, if the slider has 10 slides and the `perPage` option is 3,
-   * the slider can go to the slide 8 (the index is 7).
+   * Finalizes the dest index.
+   * If the `trim` option is `move`, needs to find the dest index where the slider actually moves.
    *
-   * @return An end index.
+   * @param dest - A validated dest index.
    */
-  function getEnd(): number {
-    return max( slideCount - ( hasFocus() || ( isLoop && perMove ) ? 1 : perPage ), 0 );
+  function validate( dest: number ): number {
+    if ( options.trimSpace === 'move' && dest !== currIndex ) {
+      const position = getPosition();
+
+      while ( position === toPosition( dest, true ) && between( dest, 0, Splide.length - 1, true ) ) {
+        dest < currIndex ? --dest : ++dest;
+      }
+    }
+
+    return loop( dest );
   }
 
   /**
@@ -261,6 +268,17 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    */
   function loop( index: number ): number {
     return isLoop ? ( index + slideCount ) % slideCount || 0 : index;
+  }
+
+  /**
+   * Returns the end index where the slider can go.
+   * For example, if the slider has 10 slides and the `perPage` option is 3,
+   * the slider can go to the slide 8 (the index is 7).
+   *
+   * @return An end index.
+   */
+  function getEnd(): number {
+    return max( slideCount - ( hasFocus() || ( isLoop && perMove ) ? 1 : perPage ), 0 );
   }
 
   /**
@@ -333,7 +351,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    * @return `true` if the slider can move, or otherwise `false`.
    */
   function isBusy(): boolean {
-    return Splide.state.is( [ MOVING, SCROLLING ] ) && options.waitForTransition;
+    return Splide.state.is( [ MOVING, SCROLLING ] ) && !! options.waitForTransition;
   }
 
   return {

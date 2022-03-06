@@ -4,8 +4,7 @@ import { SLIDE } from '../../constants/types';
 import { EventInterface, RequestInterval, RequestIntervalInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, BaseComponent, Components, Options } from '../../types';
-import { abs, apply, between, floor, max, sign } from '../../utils';
-import { Controller } from '../Controller/Controller';
+import { abs, apply, floor, max, sign } from '../../utils';
 import { BASE_VELOCITY, BOUNCE_DIFF_THRESHOLD, BOUNCE_DURATION, FRICTION_FACTOR, MIN_DURATION } from './constants';
 
 
