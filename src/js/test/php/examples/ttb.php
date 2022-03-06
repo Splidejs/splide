@@ -20,7 +20,7 @@ $settings = get_settings();
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
         width       : 400,
-        // type     : 'loop',
+        type     : 'loop',
         perPage     : 2,
         padding     : '3rem',
         gap         : 5,
@@ -28,6 +28,7 @@ $settings = get_settings();
         height      : '90vh',
         cover       : true,
         // wheel       : true,
+	      waitForTransition: false,
         releaseWheel: true,
 	      wheel       : {
 					// min: 99,

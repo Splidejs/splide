@@ -182,7 +182,6 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
   /**
    * Called when any key is pressed on the pagination.
    *
-   * @todo option?
    * @link https://www.w3.org/TR/2021/NOTE-wai-aria-practices-1.2-20211129/#keyboard-interaction-21
    *
    * @param page - A page index.

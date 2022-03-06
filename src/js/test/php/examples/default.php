@@ -32,11 +32,14 @@ $settings = get_settings();
 	      waitForTransition: false,
 	      // flickPower: 1,
 	      // flickMaxSlides: 2,
+	      // direction: 'rtl',
 	      dragMinThreshold: {
 					mouse: 20,
 		      touch: 0,
 	      },
-	      speed: 1000,
+	      // focus: 'center',
+	      trimSpace: 'move',
+	      // speed: 3000,
 	      // useScroll: true,
 				// waitForTransition: false,
         // noDrag: 'button',
@@ -98,7 +101,7 @@ $settings = get_settings();
 </head>
 <body>
 
-<?php render( 'splide01', 5 ); ?>
+<?php render( 'splide01', 10 ); ?>
 
 <pre></pre>
 

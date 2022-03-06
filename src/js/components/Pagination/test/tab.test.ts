@@ -111,4 +111,13 @@ describe( 'Pagination', () => {
         .toBe( direction === 'ttb' ? 'vertical' : null );
     } );
   } );
+
+  test( 'should not activate keyboard shortcuts if `paginationKeyboard` option is disabled.', () => {
+    const splide = init( { paginationKeyboard: false, speed: 0 } );
+    const items  = document.getElementsByClassName( CLASS_PAGINATION_PAGE );
+
+    fire( items[ 0 ], 'keydown', { key: 'ArrowRight' } );
+    expect( items[ 1 ] === document.activeElement ).toBe( false );
+    expect( splide.index ).toBe( 0 );
+  } );
 } );

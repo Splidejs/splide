@@ -22,6 +22,7 @@ $settings = get_settings();
         perPage: 2,
         gap    : '0.5em',
         drag   : 'free',
+	      snap   : true,
         // height : 400,
         type   : 'loop',
         // direction: 'rtl',
