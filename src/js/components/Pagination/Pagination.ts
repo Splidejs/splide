@@ -12,7 +12,7 @@ import {
   EVENT_MOVE,
   EVENT_PAGINATION_MOUNTED,
   EVENT_PAGINATION_UPDATED,
-  EVENT_REFRESH,
+  EVENT_REFRESH, EVENT_SCROLL,
   EVENT_SCROLLED,
   EVENT_UPDATED,
 } from '../../constants/events';
@@ -102,7 +102,7 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
   function mount(): void {
     init();
     on( [ EVENT_UPDATED, EVENT_REFRESH ], init );
-    on( [ EVENT_MOVE, EVENT_SCROLLED ], update );
+    on( [ EVENT_MOVE, EVENT_SCROLL, EVENT_SCROLLED ], update );
   }
 
   /**

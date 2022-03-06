@@ -5,6 +5,7 @@ import { EventInterface, RequestInterval, RequestIntervalInterface } from '../..
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, BaseComponent, Components, Options } from '../../types';
 import { abs, apply, between, floor, max, sign } from '../../utils';
+import { Controller } from '../Controller/Controller';
 import { BASE_VELOCITY, BOUNCE_DIFF_THRESHOLD, BOUNCE_DURATION, FRICTION_FACTOR, MIN_DURATION } from './constants';
 
 
@@ -98,16 +99,6 @@ export function Scroll( Splide: Splide, Components: Components, options: Options
    * Called when scroll ends or has been just canceled.
    */
   function onEnd(): void {
-    const position = getPosition();
-    const index    = Move.toIndex( position );
-
-    if ( ! between( index, 0, Splide.length - 1 ) ) {
-      translate( Move.shift( position, index > 0 ), true );
-    }
-
-    // todo
-    // translate( getPosition() );
-
     set( IDLE );
     callback && callback();
     emit( EVENT_SCROLLED );

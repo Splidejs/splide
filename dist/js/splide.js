@@ -1557,7 +1557,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function scroll(destination, duration, snap, callback) {
       Components2.Scroll.scroll(destination, duration, snap, function () {
-        setIndex(Move.toIndex(Move.getPosition()));
+        setIndex(loop(Move.toIndex(Move.getPosition())));
         callback && callback();
       });
     }
@@ -1968,13 +1968,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function onEnd() {
-      var position = getPosition();
-      var index = Move.toIndex(position);
-
-      if (!between(index, 0, Splide2.length - 1)) {
-        translate(Move.shift(position, index > 0), true);
-      }
-
       set(IDLE);
       callback && callback();
       emit(EVENT_SCROLLED);
@@ -2460,7 +2453,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function mount() {
       init();
       on([EVENT_UPDATED, EVENT_REFRESH], init);
-      on([EVENT_MOVE, EVENT_SCROLLED], update);
+      on([EVENT_MOVE, EVENT_SCROLL, EVENT_SCROLLED], update);
     }
 
     function init() {

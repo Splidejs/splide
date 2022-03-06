@@ -132,7 +132,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    */
   function scroll( destination: number, duration?: number, snap?: boolean, callback?: AnyFunction ): void {
     Components.Scroll.scroll( destination, duration, snap, () => {
-      setIndex( Move.toIndex( Move.getPosition() ) );
+      setIndex( loop( Move.toIndex( Move.getPosition() ) ) );
       callback && callback();
     } );
   }
