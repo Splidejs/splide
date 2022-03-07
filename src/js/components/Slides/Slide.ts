@@ -119,9 +119,8 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   function listen(): void {
     bind( slide, 'click', apply( emit, EVENT_CLICK, self ) );
     bind( slide, 'keydown', apply( emit, EVENT_SLIDE_KEYDOWN, self ) );
-
-    on( [ EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_MOVED, EVENT_SCROLLED ], apply( update, true ) );
-    on( EVENT_SHIFTED, apply( update, false ) );
+    on( [ EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_MOVED, EVENT_SCROLLED ], apply( update, false ) );
+    on( EVENT_SHIFTED, apply( update, true ) );
     on( EVENT_NAVIGATION_MOUNTED, initNavigation );
 
     if ( updateOnMove ) {
@@ -166,9 +165,9 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   /**
    * Updates attribute and classes of the slide.
    *
-   * @param attributes - Determines whether to update attributes or not.
+   * @param excludeAttributes - If `true`, attributes will be not updated.
    */
-  function update( attributes?: boolean ): void {
+  function update( excludeAttributes?: boolean ): void {
     if ( ! destroyed ) {
       const { index: curr } = Splide;
 
@@ -176,7 +175,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
       updateVisibility();
       toggleClass( slide, CLASS_PREV, index === curr - 1 );
       toggleClass( slide, CLASS_NEXT, index === curr + 1 );
-      attributes && updateAttributes();
+      excludeAttributes && updateAttributes();
     }
   }
 

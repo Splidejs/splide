@@ -858,8 +858,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function listen() {
       bind(slide, "click", apply(emit, EVENT_CLICK, self));
       bind(slide, "keydown", apply(emit, EVENT_SLIDE_KEYDOWN, self));
-      on([EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_MOVED, EVENT_SCROLLED], apply(update, true));
-      on(EVENT_SHIFTED, apply(update, false));
+      on([EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_MOVED, EVENT_SCROLLED], apply(update, false));
+      on(EVENT_SHIFTED, apply(update, true));
       on(EVENT_NAVIGATION_MOUNTED, initNavigation);
 
       if (updateOnMove) {
@@ -891,14 +891,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }
     }
 
-    function update(attributes) {
+    function update(excludeAttributes) {
       if (!destroyed) {
         var curr = Splide2.index;
         updateActivity();
         updateVisibility();
         toggleClass(slide, CLASS_PREV, index === curr - 1);
         toggleClass(slide, CLASS_NEXT, index === curr + 1);
-        attributes && updateAttributes();
+        excludeAttributes && updateAttributes();
       }
     }
 
