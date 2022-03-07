@@ -19,12 +19,13 @@ $settings = get_settings();
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
-	      width     : 600,
-	      rewind    : true,
-	      live      : true,
-	      speed     : 1000,
-	      pagination: true,
-	      arrowPath : 'm13.5 7.01 13 13m-13 13 13-13',
+	      type        : 'loop',
+	      width       : 480,
+	      rewind      : true,
+	      live        : true,
+	      speed       : 600,
+	      arrowPath   : 'm13.5 7.01 13 13m-13 13 13-13',
+	      updateOnMove: true,
       } );
 
       splide.mount();
@@ -38,24 +39,44 @@ $settings = get_settings();
 		<div class="splide__track">
 			<ul class="splide__list">
 				<li class="splide__slide">
-					<img src="../../assets/images/planets/neptune.jpg" alt="Neptune as seen from Voyager 2 from 4.4 million miles">
-					<h3 class="splide__heading">Neptune</h3>
-					<div class="splide__desc">
-						Neptune is the eighth and farthest-known Solar planet from the Sun. In the Solar System, it is the fourth-largest planet by diameter, the third-most-massive planet, and the densest giant planet.
+					<div class="splide__slide__inner">
+						<img src="../../assets/images/planets/neptune.jpg"
+						     alt="">
+						<h3 class="splide__heading">Neptune</h3>
+						<div class="splide__desc">
+							<p>
+								Neptune is the eighth and farthest-known Solar planet from the Sun.
+							</p>
+							<cite aria-hidden="true">Quoted from Wikipedia</cite>
+						</div>
 					</div>
 				</li>
 				<li class="splide__slide">
-					<img src="../../assets/images/planets/saturn.jpg" alt="Saturn as seen from the Cassini–Huygens space-research mission">
-					<h3 class="splide__heading">Saturn</h3>
-					<div class="splide__desc">
-						Saturn is the sixth planet from the Sun and the second-largest in the Solar System, after Jupiter. It is a gas giant with an average radius of about nine and a half times that of Earth.
+					<div class="splide__slide__inner">
+
+						<img src="../../assets/images/planets/saturn.jpg"
+						     alt="">
+						<h3 class="splide__heading">Saturn</h3>
+						<div class="splide__desc">
+							<p>
+								Saturn is the sixth planet from the Sun and the second-largest in the Solar System, after Jupiter.
+							</p>
+							<cite aria-hidden="true">Quoted from Wikipedia</cite>
+						</div>
 					</div>
 				</li>
 				<li class="splide__slide">
-					<img src="../../assets/images/planets/mars.jpg" alt="A simulated view of Mars as it would be seen from the Mars Global Surveyor spacecraft">
-					<h3 class="splide__heading">Mars</h3>
-					<div class="splide__desc">
-						Mars is the fourth planet from the Sun and the second-smallest planet in the Solar System, being larger than only Mercury.
+					<div class="splide__slide__inner">
+
+						<img src="../../assets/images/planets/mars.jpg"
+						     alt="">
+						<h3 class="splide__heading">Mars</h3>
+						<div class="splide__desc">
+							<p>
+								Mars is the fourth planet from the Sun and the second-smallest planet in the Solar System.
+							</p>
+							<cite aria-hidden="true">Quoted from Wikipedia</cite>
+						</div>
 					</div>
 				</li>
 			</ul>

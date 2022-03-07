@@ -4,7 +4,7 @@ import { isString } from '../../type/type';
 /**
  * The map to associate a non-standard name to the standard one.
  *
- * @since 3.7.0
+ * @since 4.0.0
  */
 export const NORMALIZATION_MAP = {
   Spacebar: ' ',

@@ -9,7 +9,7 @@ import { apply, setAttribute } from '../../utils';
 /**
  * The interface for the Live component.
  *
- * @since 3.7.0
+ * @since 4.0.0
  */
 export interface LiveComponent extends BaseComponent {
   disable( disabled: boolean ): void;
@@ -20,7 +20,7 @@ export interface LiveComponent extends BaseComponent {
  *
  * @link https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Live_Regions
  *
- * @since 3.7.0
+ * @since 4.0.0
  *
  * @param Splide     - A Splide instance.
  * @param Components - A collection of components.

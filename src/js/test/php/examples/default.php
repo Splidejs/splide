@@ -21,28 +21,13 @@ $settings = get_settings();
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
-				width: 800,
-        // type   : 'loop',
-        perPage: 3,
-        // perMove: 1,
-        rewind: true,
+	      width       : 800,
+	      type        : 'loop',
+	      perPage     : 3,
+	      rewind      : true,
 	      rewindByDrag: true,
-        padding: 40,
-	      // focus: 'center',
-        // updateOnMove: true,
-	      // keyboard: false,
-	      // waitForTransition: false,
-	      // flickPower: 1,
-	      // flickMaxSlides: 2,
-	      // direction: 'rtl',
-	      dragMinThreshold: {
-					mouse: 20,
-		      touch: 0,
-	      },
-	      // trimSpace: 'move',
-	      // speed: 3000,
-	      // useScroll: true,
-        // noDrag: 'button',
+	      padding     : 40,
+	      updateOnMove: true,
       } );
 
 	    // splide.on( 'move', function () {

@@ -17,7 +17,7 @@ export interface ClonesComponent extends BaseComponent {
 /**
  * The multiplier to determine the number of clones.
  *
- * @since 3.7.0
+ * @since 4.0.0
  */
 export const MULTIPLIER = 2;
 

@@ -5,7 +5,7 @@ import { empty, forEach } from '../../utils';
 /**
  * The type for an EventTarget or an array with EventTarget objects.
  *
- * @since 3.7.0
+ * @since 4.0.0
  */
 type EventTargets = EventTarget | EventTarget[];
 
@@ -24,7 +24,7 @@ export interface EventBinderObject {
 /**
  * The constructor function to provide methods to subscribe native events.
  *
- * @since 3.7.0
+ * @since 4.0.0
  * @constructor
  *
  * @return An EventBinder object.
