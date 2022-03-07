@@ -175,7 +175,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
       updateVisibility();
       toggleClass( slide, CLASS_PREV, index === curr - 1 );
       toggleClass( slide, CLASS_NEXT, index === curr + 1 );
-      excludeAttributes && updateAttributes();
+      ! excludeAttributes && updateAttributes();
     }
   }
 
