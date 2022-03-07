@@ -36,7 +36,8 @@ import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent } from '../../types';
 import {
-  abs, apply,
+  abs,
+  apply,
   ceil,
   child,
   floor,
@@ -45,7 +46,6 @@ import {
   getAttribute,
   hasClass,
   min,
-  nextTick,
   pad,
   queryAll,
   rect,
@@ -120,8 +120,8 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
     bind( slide, 'click', apply( emit, EVENT_CLICK, self ) );
     bind( slide, 'keydown', apply( emit, EVENT_SLIDE_KEYDOWN, self ) );
 
-    on( [ EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_SHIFTED, EVENT_MOVED, EVENT_SCROLLED ], update );
-    on( [ EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_MOVED, EVENT_SCROLLED ], updateAria );
+    on( [ EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_MOVED, EVENT_SCROLLED ], apply( update, true ) );
+    on( EVENT_SHIFTED, apply( update, false ) );
     on( EVENT_NAVIGATION_MOUNTED, initNavigation );
 
     if ( updateOnMove ) {
@@ -151,7 +151,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
 
     setAttribute( slide, ARIA_LABEL, format( i18n.slideX, ( isClone ? slideIndex : index ) + 1 ) );
     setAttribute( slide, ARIA_CONTROLS, controls );
-    updateActivity( isActive() );
+    updateAttributes();
   }
 
   /**
@@ -165,73 +165,63 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
 
   /**
    * Updates attribute and classes of the slide.
+   *
+   * @param attributes - Determines whether to update attributes or not.
    */
-  function update(): void {
+  function update( attributes?: boolean ): void {
     if ( ! destroyed ) {
       const { index: curr } = Splide;
 
-      updateActivity( isActive() );
-      updateVisibility( isVisible() );
-
+      updateActivity();
+      updateVisibility();
       toggleClass( slide, CLASS_PREV, index === curr - 1 );
       toggleClass( slide, CLASS_NEXT, index === curr + 1 );
+      attributes && updateAttributes();
     }
   }
 
   /**
    * Updates the status related with activity.
-   *
-   * @param active - Set `true` if the slide is active.
    */
-  function updateActivity( active: boolean ): void {
+  function updateActivity(): void {
+    const active = isActive();
+
     if ( active !== hasClass( slide, CLASS_ACTIVE ) ) {
       toggleClass( slide, CLASS_ACTIVE, active );
-      setAttribute( slide, ARIA_CURRENT, isNavigation && active || '' );
       emit( active ? EVENT_ACTIVE : EVENT_INACTIVE, self );
     }
   }
 
   /**
    * Updates classes and attributes related with visibility.
-   *
-   * @param visible - Set `true` if the slide is visible.
+   * If the slide has focus and gets hidden, moves focus to the active slide.
    */
-  function updateVisibility( visible: boolean ): void {
-    const hidden = ! visible && ( ! isActive() || isClone );
-
-    if ( document.activeElement === slide && hidden ) {
-      nextTick( keepFocus );
-    }
-
-    setAttribute( slide, TAB_INDEX, ! hidden && options.slideFocus ? 0 : '' );
-    setAttribute( queryAll( slide, options.focusableNodes || '' ), TAB_INDEX, hidden ? -1 : '' );
+  function updateVisibility(): void {
+    const visible = isVisible();
 
     if ( visible !== hasClass( slide, CLASS_VISIBLE ) ) {
       toggleClass( slide, CLASS_VISIBLE, visible );
       emit( visible ? EVENT_VISIBLE : EVENT_HIDDEN, self );
     }
-  }
 
-  /**
-   * Updates aria attributes.
-   *
-   * @todo
-   */
-  function updateAria(): void {
-    const hidden = ! isVisible() && ( ! isActive() || isClone );
-    setAttribute( slide, ARIA_HIDDEN, hidden || '' );
-  }
-
-  /**
-   * Forwards the focus to the active element.
-   * Avoid losing focus from the slider when the focused slide gets hidden by slider move.
-   */
-  function keepFocus(): void {
-    const Slide = Components.Slides.getAt( Splide.index );
-
-    if ( Slide ) {
-      focus( Slide.slide );
+    if ( ! visible && document.activeElement === slide ) {
+      const Slide = Components.Slides.getAt( Splide.index );
+      Slide && focus( Slide.slide );
     }
+  }
+
+  /**
+   * Updates attributes.
+   * Do not call this on "shifted" event to avoid SR from reading clone's contents.
+   */
+  function updateAttributes(): void {
+    const active = isActive();
+    const hidden = ! isVisible() && ( ! active || isClone );
+
+    setAttribute( slide, ARIA_CURRENT, isNavigation && active || '' );
+    setAttribute( slide, ARIA_HIDDEN, hidden || '' );
+    setAttribute( slide, TAB_INDEX, ! hidden && options.slideFocus ? 0 : '' );
+    setAttribute( queryAll( slide, options.focusableNodes || '' ), TAB_INDEX, hidden ? -1 : '' );
   }
 
   /**

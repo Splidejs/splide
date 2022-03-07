@@ -855,10 +855,10 @@ function Slide$1(Splide2, index, slideIndex, slide) {
   }
 
   function listen() {
-    bind(slide, "click keydown", function (e) {
-      emit(e.type === "click" ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, self, e);
-    });
-    on([EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_SHIFTED, EVENT_MOVED, EVENT_SCROLLED], update);
+    bind(slide, "click", apply(emit, EVENT_CLICK, self));
+    bind(slide, "keydown", apply(emit, EVENT_SLIDE_KEYDOWN, self));
+    on([EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_MOVED, EVENT_SCROLLED], apply(update, true));
+    on(EVENT_SHIFTED, apply(update, false));
     on(EVENT_NAVIGATION_MOUNTED, initNavigation);
 
     if (updateOnMove) {
@@ -881,7 +881,7 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     }).join(" ");
     setAttribute(slide, ARIA_LABEL, format(i18n.slideX, (isClone ? slideIndex : index) + 1));
     setAttribute(slide, ARIA_CONTROLS, controls);
-    updateActivity(isActive());
+    updateAttributes();
   }
 
   function onMove() {
@@ -890,47 +890,47 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     }
   }
 
-  function update() {
+  function update(attributes) {
     if (!destroyed) {
       var curr = Splide2.index;
-      updateActivity(isActive());
-      updateVisibility(isVisible());
+      updateActivity();
+      updateVisibility();
       toggleClass(slide, CLASS_PREV, index === curr - 1);
       toggleClass(slide, CLASS_NEXT, index === curr + 1);
+      attributes && updateAttributes();
     }
   }
 
-  function updateActivity(active) {
+  function updateActivity() {
+    var active = isActive();
+
     if (active !== hasClass(slide, CLASS_ACTIVE)) {
       toggleClass(slide, CLASS_ACTIVE, active);
-      setAttribute(slide, ARIA_CURRENT, isNavigation && active || "");
       emit(active ? EVENT_ACTIVE : EVENT_INACTIVE, self);
     }
   }
 
-  function updateVisibility(visible) {
-    var hidden = !visible && (!isActive() || isClone);
-
-    if (document.activeElement === slide && hidden) {
-      nextTick(forwardFocus);
-    }
-
-    setAttribute(slide, ARIA_HIDDEN, hidden || "");
-    setAttribute(slide, TAB_INDEX, !hidden && options.slideFocus ? 0 : "");
-    setAttribute(queryAll(slide, options.focusableNodes || ""), TAB_INDEX, hidden ? -1 : "");
+  function updateVisibility() {
+    var visible = isVisible();
 
     if (visible !== hasClass(slide, CLASS_VISIBLE)) {
       toggleClass(slide, CLASS_VISIBLE, visible);
       emit(visible ? EVENT_VISIBLE : EVENT_HIDDEN, self);
     }
+
+    if (!visible && document.activeElement === slide) {
+      var Slide2 = Components.Slides.getAt(Splide2.index);
+      Slide2 && focus(Slide2.slide);
+    }
   }
 
-  function forwardFocus() {
-    var Slide2 = Components.Slides.getAt(Splide2.index);
-
-    if (Slide2) {
-      focus(Slide2.slide);
-    }
+  function updateAttributes() {
+    var active = isActive();
+    var hidden = !isVisible() && (!active || isClone);
+    setAttribute(slide, ARIA_CURRENT, isNavigation && active || "");
+    setAttribute(slide, ARIA_HIDDEN, hidden || "");
+    setAttribute(slide, TAB_INDEX, !hidden && options.slideFocus ? 0 : "");
+    setAttribute(queryAll(slide, options.focusableNodes || ""), TAB_INDEX, hidden ? -1 : "");
   }
 
   function style$1(prop, value, useContainer) {
