@@ -887,7 +887,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function onMove() {
       if (!destroyed) {
-        update();
+        update(true);
       }
     }
 
@@ -898,7 +898,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         updateVisibility();
         toggleClass(slide, CLASS_PREV, index === curr - 1);
         toggleClass(slide, CLASS_NEXT, index === curr + 1);
-        excludeAttributes && updateAttributes();
+        !excludeAttributes && updateAttributes();
       }
     }
 

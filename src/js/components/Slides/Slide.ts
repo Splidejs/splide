@@ -158,7 +158,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    */
   function onMove(): void {
     if ( ! destroyed ) {
-      update();
+      update( true );
     }
   }
 

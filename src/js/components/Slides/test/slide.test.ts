@@ -100,6 +100,40 @@ describe( 'Slide', () => {
     expect( Slide2.slide.getAttribute( 'aria-hidden' ) ).toBeNull();
   } );
 
+  test( 'should not update aria-hidden on move even if `updateOnMove` is enabled.', () => {
+    const splide = init( { speed: 100, updateOnMove: true } );
+    const { Slides } = splide.Components;
+    const { list } = splide.Components.Elements;
+
+    const Slide0 = Slides.getAt( 0 );
+    const Slide1 = Slides.getAt( 1 );
+    const Slide2 = Slides.getAt( 2 );
+
+    splide.go( 1 );
+
+    expect( Slide0.slide.getAttribute( 'aria-hidden' ) ).toBeNull();
+    expect( Slide1.slide.getAttribute( 'aria-hidden' ) ).toBe( 'true' );
+    expect( Slide2.slide.getAttribute( 'aria-hidden' ) ).toBe( 'true' );
+
+    fire( list, 'transitionend' );
+
+    expect( Slide0.slide.getAttribute( 'aria-hidden' ) ).toBe( 'true' );
+    expect( Slide1.slide.getAttribute( 'aria-hidden' ) ).toBeNull();
+    expect( Slide2.slide.getAttribute( 'aria-hidden' ) ).toBe( 'true' );
+
+    splide.go( 2 );
+
+    expect( Slide0.slide.getAttribute( 'aria-hidden' ) ).toBe( 'true' );
+    expect( Slide1.slide.getAttribute( 'aria-hidden' ) ).toBeNull();
+    expect( Slide2.slide.getAttribute( 'aria-hidden' ) ).toBe( 'true' );
+
+    fire( list, 'transitionend' );
+
+    expect( Slide0.slide.getAttribute( 'aria-hidden' ) ).toBe( 'true' );
+    expect( Slide1.slide.getAttribute( 'aria-hidden' ) ).toBe( 'true' );
+    expect( Slide2.slide.getAttribute( 'aria-hidden' ) ).toBeNull();
+  } );
+
   test( 'can emit an event when the slide becomes visible.', () => {
     const splide = init( { speed: 0, perPage: 2 } );
     const { Slides } = splide.Components;
