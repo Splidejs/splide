@@ -36,7 +36,7 @@ import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent } from '../../types';
 import {
-  abs,
+  abs, apply,
   ceil,
   child,
   floor,
@@ -117,11 +117,11 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    * Listens to some events.
    */
   function listen(): void {
-    bind( slide, 'click keydown', e => {
-      emit( e.type === 'click' ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, self, e );
-    } );
+    bind( slide, 'click', apply( emit, EVENT_CLICK, self ) );
+    bind( slide, 'keydown', apply( emit, EVENT_SLIDE_KEYDOWN, self ) );
 
     on( [ EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_SHIFTED, EVENT_MOVED, EVENT_SCROLLED ], update );
+    on( [ EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_MOVED, EVENT_SCROLLED ], updateAria );
     on( EVENT_NAVIGATION_MOUNTED, initNavigation );
 
     if ( updateOnMove ) {
@@ -200,10 +200,9 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
     const hidden = ! visible && ( ! isActive() || isClone );
 
     if ( document.activeElement === slide && hidden ) {
-      nextTick( forwardFocus );
+      nextTick( keepFocus );
     }
 
-    setAttribute( slide, ARIA_HIDDEN, hidden || '' );
     setAttribute( slide, TAB_INDEX, ! hidden && options.slideFocus ? 0 : '' );
     setAttribute( queryAll( slide, options.focusableNodes || '' ), TAB_INDEX, hidden ? -1 : '' );
 
@@ -214,10 +213,20 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   }
 
   /**
+   * Updates aria attributes.
+   *
+   * @todo
+   */
+  function updateAria(): void {
+    const hidden = ! isVisible() && ( ! isActive() || isClone );
+    setAttribute( slide, ARIA_HIDDEN, hidden || '' );
+  }
+
+  /**
    * Forwards the focus to the active element.
    * Avoid losing focus from the slider when the focused slide gets hidden by slider move.
    */
-  function forwardFocus(): void {
+  function keepFocus(): void {
     const Slide = Components.Slides.getAt( Splide.index );
 
     if ( Slide ) {

@@ -12,7 +12,7 @@
       vertical-align: bottom;
     }
 
-    &.is-active {
+    &:not([aria-hidden]) {
       display: block;
     }
   }

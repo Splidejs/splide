@@ -856,10 +856,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function listen() {
-      bind(slide, "click keydown", function (e) {
-        emit(e.type === "click" ? EVENT_CLICK : EVENT_SLIDE_KEYDOWN, self, e);
-      });
+      bind(slide, "click", apply(emit, EVENT_CLICK, self));
+      bind(slide, "keydown", apply(emit, EVENT_SLIDE_KEYDOWN, self));
       on([EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_SHIFTED, EVENT_MOVED, EVENT_SCROLLED], update);
+      on([EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_MOVED, EVENT_SCROLLED], updateAria);
       on(EVENT_NAVIGATION_MOUNTED, initNavigation);
 
       if (updateOnMove) {
@@ -913,10 +913,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var hidden = !visible && (!isActive() || isClone);
 
       if (document.activeElement === slide && hidden) {
-        nextTick(forwardFocus);
+        nextTick(keepFocus);
       }
 
-      setAttribute(slide, ARIA_HIDDEN, hidden || "");
       setAttribute(slide, TAB_INDEX, !hidden && options.slideFocus ? 0 : "");
       setAttribute(queryAll(slide, options.focusableNodes || ""), TAB_INDEX, hidden ? -1 : "");
 
@@ -926,7 +925,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }
     }
 
-    function forwardFocus() {
+    function updateAria() {
+      var hidden = !isVisible() && (!isActive() || isClone);
+      setAttribute(slide, ARIA_HIDDEN, hidden || "");
+    }
+
+    function keepFocus() {
       var Slide2 = Components.Slides.getAt(Splide2.index);
 
       if (Slide2) {
