@@ -23,17 +23,17 @@ interface DirectionComponent extends BaseComponent {
  */
 interface ElementCollection {
     root: HTMLElement;
-    slider: HTMLElement;
     track: HTMLElement;
     list: HTMLElement;
     slides: HTMLElement[];
-    arrows: HTMLElement;
-    prev: HTMLButtonElement;
-    next: HTMLButtonElement;
-    bar: HTMLElement;
-    autoplay: HTMLElement;
-    play: HTMLButtonElement;
-    pause: HTMLButtonElement;
+    arrows: HTMLElement | null;
+    pagination: HTMLUListElement | null;
+    prev: HTMLButtonElement | null;
+    next: HTMLButtonElement | null;
+    bar: HTMLElement | null;
+    autoplay: HTMLElement | null;
+    play: HTMLButtonElement | null;
+    pause: HTMLButtonElement | null;
 }
 /**
  * The interface for the Elements component.
@@ -240,7 +240,7 @@ interface WheelComponent extends BaseComponent {
 /**
  * The interface for the Live component.
  *
- * @since 3.7.0
+ * @since 4.0.0
  */
 interface LiveComponent extends BaseComponent {
     disable(disabled: boolean): void;
@@ -562,11 +562,11 @@ interface ResponsiveOptions {
     /**
      * Determines whether to create/find arrows or not.
      */
-    arrows?: boolean | 'slider';
+    arrows?: boolean;
     /**
      * Determines whether to create pagination (indicator dots) or not.
      */
-    pagination?: boolean | 'slider';
+    pagination?: boolean;
     /**
      * The timing function for the CSS transition. For example, `linear`, ease or `cubic-bezier()`.
      */
@@ -799,7 +799,7 @@ declare type SlideMatcher = number | number[] | string | SlidesPredicate;
 /**
  * The type for an EventTarget or an array with EventTarget objects.
  *
- * @since 3.7.0
+ * @since 4.0.0
  */
 declare type EventTargets = EventTarget | EventTarget[];
 /**
@@ -816,7 +816,7 @@ interface EventBinderObject {
 /**
  * The constructor function to provide methods to subscribe native events.
  *
- * @since 3.7.0
+ * @since 4.0.0
  * @constructor
  *
  * @return An EventBinder object.

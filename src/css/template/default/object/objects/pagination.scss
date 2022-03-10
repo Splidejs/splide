@@ -33,6 +33,7 @@ $dot-transform-active: scale( 1.4 ) !default;
       height: $dot-height;
       margin: $dot-margin;
       padding: $dot-padding;
+      position: relative;
       transition: $dot-transition;
       width: $dot-width;
 
@@ -42,6 +43,7 @@ $dot-transform-active: scale( 1.4 ) !default;
 
       &.is-active {
         background: $dot-background-active;
+        z-index: 1;
 
         @if $dot-transform-active {
           transform: $dot-transform-active;

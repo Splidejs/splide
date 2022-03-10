@@ -1,3 +1,4 @@
+import { CLASS_ARROW, CLASS_PAGINATION_PAGE } from '../../constants/classes';
 import { EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_MOUNTED, EVENT_UPDATED } from '../../constants/events';
 import { SCROLL_LISTENER_OPTIONS } from '../../constants/listener-options';
 import { DRAGGING, IDLE, MOVING, SCROLLING } from '../../constants/states';
@@ -5,7 +6,7 @@ import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { abs, isObject, matches, min, noop, prevent, sign, timeOf } from '../../utils';
+import { abs, isObject, matches, min, noop, prevent, push, sign, timeOf } from '../../utils';
 import { FRICTION, LOG_INTERVAL, POINTER_DOWN_EVENTS, POINTER_MOVE_EVENTS, POINTER_UP_EVENTS } from './constants';
 
 
@@ -117,11 +118,9 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
     clickPrevented = false;
 
     if ( ! disabled ) {
-      const { noDrag } = options;
-      const isTouch     = isTouchEvent( e );
-      const isDraggable = ! noDrag || ! matches( e.target, noDrag );
+      const isTouch = isTouchEvent( e );
 
-      if ( isDraggable && ( isTouch || ! e.button ) ) {
+      if ( isDraggable( e.target ) && ( isTouch || ! e.button ) ) {
         if ( ! Controller.isBusy() ) {
           target        = isTouch ? track : window;
           dragging      = state.is( [ MOVING, SCROLLING ] );
@@ -227,15 +226,16 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
     const velocity    = computeVelocity( e );
     const destination = computeDestination( velocity );
     const rewind      = options.rewind && options.rewindByDrag;
+    const { go } = Controller;
 
     if ( isFree ) {
       Controller.scroll( destination, 0, options.snap );
     } else if ( Splide.is( FADE ) ) {
-      Controller.go( orient( sign( velocity ) ) < 0 ? ( rewind ? '<' : '-' ) : ( rewind ? '>' : '+' ) );
+      go( orient( sign( velocity ) ) < 0 ? ( rewind ? '<' : '-' ) : ( rewind ? '>' : '+' ) );
     } else if ( Splide.is( SLIDE ) && exceeded && rewind ) {
-      Controller.go( exceededLimit( true ) ? '>' : '<' );
+      go( exceededLimit( true ) ? '>' : '<' );
     } else {
-      Controller.go( Controller.toDest( destination ), true );
+      go( Controller.toDest( destination ), true );
     }
   }
 
@@ -356,6 +356,20 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    */
   function constrain( diff: number ): number {
     return diff / ( exceeded && Splide.is( SLIDE ) ? FRICTION : 1 );
+  }
+
+  /**
+   * Returns `true` if the user can drag the target.
+   *
+   * @param target - An event target.
+   *
+   * @return `true` if the target is draggable.
+   */
+  function isDraggable( target: EventTarget ): boolean {
+    return ! matches( target, push(
+      ( options.noDrag || '' ).split( ',' ).filter( Boolean ),
+      [ `.${ CLASS_PAGINATION_PAGE }`, `.${ CLASS_ARROW }` ]
+    ).join( ',' ) );
   }
 
   /**

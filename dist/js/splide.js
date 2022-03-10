@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 3.6.14
+ * Version  : 4.0.0
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
@@ -157,9 +157,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   function children(parent, selector) {
-    return parent ? slice(parent.children).filter(function (child) {
+    var children2 = parent ? slice(parent.children) : [];
+    return selector ? children2.filter(function (child) {
       return matches(child, selector);
-    }) : [];
+    }) : children2;
   }
 
   function child(parent, selector) {
@@ -698,7 +699,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var ARIA_LIVE = ARIA_PREFIX + "live";
   var ALL_ATTRIBUTES = [ROLE, TAB_INDEX, DISABLED, ARIA_CONTROLS, ARIA_CURRENT, ARIA_LABEL, ARIA_HIDDEN, ARIA_ORIENTATION, ARIA_ROLEDESCRIPTION, ARIA_ATOMIC, ARIA_LIVE];
   var CLASS_ROOT = PROJECT_CODE;
-  var CLASS_SLIDER = PROJECT_CODE + "__slider";
   var CLASS_TRACK = PROJECT_CODE + "__track";
   var CLASS_LIST = PROJECT_CODE + "__list";
   var CLASS_SLIDE = PROJECT_CODE + "__slide";
@@ -735,6 +735,24 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     spinner: CLASS_SPINNER
   };
 
+  function closest(from, selector) {
+    if (isFunction(from.closest)) {
+      return from.closest(selector);
+    }
+
+    var elm = from;
+
+    while (elm && elm.nodeType === 1) {
+      if (matches(elm, selector)) {
+        break;
+      }
+
+      elm = elm.parentElement;
+    }
+
+    return elm;
+  }
+
   function Elements(Splide2, Components2, options) {
     var _EventInterface = EventInterface(Splide2),
         on = _EventInterface.on;
@@ -744,7 +762,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var elements = {};
     var slides = [];
     var classes;
-    var slider;
     var track;
     var list;
 
@@ -772,26 +789,27 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function collect() {
-      slider = child(root, "." + CLASS_SLIDER);
-      track = query(root, "." + CLASS_TRACK);
+      track = find("." + CLASS_TRACK);
       list = child(track, "." + CLASS_LIST);
       assert(track && list, "A track/list element is missing.");
       push(slides, children(list, "." + CLASS_SLIDE + ":not(." + CLASS_CLONE + ")"));
-      var autoplay = find("." + CLASS_AUTOPLAY);
-      var arrows = find("." + CLASS_ARROWS);
+      forOwn({
+        arrows: CLASS_ARROWS,
+        pagination: CLASS_PAGINATION,
+        autoplay: CLASS_AUTOPLAY,
+        prev: CLASS_ARROW_PREV,
+        next: CLASS_ARROW_NEXT,
+        bar: CLASS_PROGRESS_BAR,
+        play: CLASS_PLAY,
+        pause: CLASS_PAUSE
+      }, function (className, key) {
+        elements[key] = find("." + className);
+      });
       assign(elements, {
         root: root,
-        slider: slider,
         track: track,
         list: list,
-        slides: slides,
-        arrows: arrows,
-        autoplay: autoplay,
-        prev: query(arrows, "." + CLASS_ARROW_PREV),
-        next: query(arrows, "." + CLASS_ARROW_NEXT),
-        bar: query(find("." + CLASS_PROGRESS), "." + CLASS_PROGRESS_BAR),
-        play: query(autoplay, "." + CLASS_PLAY),
-        pause: query(autoplay, "." + CLASS_PAUSE)
+        slides: slides
       });
     }
 
@@ -806,7 +824,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function find(selector) {
-      return child(root, selector) || child(slider, selector);
+      var elm = query(root, selector);
+      return elm && closest(elm, "." + CLASS_ROOT) === root ? elm : null;
     }
 
     function getClasses() {
@@ -1703,13 +1722,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var _EventInterface8 = EventInterface(Splide2),
         on = _EventInterface8.on,
         bind = _EventInterface8.bind,
-        emit = _EventInterface8.emit;
+        emit = _EventInterface8.emit,
+        destroyEvents = _EventInterface8.destroy;
 
     var classes = options.classes,
         i18n = options.i18n;
     var Elements = Components2.Elements,
         Controller = Components2.Controller;
-    var wrapper = Elements.arrows;
+    var userArrows = Elements.arrows;
+    var wrapper = userArrows;
     var prev = Elements.prev;
     var next = Elements.next;
     var created;
@@ -1717,51 +1738,65 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function mount() {
       init();
-      on(EVENT_UPDATED, init);
+      on(EVENT_UPDATED, remount);
+    }
+
+    function remount() {
+      destroy();
+      mount();
     }
 
     function init() {
-      if (options.arrows) {
-        if (!prev || !next) {
-          createArrows();
-        }
+      var enabled = options.arrows;
+
+      if (enabled && !(prev && next)) {
+        createArrows();
       }
 
       if (prev && next) {
-        if (!arrows.prev) {
-          setAttribute([prev, next], ARIA_CONTROLS, Elements.list.id);
-          arrows.prev = prev;
-          arrows.next = next;
+        assign(arrows, {
+          prev: prev,
+          next: next
+        });
+        display(wrapper, enabled ? "" : "none");
+
+        if (enabled) {
           listen();
+          update();
+          setAttribute([prev, next], ARIA_CONTROLS, Elements.list.id);
           emit(EVENT_ARROWS_MOUNTED, prev, next);
         }
-
-        display(wrapper, options.arrows === false ? "none" : "");
       }
     }
 
     function destroy() {
+      destroyEvents();
+
       if (created) {
-        remove(wrapper);
+        remove(userArrows ? [prev, next] : wrapper);
+        prev = next = null;
       } else {
         removeAttribute([prev, next], ALL_ATTRIBUTES);
       }
     }
 
     function listen() {
-      var go = Controller.go;
-      on([EVENT_MOUNTED, EVENT_MOVED, EVENT_UPDATED, EVENT_REFRESH, EVENT_SCROLLED], update);
-      bind(next, "click", apply(go, ">", true, void 0));
-      bind(prev, "click", apply(go, "<", true, void 0));
+      on([EVENT_MOVED, EVENT_REFRESH, EVENT_SCROLLED], update);
+      bind(next, "click", apply(go, ">"));
+      bind(prev, "click", apply(go, "<"));
+    }
+
+    function go(control) {
+      Controller.go(control, true);
     }
 
     function createArrows() {
-      wrapper = create("div", classes.arrows);
+      wrapper = userArrows || create("div", classes.arrows);
       prev = createArrow(true);
       next = createArrow(false);
       created = true;
       append(wrapper, [prev, next]);
-      before(wrapper, child(options.arrows === "slider" && Elements.slider || Splide2.root));
+      !userArrows && before(wrapper, Elements.track);
     }
 
     function createArrow(prev2) {
@@ -2079,11 +2114,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       clickPrevented = false;
 
       if (!disabled) {
-        var noDrag = options.noDrag;
         var isTouch = isTouchEvent(e);
-        var isDraggable = !noDrag || !matches(e.target, noDrag);
 
-        if (isDraggable && (isTouch || !e.button)) {
+        if (isDraggable(e.target) && (isTouch || !e.button)) {
           if (!Controller.isBusy()) {
             target = isTouch ? track : window;
             dragging = state.is([MOVING, SCROLLING]);
@@ -2158,15 +2191,16 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var velocity = computeVelocity(e);
       var destination = computeDestination(velocity);
       var rewind = options.rewind && options.rewindByDrag;
+      var go = Controller.go;
 
       if (isFree) {
         Controller.scroll(destination, 0, options.snap);
       } else if (Splide2.is(FADE)) {
-        Controller.go(orient(sign(velocity)) < 0 ? rewind ? "<" : "-" : rewind ? ">" : "+");
+        go(orient(sign(velocity)) < 0 ? rewind ? "<" : "-" : rewind ? ">" : "+");
       } else if (Splide2.is(SLIDE) && exceeded && rewind) {
-        Controller.go(exceededLimit(true) ? ">" : "<");
+        go(exceededLimit(true) ? ">" : "<");
       } else {
-        Controller.go(Controller.toDest(destination), true);
+        go(Controller.toDest(destination), true);
       }
     }
 
@@ -2216,6 +2250,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function constrain(diff) {
       return diff / (exceeded && Splide2.is(SLIDE) ? FRICTION : 1);
+    }
+
+    function isDraggable(target2) {
+      return !matches(target2, push((options.noDrag || "").split(",").filter(Boolean), ["." + CLASS_PAGINATION_PAGE, "." + CLASS_ARROW]).join(","));
     }
 
     function isTouchEvent(e) {
@@ -2445,7 +2483,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         on = _EventInterface15.on,
         emit = _EventInterface15.emit,
         bind = _EventInterface15.bind,
-        unbind = _EventInterface15.unbind;
+        destroyEvents = _EventInterface15.destroy;
 
     var Slides = Components2.Slides,
         Elements = Components2.Elements,
@@ -2455,21 +2493,17 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         go = Controller.go;
     var resolve = Components2.Direction.resolve;
     var items = [];
-    var list;
+    var pagination;
 
     function mount() {
-      init();
-      on([EVENT_UPDATED, EVENT_REFRESH], init);
-      on([EVENT_MOVE, EVENT_SCROLL, EVENT_SCROLLED], update);
-    }
-
-    function init() {
       destroy();
+      on([EVENT_UPDATED, EVENT_REFRESH], mount);
 
       if (options.pagination && Slides.isEnough()) {
+        on([EVENT_MOVE, EVENT_SCROLL, EVENT_SCROLLED], update);
         createPagination();
         emit(EVENT_PAGINATION_MOUNTED, {
-          list: list,
+          list: pagination,
           items: items
         }, getAt(Splide2.index));
         update();
@@ -2477,13 +2511,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function destroy() {
-      if (list) {
-        remove(list);
-        items.forEach(function (item) {
-          unbind(item.button, "click keydown focus");
-        });
+      if (pagination) {
+        destroyEvents();
+        remove(Elements.pagination ? slice(pagination.children) : pagination);
         empty(items);
-        list = null;
+        pagination = null;
       }
     }
 
@@ -2492,15 +2524,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var classes = options.classes,
           i18n = options.i18n,
           perPage = options.perPage;
-      var parent = options.pagination === "slider" && Elements.slider || Elements.root;
       var max = hasFocus() ? length : ceil(length / perPage);
-      list = create("ul", classes.pagination, parent);
-      setAttribute(list, ROLE, "tablist");
-      setAttribute(list, ARIA_LABEL, i18n.select);
-      setAttribute(list, ARIA_ORIENTATION, options.direction === TTB ? "vertical" : "");
+      pagination = Elements.pagination || create("ul", classes.pagination, Elements.root);
+      setAttribute(pagination, ROLE, "tablist");
+      setAttribute(pagination, ARIA_LABEL, i18n.select);
+      setAttribute(pagination, ARIA_ORIENTATION, options.direction === TTB ? "vertical" : "");
 
       for (var i = 0; i < max; i++) {
-        var li = create("li", null, list);
+        var li = create("li", null, pagination);
         var button = create("button", {
           class: classes.page,
           type: "button"
@@ -2579,7 +2610,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }
 
       emit(EVENT_PAGINATION_UPDATED, {
-        list: list,
+        list: pagination,
         items: items
       }, prev, curr);
     }

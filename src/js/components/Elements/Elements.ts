@@ -7,13 +7,12 @@ import {
   CLASS_AUTOPLAY,
   CLASS_CLONE,
   CLASS_LIST,
+  CLASS_PAGINATION,
   CLASS_PAUSE,
   CLASS_PLAY,
-  CLASS_PROGRESS,
   CLASS_PROGRESS_BAR,
   CLASS_ROOT,
   CLASS_SLIDE,
-  CLASS_SLIDER,
   CLASS_TRACK,
 } from '../../constants/classes';
 import { EVENT_REFRESH, EVENT_UPDATED } from '../../constants/events';
@@ -28,6 +27,7 @@ import {
   child,
   children,
   empty,
+  forOwn,
   push,
   query,
   removeAttribute,
@@ -35,6 +35,7 @@ import {
   setAttribute,
   uniqueId,
 } from '../../utils';
+import { closest } from '../../utils/dom/closest/closest';
 
 
 /**
@@ -44,17 +45,17 @@ import {
  */
 export interface ElementCollection {
   root: HTMLElement;
-  slider: HTMLElement;
   track: HTMLElement;
   list: HTMLElement;
   slides: HTMLElement[];
-  arrows: HTMLElement;
-  prev: HTMLButtonElement;
-  next: HTMLButtonElement;
-  bar: HTMLElement;
-  autoplay: HTMLElement;
-  play: HTMLButtonElement;
-  pause: HTMLButtonElement;
+  arrows: HTMLElement | null;
+  pagination: HTMLUListElement | null;
+  prev: HTMLButtonElement | null;
+  next: HTMLButtonElement | null;
+  bar: HTMLElement | null;
+  autoplay: HTMLElement | null;
+  play: HTMLButtonElement | null;
+  pause: HTMLButtonElement | null;
 }
 
 /**
@@ -91,11 +92,6 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
    * Stores all root classes.
    */
   let classes: string[];
-
-  /**
-   * The slider element that may be `undefined`.
-   */
-  let slider: HTMLElement;
 
   /**
    * The track element.
@@ -146,31 +142,26 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
    * Collects elements which the slider consists of.
    */
   function collect(): void {
-    slider = child( root, `.${ CLASS_SLIDER }` );
-    track  = query( root, `.${ CLASS_TRACK }` );
-    list   = child( track, `.${ CLASS_LIST }` );
+    track = find( `.${ CLASS_TRACK }` );
+    list  = child( track, `.${ CLASS_LIST }` );
 
     assert( track && list, 'A track/list element is missing.' );
-
     push( slides, children( list, `.${ CLASS_SLIDE }:not(.${ CLASS_CLONE })` ) );
 
-    const autoplay = find( `.${ CLASS_AUTOPLAY }` );
-    const arrows   = find( `.${ CLASS_ARROWS }` );
-
-    assign( elements, {
-      root,
-      slider,
-      track,
-      list,
-      slides,
-      arrows,
-      autoplay,
-      prev : query( arrows, `.${ CLASS_ARROW_PREV }` ),
-      next : query( arrows, `.${ CLASS_ARROW_NEXT }` ),
-      bar  : query( find( `.${ CLASS_PROGRESS }` ), `.${ CLASS_PROGRESS_BAR }` ),
-      play : query( autoplay, `.${ CLASS_PLAY }` ),
-      pause: query( autoplay, `.${ CLASS_PAUSE }` ),
+    forOwn( {
+      arrows    : CLASS_ARROWS,
+      pagination: CLASS_PAGINATION,
+      autoplay  : CLASS_AUTOPLAY,
+      prev      : CLASS_ARROW_PREV,
+      next      : CLASS_ARROW_NEXT,
+      bar       : CLASS_PROGRESS_BAR,
+      play      : CLASS_PLAY,
+      pause     : CLASS_PAUSE,
+    }, ( className, key ) => {
+      elements[ key ] = find( `.${ className }` );
     } );
+
+    assign( elements, { root, track, list, slides } );
   }
 
   /**
@@ -188,12 +179,13 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
   }
 
   /**
-   * Finds an element only in children of the root or slider element.
+   * Finds an element only in this slider, ignoring elements in a nested slider.
    *
-   * @return {Element} - A found element or undefined.
+   * @return A found element or null.
    */
-  function find( selector: string ): HTMLElement {
-    return child( root, selector ) || child( slider, selector );
+  function find( selector: string ): HTMLElement | null {
+    const elm = query<HTMLElement>( root, selector );
+    return elm && closest( elm, `.${ CLASS_ROOT }` ) === root ? elm : null;
   }
 
   /**

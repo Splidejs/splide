@@ -345,12 +345,12 @@ export interface ResponsiveOptions {
   /**
    * Determines whether to create/find arrows or not.
    */
-  arrows?: boolean | 'slider';
+  arrows?: boolean;
 
   /**
    * Determines whether to create pagination (indicator dots) or not.
    */
-  pagination?: boolean | 'slider';
+  pagination?: boolean;
 
   /**
    * The timing function for the CSS transition. For example, `linear`, ease or `cubic-bezier()`.

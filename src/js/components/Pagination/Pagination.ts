@@ -12,7 +12,8 @@ import {
   EVENT_MOVE,
   EVENT_PAGINATION_MOUNTED,
   EVENT_PAGINATION_UPDATED,
-  EVENT_REFRESH, EVENT_SCROLL,
+  EVENT_REFRESH,
+  EVENT_SCROLL,
   EVENT_SCROLLED,
   EVENT_UPDATED,
 } from '../../constants/events';
@@ -32,6 +33,7 @@ import {
   removeAttribute,
   removeClass,
   setAttribute,
+  slice,
 } from '../../utils';
 import { normalizeKey } from '../../utils/dom/normalizeKey/normalizeKey';
 
@@ -81,7 +83,7 @@ export interface PaginationItem {
  * @return A Pagination component object.
  */
 export function Pagination( Splide: Splide, Components: Components, options: Options ): PaginationComponent {
-  const { on, emit, bind, unbind } = EventInterface( Splide );
+  const { on, emit, bind, destroy: destroyEvents } = EventInterface( Splide );
   const { Slides, Elements, Controller } = Components;
   const { hasFocus, getIndex, go } = Controller;
   const { resolve } = Components.Direction;
@@ -94,26 +96,20 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
   /**
    * The pagination element.
    */
-  let list: HTMLUListElement;
+  let pagination: HTMLUListElement | null;
 
   /**
    * Called when the component is mounted.
    */
   function mount(): void {
-    init();
-    on( [ EVENT_UPDATED, EVENT_REFRESH ], init );
-    on( [ EVENT_MOVE, EVENT_SCROLL, EVENT_SCROLLED ], update );
-  }
-
-  /**
-   * Initializes the pagination.
-   */
-  function init(): void {
     destroy();
 
+    on( [ EVENT_UPDATED, EVENT_REFRESH ], mount );
+
     if ( options.pagination && Slides.isEnough() ) {
+      on( [ EVENT_MOVE, EVENT_SCROLL, EVENT_SCROLLED ], update );
       createPagination();
-      emit( EVENT_PAGINATION_MOUNTED, { list, items }, getAt( Splide.index ) );
+      emit( EVENT_PAGINATION_MOUNTED, { list: pagination, items }, getAt( Splide.index ) );
       update();
     }
   }
@@ -122,11 +118,11 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
    * Destroys the component.
    */
   function destroy(): void {
-    if ( list ) {
-      remove( list );
-      items.forEach( item => { unbind( item.button, 'click keydown focus' ) } );
+    if ( pagination ) {
+      destroyEvents();
+      remove( Elements.pagination ? slice( pagination.children ) : pagination );
       empty( items );
-      list = null;
+      pagination = null;
     }
   }
 
@@ -136,17 +132,16 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
   function createPagination(): void {
     const { length } = Splide;
     const { classes, i18n, perPage } = options;
-    const parent = options.pagination === 'slider' && Elements.slider || Elements.root;
-    const max    = hasFocus() ? length : ceil( length / perPage );
+    const max = hasFocus() ? length : ceil( length / perPage );
 
-    list = create( 'ul', classes.pagination, parent );
+    pagination = Elements.pagination || create( 'ul', classes.pagination, Elements.root );
 
-    setAttribute( list, ROLE, 'tablist' );
-    setAttribute( list, ARIA_LABEL, i18n.select );
-    setAttribute( list, ARIA_ORIENTATION, options.direction === TTB ? 'vertical' : '' );
+    setAttribute( pagination, ROLE, 'tablist' );
+    setAttribute( pagination, ARIA_LABEL, i18n.select );
+    setAttribute( pagination, ARIA_ORIENTATION, options.direction === TTB ? 'vertical' : '' );
 
     for ( let i = 0; i < max; i++ ) {
-      const li       = create( 'li', null, list );
+      const li       = create( 'li', null, pagination );
       const button   = create( 'button', { class: classes.page, type: 'button' }, li );
       const controls = Slides.getIn( i ).map( Slide => Slide.slide.id );
       const text     = ! hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
@@ -244,7 +239,7 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
       setAttribute( button, TAB_INDEX, '' );
     }
 
-    emit( EVENT_PAGINATION_UPDATED, { list, items }, prev, curr );
+    emit( EVENT_PAGINATION_UPDATED, { list: pagination, items }, prev, curr );
   }
 
   return {
