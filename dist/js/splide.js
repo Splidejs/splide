@@ -761,14 +761,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var i18n = options.i18n;
     var elements = {};
     var slides = [];
-    var classes;
+    var rootClasses = [];
+    var trackClasses = [];
     var track;
     var list;
 
     function setup() {
       collect();
       init();
-      addClass(root, classes = getClasses());
+      update();
     }
 
     function mount() {
@@ -779,13 +780,18 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function destroy() {
       empty(slides);
-      removeClass(root, classes);
+      removeClass(root, rootClasses);
+      removeClass(track, trackClasses);
       removeAttribute([root, track, list], ALL_ATTRIBUTES.concat("style"));
     }
 
     function update() {
-      removeClass(root, classes);
-      addClass(root, classes = getClasses());
+      removeClass(root, rootClasses);
+      removeClass(track, trackClasses);
+      rootClasses = getClasses(CLASS_ROOT);
+      trackClasses = getClasses(CLASS_TRACK);
+      addClass(root, rootClasses);
+      addClass(track, trackClasses);
     }
 
     function collect() {
@@ -828,8 +834,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       return elm && closest(elm, "." + CLASS_ROOT) === root ? elm : null;
     }
 
-    function getClasses() {
-      return [CLASS_ROOT + "--" + options.type, CLASS_ROOT + "--" + options.direction, options.drag && CLASS_ROOT + "--draggable", options.isNavigation && CLASS_ROOT + "--nav", CLASS_ACTIVE];
+    function getClasses(base) {
+      return [base + "--" + options.type, base + "--" + options.direction, options.drag && base + "--draggable", options.isNavigation && base + "--nav", base === CLASS_ROOT && CLASS_ACTIVE];
     }
 
     return assign(elements, {
@@ -1730,6 +1736,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var Elements = Components2.Elements,
         Controller = Components2.Controller;
     var userArrows = Elements.arrows;
+    var wrapperClasses = CLASS_ARROWS + "--" + options.direction;
     var wrapper = userArrows;
     var prev = Elements.prev;
     var next = Elements.next;
@@ -1759,6 +1766,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           next: next
         });
         display(wrapper, enabled ? "" : "none");
+        addClass(wrapper, wrapperClasses);
 
         if (enabled) {
           listen();
@@ -1771,6 +1779,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function destroy() {
       destroyEvents();
+      removeClass(wrapper, wrapperClasses);
 
       if (created) {
         remove(userArrows ? [prev, next] : wrapper);
@@ -2492,6 +2501,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         getIndex = Controller.getIndex,
         go = Controller.go;
     var resolve = Components2.Direction.resolve;
+    var paginationClasses = CLASS_PAGINATION + "--" + options.direction;
     var items = [];
     var pagination;
 
@@ -2514,6 +2524,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       if (pagination) {
         destroyEvents();
         remove(Elements.pagination ? slice(pagination.children) : pagination);
+        removeClass(pagination, paginationClasses);
         empty(items);
         pagination = null;
       }
@@ -2526,6 +2537,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           perPage = options.perPage;
       var max = hasFocus() ? length : ceil(length / perPage);
       pagination = Elements.pagination || create("ul", classes.pagination, Elements.root);
+      addClass(pagination, paginationClasses);
       setAttribute(pagination, ROLE, "tablist");
       setAttribute(pagination, ARIA_LABEL, i18n.select);
       setAttribute(pagination, ARIA_ORIENTATION, options.direction === TTB ? "vertical" : "");

@@ -1,4 +1,5 @@
 import { ALL_ATTRIBUTES, ARIA_CONTROLS, ARIA_LABEL } from '../../constants/attributes';
+import { CLASS_ARROWS } from '../../constants/classes';
 import {
   EVENT_ARROWS_MOUNTED,
   EVENT_ARROWS_UPDATED,
@@ -11,6 +12,7 @@ import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import {
+  addClass,
   append,
   apply,
   assign,
@@ -20,6 +22,7 @@ import {
   parseHtml,
   remove,
   removeAttribute,
+  removeClass,
   setAttribute,
 } from '../../utils';
 import { PATH, SIZE, XML_NAME_SPACE } from './path';
@@ -49,7 +52,8 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
   const { on, bind, emit, destroy: destroyEvents } = EventInterface( Splide );
   const { classes, i18n } = options;
   const { Elements, Controller } = Components;
-  const userArrows = Elements.arrows;
+  const userArrows     = Elements.arrows;
+  const wrapperClasses = `${ CLASS_ARROWS }--${ options.direction }`;
 
   /**
    * The wrapper element.
@@ -105,6 +109,7 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
     if ( prev && next ) {
       assign( arrows, { prev, next } );
       display( wrapper, enabled ? '' : 'none' );
+      addClass( wrapper, wrapperClasses );
 
       if ( enabled ) {
         listen();
@@ -120,6 +125,7 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
    */
   function destroy(): void {
     destroyEvents();
+    removeClass( wrapper, wrapperClasses );
 
     if ( created ) {
       remove( userArrows ? [ prev, next ] : wrapper );

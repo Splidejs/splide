@@ -91,7 +91,12 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
   /**
    * Stores all root classes.
    */
-  let classes: string[];
+  let rootClasses: string[] = [];
+
+  /**
+   * Stores all list classes.
+   */
+  let trackClasses: string[] = [];
 
   /**
    * The track element.
@@ -109,7 +114,7 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
   function setup(): void {
     collect();
     init();
-    addClass( root, ( classes = getClasses() ) );
+    update();
   }
 
   /**
@@ -126,7 +131,8 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
    */
   function destroy(): void {
     empty( slides );
-    removeClass( root, classes );
+    removeClass( root, rootClasses );
+    removeClass( track, trackClasses );
     removeAttribute( [ root, track, list ], ALL_ATTRIBUTES.concat( 'style' ) );
   }
 
@@ -134,8 +140,14 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
    * Updates the status of elements.
    */
   function update(): void {
-    removeClass( root, classes );
-    addClass( root, ( classes = getClasses() ) );
+    removeClass( root, rootClasses );
+    removeClass( track, trackClasses );
+
+    rootClasses  = getClasses( CLASS_ROOT );
+    trackClasses = getClasses( CLASS_TRACK );
+
+    addClass( root, rootClasses );
+    addClass( track, trackClasses );
   }
 
   /**
@@ -189,17 +201,19 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
   }
 
   /**
-   * Return an array with classes for the root element.
+   * Return an array with modifier classes.
+   *
+   * @param base - A base class name.
    *
    * @return An array with classes.
    */
-  function getClasses(): string[] {
+  function getClasses( base: string ): string[] {
     return [
-      `${ CLASS_ROOT }--${ options.type }`,
-      `${ CLASS_ROOT }--${ options.direction }`,
-      options.drag && `${ CLASS_ROOT }--draggable`,
-      options.isNavigation && `${ CLASS_ROOT }--nav`,
-      CLASS_ACTIVE,
+      `${ base }--${ options.type }`,
+      `${ base }--${ options.direction }`,
+      options.drag && `${ base }--draggable`,
+      options.isNavigation && `${ base }--nav`,
+      base === CLASS_ROOT && CLASS_ACTIVE,
     ];
   }
 

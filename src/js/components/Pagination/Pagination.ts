@@ -6,7 +6,7 @@ import {
   ROLE,
   TAB_INDEX,
 } from '../../constants/attributes';
-import { CLASS_ACTIVE } from '../../constants/classes';
+import { CLASS_ACTIVE, CLASS_PAGINATION } from '../../constants/classes';
 import { TTB } from '../../constants/directions';
 import {
   EVENT_MOVE,
@@ -87,6 +87,7 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
   const { Slides, Elements, Controller } = Components;
   const { hasFocus, getIndex, go } = Controller;
   const { resolve } = Components.Direction;
+  const paginationClasses = `${ CLASS_PAGINATION }--${ options.direction }`;
 
   /**
    * Stores all pagination items.
@@ -121,6 +122,7 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
     if ( pagination ) {
       destroyEvents();
       remove( Elements.pagination ? slice( pagination.children ) : pagination );
+      removeClass( pagination, paginationClasses );
       empty( items );
       pagination = null;
     }
@@ -136,6 +138,7 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
 
     pagination = Elements.pagination || create( 'ul', classes.pagination, Elements.root );
 
+    addClass( pagination, paginationClasses );
     setAttribute( pagination, ROLE, 'tablist' );
     setAttribute( pagination, ARIA_LABEL, i18n.select );
     setAttribute( pagination, ARIA_ORIENTATION, options.direction === TTB ? 'vertical' : '' );

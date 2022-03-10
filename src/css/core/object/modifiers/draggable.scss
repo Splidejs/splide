@@ -1,11 +1,8 @@
 .splide {
   $root: &;
 
-  &--draggable {
-    > #{ $root }__slider > #{ $root }__track,
-    > #{ $root }__track {
-      -webkit-touch-callout: none;
-      user-select: none;
-    }
+  &__track--draggable {
+    -webkit-touch-callout: none;
+    user-select: none;
   }
 }

@@ -4,27 +4,23 @@ $arrow-left: 1em !default;
 .splide {
   $root: &;
 
-  &--rtl {
-    > #{ $root }__slider > #{ $root }__track > #{ $root }__arrows,
-    > #{ $root }__track > #{ $root }__arrows,
-    > #{ $root }__arrows {
-      #{ $root }__arrow {
-        &--prev {
-          left: auto;
-          right: $arrow-right;
+  &__arrows--rtl {
+    #{ $root }__arrow {
+      &--prev {
+        left: auto;
+        right: $arrow-right;
 
-          svg {
-            transform: scaleX( 1 );
-          }
+        svg {
+          transform: scaleX( 1 );
         }
+      }
 
-        &--next {
-          left: $arrow-left;
-          right: auto;
+      &--next {
+        left: $arrow-left;
+        right: auto;
 
-          svg {
-            transform: scaleX( -1 );
-          }
+        svg {
+          transform: scaleX( -1 );
         }
       }
     }

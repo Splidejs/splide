@@ -1,14 +1,9 @@
 .splide {
   $root: &;
 
-  &--ttb {
-    &.is-active {
-      > #{ $root }__slider > #{ $root }__track,
-      > #{ $root }__track {
-        > #{ $root }__list {
-          display: block;
-        }
-      }
+  &__track--ttb {
+    > #{ $root }__list {
+      display: block;
     }
   }
 }

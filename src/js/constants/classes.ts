@@ -2,7 +2,6 @@ import { PROJECT_CODE } from './project';
 
 
 export const CLASS_ROOT            = PROJECT_CODE;
-export const CLASS_SLIDER          = `${ PROJECT_CODE }__slider`;
 export const CLASS_TRACK           = `${ PROJECT_CODE }__track`;
 export const CLASS_LIST            = `${ PROJECT_CODE }__list`;
 export const CLASS_SLIDE           = `${ PROJECT_CODE }__slide`;
