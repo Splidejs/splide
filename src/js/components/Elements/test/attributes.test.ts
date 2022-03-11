@@ -13,8 +13,6 @@ describe( 'Elements', () => {
     const splide = init( { keyboard: 'focused' } );
     const { root, track, list } = splide.Components.Elements;
 
-    expect( root.getAttribute( TAB_INDEX ) ).not.toBeNull();
-
     splide.destroy();
 
     const attributes = ALL_ATTRIBUTES.concat( 'style' );

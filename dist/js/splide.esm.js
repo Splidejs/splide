@@ -139,7 +139,7 @@ function append(parent, children) {
 
 function before(nodes, ref) {
   forEach(nodes, function (node) {
-    var parent = ref.parentNode;
+    var parent = (ref || node).parentNode;
 
     if (parent) {
       parent.insertBefore(node, ref);
@@ -717,6 +717,7 @@ var CLASS_AUTOPLAY = PROJECT_CODE + "__autoplay";
 var CLASS_PLAY = PROJECT_CODE + "__play";
 var CLASS_PAUSE = PROJECT_CODE + "__pause";
 var CLASS_SPINNER = PROJECT_CODE + "__spinner";
+var CLASS_SR = PROJECT_CODE + "__sr";
 var CLASS_INITIALIZED = "is-initialized";
 var CLASS_ACTIVE = "is-active";
 var CLASS_PREV = "is-prev";
@@ -851,12 +852,10 @@ var LOOP = "loop";
 var FADE = "fade";
 
 function Slide$1(Splide2, index, slideIndex, slide) {
-  var _EventInterface2 = EventInterface(Splide2),
-      on = _EventInterface2.on,
-      emit = _EventInterface2.emit,
-      bind = _EventInterface2.bind,
-      destroyEvents = _EventInterface2.destroy;
-
+  var event = EventInterface(Splide2);
+  var on = event.on,
+      emit = event.emit,
+      bind = event.bind;
   var Components = Splide2.Components,
       root = Splide2.root,
       options = Splide2.options;
@@ -866,16 +865,20 @@ function Slide$1(Splide2, index, slideIndex, slide) {
       pagination = options.pagination;
   var resolve = Components.Direction.resolve;
   var styles = getAttribute(slide, "style");
+  var label = getAttribute(slide, ARIA_LABEL);
   var isClone = slideIndex > -1;
   var container = child(slide, "." + CLASS_CONTAINER);
+  var sr = create("span", CLASS_SR, child(slide));
   var destroyed;
 
   function mount() {
     if (!isClone) {
+      var slideLabel = label || format(i18n.slideLabel, [index + 1, Splide2.length]);
       slide.id = root.id + "-slide" + pad(index + 1);
       setAttribute(slide, ROLE, pagination ? "tabpanel" : "group");
       setAttribute(slide, ARIA_ROLEDESCRIPTION, pagination ? "" : i18n.slide);
-      setAttribute(slide, ARIA_LABEL, format(i18n.slideLabel, [index + 1, Splide2.length]));
+      setAttribute(slide, ARIA_LABEL, slideLabel);
+      sr.textContent = slideLabel;
     }
 
     listen();
@@ -895,10 +898,12 @@ function Slide$1(Splide2, index, slideIndex, slide) {
 
   function destroy() {
     destroyed = true;
-    destroyEvents();
+    event.destroy();
+    remove(sr);
     removeClass(slide, STATUS_CLASSES);
     removeAttribute(slide, ALL_ATTRIBUTES);
     setAttribute(slide, "style", styles);
+    setAttribute(slide, ARIA_LABEL, label || "");
   }
 
   function initNavigation() {
@@ -908,7 +913,8 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     }).join(" ");
     setAttribute(slide, ARIA_LABEL, format(i18n.slideX, (isClone ? slideIndex : index) + 1));
     setAttribute(slide, ARIA_CONTROLS, controls);
-    updateAttributes();
+    setAttribute(slide, ROLE, options.slideFocus ? "button" : "");
+    updateA11y();
   }
 
   function onMove() {
@@ -917,14 +923,14 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     }
   }
 
-  function update(excludeAttributes) {
+  function update(excludeA11y) {
     if (!destroyed) {
       var curr = Splide2.index;
       updateActivity();
       updateVisibility();
       toggleClass(slide, CLASS_PREV, index === curr - 1);
       toggleClass(slide, CLASS_NEXT, index === curr + 1);
-      !excludeAttributes && updateAttributes();
+      !excludeA11y && updateA11y();
     }
   }
 
@@ -951,13 +957,17 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     }
   }
 
-  function updateAttributes() {
+  function updateA11y() {
     var active = isActive();
     var hidden = !isVisible() && (!active || isClone);
     setAttribute(slide, ARIA_CURRENT, isNavigation && active || "");
     setAttribute(slide, ARIA_HIDDEN, hidden || "");
     setAttribute(slide, TAB_INDEX, !hidden && options.slideFocus ? 0 : "");
     setAttribute(queryAll(slide, options.focusableNodes || ""), TAB_INDEX, hidden ? -1 : "");
+
+    if (options.live) {
+      hidden ? remove(sr) : before(sr, child(slide));
+    }
   }
 
   function style$1(prop, value, useContainer) {
@@ -1007,10 +1017,10 @@ function Slide$1(Splide2, index, slideIndex, slide) {
 }
 
 function Slides(Splide2, Components2, options) {
-  var _EventInterface3 = EventInterface(Splide2),
-      on = _EventInterface3.on,
-      emit = _EventInterface3.emit,
-      bind = _EventInterface3.bind;
+  var _EventInterface2 = EventInterface(Splide2),
+      on = _EventInterface2.on,
+      emit = _EventInterface2.emit,
+      bind = _EventInterface2.bind;
 
   var _Components2$Elements = Components2.Elements,
       slides = _Components2$Elements.slides,
@@ -1155,10 +1165,10 @@ function Slides(Splide2, Components2, options) {
 }
 
 function Layout(Splide2, Components2, options) {
-  var _EventInterface4 = EventInterface(Splide2),
-      on = _EventInterface4.on,
-      bind = _EventInterface4.bind,
-      emit = _EventInterface4.emit;
+  var _EventInterface3 = EventInterface(Splide2),
+      on = _EventInterface3.on,
+      bind = _EventInterface3.bind,
+      emit = _EventInterface3.emit;
 
   var Slides = Components2.Slides;
   var resolve = Components2.Direction.resolve;
@@ -1282,9 +1292,9 @@ function Layout(Splide2, Components2, options) {
 var MULTIPLIER = 2;
 
 function Clones(Splide2, Components2, options) {
-  var _EventInterface5 = EventInterface(Splide2),
-      on = _EventInterface5.on,
-      emit = _EventInterface5.emit;
+  var _EventInterface4 = EventInterface(Splide2),
+      on = _EventInterface4.on,
+      emit = _EventInterface4.emit;
 
   var Elements = Components2.Elements,
       Slides = Components2.Slides;
@@ -1364,9 +1374,9 @@ function Clones(Splide2, Components2, options) {
 }
 
 function Move(Splide2, Components2, options) {
-  var _EventInterface6 = EventInterface(Splide2),
-      on = _EventInterface6.on,
-      emit = _EventInterface6.emit;
+  var _EventInterface5 = EventInterface(Splide2),
+      on = _EventInterface5.on,
+      emit = _EventInterface5.emit;
 
   var set = Splide2.state.set;
   var _Components2$Layout = Components2.Layout,
@@ -1527,8 +1537,8 @@ function Move(Splide2, Components2, options) {
 }
 
 function Controller(Splide2, Components2, options) {
-  var _EventInterface7 = EventInterface(Splide2),
-      on = _EventInterface7.on;
+  var _EventInterface6 = EventInterface(Splide2),
+      on = _EventInterface6.on;
 
   var Move = Components2.Move;
   var getPosition = Move.getPosition,
@@ -1726,12 +1736,10 @@ var PATH = "m15.5 0.932-4.3 4.38 14.5 14.6-14.5 14.5 4.3 4.4 14.6-14.6 4.4-4.3-4
 var SIZE = 40;
 
 function Arrows(Splide2, Components2, options) {
-  var _EventInterface8 = EventInterface(Splide2),
-      on = _EventInterface8.on,
-      bind = _EventInterface8.bind,
-      emit = _EventInterface8.emit,
-      destroyEvents = _EventInterface8.destroy;
-
+  var event = EventInterface(Splide2);
+  var on = event.on,
+      bind = event.bind,
+      emit = event.emit;
   var classes = options.classes,
       i18n = options.i18n;
   var Elements = Components2.Elements,
@@ -1779,7 +1787,7 @@ function Arrows(Splide2, Components2, options) {
   }
 
   function destroy() {
-    destroyEvents();
+    event.destroy();
     removeClass(wrapper, wrapperClasses);
 
     if (created) {
@@ -1837,10 +1845,10 @@ function Arrows(Splide2, Components2, options) {
 var INTERVAL_DATA_ATTRIBUTE = DATA_ATTRIBUTE + "-interval";
 
 function Autoplay(Splide2, Components2, options) {
-  var _EventInterface9 = EventInterface(Splide2),
-      on = _EventInterface9.on,
-      bind = _EventInterface9.bind,
-      emit = _EventInterface9.emit;
+  var _EventInterface7 = EventInterface(Splide2),
+      on = _EventInterface7.on,
+      bind = _EventInterface7.bind,
+      emit = _EventInterface7.emit;
 
   var interval = RequestInterval(options.interval, Splide2.go.bind(Splide2, ">"), update);
   var isPaused = interval.isPaused;
@@ -1943,8 +1951,8 @@ function Autoplay(Splide2, Components2, options) {
 }
 
 function Cover(Splide2, Components2, options) {
-  var _EventInterface10 = EventInterface(Splide2),
-      on = _EventInterface10.on;
+  var _EventInterface8 = EventInterface(Splide2),
+      on = _EventInterface8.on;
 
   function mount() {
     if (options.cover) {
@@ -1981,9 +1989,9 @@ var BASE_VELOCITY = 1.5;
 var MIN_DURATION = 800;
 
 function Scroll(Splide2, Components2, options) {
-  var _EventInterface11 = EventInterface(Splide2),
-      on = _EventInterface11.on,
-      emit = _EventInterface11.emit;
+  var _EventInterface9 = EventInterface(Splide2),
+      on = _EventInterface9.on,
+      emit = _EventInterface9.emit;
 
   var set = Splide2.state.set;
   var Move = Components2.Move;
@@ -2077,11 +2085,11 @@ var POINTER_MOVE_EVENTS = "touchmove mousemove";
 var POINTER_UP_EVENTS = "touchend touchcancel mouseup";
 
 function Drag(Splide2, Components2, options) {
-  var _EventInterface12 = EventInterface(Splide2),
-      on = _EventInterface12.on,
-      emit = _EventInterface12.emit,
-      bind = _EventInterface12.bind,
-      unbind = _EventInterface12.unbind;
+  var _EventInterface10 = EventInterface(Splide2),
+      on = _EventInterface10.on,
+      emit = _EventInterface10.emit,
+      bind = _EventInterface10.bind,
+      unbind = _EventInterface10.unbind;
 
   var state = Splide2.state;
   var Move = Components2.Move,
@@ -2263,7 +2271,8 @@ function Drag(Splide2, Components2, options) {
   }
 
   function isDraggable(target2) {
-    return !matches(target2, push((options.noDrag || "").split(",").filter(Boolean), ["." + CLASS_PAGINATION_PAGE, "." + CLASS_ARROW]).join(","));
+    var noDrag = options.noDrag;
+    return !matches(target2, "." + CLASS_PAGINATION_PAGE + ", ." + CLASS_ARROW) && !noDrag || !matches(target2, noDrag);
   }
 
   function isTouchEvent(e) {
@@ -2301,10 +2310,10 @@ function normalizeKey(key) {
 var KEYBOARD_EVENT = "keydown";
 
 function Keyboard(Splide2, Components2, options) {
-  var _EventInterface13 = EventInterface(Splide2),
-      on = _EventInterface13.on,
-      bind = _EventInterface13.bind,
-      unbind = _EventInterface13.unbind;
+  var _EventInterface11 = EventInterface(Splide2),
+      on = _EventInterface11.on,
+      bind = _EventInterface11.bind,
+      unbind = _EventInterface11.unbind;
 
   var root = Splide2.root;
   var resolve = Components2.Direction.resolve;
@@ -2322,13 +2331,7 @@ function Keyboard(Splide2, Components2, options) {
     var keyboard = options.keyboard;
 
     if (keyboard) {
-      if (keyboard === "focused") {
-        target = root;
-        setAttribute(root, TAB_INDEX, 0);
-      } else {
-        target = window;
-      }
-
+      target = keyboard === "global" ? window : root;
       bind(target, KEYBOARD_EVENT, onKeydown);
     }
   }
@@ -2373,11 +2376,11 @@ var SRCSET_DATA_ATTRIBUTE = SRC_DATA_ATTRIBUTE + "-srcset";
 var IMAGE_SELECTOR = "[" + SRC_DATA_ATTRIBUTE + "], [" + SRCSET_DATA_ATTRIBUTE + "]";
 
 function LazyLoad(Splide2, Components2, options) {
-  var _EventInterface14 = EventInterface(Splide2),
-      on = _EventInterface14.on,
-      off = _EventInterface14.off,
-      bind = _EventInterface14.bind,
-      emit = _EventInterface14.emit;
+  var _EventInterface12 = EventInterface(Splide2),
+      on = _EventInterface12.on,
+      off = _EventInterface12.off,
+      bind = _EventInterface12.bind,
+      emit = _EventInterface12.emit;
 
   var isSequential = options.lazyLoad === "sequential";
   var images = [];
@@ -2489,12 +2492,10 @@ function LazyLoad(Splide2, Components2, options) {
 }
 
 function Pagination(Splide2, Components2, options) {
-  var _EventInterface15 = EventInterface(Splide2),
-      on = _EventInterface15.on,
-      emit = _EventInterface15.emit,
-      bind = _EventInterface15.bind,
-      destroyEvents = _EventInterface15.destroy;
-
+  var event = EventInterface(Splide2);
+  var on = event.on,
+      emit = event.emit,
+      bind = event.bind;
   var Slides = Components2.Slides,
       Elements = Components2.Elements,
       Controller = Components2.Controller;
@@ -2523,7 +2524,7 @@ function Pagination(Splide2, Components2, options) {
 
   function destroy() {
     if (list) {
-      destroyEvents();
+      event.destroy();
       remove(Elements.pagination ? slice(list.children) : list);
       removeClass(list, paginationClasses);
       empty(items);
@@ -2714,15 +2715,13 @@ function Sync(Splide2, Components2, options) {
 }
 
 function Wheel(Splide2, Components2, options) {
-  var _EventInterface16 = EventInterface(Splide2),
-      bind = _EventInterface16.bind;
+  var _EventInterface13 = EventInterface(Splide2),
+      bind = _EventInterface13.bind;
 
-  var wheelOption = options.wheel;
-  var wheel = isObject(wheelOption) ? wheelOption : wheelOption && {};
   var lastTime = 0;
 
   function mount() {
-    if (wheel) {
+    if (options.wheel) {
       bind(Components2.Elements.track, "wheel", onWheel, SCROLL_LISTENER_OPTIONS);
     }
   }
@@ -2733,7 +2732,11 @@ function Wheel(Splide2, Components2, options) {
       var backwards = deltaY < 0;
       var timeStamp = timeOf(e);
 
-      if (abs(deltaY) > (wheel.min || 0) && timeStamp - lastTime > (wheel.sleep || 0)) {
+      var _min = options.wheelMinThreshold || 0;
+
+      var sleep = options.wheelSleep || 0;
+
+      if (abs(deltaY) > _min && timeStamp - lastTime > sleep) {
         Splide2.go(backwards ? "<" : ">");
         lastTime = timeStamp;
       }
@@ -2752,8 +2755,8 @@ function Wheel(Splide2, Components2, options) {
 }
 
 function Live(Splide2, Components2, options) {
-  var _EventInterface17 = EventInterface(Splide2),
-      on = _EventInterface17.on;
+  var _EventInterface14 = EventInterface(Splide2),
+      on = _EventInterface14.on;
 
   var list = Components2.Elements.list;
   var live = options.live;
@@ -2840,8 +2843,8 @@ var DEFAULTS = {
 };
 
 function Fade(Splide2, Components2, options) {
-  var _EventInterface18 = EventInterface(Splide2),
-      on = _EventInterface18.on;
+  var _EventInterface15 = EventInterface(Splide2),
+      on = _EventInterface15.on;
 
   function mount() {
     on([EVENT_MOUNTED, EVENT_REFRESH], function () {
@@ -2868,8 +2871,8 @@ function Fade(Splide2, Components2, options) {
 }
 
 function Slide(Splide2, Components2, options) {
-  var _EventInterface19 = EventInterface(Splide2),
-      bind = _EventInterface19.bind;
+  var _EventInterface16 = EventInterface(Splide2),
+      bind = _EventInterface16.bind;
 
   var Move = Components2.Move,
       Controller = Components2.Controller;
@@ -3179,8 +3182,8 @@ var SplideRenderer = /*#__PURE__*/function () {
   }
 
   SplideRenderer.clean = function clean(splide) {
-    var _EventInterface20 = EventInterface(splide),
-        on = _EventInterface20.on;
+    var _EventInterface17 = EventInterface(splide),
+        on = _EventInterface17.on;
 
     var root = splide.root;
     var clones = queryAll(root, "." + CLASS_CLONE);
@@ -3620,4 +3623,4 @@ var SplideRenderer = /*#__PURE__*/function () {
   return SplideRenderer;
 }();
 
-export { CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_AUTOPLAY, CLASS_CLONE, CLASS_CONTAINER, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PAUSE, CLASS_PLAY, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SPINNER, CLASS_TRACK, CLASS_VISIBLE, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MEDIA, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, EventBinder, EventInterface, RequestInterval, STATUS_CLASSES, Splide, SplideRenderer, State, Throttle, Splide as default };
+export { CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_AUTOPLAY, CLASS_CLONE, CLASS_CONTAINER, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PAUSE, CLASS_PLAY, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SPINNER, CLASS_SR, CLASS_TRACK, CLASS_VISIBLE, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MEDIA, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, EventBinder, EventInterface, RequestInterval, STATUS_CLASSES, Splide, SplideRenderer, State, Throttle, Splide as default };

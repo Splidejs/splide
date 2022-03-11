@@ -50,8 +50,9 @@ export function Direction( Splide: Splide, Components: Components, options: Opti
   /**
    * Resolves the provided property name.
    *
-   * @param prop     - A property name to translate.
-   * @param axisOnly - Optional. If `ture`, returns the same property for LTR and RTL.
+   * @param prop      - A property name to translate.
+   * @param axisOnly  - Optional. If `ture`, returns the same property for LTR and RTL.
+   * @param direction - Optional. Specify the direction. The default value is the `direction` option.
    */
   function resolve( prop: string, axisOnly?: boolean, direction?: Options['direction'] ): string {
     direction = direction || options.direction;

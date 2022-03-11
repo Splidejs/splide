@@ -6,7 +6,7 @@ import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { abs, isObject, matches, min, noop, prevent, push, sign, timeOf } from '../../utils';
+import { abs, isObject, matches, min, noop, prevent, sign, timeOf } from '../../utils';
 import { FRICTION, LOG_INTERVAL, POINTER_DOWN_EVENTS, POINTER_MOVE_EVENTS, POINTER_UP_EVENTS } from './constants';
 
 
@@ -366,10 +366,9 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    * @return `true` if the target is draggable.
    */
   function isDraggable( target: EventTarget ): boolean {
-    return ! matches( target, push(
-      ( options.noDrag || '' ).split( ',' ).filter( Boolean ),
-      [ `.${ CLASS_PAGINATION_PAGE }`, `.${ CLASS_ARROW }` ]
-    ).join( ',' ) );
+    const { noDrag } = options;
+    return ! matches( target, `.${ CLASS_PAGINATION_PAGE }, .${ CLASS_ARROW }` )
+      && ! noDrag || ! matches( target, noDrag );
   }
 
   /**

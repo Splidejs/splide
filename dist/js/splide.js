@@ -144,7 +144,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
   function before(nodes, ref) {
     forEach(nodes, function (node) {
-      var parent = ref.parentNode;
+      var parent = (ref || node).parentNode;
 
       if (parent) {
         parent.insertBefore(node, ref);
@@ -863,7 +863,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var isNavigation = options.isNavigation,
         updateOnMove = options.updateOnMove,
         i18n = options.i18n,
-        pagination = options.pagination;
+        pagination = options.pagination,
+        slideFocus = options.slideFocus;
     var resolve = Components.Direction.resolve;
     var styles = getAttribute(slide, "style");
     var label = getAttribute(slide, ARIA_LABEL);
@@ -914,6 +915,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }).join(" ");
       setAttribute(slide, ARIA_LABEL, format(i18n.slideX, (isClone ? slideIndex : index) + 1));
       setAttribute(slide, ARIA_CONTROLS, controls);
+      setAttribute(slide, ROLE, slideFocus ? "button" : "");
       updateA11y();
     }
 
@@ -962,8 +964,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var hidden = !isVisible() && (!active || isClone);
       setAttribute(slide, ARIA_CURRENT, isNavigation && active || "");
       setAttribute(slide, ARIA_HIDDEN, hidden || "");
-      setAttribute(slide, TAB_INDEX, !hidden && options.slideFocus ? 0 : "");
       setAttribute(queryAll(slide, options.focusableNodes || ""), TAB_INDEX, hidden ? -1 : "");
+
+      if (slideFocus) {
+        setAttribute(slide, TAB_INDEX, hidden ? -1 : 0);
+      }
 
       if (options.live) {
         hidden ? remove(sr) : before(sr, child(slide));
@@ -2271,7 +2276,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function isDraggable(target2) {
-      return !matches(target2, push((options.noDrag || "").split(",").filter(Boolean), ["." + CLASS_PAGINATION_PAGE, "." + CLASS_ARROW]).join(","));
+      var noDrag = options.noDrag;
+      return !matches(target2, "." + CLASS_PAGINATION_PAGE + ", ." + CLASS_ARROW) && !noDrag || !matches(target2, noDrag);
     }
 
     function isTouchEvent(e) {

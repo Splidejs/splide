@@ -9,7 +9,7 @@ import { forEach } from '../../array';
  */
 export function before( nodes: Node | Node[], ref: Node ): void {
   forEach( nodes, node => {
-    const parent = ref.parentNode;
+    const parent = ( ref || node ).parentNode;
 
     if ( parent ) {
       parent.insertBefore( node, ref );

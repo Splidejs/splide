@@ -93,7 +93,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   const event = EventInterface( Splide );
   const { on, emit, bind } = event;
   const { Components, root, options } = Splide;
-  const { isNavigation, updateOnMove, i18n, pagination } = options;
+  const { isNavigation, updateOnMove, i18n, pagination, slideFocus } = options;
   const { resolve } = Components.Direction;
   const styles    = getAttribute( slide, 'style' );
   const label     = getAttribute( slide, ARIA_LABEL );
@@ -162,6 +162,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
 
     setAttribute( slide, ARIA_LABEL, format( i18n.slideX, ( isClone ? slideIndex : index ) + 1 ) );
     setAttribute( slide, ARIA_CONTROLS, controls );
+    setAttribute( slide, ROLE, slideFocus ? 'button' : '' );
     updateA11y();
   }
 
@@ -231,8 +232,11 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
 
     setAttribute( slide, ARIA_CURRENT, isNavigation && active || '' );
     setAttribute( slide, ARIA_HIDDEN, hidden || '' );
-    setAttribute( slide, TAB_INDEX, ! hidden && options.slideFocus ? 0 : '' );
     setAttribute( queryAll( slide, options.focusableNodes || '' ), TAB_INDEX, hidden ? -1 : '' );
+
+    if ( slideFocus ) {
+      setAttribute( slide, TAB_INDEX, hidden ? -1 : 0 );
+    }
 
     if ( options.live ) {
       hidden ? remove( sr ) : before( sr, child( slide ) );
