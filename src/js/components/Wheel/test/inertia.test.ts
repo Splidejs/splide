@@ -4,7 +4,7 @@ import { fireCancelable } from './general.test';
 
 describe( 'Wheel', () => {
   test( 'should move the slider only when the delta is greater than the min threshold.', () => {
-    const splide = init( { speed: 0, wheel: { min: 50 } } );
+    const splide = init( { speed: 0, wheel: true, wheelMinThreshold: 50 } );
     const { track } = splide.Components.Elements;
 
     fireCancelable( track, 'wheel', { deltaY: 49 } );
@@ -27,7 +27,7 @@ describe( 'Wheel', () => {
   } );
 
   test( 'should not move the slider while the wheel component is sleeping.', () => {
-    const splide = init( { speed: 0, wheel: { sleep: 500 } } );
+    const splide = init( { speed: 0, wheel: true, wheelSleep: 500 } );
     const { track } = splide.Components.Elements;
 
     fireCancelable( track, 'wheel', { deltaY: 100, timeStamp: 1000 } );

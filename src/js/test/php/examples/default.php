@@ -22,7 +22,7 @@ $settings = get_settings();
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
 	      width       : 800,
-	      type        : 'loop',
+	      // type        : 'loop',
 	      perPage     : 3,
 	      rewind      : true,
 	      rewindByDrag: true,

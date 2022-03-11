@@ -104,20 +104,20 @@ export interface Options extends ResponsiveOptions {
 
   /**
    * Enables navigation by the mouse wheel.
-   * Set `waitForTransition` to `ture` or provide the `sleep` duration.
+   * Set `waitForTransition` to `ture` or provide the `wheelSleep` duration.
    */
-  wheel?: boolean | {
-    /**
-     * The threshold to cut off the small delta produced by inertia scroll.
-     */
-    min?: number,
+  wheel?: boolean;
 
-    /**
-     * The sleep time in milliseconds until accepting next wheel.
-     * The timer starts when the transition begins.
-     */
-    sleep?: number,
-  };
+  /**
+   * The threshold to cut off the small delta produced by inertia scroll.
+   */
+  wheelMinThreshold?: number;
+
+  /**
+   * The sleep time in milliseconds until accepting next wheel.
+   * The timer starts when the transition begins.
+   */
+  wheelSleep?: number;
 
   /**
    * Determines whether to release the wheel event when the slider reaches the first or last slide.

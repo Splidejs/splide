@@ -2508,7 +2508,7 @@ function Pagination(Splide2, Components2, options) {
       go = Controller.go;
   var resolve = Components2.Direction.resolve;
   var items = [];
-  var pagination;
+  var list;
   var paginationClasses;
 
   function mount() {
@@ -2520,19 +2520,19 @@ function Pagination(Splide2, Components2, options) {
       createPagination();
       update();
       emit(EVENT_PAGINATION_MOUNTED, {
-        list: pagination,
+        list: list,
         items: items
       }, getAt(Splide2.index));
     }
   }
 
   function destroy() {
-    if (pagination) {
+    if (list) {
       destroyEvents();
-      remove(Elements.pagination ? slice(pagination.children) : pagination);
-      removeClass(pagination, paginationClasses);
+      remove(Elements.pagination ? slice(list.children) : list);
+      removeClass(list, paginationClasses);
       empty(items);
-      pagination = null;
+      list = null;
     }
   }
 
@@ -2542,14 +2542,14 @@ function Pagination(Splide2, Components2, options) {
         i18n = options.i18n,
         perPage = options.perPage;
     var max = hasFocus() ? length : ceil(length / perPage);
-    pagination = Elements.pagination || create("ul", classes.pagination, Elements.root);
-    addClass(pagination, paginationClasses = CLASS_PAGINATION + "--" + options.direction);
-    setAttribute(pagination, ROLE, "tablist");
-    setAttribute(pagination, ARIA_LABEL, i18n.select);
-    setAttribute(pagination, ARIA_ORIENTATION, options.direction === TTB ? "vertical" : "");
+    list = Elements.pagination || create("ul", classes.pagination, Elements.root);
+    addClass(list, paginationClasses = CLASS_PAGINATION + "--" + getDirection());
+    setAttribute(list, ROLE, "tablist");
+    setAttribute(list, ARIA_LABEL, i18n.select);
+    setAttribute(list, ARIA_ORIENTATION, getDirection() === TTB ? "vertical" : "");
 
     for (var i = 0; i < max; i++) {
-      var li = create("li", null, pagination);
+      var li = create("li", null, list);
       var button = create("button", {
         class: classes.page,
         type: "button"
@@ -2584,11 +2584,12 @@ function Pagination(Splide2, Components2, options) {
   function onKeydown(page, e) {
     var length = items.length;
     var key = normalizeKey(e);
+    var dir = getDirection();
     var nextPage = -1;
 
-    if (key === resolve("ArrowRight")) {
+    if (key === resolve("ArrowRight", false, dir)) {
       nextPage = ++page % length;
-    } else if (key === resolve("ArrowLeft")) {
+    } else if (key === resolve("ArrowLeft", false, dir)) {
       nextPage = (--page + length) % length;
     } else if (key === "Home") {
       nextPage = 0;
@@ -2603,6 +2604,10 @@ function Pagination(Splide2, Components2, options) {
       go(">" + nextPage);
       prevent(e, true);
     }
+  }
+
+  function getDirection() {
+    return options.paginationDirection || options.direction;
   }
 
   function getAt(index) {
@@ -2628,7 +2633,7 @@ function Pagination(Splide2, Components2, options) {
     }
 
     emit(EVENT_PAGINATION_UPDATED, {
-      list: pagination,
+      list: list,
       items: items
     }, prev, curr);
   }
@@ -2832,7 +2837,6 @@ var DEFAULTS = {
   easing: "cubic-bezier(0.25, 1, 0.5, 1)",
   drag: true,
   direction: "ltr",
-  slideFocus: true,
   trimSpace: true,
   focusableNodes: "a, button, textarea, input, select, iframe",
   live: true,

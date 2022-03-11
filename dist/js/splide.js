@@ -2718,12 +2718,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var _EventInterface16 = EventInterface(Splide2),
         bind = _EventInterface16.bind;
 
-    var wheelOption = options.wheel;
-    var wheel = isObject(wheelOption) ? wheelOption : wheelOption && {};
     var lastTime = 0;
 
     function mount() {
-      if (wheel) {
+      if (options.wheel) {
         bind(Components2.Elements.track, "wheel", onWheel, SCROLL_LISTENER_OPTIONS);
       }
     }
@@ -2734,7 +2732,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         var backwards = deltaY < 0;
         var timeStamp = timeOf(e);
 
-        if (abs(deltaY) > (wheel.min || 0) && timeStamp - lastTime > (wheel.sleep || 0)) {
+        var _min = options.wheelMinThreshold || 0;
+
+        var sleep = options.wheelSleep || 0;
+
+        if (abs(deltaY) > _min && timeStamp - lastTime > sleep) {
           Splide2.go(backwards ? "<" : ">");
           lastTime = timeStamp;
         }
@@ -2833,7 +2835,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     easing: "cubic-bezier(0.25, 1, 0.5, 1)",
     drag: true,
     direction: "ltr",
-    slideFocus: true,
     trimSpace: true,
     focusableNodes: "a, button, textarea, input, select, iframe",
     live: true,

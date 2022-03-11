@@ -28,7 +28,6 @@ import {
   empty,
   focus,
   format,
-  isObject,
   prevent,
   remove,
   removeAttribute,
