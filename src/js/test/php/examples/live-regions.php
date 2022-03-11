@@ -22,7 +22,7 @@ $settings = get_settings();
 	      type        : 'loop',
 	      width       : 480,
 	      rewind      : true,
-	      live        : true,
+	      live        : false,
 	      speed       : 600,
 	      arrowPath   : 'm13.5 7.01 13 13m-13 13 13-13',
 	      updateOnMove: true,

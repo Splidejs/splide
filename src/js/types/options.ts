@@ -103,12 +103,6 @@ export interface Options extends ResponsiveOptions {
   keyboard?: boolean | string;
 
   /**
-   * Enables keyboard shortcuts for the pagination, recommended by W3C.
-   * The default value is `true`.
-   */
-  paginationKeyboard?: boolean;
-
-  /**
    * Enables navigation by the mouse wheel.
    * Set `waitForTransition` to `ture` or provide the `sleep` duration.
    */
@@ -351,6 +345,18 @@ export interface ResponsiveOptions {
    * Determines whether to create pagination (indicator dots) or not.
    */
   pagination?: boolean;
+
+  /**
+   * Determines whether to enable keyboard shortcuts for pagination when it contains focus.
+   * The default value is `true`.
+   */
+  paginationKeyboard?: boolean;
+
+  /**
+   * Explicitly sets the pagination direction that does not only affect appearance but also shortcuts and ARIA attributes.
+   * The default value is same with the carousel direction.
+   */
+  paginationDirection?: Options['direction'];
 
   /**
    * The timing function for the CSS transition. For example, `linear`, ease or `cubic-bezier()`.

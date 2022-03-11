@@ -631,7 +631,9 @@ function Media(Splide2, Components2, options) {
       destroy(true);
       Splide2.mount();
     } else {
+      var oriented = Splide2.options.direction !== options2.direction;
       Splide2.options = options2;
+      oriented && Splide2.refresh();
     }
   }
 
@@ -672,8 +674,8 @@ var ORIENTATION_MAP = {
 };
 
 function Direction(Splide2, Components2, options) {
-  function resolve(prop, axisOnly) {
-    var direction = options.direction;
+  function resolve(prop, axisOnly, direction) {
+    direction = direction || options.direction;
     var index = direction === RTL && !axisOnly ? 1 : direction === TTB ? 0 : -1;
     return ORIENTATION_MAP[prop][index] || prop;
   }
@@ -703,7 +705,6 @@ var ARIA_ATOMIC = ARIA_PREFIX + "atomic";
 var ARIA_LIVE = ARIA_PREFIX + "live";
 var ALL_ATTRIBUTES = [ROLE, TAB_INDEX, DISABLED, ARIA_CONTROLS, ARIA_CURRENT, ARIA_LABEL, ARIA_HIDDEN, ARIA_ORIENTATION, ARIA_ROLEDESCRIPTION, ARIA_ATOMIC, ARIA_LIVE];
 var CLASS_ROOT = PROJECT_CODE;
-var CLASS_SLIDER = PROJECT_CODE + "__slider";
 var CLASS_TRACK = PROJECT_CODE + "__track";
 var CLASS_LIST = PROJECT_CODE + "__list";
 var CLASS_SLIDE = PROJECT_CODE + "__slide";
@@ -766,14 +767,15 @@ function Elements(Splide2, Components2, options) {
   var i18n = options.i18n;
   var elements = {};
   var slides = [];
-  var classes;
+  var rootClasses = [];
+  var trackClasses = [];
   var track;
   var list;
 
   function setup() {
     collect();
     init();
-    addClass(root, classes = getClasses());
+    update();
   }
 
   function mount() {
@@ -784,13 +786,18 @@ function Elements(Splide2, Components2, options) {
 
   function destroy() {
     empty(slides);
-    removeClass(root, classes);
+    removeClass(root, rootClasses);
+    removeClass(track, trackClasses);
     removeAttribute([root, track, list], ALL_ATTRIBUTES.concat("style"));
   }
 
   function update() {
-    removeClass(root, classes);
-    addClass(root, classes = getClasses());
+    removeClass(root, rootClasses);
+    removeClass(track, trackClasses);
+    rootClasses = getClasses(CLASS_ROOT);
+    trackClasses = getClasses(CLASS_TRACK);
+    addClass(root, rootClasses);
+    addClass(track, trackClasses);
   }
 
   function collect() {
@@ -833,8 +840,8 @@ function Elements(Splide2, Components2, options) {
     return elm && closest(elm, "." + CLASS_ROOT) === root ? elm : null;
   }
 
-  function getClasses() {
-    return [CLASS_ROOT + "--" + options.type, CLASS_ROOT + "--" + options.direction, options.drag && CLASS_ROOT + "--draggable", options.isNavigation && CLASS_ROOT + "--nav", CLASS_ACTIVE];
+  function getClasses(base) {
+    return [base + "--" + options.type, base + "--" + options.direction, options.drag && base + "--draggable", options.isNavigation && base + "--nav", base === CLASS_ROOT && CLASS_ACTIVE];
   }
 
   return assign(elements, {
@@ -1739,6 +1746,7 @@ function Arrows(Splide2, Components2, options) {
   var prev = Elements.prev;
   var next = Elements.next;
   var created;
+  var wrapperClasses;
   var arrows = {};
 
   function mount() {
@@ -1764,6 +1772,7 @@ function Arrows(Splide2, Components2, options) {
         next: next
       });
       display(wrapper, enabled ? "" : "none");
+      addClass(wrapper, wrapperClasses = CLASS_ARROWS + "--" + options.direction);
 
       if (enabled) {
         listen();
@@ -1776,6 +1785,7 @@ function Arrows(Splide2, Components2, options) {
 
   function destroy() {
     destroyEvents();
+    removeClass(wrapper, wrapperClasses);
 
     if (created) {
       remove(userArrows ? [prev, next] : wrapper);
@@ -2499,6 +2509,7 @@ function Pagination(Splide2, Components2, options) {
   var resolve = Components2.Direction.resolve;
   var items = [];
   var pagination;
+  var paginationClasses;
 
   function mount() {
     destroy();
@@ -2507,11 +2518,11 @@ function Pagination(Splide2, Components2, options) {
     if (options.pagination && Slides.isEnough()) {
       on([EVENT_MOVE, EVENT_SCROLL, EVENT_SCROLLED], update);
       createPagination();
+      update();
       emit(EVENT_PAGINATION_MOUNTED, {
         list: pagination,
         items: items
       }, getAt(Splide2.index));
-      update();
     }
   }
 
@@ -2519,6 +2530,7 @@ function Pagination(Splide2, Components2, options) {
     if (pagination) {
       destroyEvents();
       remove(Elements.pagination ? slice(pagination.children) : pagination);
+      removeClass(pagination, paginationClasses);
       empty(items);
       pagination = null;
     }
@@ -2531,6 +2543,7 @@ function Pagination(Splide2, Components2, options) {
         perPage = options.perPage;
     var max = hasFocus() ? length : ceil(length / perPage);
     pagination = Elements.pagination || create("ul", classes.pagination, Elements.root);
+    addClass(pagination, paginationClasses = CLASS_PAGINATION + "--" + options.direction);
     setAttribute(pagination, ROLE, "tablist");
     setAttribute(pagination, ARIA_LABEL, i18n.select);
     setAttribute(pagination, ARIA_ORIENTATION, options.direction === TTB ? "vertical" : "");
@@ -3630,7 +3643,6 @@ exports.CLASS_PROGRESS = CLASS_PROGRESS;
 exports.CLASS_PROGRESS_BAR = CLASS_PROGRESS_BAR;
 exports.CLASS_ROOT = CLASS_ROOT;
 exports.CLASS_SLIDE = CLASS_SLIDE;
-exports.CLASS_SLIDER = CLASS_SLIDER;
 exports.CLASS_SPINNER = CLASS_SPINNER;
 exports.CLASS_TRACK = CLASS_TRACK;
 exports.CLASS_VISIBLE = CLASS_VISIBLE;

@@ -28,6 +28,7 @@ import {
   empty,
   focus,
   format,
+  isObject,
   prevent,
   remove,
   removeAttribute,
@@ -87,7 +88,6 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
   const { Slides, Elements, Controller } = Components;
   const { hasFocus, getIndex, go } = Controller;
   const { resolve } = Components.Direction;
-  const paginationClasses = `${ CLASS_PAGINATION }--${ options.direction }`;
 
   /**
    * Stores all pagination items.
@@ -97,7 +97,12 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
   /**
    * The pagination element.
    */
-  let pagination: HTMLUListElement | null;
+  let list: HTMLUListElement | null;
+
+  /**
+   * Holds modifier classes.
+   */
+  let paginationClasses: string;
 
   /**
    * Called when the component is mounted.
@@ -110,8 +115,8 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
     if ( options.pagination && Slides.isEnough() ) {
       on( [ EVENT_MOVE, EVENT_SCROLL, EVENT_SCROLLED ], update );
       createPagination();
-      emit( EVENT_PAGINATION_MOUNTED, { list: pagination, items }, getAt( Splide.index ) );
       update();
+      emit( EVENT_PAGINATION_MOUNTED, { list, items }, getAt( Splide.index ) );
     }
   }
 
@@ -119,12 +124,12 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
    * Destroys the component.
    */
   function destroy(): void {
-    if ( pagination ) {
+    if ( list ) {
       destroyEvents();
-      remove( Elements.pagination ? slice( pagination.children ) : pagination );
-      removeClass( pagination, paginationClasses );
+      remove( Elements.pagination ? slice( list.children ) : list );
+      removeClass( list, paginationClasses );
       empty( items );
-      pagination = null;
+      list = null;
     }
   }
 
@@ -134,17 +139,17 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
   function createPagination(): void {
     const { length } = Splide;
     const { classes, i18n, perPage } = options;
-    const max = hasFocus() ? length : ceil( length / perPage );
+    const max       = hasFocus() ? length : ceil( length / perPage );
 
-    pagination = Elements.pagination || create( 'ul', classes.pagination, Elements.root );
+    list = Elements.pagination || create( 'ul', classes.pagination, Elements.root );
 
-    addClass( pagination, paginationClasses );
-    setAttribute( pagination, ROLE, 'tablist' );
-    setAttribute( pagination, ARIA_LABEL, i18n.select );
-    setAttribute( pagination, ARIA_ORIENTATION, options.direction === TTB ? 'vertical' : '' );
+    addClass( list, ( paginationClasses = `${ CLASS_PAGINATION }--${ getDirection() }` ) );
+    setAttribute( list, ROLE, 'tablist' );
+    setAttribute( list, ARIA_LABEL, i18n.select );
+    setAttribute( list, ARIA_ORIENTATION, getDirection() === TTB ? 'vertical' : '' );
 
     for ( let i = 0; i < max; i++ ) {
-      const li       = create( 'li', null, pagination );
+      const li       = create( 'li', null, list );
       const button   = create( 'button', { class: classes.page, type: 'button' }, li );
       const controls = Slides.getIn( i ).map( Slide => Slide.slide.id );
       const text     = ! hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
@@ -188,12 +193,13 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
   function onKeydown( page: number, e: KeyboardEvent ): void {
     const { length } = items;
     const key = normalizeKey( e );
+    const dir = getDirection();
 
     let nextPage = -1;
 
-    if ( key === resolve( 'ArrowRight' ) ) {
+    if ( key === resolve( 'ArrowRight', false, dir ) ) {
       nextPage = ++page % length;
-    } else if ( key === resolve( 'ArrowLeft' ) ) {
+    } else if ( key === resolve( 'ArrowLeft', false, dir ) ) {
       nextPage = ( --page + length ) % length;
     } else if ( key === 'Home' ) {
       nextPage = 0;
@@ -208,6 +214,13 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
       go( `>${ nextPage }` );
       prevent( e, true );
     }
+  }
+
+  /**
+   * Returns the latest direction for pagination.
+   */
+  function getDirection(): Options['direction'] {
+    return options.paginationDirection || options.direction;
   }
 
   /**
@@ -242,7 +255,7 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
       setAttribute( button, TAB_INDEX, '' );
     }
 
-    emit( EVENT_PAGINATION_UPDATED, { list: pagination, items }, prev, curr );
+    emit( EVENT_PAGINATION_UPDATED, { list, items }, prev, curr );
   }
 
   return {

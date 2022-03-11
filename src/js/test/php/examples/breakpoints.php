@@ -18,30 +18,32 @@ $settings = get_settings();
 
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
-      var splide = new Splide( '#splide01', {
-        perPage    : 3,
-        arrows     : false,
-        mediaQuery : 'max',
-        breakpoints: {
-          1200: {
-            perPage: 1,
-            gap    : '1rem',
-            arrows : true,
-            padding: 50,
-          },
-          1000: {
-            perPage: 2,
-            gap    : 0,
-            arrows : false,
-            padding: 0,
-          },
-          800: {
-            destroy: true,
-          },
-        },
-      } );
+			const options = {
+				perPage    : 3,
+				arrows     : false,
+				mediaQuery : 'max',
+				breakpoints: {
+					1200: {
+						perPage: 1,
+						gap    : '1rem',
+						arrows : true,
+						padding: 50,
+					},
+					1000: {
+						perPage   : 2,
+						gap       : 0,
+						arrows    : false,
+						padding   : 0,
+						pagination: false,
+					},
+					800 : {
+						destroy: true,
+					},
+				},
+			}
 
-      splide.mount();
+	    new Splide( '#splide01', options ).mount();
+	    new Splide( '#splide02', options ).mount();
     } );
   </script>
 </head>
@@ -53,14 +55,24 @@ $settings = get_settings();
 			<?php render_slides(); ?>
 		</div>
 	</div>
+</div>
 
-	<div class="splide__arrows">
-		<div class="splide__arrow splide__arrow--prev">
-			←
+<div id="splide02" class="splide">
+	<div class="splide__track">
+		<div class="splide__list">
+			<?php render_slides(); ?>
 		</div>
-		<div class="splide__arrow splide__arrow--next">
-			→
+
+		<div class="splide__arrows">
+			<button class="splide__arrow splide__arrow--prev">
+				←
+			</button>
+			<button class="splide__arrow splide__arrow--next">
+				→
+			</button>
 		</div>
+
+		<div class="splide__pagination"></div>
 	</div>
 </div>
 

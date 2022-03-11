@@ -627,7 +627,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         destroy(true);
         Splide2.mount();
       } else {
+        var oriented = Splide2.options.direction !== options2.direction;
         Splide2.options = options2;
+        oriented && Splide2.refresh();
       }
     }
 
@@ -668,8 +670,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   };
 
   function Direction(Splide2, Components2, options) {
-    function resolve(prop, axisOnly) {
-      var direction = options.direction;
+    function resolve(prop, axisOnly, direction) {
+      direction = direction || options.direction;
       var index = direction === RTL && !axisOnly ? 1 : direction === TTB ? 0 : -1;
       return ORIENTATION_MAP[prop][index] || prop;
     }
@@ -1736,11 +1738,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var Elements = Components2.Elements,
         Controller = Components2.Controller;
     var userArrows = Elements.arrows;
-    var wrapperClasses = CLASS_ARROWS + "--" + options.direction;
     var wrapper = userArrows;
     var prev = Elements.prev;
     var next = Elements.next;
     var created;
+    var wrapperClasses;
     var arrows = {};
 
     function mount() {
@@ -1766,7 +1768,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           next: next
         });
         display(wrapper, enabled ? "" : "none");
-        addClass(wrapper, wrapperClasses);
+        addClass(wrapper, wrapperClasses = CLASS_ARROWS + "--" + options.direction);
 
         if (enabled) {
           listen();
@@ -2501,9 +2503,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         getIndex = Controller.getIndex,
         go = Controller.go;
     var resolve = Components2.Direction.resolve;
-    var paginationClasses = CLASS_PAGINATION + "--" + options.direction;
     var items = [];
-    var pagination;
+    var list;
+    var paginationClasses;
 
     function mount() {
       destroy();
@@ -2512,21 +2514,21 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       if (options.pagination && Slides.isEnough()) {
         on([EVENT_MOVE, EVENT_SCROLL, EVENT_SCROLLED], update);
         createPagination();
+        update();
         emit(EVENT_PAGINATION_MOUNTED, {
-          list: pagination,
+          list: list,
           items: items
         }, getAt(Splide2.index));
-        update();
       }
     }
 
     function destroy() {
-      if (pagination) {
+      if (list) {
         destroyEvents();
-        remove(Elements.pagination ? slice(pagination.children) : pagination);
-        removeClass(pagination, paginationClasses);
+        remove(Elements.pagination ? slice(list.children) : list);
+        removeClass(list, paginationClasses);
         empty(items);
-        pagination = null;
+        list = null;
       }
     }
 
@@ -2536,14 +2538,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           i18n = options.i18n,
           perPage = options.perPage;
       var max = hasFocus() ? length : ceil(length / perPage);
-      pagination = Elements.pagination || create("ul", classes.pagination, Elements.root);
-      addClass(pagination, paginationClasses);
-      setAttribute(pagination, ROLE, "tablist");
-      setAttribute(pagination, ARIA_LABEL, i18n.select);
-      setAttribute(pagination, ARIA_ORIENTATION, options.direction === TTB ? "vertical" : "");
+      list = Elements.pagination || create("ul", classes.pagination, Elements.root);
+      addClass(list, paginationClasses = CLASS_PAGINATION + "--" + getDirection());
+      setAttribute(list, ROLE, "tablist");
+      setAttribute(list, ARIA_LABEL, i18n.select);
+      setAttribute(list, ARIA_ORIENTATION, getDirection() === TTB ? "vertical" : "");
 
       for (var i = 0; i < max; i++) {
-        var li = create("li", null, pagination);
+        var li = create("li", null, list);
         var button = create("button", {
           class: classes.page,
           type: "button"
@@ -2578,11 +2580,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function onKeydown(page, e) {
       var length = items.length;
       var key = normalizeKey(e);
+      var dir = getDirection();
       var nextPage = -1;
 
-      if (key === resolve("ArrowRight")) {
+      if (key === resolve("ArrowRight", false, dir)) {
         nextPage = ++page % length;
-      } else if (key === resolve("ArrowLeft")) {
+      } else if (key === resolve("ArrowLeft", false, dir)) {
         nextPage = (--page + length) % length;
       } else if (key === "Home") {
         nextPage = 0;
@@ -2597,6 +2600,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         go(">" + nextPage);
         prevent(e, true);
       }
+    }
+
+    function getDirection() {
+      return options.paginationDirection || options.direction;
     }
 
     function getAt(index) {
@@ -2622,7 +2629,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }
 
       emit(EVENT_PAGINATION_UPDATED, {
-        list: pagination,
+        list: list,
         items: items
       }, prev, curr);
     }

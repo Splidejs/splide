@@ -28,6 +28,17 @@ $settings = get_settings();
 	      rewindByDrag: true,
 	      padding     : 40,
 	      updateOnMove: true,
+	      direction   : 'ltr',
+	      height      : undefined,
+	      paginationDirection: 'ttb',
+
+	      breakpoints: {
+					1200: {
+						direction: 'ttb',
+						height   : 500,
+						perPage  : 2,
+					}
+	      }
       } );
 
 	    // splide.on( 'move', function () {

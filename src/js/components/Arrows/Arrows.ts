@@ -52,8 +52,7 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
   const { on, bind, emit, destroy: destroyEvents } = EventInterface( Splide );
   const { classes, i18n } = options;
   const { Elements, Controller } = Components;
-  const userArrows     = Elements.arrows;
-  const wrapperClasses = `${ CLASS_ARROWS }--${ options.direction }`;
+  const userArrows = Elements.arrows;
 
   /**
    * The wrapper element.
@@ -74,6 +73,11 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
    * Indicates whether the component creates arrows or retrieved from the DOM.
    */
   let created: boolean;
+
+  /**
+   * Holds modifier classes.
+   */
+  let wrapperClasses: string;
 
   /**
    * An object with previous and next arrows.
@@ -109,7 +113,7 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
     if ( prev && next ) {
       assign( arrows, { prev, next } );
       display( wrapper, enabled ? '' : 'none' );
-      addClass( wrapper, wrapperClasses );
+      addClass( wrapper, ( wrapperClasses = `${ CLASS_ARROWS }--${ options.direction }` ) );
 
       if ( enabled ) {
         listen();

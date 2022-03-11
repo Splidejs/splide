@@ -95,7 +95,9 @@ export function Media( Splide: Splide, Components: Components, options: Options 
       destroy( true );
       Splide.mount();
     } else {
+      const oriented = Splide.options.direction !== options.direction;
       Splide.options = options;
+      oriented && Splide.refresh();
     }
   }
 
