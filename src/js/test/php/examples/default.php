@@ -37,7 +37,10 @@ $settings = get_settings();
 						direction: 'ttb',
 						height   : 500,
 						perPage  : 2,
-					}
+					},
+		      1000: {
+						destroy: true,
+		      }
 	      }
       } );
 

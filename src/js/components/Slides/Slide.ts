@@ -91,6 +91,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   const { isNavigation, updateOnMove, i18n, pagination } = options;
   const { resolve } = Components.Direction;
   const styles    = getAttribute( slide, 'style' );
+  const label     = getAttribute( slide, ARIA_LABEL );
   const isClone   = slideIndex > -1;
   const container = child( slide, `.${ CLASS_CONTAINER }` );
 
@@ -107,7 +108,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
       slide.id = `${ root.id }-slide${ pad( index + 1 ) }`;
       setAttribute( slide, ROLE, pagination ? 'tabpanel' : 'group' );
       setAttribute( slide, ARIA_ROLEDESCRIPTION, pagination ? '' : i18n.slide );
-      setAttribute( slide, ARIA_LABEL, format( i18n.slideLabel, [ index + 1, Splide.length ] ) );
+      setAttribute( slide, ARIA_LABEL, label || format( i18n.slideLabel, [ index + 1, Splide.length ] ) );
     }
 
     listen();
@@ -137,6 +138,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
     removeClass( slide, STATUS_CLASSES );
     removeAttribute( slide, ALL_ATTRIBUTES );
     setAttribute( slide, 'style', styles );
+    setAttribute( slide, ARIA_LABEL, label || '' );
   }
 
   /**

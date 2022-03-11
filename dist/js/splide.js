@@ -867,6 +867,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         pagination = options.pagination;
     var resolve = Components.Direction.resolve;
     var styles = getAttribute(slide, "style");
+    var label = getAttribute(slide, ARIA_LABEL);
     var isClone = slideIndex > -1;
     var container = child(slide, "." + CLASS_CONTAINER);
     var destroyed;
@@ -876,7 +877,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         slide.id = root.id + "-slide" + pad(index + 1);
         setAttribute(slide, ROLE, pagination ? "tabpanel" : "group");
         setAttribute(slide, ARIA_ROLEDESCRIPTION, pagination ? "" : i18n.slide);
-        setAttribute(slide, ARIA_LABEL, format(i18n.slideLabel, [index + 1, Splide2.length]));
+        setAttribute(slide, ARIA_LABEL, label || format(i18n.slideLabel, [index + 1, Splide2.length]));
       }
 
       listen();
@@ -900,6 +901,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       removeClass(slide, STATUS_CLASSES);
       removeAttribute(slide, ALL_ATTRIBUTES);
       setAttribute(slide, "style", styles);
+      setAttribute(slide, ARIA_LABEL, label || "");
     }
 
     function initNavigation() {
