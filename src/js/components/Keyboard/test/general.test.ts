@@ -4,7 +4,7 @@ import { init, keydown, wait } from '../../../test';
 
 describe( 'Keyboard', () => {
   test( 'can control the slider by keyboards.', async () => {
-    const splide = init( { speed: 0, keyboard: true } );
+    const splide = init( { speed: 0, keyboard: 'global' } );
 
     keydown( 'ArrowRight' );
     expect( splide.index ).toBe( 1 );
@@ -26,7 +26,7 @@ describe( 'Keyboard', () => {
   } );
 
   test( 'can control the slider by keyboards in TTB mode.', async () => {
-    const splide = init( { direction: TTB, height: 1, speed: 0, keyboard: true } );
+    const splide = init( { direction: TTB, height: 1, speed: 0, keyboard: 'global' } );
 
     keydown( 'ArrowDown' );
     expect( splide.index ).toBe( 1 );
@@ -48,7 +48,7 @@ describe( 'Keyboard', () => {
   } );
 
   test( 'can control the slider by keyboards in RTL mode.', async () => {
-    const splide = init( { direction: RTL, speed: 0, keyboard: true } );
+    const splide = init( { direction: RTL, speed: 0, keyboard: 'global' } );
 
     keydown( 'ArrowLeft' );
     expect( splide.index ).toBe( 1 );
@@ -73,14 +73,12 @@ describe( 'Keyboard', () => {
     const splide = init( { keyboard: 'focused', speed: 0 } );
     const { root } = splide;
 
-    expect( root.tabIndex ).toBe( 0 );
-
     keydown( 'ArrowRight' );
     expect( splide.index ).toBe( 0 );
 
     await wait();
 
-    splide.root.focus();
+    splide.Components.Arrows.arrows.prev.focus();
 
     await wait();
 
@@ -89,7 +87,7 @@ describe( 'Keyboard', () => {
   } );
 
   test( 'can disable the keyboard input.', async () => {
-    const splide = init( { speed: 0, keyboard: true } );
+    const splide = init( { speed: 0, keyboard: 'global' } );
     const { disable } = splide.Components.Keyboard;
 
     keydown( 'ArrowRight' );

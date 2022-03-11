@@ -5,15 +5,10 @@
     flex-shrink: 0;
     list-style-type: none !important;
     margin: 0;
-    outline: none;
     position: relative;
 
     img {
       vertical-align: bottom;
     }
-
-    //&:not([aria-hidden]) {
-      //display: unset;
-    //}
   }
 }

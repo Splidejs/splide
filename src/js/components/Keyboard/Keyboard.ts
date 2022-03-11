@@ -66,13 +66,7 @@ export function Keyboard( Splide: Splide, Components: Components, options: Optio
     const { keyboard } = options;
 
     if ( keyboard ) {
-      if ( keyboard === 'focused' ) {
-        target = root;
-        setAttribute( root, TAB_INDEX, 0 );
-      } else {
-        target = window;
-      }
-
+      target = keyboard === 'global' ? window : root;
       bind( target, KEYBOARD_EVENT, onKeydown );
     }
   }

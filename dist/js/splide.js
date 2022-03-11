@@ -2330,13 +2330,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var keyboard = options.keyboard;
 
       if (keyboard) {
-        if (keyboard === "focused") {
-          target = root;
-          setAttribute(root, TAB_INDEX, 0);
-        } else {
-          target = window;
-        }
-
+        target = keyboard === "global" ? window : root;
         bind(target, KEYBOARD_EVENT, onKeydown);
       }
     }

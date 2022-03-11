@@ -14,6 +14,7 @@ $button-border-radius: 50% !default;
 $button-transition: false !default;
 $opacity: .7 !default;
 $opacity-hover: .9 !default;
+$opacity-disabled: .3 !default;
 $left: 1em !default;
 $right: 1em !default;
 
@@ -55,7 +56,7 @@ $right: 1em !default;
       }
     }
 
-    &:hover {
+    &:hover:not(:disabled) {
       @if $opacity-hover {
         opacity: $opacity-hover;
       }
@@ -71,12 +72,14 @@ $right: 1em !default;
       }
     }
 
-    &:focus {
-      outline: none;
-    }
-
     &:focus-visible {
       @include mixins.focus-outline;
+    }
+
+    &:disabled {
+      @if $opacity-disabled {
+        opacity: $opacity-disabled;
+      }
     }
 
     &--prev {

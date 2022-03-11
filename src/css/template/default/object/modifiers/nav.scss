@@ -32,12 +32,8 @@ $opacity-active: false !default;
           }
         }
 
-        &:focus {
-          outline: none;
-        }
-
         &:focus-visible {
-          @include mixins.focus-outline-slide;
+          @include mixins.focus-outline-inset;
         }
       }
     }
