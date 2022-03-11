@@ -49,7 +49,8 @@ export interface ArrowsComponent extends BaseComponent {
  * @return An Arrows component object.
  */
 export function Arrows( Splide: Splide, Components: Components, options: Options ): ArrowsComponent {
-  const { on, bind, emit, destroy: destroyEvents } = EventInterface( Splide );
+  const event = EventInterface( Splide );
+  const { on, bind, emit } = event;
   const { classes, i18n } = options;
   const { Elements, Controller } = Components;
   const userArrows = Elements.arrows;
@@ -128,7 +129,7 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
    * Destroys the component.
    */
   function destroy(): void {
-    destroyEvents();
+    event.destroy();
     removeClass( wrapper, wrapperClasses );
 
     if ( created ) {

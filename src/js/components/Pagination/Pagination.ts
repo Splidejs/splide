@@ -83,7 +83,8 @@ export interface PaginationItem {
  * @return A Pagination component object.
  */
 export function Pagination( Splide: Splide, Components: Components, options: Options ): PaginationComponent {
-  const { on, emit, bind, destroy: destroyEvents } = EventInterface( Splide );
+  const event = EventInterface( Splide );
+  const { on, emit, bind } = event;
   const { Slides, Elements, Controller } = Components;
   const { hasFocus, getIndex, go } = Controller;
   const { resolve } = Components.Direction;
@@ -124,7 +125,7 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
    */
   function destroy(): void {
     if ( list ) {
-      destroyEvents();
+      event.destroy();
       remove( Elements.pagination ? slice( list.children ) : list );
       removeClass( list, paginationClasses );
       empty( items );
@@ -138,7 +139,7 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
   function createPagination(): void {
     const { length } = Splide;
     const { classes, i18n, perPage } = options;
-    const max       = hasFocus() ? length : ceil( length / perPage );
+    const max = hasFocus() ? length : ceil( length / perPage );
 
     list = Elements.pagination || create( 'ul', classes.pagination, Elements.root );
 

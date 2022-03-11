@@ -13,6 +13,7 @@ import {
   CLASS_CONTAINER,
   CLASS_NEXT,
   CLASS_PREV,
+  CLASS_SR,
   CLASS_VISIBLE,
   STATUS_CLASSES,
 } from '../../constants/classes';
@@ -38,8 +39,10 @@ import { BaseComponent } from '../../types';
 import {
   abs,
   apply,
+  before,
   ceil,
   child,
+  create,
   floor,
   focus,
   format,
@@ -49,6 +52,7 @@ import {
   pad,
   queryAll,
   rect,
+  remove,
   removeAttribute,
   removeClass,
   setAttribute,
@@ -86,7 +90,8 @@ export interface  SlideComponent extends BaseComponent {
  * @return A Slide sub component.
  */
 export function Slide( Splide: Splide, index: number, slideIndex: number, slide: HTMLElement ): SlideComponent {
-  const { on, emit, bind, destroy: destroyEvents } = EventInterface( Splide );
+  const event = EventInterface( Splide );
+  const { on, emit, bind } = event;
   const { Components, root, options } = Splide;
   const { isNavigation, updateOnMove, i18n, pagination } = options;
   const { resolve } = Components.Direction;
@@ -94,6 +99,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   const label     = getAttribute( slide, ARIA_LABEL );
   const isClone   = slideIndex > -1;
   const container = child( slide, `.${ CLASS_CONTAINER }` );
+  const sr        = create( 'span', CLASS_SR, child( slide ) );
 
   /**
    * Turns into `true` when the component is destroyed.
@@ -105,10 +111,13 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    */
   function mount( this: SlideComponent ): void {
     if ( ! isClone ) {
+      const slideLabel = label || format( i18n.slideLabel, [ index + 1, Splide.length ] );
+
       slide.id = `${ root.id }-slide${ pad( index + 1 ) }`;
       setAttribute( slide, ROLE, pagination ? 'tabpanel' : 'group' );
       setAttribute( slide, ARIA_ROLEDESCRIPTION, pagination ? '' : i18n.slide );
-      setAttribute( slide, ARIA_LABEL, label || format( i18n.slideLabel, [ index + 1, Splide.length ] ) );
+      setAttribute( slide, ARIA_LABEL, slideLabel );
+      sr.textContent = slideLabel;
     }
 
     listen();
@@ -134,7 +143,8 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    */
   function destroy(): void {
     destroyed = true;
-    destroyEvents();
+    event.destroy();
+    remove( sr );
     removeClass( slide, STATUS_CLASSES );
     removeAttribute( slide, ALL_ATTRIBUTES );
     setAttribute( slide, 'style', styles );
@@ -152,7 +162,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
 
     setAttribute( slide, ARIA_LABEL, format( i18n.slideX, ( isClone ? slideIndex : index ) + 1 ) );
     setAttribute( slide, ARIA_CONTROLS, controls );
-    updateAttributes();
+    updateA11y();
   }
 
   /**
@@ -167,9 +177,9 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   /**
    * Updates attribute and classes of the slide.
    *
-   * @param excludeAttributes - If `true`, attributes will be not updated.
+   * @param excludeA11y - If `true`, attributes will be not updated.
    */
-  function update( excludeAttributes?: boolean ): void {
+  function update( excludeA11y?: boolean ): void {
     if ( ! destroyed ) {
       const { index: curr } = Splide;
 
@@ -177,7 +187,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
       updateVisibility();
       toggleClass( slide, CLASS_PREV, index === curr - 1 );
       toggleClass( slide, CLASS_NEXT, index === curr + 1 );
-      ! excludeAttributes && updateAttributes();
+      ! excludeA11y && updateA11y();
     }
   }
 
@@ -215,7 +225,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    * Updates attributes.
    * Do not call this on "shifted" event to avoid SR from reading clone's contents.
    */
-  function updateAttributes(): void {
+  function updateA11y(): void {
     const active = isActive();
     const hidden = ! isVisible() && ( ! active || isClone );
 
@@ -223,6 +233,10 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
     setAttribute( slide, ARIA_HIDDEN, hidden || '' );
     setAttribute( slide, TAB_INDEX, ! hidden && options.slideFocus ? 0 : '' );
     setAttribute( queryAll( slide, options.focusableNodes || '' ), TAB_INDEX, hidden ? -1 : '' );
+
+    if ( options.live ) {
+      hidden ? remove( sr ) : before( sr, child( slide ) );
+    }
   }
 
   /**

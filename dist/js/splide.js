@@ -718,6 +718,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var CLASS_PLAY = PROJECT_CODE + "__play";
   var CLASS_PAUSE = PROJECT_CODE + "__pause";
   var CLASS_SPINNER = PROJECT_CODE + "__spinner";
+  var CLASS_SR = PROJECT_CODE + "__sr";
   var CLASS_INITIALIZED = "is-initialized";
   var CLASS_ACTIVE = "is-active";
   var CLASS_PREV = "is-prev";
@@ -852,12 +853,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var FADE = "fade";
 
   function Slide$1(Splide2, index, slideIndex, slide) {
-    var _EventInterface2 = EventInterface(Splide2),
-        on = _EventInterface2.on,
-        emit = _EventInterface2.emit,
-        bind = _EventInterface2.bind,
-        destroyEvents = _EventInterface2.destroy;
-
+    var event = EventInterface(Splide2);
+    var on = event.on,
+        emit = event.emit,
+        bind = event.bind;
     var Components = Splide2.Components,
         root = Splide2.root,
         options = Splide2.options;
@@ -870,14 +869,17 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var label = getAttribute(slide, ARIA_LABEL);
     var isClone = slideIndex > -1;
     var container = child(slide, "." + CLASS_CONTAINER);
+    var sr = create("span", CLASS_SR, child(slide));
     var destroyed;
 
     function mount() {
       if (!isClone) {
+        var slideLabel = label || format(i18n.slideLabel, [index + 1, Splide2.length]);
         slide.id = root.id + "-slide" + pad(index + 1);
         setAttribute(slide, ROLE, pagination ? "tabpanel" : "group");
         setAttribute(slide, ARIA_ROLEDESCRIPTION, pagination ? "" : i18n.slide);
-        setAttribute(slide, ARIA_LABEL, label || format(i18n.slideLabel, [index + 1, Splide2.length]));
+        setAttribute(slide, ARIA_LABEL, slideLabel);
+        sr.textContent = slideLabel;
       }
 
       listen();
@@ -897,7 +899,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function destroy() {
       destroyed = true;
-      destroyEvents();
+      event.destroy();
+      remove(sr);
       removeClass(slide, STATUS_CLASSES);
       removeAttribute(slide, ALL_ATTRIBUTES);
       setAttribute(slide, "style", styles);
@@ -911,7 +914,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }).join(" ");
       setAttribute(slide, ARIA_LABEL, format(i18n.slideX, (isClone ? slideIndex : index) + 1));
       setAttribute(slide, ARIA_CONTROLS, controls);
-      updateAttributes();
+      updateA11y();
     }
 
     function onMove() {
@@ -920,14 +923,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }
     }
 
-    function update(excludeAttributes) {
+    function update(excludeA11y) {
       if (!destroyed) {
         var curr = Splide2.index;
         updateActivity();
         updateVisibility();
         toggleClass(slide, CLASS_PREV, index === curr - 1);
         toggleClass(slide, CLASS_NEXT, index === curr + 1);
-        !excludeAttributes && updateAttributes();
+        !excludeA11y && updateA11y();
       }
     }
 
@@ -954,13 +957,17 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }
     }
 
-    function updateAttributes() {
+    function updateA11y() {
       var active = isActive();
       var hidden = !isVisible() && (!active || isClone);
       setAttribute(slide, ARIA_CURRENT, isNavigation && active || "");
       setAttribute(slide, ARIA_HIDDEN, hidden || "");
       setAttribute(slide, TAB_INDEX, !hidden && options.slideFocus ? 0 : "");
       setAttribute(queryAll(slide, options.focusableNodes || ""), TAB_INDEX, hidden ? -1 : "");
+
+      if (options.live) {
+        hidden ? remove(sr) : before(sr, child(slide));
+      }
     }
 
     function style$1(prop, value, useContainer) {
@@ -1010,10 +1017,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   function Slides(Splide2, Components2, options) {
-    var _EventInterface3 = EventInterface(Splide2),
-        on = _EventInterface3.on,
-        emit = _EventInterface3.emit,
-        bind = _EventInterface3.bind;
+    var _EventInterface2 = EventInterface(Splide2),
+        on = _EventInterface2.on,
+        emit = _EventInterface2.emit,
+        bind = _EventInterface2.bind;
 
     var _Components2$Elements = Components2.Elements,
         slides = _Components2$Elements.slides,
@@ -1158,10 +1165,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   function Layout(Splide2, Components2, options) {
-    var _EventInterface4 = EventInterface(Splide2),
-        on = _EventInterface4.on,
-        bind = _EventInterface4.bind,
-        emit = _EventInterface4.emit;
+    var _EventInterface3 = EventInterface(Splide2),
+        on = _EventInterface3.on,
+        bind = _EventInterface3.bind,
+        emit = _EventInterface3.emit;
 
     var Slides = Components2.Slides;
     var resolve = Components2.Direction.resolve;
@@ -1285,9 +1292,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var MULTIPLIER = 2;
 
   function Clones(Splide2, Components2, options) {
-    var _EventInterface5 = EventInterface(Splide2),
-        on = _EventInterface5.on,
-        emit = _EventInterface5.emit;
+    var _EventInterface4 = EventInterface(Splide2),
+        on = _EventInterface4.on,
+        emit = _EventInterface4.emit;
 
     var Elements = Components2.Elements,
         Slides = Components2.Slides;
@@ -1367,9 +1374,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   function Move(Splide2, Components2, options) {
-    var _EventInterface6 = EventInterface(Splide2),
-        on = _EventInterface6.on,
-        emit = _EventInterface6.emit;
+    var _EventInterface5 = EventInterface(Splide2),
+        on = _EventInterface5.on,
+        emit = _EventInterface5.emit;
 
     var set = Splide2.state.set;
     var _Components2$Layout = Components2.Layout,
@@ -1530,8 +1537,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   function Controller(Splide2, Components2, options) {
-    var _EventInterface7 = EventInterface(Splide2),
-        on = _EventInterface7.on;
+    var _EventInterface6 = EventInterface(Splide2),
+        on = _EventInterface6.on;
 
     var Move = Components2.Move;
     var getPosition = Move.getPosition,
@@ -1729,12 +1736,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var SIZE = 40;
 
   function Arrows(Splide2, Components2, options) {
-    var _EventInterface8 = EventInterface(Splide2),
-        on = _EventInterface8.on,
-        bind = _EventInterface8.bind,
-        emit = _EventInterface8.emit,
-        destroyEvents = _EventInterface8.destroy;
-
+    var event = EventInterface(Splide2);
+    var on = event.on,
+        bind = event.bind,
+        emit = event.emit;
     var classes = options.classes,
         i18n = options.i18n;
     var Elements = Components2.Elements,
@@ -1782,7 +1787,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function destroy() {
-      destroyEvents();
+      event.destroy();
       removeClass(wrapper, wrapperClasses);
 
       if (created) {
@@ -1840,10 +1845,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var INTERVAL_DATA_ATTRIBUTE = DATA_ATTRIBUTE + "-interval";
 
   function Autoplay(Splide2, Components2, options) {
-    var _EventInterface9 = EventInterface(Splide2),
-        on = _EventInterface9.on,
-        bind = _EventInterface9.bind,
-        emit = _EventInterface9.emit;
+    var _EventInterface7 = EventInterface(Splide2),
+        on = _EventInterface7.on,
+        bind = _EventInterface7.bind,
+        emit = _EventInterface7.emit;
 
     var interval = RequestInterval(options.interval, Splide2.go.bind(Splide2, ">"), update);
     var isPaused = interval.isPaused;
@@ -1946,8 +1951,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   function Cover(Splide2, Components2, options) {
-    var _EventInterface10 = EventInterface(Splide2),
-        on = _EventInterface10.on;
+    var _EventInterface8 = EventInterface(Splide2),
+        on = _EventInterface8.on;
 
     function mount() {
       if (options.cover) {
@@ -1984,9 +1989,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var MIN_DURATION = 800;
 
   function Scroll(Splide2, Components2, options) {
-    var _EventInterface11 = EventInterface(Splide2),
-        on = _EventInterface11.on,
-        emit = _EventInterface11.emit;
+    var _EventInterface9 = EventInterface(Splide2),
+        on = _EventInterface9.on,
+        emit = _EventInterface9.emit;
 
     var set = Splide2.state.set;
     var Move = Components2.Move;
@@ -2080,11 +2085,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var POINTER_UP_EVENTS = "touchend touchcancel mouseup";
 
   function Drag(Splide2, Components2, options) {
-    var _EventInterface12 = EventInterface(Splide2),
-        on = _EventInterface12.on,
-        emit = _EventInterface12.emit,
-        bind = _EventInterface12.bind,
-        unbind = _EventInterface12.unbind;
+    var _EventInterface10 = EventInterface(Splide2),
+        on = _EventInterface10.on,
+        emit = _EventInterface10.emit,
+        bind = _EventInterface10.bind,
+        unbind = _EventInterface10.unbind;
 
     var state = Splide2.state;
     var Move = Components2.Move,
@@ -2304,10 +2309,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var KEYBOARD_EVENT = "keydown";
 
   function Keyboard(Splide2, Components2, options) {
-    var _EventInterface13 = EventInterface(Splide2),
-        on = _EventInterface13.on,
-        bind = _EventInterface13.bind,
-        unbind = _EventInterface13.unbind;
+    var _EventInterface11 = EventInterface(Splide2),
+        on = _EventInterface11.on,
+        bind = _EventInterface11.bind,
+        unbind = _EventInterface11.unbind;
 
     var root = Splide2.root;
     var resolve = Components2.Direction.resolve;
@@ -2376,11 +2381,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var IMAGE_SELECTOR = "[" + SRC_DATA_ATTRIBUTE + "], [" + SRCSET_DATA_ATTRIBUTE + "]";
 
   function LazyLoad(Splide2, Components2, options) {
-    var _EventInterface14 = EventInterface(Splide2),
-        on = _EventInterface14.on,
-        off = _EventInterface14.off,
-        bind = _EventInterface14.bind,
-        emit = _EventInterface14.emit;
+    var _EventInterface12 = EventInterface(Splide2),
+        on = _EventInterface12.on,
+        off = _EventInterface12.off,
+        bind = _EventInterface12.bind,
+        emit = _EventInterface12.emit;
 
     var isSequential = options.lazyLoad === "sequential";
     var images = [];
@@ -2492,12 +2497,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   function Pagination(Splide2, Components2, options) {
-    var _EventInterface15 = EventInterface(Splide2),
-        on = _EventInterface15.on,
-        emit = _EventInterface15.emit,
-        bind = _EventInterface15.bind,
-        destroyEvents = _EventInterface15.destroy;
-
+    var event = EventInterface(Splide2);
+    var on = event.on,
+        emit = event.emit,
+        bind = event.bind;
     var Slides = Components2.Slides,
         Elements = Components2.Elements,
         Controller = Components2.Controller;
@@ -2526,7 +2529,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function destroy() {
       if (list) {
-        destroyEvents();
+        event.destroy();
         remove(Elements.pagination ? slice(list.children) : list);
         removeClass(list, paginationClasses);
         empty(items);
@@ -2717,8 +2720,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   function Wheel(Splide2, Components2, options) {
-    var _EventInterface16 = EventInterface(Splide2),
-        bind = _EventInterface16.bind;
+    var _EventInterface13 = EventInterface(Splide2),
+        bind = _EventInterface13.bind;
 
     var lastTime = 0;
 
@@ -2757,8 +2760,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   function Live(Splide2, Components2, options) {
-    var _EventInterface17 = EventInterface(Splide2),
-        on = _EventInterface17.on;
+    var _EventInterface14 = EventInterface(Splide2),
+        on = _EventInterface14.on;
 
     var list = Components2.Elements.list;
     var live = options.live;
@@ -2845,8 +2848,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   };
 
   function Fade(Splide2, Components2, options) {
-    var _EventInterface18 = EventInterface(Splide2),
-        on = _EventInterface18.on;
+    var _EventInterface15 = EventInterface(Splide2),
+        on = _EventInterface15.on;
 
     function mount() {
       on([EVENT_MOUNTED, EVENT_REFRESH], function () {
@@ -2873,8 +2876,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   function Slide(Splide2, Components2, options) {
-    var _EventInterface19 = EventInterface(Splide2),
-        bind = _EventInterface19.bind;
+    var _EventInterface16 = EventInterface(Splide2),
+        bind = _EventInterface16.bind;
 
     var Move = Components2.Move,
         Controller = Components2.Controller;

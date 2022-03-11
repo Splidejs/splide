@@ -12,8 +12,8 @@
       vertical-align: bottom;
     }
 
-    &:not([aria-hidden]) {
-      display: block;
-    }
+    //&:not([aria-hidden]) {
+      //display: unset;
+    //}
   }
 }

@@ -19,12 +19,14 @@ export const CLASS_AUTOPLAY        = `${ PROJECT_CODE }__autoplay`;
 export const CLASS_PLAY            = `${ PROJECT_CODE }__play`;
 export const CLASS_PAUSE           = `${ PROJECT_CODE }__pause`;
 export const CLASS_SPINNER         = `${ PROJECT_CODE }__spinner`;
+export const CLASS_SR              = `${ PROJECT_CODE }__sr`;
 export const CLASS_INITIALIZED     = 'is-initialized';
 export const CLASS_ACTIVE          = 'is-active';
 export const CLASS_PREV            = 'is-prev';
 export const CLASS_NEXT            = 'is-next';
 export const CLASS_VISIBLE         = 'is-visible';
 export const CLASS_LOADING         = 'is-loading';
+
 
 /**
  * The array with all status classes.
