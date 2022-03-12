@@ -1579,7 +1579,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function go(control, allowSameIndex, callback) {
       if (!isBusy()) {
         var dest = parse(control);
-        var index = validate(dest);
+        var index = loop(dest);
 
         if (index > -1 && (allowSameIndex || index !== currIndex)) {
           setIndex(index);
@@ -1604,7 +1604,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
             number = _ref[2];
 
         if (indicator === "+" || indicator === "-") {
-          index = computeDestIndex(currIndex + +("" + indicator + (+number || 1)), currIndex, true);
+          index = computeDestIndex(currIndex + +("" + indicator + (+number || 1)), currIndex);
         } else if (indicator === ">") {
           index = number ? toIndex(+number) : getNext(true);
         } else if (indicator === "<") {
@@ -1619,7 +1619,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function getAdjacent(prev, destination) {
       var number = perMove || (hasFocus() ? 1 : perPage);
-      var dest = computeDestIndex(currIndex + number * (prev ? -1 : 1), currIndex);
+      var dest = computeDestIndex(currIndex + number * (prev ? -1 : 1), currIndex, !(perMove || hasFocus()));
 
       if (dest === -1 && isSlide) {
         if (!approximatelyEqual(getPosition(), getLimit(!prev), 1)) {
@@ -1630,16 +1630,23 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       return destination ? dest : loop(dest);
     }
 
-    function computeDestIndex(dest, from, incremental) {
+    function computeDestIndex(dest, from, snapPage) {
       if (isEnough()) {
         var end = getEnd();
+        var movable = computeMovableDestIndex(dest);
+
+        if (movable !== dest) {
+          from = dest;
+          dest = movable;
+          snapPage = false;
+        }
 
         if (dest < 0 || dest > end) {
           if (between(0, dest, from, true) || between(end, from, dest, true)) {
             dest = toIndex(toPage(dest));
           } else {
             if (isLoop) {
-              dest = perMove || hasFocus() ? dest : dest < 0 ? -(slideCount % perPage || perPage) : slideCount;
+              dest = snapPage ? dest < 0 ? -(slideCount % perPage || perPage) : slideCount : dest;
             } else if (options.rewind) {
               dest = dest < 0 ? end : 0;
             } else {
@@ -1647,8 +1654,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
             }
           }
         } else {
-          if (!incremental && dest !== from) {
-            dest = perMove ? dest : toIndex(toPage(from) + (dest < from ? -1 : 1));
+          if (snapPage && dest !== from) {
+            dest = toIndex(toPage(from) + (dest < from ? -1 : 1));
           }
         }
       } else {
@@ -1658,16 +1665,16 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       return dest;
     }
 
-    function validate(dest) {
-      if (options.trimSpace === "move" && dest !== currIndex) {
+    function computeMovableDestIndex(dest) {
+      if (isSlide && options.trimSpace === "move" && dest !== currIndex) {
         var position = getPosition();
 
-        while (position === toPosition(dest, true) && between(dest, 0, Splide2.length - 1, true)) {
+        while (position === toPosition(dest, true) && between(dest, 0, Splide2.length - 1)) {
           dest < currIndex ? --dest : ++dest;
         }
       }
 
-      return loop(dest);
+      return dest;
     }
 
     function loop(index) {
