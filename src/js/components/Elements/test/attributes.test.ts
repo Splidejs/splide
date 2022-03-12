@@ -1,4 +1,4 @@
-import { ALL_ATTRIBUTES, ARIA_ROLEDESCRIPTION, ROLE, TAB_INDEX } from '../../../constants/attributes';
+import { ALL_ATTRIBUTES, ARIA_ROLEDESCRIPTION, ROLE } from '../../../constants/attributes';
 import { buildHtml, init } from '../../../test';
 
 

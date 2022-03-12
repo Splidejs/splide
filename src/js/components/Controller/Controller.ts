@@ -14,7 +14,7 @@ import { apply, approximatelyEqual, between, clamp, floor, isString, isUndefined
  */
 export interface ControllerComponent extends BaseComponent {
   go( control: number | string, allowSameIndex?: boolean, callback?: AnyFunction ): void;
-  scrollTo( index: number, duration?: number, callback?: AnyFunction ): void;
+  // scrollTo( index: number, duration?: number, callback?: AnyFunction ): void;
   scroll( destination: number, duration?: number, snap?: boolean, callback?: AnyFunction ): void;
   getNext( destination?: boolean ): number;
   getPrev( destination?: boolean ): number;
@@ -117,7 +117,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
 
       if ( index > -1 && ( allowSameIndex || index !== currIndex ) ) {
         setIndex( index );
-        options.useScroll ? scrollTo( dest, options.speed, callback ) : Move.move( dest, index, prevIndex, callback );
+        Move.move( dest, index, prevIndex, callback );
       }
     }
   }
@@ -137,16 +137,16 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
     } );
   }
 
-  /**
-   * Scrolls the slider to the specified index with updating indices.
-   *
-   * @param index    - An index to scroll the slider to.
-   * @param duration - Optional. Specifies the scroll duration.
-   * @param callback - Optional. A callback function invoked after scroll ends.
-   */
-  function scrollTo( index: number, duration?: number, callback?: AnyFunction ): void {
-    scroll( toPosition( index, true ), duration, false, callback );
-  }
+  // /**
+  //  * Scrolls the slider to the specified index with updating indices.
+  //  *
+  //  * @param index    - An index to scroll the slider to.
+  //  * @param duration - Optional. Specifies the scroll duration.
+  //  * @param callback - Optional. A callback function invoked after scroll ends.
+  //  */
+  // function scrollTo( index: number, duration?: number, callback?: AnyFunction ): void {
+  //   scroll( toPosition( index, true ), duration, false, callback );
+  // }
 
   /**
    * Parses the control and returns a slide index.
@@ -244,6 +244,8 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
   /**
    * Finalizes the dest index.
    * If the `trim` option is `move`, needs to find the dest index where the slider actually moves.
+   *
+   * @todo
    *
    * @param dest - A validated dest index.
    */
@@ -358,7 +360,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
     mount,
     go,
     scroll,
-    scrollTo,
+    // scrollTo,
     getNext,
     getPrev,
     getAdjacent,

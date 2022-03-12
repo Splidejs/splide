@@ -595,10 +595,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }).map(function (key) {
         return [breakpoints[key], "(" + (isMin ? "min" : "max") + "-width:" + key + "px)"];
       }));
-      register([[{
-        speed: 0,
-        autoplay: "pause"
-      }, "(prefers-reduced-motion: reduce)"]]);
+      register([[options.reducedMotion, "(prefers-reduced-motion: reduce)"]]);
       update();
     }
 
@@ -618,11 +615,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function update() {
       var options2 = accumulate();
-      var _destroy = options2.destroy;
+      var destruction = options2.destroy;
 
-      if (_destroy) {
+      if (destruction) {
         Splide2.options = initialOptions;
-        Splide2.destroy(_destroy === "completely");
+        Splide2.destroy(destruction === "completely");
       } else if (Splide2.state.is(DESTROYED)) {
         destroy(true);
         Splide2.mount();
@@ -1586,7 +1583,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
         if (index > -1 && (allowSameIndex || index !== currIndex)) {
           setIndex(index);
-          options.useScroll ? scrollTo(dest, options.speed, callback) : Move.move(dest, index, prevIndex, callback);
+          Move.move(dest, index, prevIndex, callback);
         }
       }
     }
@@ -1596,10 +1593,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         setIndex(loop(Move.toIndex(Move.getPosition())));
         callback && callback();
       });
-    }
-
-    function scrollTo(index, duration, callback) {
-      scroll(toPosition(index, true), duration, false, callback);
     }
 
     function parse(control) {
@@ -1721,7 +1714,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       mount: mount,
       go: go,
       scroll: scroll,
-      scrollTo: scrollTo,
       getNext: getNext,
       getPrev: getPrev,
       getAdjacent: getAdjacent,
@@ -2023,8 +2015,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         destination = Move.toPosition(Components2.Controller.toDest(destination % size)) + offset;
       }
 
+      var noDistance = approximatelyEqual(from, destination, 1);
       friction = 1;
-      duration = duration || max(abs(destination - from) / BASE_VELOCITY, MIN_DURATION);
+      duration = noDistance ? 0 : duration || max(abs(destination - from) / BASE_VELOCITY, MIN_DURATION);
       callback = onScrolled;
       interval = RequestInterval(duration, onEnd, apply(update, from, destination, noConstrain), 1);
       set(SCROLLING);
@@ -2844,7 +2837,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     focusableNodes: "a, button, textarea, input, select, iframe",
     live: true,
     classes: CLASSES,
-    i18n: I18N
+    i18n: I18N,
+    reducedMotion: {
+      speed: 0,
+      autoplay: "pause"
+    }
   };
 
   function Fade(Splide2, Components2, options) {
@@ -2880,8 +2877,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         bind = _EventInterface16.bind;
 
     var Move = Components2.Move,
-        Controller = Components2.Controller;
+        Controller = Components2.Controller,
+        Scroll = Components2.Scroll;
     var list = Components2.Elements.list;
+    var transition = apply(style, list, "transition");
     var endCallback;
 
     function mount() {
@@ -2899,9 +2898,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var speed = getSpeed(index);
 
       if (abs(destination - position) >= 1 && speed >= 1) {
-        apply("transform " + speed + "ms " + options.easing);
-        Move.translate(destination, true);
-        endCallback = done;
+        if (options.useScroll) {
+          Scroll.scroll(destination, speed, false, done);
+        } else {
+          transition("transform " + speed + "ms " + options.easing);
+          Move.translate(destination, true);
+          endCallback = done;
+        }
       } else {
         Move.jump(index);
         done();
@@ -2909,7 +2912,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function cancel() {
-      apply("");
+      transition("");
+      Scroll.cancel();
     }
 
     function getSpeed(index) {
@@ -2925,10 +2929,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }
 
       return options.speed;
-    }
-
-    function apply(transition) {
-      style(list, "transition", transition);
     }
 
     return {

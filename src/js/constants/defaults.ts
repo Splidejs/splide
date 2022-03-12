@@ -30,4 +30,8 @@ export const DEFAULTS: Options = {
   live              : true,
   classes           : CLASSES,
   i18n              : I18N,
+  reducedMotion: {
+    speed   : 0,
+    autoplay: 'pause',
+  },
 };

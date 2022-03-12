@@ -49,10 +49,7 @@ export function Media( Splide: Splide, Components: Components, options: Options 
       .sort( ( n, m ) => isMin ? +m - +n : +n - +m )
       .map<[ Options, string ]>( key => [ breakpoints[ key ], `(${ isMin ? 'min' : 'max' }-width:${ key }px)` ] ) );
 
-    register( [ [ {
-      speed   : 0,
-      autoplay: 'pause',
-    }, '(prefers-reduced-motion: reduce)' ] ] );
+    register( [ [ options.reducedMotion, '(prefers-reduced-motion: reduce)' ] ] );
 
     update();
   }
@@ -86,11 +83,11 @@ export function Media( Splide: Splide, Components: Components, options: Options 
    */
   function update(): void {
     const options = accumulate();
-    const { destroy: _destroy } = options;
+    const { destroy: destruction } = options;
 
-    if ( _destroy ) {
+    if ( destruction ) {
       Splide.options = initialOptions;
-      Splide.destroy( _destroy === 'completely' );
+      Splide.destroy( destruction === 'completely' );
     } else if ( Splide.state.is( DESTROYED ) ) {
       destroy( true );
       Splide.mount();

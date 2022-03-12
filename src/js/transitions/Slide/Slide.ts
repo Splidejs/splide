@@ -2,7 +2,7 @@ import { SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { Components, Options, TransitionComponent } from '../../types';
-import { abs, style } from '../../utils';
+import { abs, apply, style } from '../../utils';
 
 
 /**
@@ -18,8 +18,9 @@ import { abs, style } from '../../utils';
  */
 export function Slide( Splide: Splide, Components: Components, options: Options ): TransitionComponent {
   const { bind } = EventInterface( Splide );
-  const { Move, Controller } = Components;
+  const { Move, Controller, Scroll } = Components;
   const { list } = Components.Elements;
+  const transition = apply( style, list, 'transition' );
 
   /**
    * Holds the `done` callback function.
@@ -51,9 +52,13 @@ export function Slide( Splide: Splide, Components: Components, options: Options 
     const speed       = getSpeed( index );
 
     if ( abs( destination - position ) >= 1 && speed >= 1 ) {
-      apply( `transform ${ speed }ms ${ options.easing }` );
-      Move.translate( destination, true );
-      endCallback = done;
+      if ( options.useScroll ) {
+        Scroll.scroll( destination, speed, false, done );
+      } else {
+        transition( `transform ${ speed }ms ${ options.easing }` );
+        Move.translate( destination, true );
+        endCallback = done;
+      }
     } else {
       Move.jump( index );
       done();
@@ -64,7 +69,8 @@ export function Slide( Splide: Splide, Components: Components, options: Options 
    * Cancels the transition.
    */
   function cancel(): void {
-    apply( '' );
+    transition( '' );
+    Scroll.cancel();
   }
 
   /**
@@ -85,15 +91,6 @@ export function Slide( Splide: Splide, Components: Components, options: Options 
     }
 
     return options.speed;
-  }
-
-  /**
-   * Applies the transition CSS property to the list element.
-   *
-   * @param transition - A transition CSS value.
-   */
-  function apply( transition: string ): void {
-    style( list, 'transition', transition );
   }
 
   return {

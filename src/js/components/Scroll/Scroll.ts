@@ -4,7 +4,7 @@ import { SLIDE } from '../../constants/types';
 import { EventInterface, RequestInterval, RequestIntervalInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, BaseComponent, Components, Options } from '../../types';
-import { abs, apply, floor, max, sign } from '../../utils';
+import { abs, apply, approximatelyEqual, floor, max, sign } from '../../utils';
 import { BASE_VELOCITY, BOUNCE_DIFF_THRESHOLD, BOUNCE_DURATION, FRICTION_FACTOR, MIN_DURATION } from './constants';
 
 
@@ -84,8 +84,10 @@ export function Scroll( Splide: Splide, Components: Components, options: Options
       destination = Move.toPosition( Components.Controller.toDest( destination % size ) ) + offset;
     }
 
+    const noDistance = approximatelyEqual( from, destination, 1 );
+
     friction = 1;
-    duration = duration || max( abs( destination - from ) / BASE_VELOCITY, MIN_DURATION );
+    duration = noDistance ? 0 : duration || max( abs( destination - from ) / BASE_VELOCITY, MIN_DURATION );
     callback = onScrolled;
     interval = RequestInterval( duration, onEnd, apply( update, from, destination, noConstrain ), 1 );
 

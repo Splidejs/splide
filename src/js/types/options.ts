@@ -208,6 +208,11 @@ export interface Options extends ResponsiveOptions {
   breakpoints?: Record<string | number, ResponsiveOptions>,
 
   /**
+   * Options used when the `(prefers-reduced-motion: reduce)` is detected.
+   */
+  reducedMotion?: Options;
+
+  /**
    * The collection of class names.
    */
   classes?: Record<string, string>;
