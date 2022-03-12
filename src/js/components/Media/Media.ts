@@ -11,6 +11,7 @@ import { merge, noop, ownKeys } from '../../utils';
  * @since 3.0.0
  */
 export interface MediaComponent extends BaseComponent {
+  matches( key: string ): void;
 }
 
 /**
@@ -36,7 +37,7 @@ export function Media( Splide: Splide, Components: Components, options: Options 
   /**
    * Stores options and MediaQueryList object.
    */
-  const queries: Array<[ Options, MediaQueryList ]> = [];
+  const queries: Record<string, [ Options, MediaQueryList ]> = {};
 
   /**
    * Called when the component is constructed.
@@ -47,10 +48,10 @@ export function Media( Splide: Splide, Components: Components, options: Options 
     ownKeys( breakpoints )
       .sort( ( n, m ) => isMin ? +n - +m  : +m - +n )
       .forEach( key => {
-        register( breakpoints[ key ], `(${ isMin ? 'min' : 'max' }-width:${ key }px)` );
+        register( key, breakpoints[ key ], `(${ isMin ? 'min' : 'max' }-width:${ key }px)` );
       } );
 
-    register( options.reducedMotion || {}, '(prefers-reduced-motion: reduce)' );
+    register( 'motion', options.reducedMotion || {}, '(prefers-reduced-motion: reduce)' );
     update();
   }
 
@@ -77,13 +78,14 @@ export function Media( Splide: Splide, Components: Components, options: Options 
   /**
    * Registers entries as [ Options, media query string ].
    *
-   * @param options - Options.
+   * @param key     - An unique key.
+   * @param options - Options merged to current options when the query matches the media.
    * @param query   - A query string.
    */
-  function register( options: Options, query: string ): void {
+  function register( key: string, options: Options, query: string ): void {
     const queryList = matchMedia( query );
     binder.bind( queryList, 'change', update );
-    queries.push( [ options, queryList ] );
+    queries[ key ] = [ options, queryList ];
   }
 
   /**
@@ -114,14 +116,27 @@ export function Media( Splide: Splide, Components: Components, options: Options 
    * @return Merged options.
    */
   function accumulate(): Options {
-    return queries.reduce<Options>( ( merged, entry ) => {
-      return merge( merged, entry[ 1 ].matches ? entry[ 0 ] : {} );
-    }, merge( {}, initialOptions ) );
+    return ownKeys( queries )
+      .reduce( ( merged, key ) => merge( merged, matches( key ) || {} ), merge( {}, initialOptions ) );
+  }
+
+  /**
+   * Finds the entry, `[ options, query ]` registered by the specified key,
+   * and returns options if the query matches the current media.
+   *
+   * @param key - A key.
+   *
+   * @return An object with options if found, or otherwise `null`.
+   */
+  function matches( key: string ): Options | null {
+    const entry = queries[ key ];
+    return ( entry && entry[ 1 ].matches ) ? entry[ 0 ] : null;
   }
 
   return {
     setup,
     mount: noop,
     destroy,
+    matches,
   };
 }

@@ -584,16 +584,16 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var binder = EventBinder();
     var breakpoints = options.breakpoints || {};
     var initialOptions = Splide2._io;
-    var queries = [];
+    var queries = {};
 
     function setup() {
       var isMin = options.mediaQuery === "min";
       ownKeys(breakpoints).sort(function (n, m) {
         return isMin ? +n - +m : +m - +n;
       }).forEach(function (key) {
-        register(breakpoints[key], "(" + (isMin ? "min" : "max") + "-width:" + key + "px)");
+        register(key, breakpoints[key], "(" + (isMin ? "min" : "max") + "-width:" + key + "px)");
       });
-      register(options.reducedMotion || {}, "(prefers-reduced-motion: reduce)");
+      register("motion", options.reducedMotion || {}, "(prefers-reduced-motion: reduce)");
       update();
     }
 
@@ -609,10 +609,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }
     }
 
-    function register(options2, query) {
+    function register(key, options2, query) {
       var queryList = matchMedia(query);
       binder.bind(queryList, "change", update);
-      queries.push([options2, queryList]);
+      queries[key] = [options2, queryList];
     }
 
     function update() {
@@ -633,15 +633,21 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function accumulate() {
-      return queries.reduce(function (merged, entry) {
-        return merge(merged, entry[1].matches ? entry[0] : {});
+      return ownKeys(queries).reduce(function (merged, key) {
+        return merge(merged, matches(key) || {});
       }, merge({}, initialOptions));
+    }
+
+    function matches(key) {
+      var entry = queries[key];
+      return entry && entry[1].matches ? entry[0] : null;
     }
 
     return {
       setup: setup,
       mount: noop,
-      destroy: destroy
+      destroy: destroy,
+      matches: matches
     };
   }
 
