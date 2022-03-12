@@ -31,7 +31,8 @@ export const DEFAULTS: Options = {
   classes           : CLASSES,
   i18n              : I18N,
   reducedMotion: {
-    speed   : 0,
-    autoplay: 'pause',
+    speed      : 0,
+    rewindSpeed: 0,
+    autoplay   : 'pause',
   },
 };

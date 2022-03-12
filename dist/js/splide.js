@@ -1634,11 +1634,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function computeDestIndex(dest, from, snapPage) {
       if (isEnough()) {
         var end = getEnd();
-        var movable = computeMovableDestIndex(dest);
+        var index = computeMovableDestIndex(dest);
 
-        if (movable !== dest) {
+        if (index !== dest) {
           from = dest;
-          dest = movable;
+          dest = index;
           snapPage = false;
         }
 
@@ -2215,7 +2215,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var velocity = computeVelocity(e);
       var destination = computeDestination(velocity);
       var rewind = options.rewind && options.rewindByDrag;
+      var reduced = Components2.Media.matches("motion");
       var go = Controller.go;
+
+      if (reduced) {
+        options.speed = Splide2._io.speed;
+      }
 
       if (isFree) {
         Controller.scroll(destination, 0, options.snap);
@@ -2225,6 +2230,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         go(exceededLimit(true) ? ">" : "<");
       } else {
         go(Controller.toDest(destination), true);
+      }
+
+      if (reduced) {
+        options.speed = 0;
       }
     }
 
@@ -2848,6 +2857,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     i18n: I18N,
     reducedMotion: {
       speed: 0,
+      rewindSpeed: 0,
       autoplay: "pause"
     }
   };

@@ -1,4 +1,5 @@
 import { CLASS_ARROW, CLASS_PAGINATION_PAGE } from '../../constants/classes';
+import { DEFAULTS } from '../../constants/defaults';
 import { EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_MOUNTED, EVENT_UPDATED } from '../../constants/events';
 import { SCROLL_LISTENER_OPTIONS } from '../../constants/listener-options';
 import { DRAGGING, IDLE, MOVING, SCROLLING } from '../../constants/states';
@@ -218,7 +219,9 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
   }
 
   /**
-   * Moves the slider according to the drag result.
+   * Calculates the destination by the drag velocity and moves the carousel.
+   * If motion is reduced, restores transition speed to the initial value
+   * because it's "essential" motion for the user to recognize what happens on the carousel.
    *
    * @param e - A TouchEvent or MouseEvent object.
    */
@@ -226,7 +229,12 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
     const velocity    = computeVelocity( e );
     const destination = computeDestination( velocity );
     const rewind      = options.rewind && options.rewindByDrag;
+    const reduced     = Components.Media.matches( 'motion' );
     const { go } = Controller;
+
+    if ( reduced ) {
+      options.speed = Splide._io.speed;
+    }
 
     if ( isFree ) {
       Controller.scroll( destination, 0, options.snap );
@@ -236,6 +244,10 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
       go( exceededLimit( true ) ? '>' : '<' );
     } else {
       go( Controller.toDest( destination ), true );
+    }
+
+    if ( reduced ) {
+      options.speed = 0;
     }
   }
 

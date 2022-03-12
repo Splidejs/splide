@@ -14,7 +14,6 @@ import { apply, approximatelyEqual, between, clamp, floor, isString, isUndefined
  */
 export interface ControllerComponent extends BaseComponent {
   go( control: number | string, allowSameIndex?: boolean, callback?: AnyFunction ): void;
-  // scrollTo( index: number, duration?: number, callback?: AnyFunction ): void;
   scroll( destination: number, duration?: number, snap?: boolean, callback?: AnyFunction ): void;
   getNext( destination?: boolean ): number;
   getPrev( destination?: boolean ): number;
@@ -137,17 +136,6 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
     } );
   }
 
-  // /**
-  //  * Scrolls the slider to the specified index with updating indices.
-  //  *
-  //  * @param index    - An index to scroll the slider to.
-  //  * @param duration - Optional. Specifies the scroll duration.
-  //  * @param callback - Optional. A callback function invoked after scroll ends.
-  //  */
-  // function scrollTo( index: number, duration?: number, callback?: AnyFunction ): void {
-  //   scroll( toPosition( index, true ), duration, false, callback );
-  // }
-
   /**
    * Parses the control and returns a slide index.
    *
@@ -213,12 +201,12 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    */
   function computeDestIndex( dest: number, from: number, snapPage?: boolean ): number {
     if ( isEnough() ) {
-      const end         = getEnd();
-      const movable     = computeMovableDestIndex( dest );
+      const end   = getEnd();
+      const index = computeMovableDestIndex( dest );
 
-      if ( movable !== dest ) {
+      if ( index !== dest ) {
         from     = dest;
-        dest     = movable;
+        dest     = index;
         snapPage = false;
       }
 
@@ -369,7 +357,6 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
     mount,
     go,
     scroll,
-    // scrollTo,
     getNext,
     getPrev,
     getAdjacent,
