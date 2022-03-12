@@ -1,4 +1,3 @@
-import { EVENT_MEDIA } from '../../../constants/events';
 import { DESTROYED } from '../../../constants/states';
 import { init } from '../../../test';
 
@@ -31,18 +30,5 @@ describe( 'Options', () => {
     const splide = init();
     expect( splide.options.speed ).toBe( 0 );
     expect( splide.options.autoplay ).toBe( 'pause' );
-  } );
-
-  test( 'can emit events when any media query changes.', () => {
-    const splide   = init( { breakpoints: { 640: { perPage: 4 } } }, { mount: false } );
-    const callback = jest.fn();
-
-    splide.on( EVENT_MEDIA, query => {
-      expect( query.matches ).toBe( true );
-      callback();
-    } );
-
-    splide.mount();
-    expect( callback ).toHaveBeenCalledTimes( 2 ); // a breakpoint and prefers-reduced-motion
   } );
 } );

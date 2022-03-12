@@ -1,3 +1,6 @@
+import { ownKeys } from '../ownKeys/ownKeys';
+
+
 /**
  * Iterates over the provided object by own enumerable keys with calling the iteratee function.
  *
@@ -13,7 +16,7 @@ export function forOwn<T extends object>(
   right?: boolean
 ): T {
   if ( object ) {
-    let keys = Object.keys( object );
+    let keys = ownKeys( object );
     keys = right ? keys.reverse() : keys;
 
     for ( let i = 0; i < keys.length; i++ ) {

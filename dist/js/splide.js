@@ -13,38 +13,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 })(this, function () {
   'use strict';
 
-  var EVENT_MOUNTED = "mounted";
-  var EVENT_READY = "ready";
-  var EVENT_MOVE = "move";
-  var EVENT_MOVED = "moved";
-  var EVENT_SHIFTED = "shifted";
-  var EVENT_CLICK = "click";
-  var EVENT_ACTIVE = "active";
-  var EVENT_INACTIVE = "inactive";
-  var EVENT_VISIBLE = "visible";
-  var EVENT_HIDDEN = "hidden";
-  var EVENT_SLIDE_KEYDOWN = "slide:keydown";
-  var EVENT_REFRESH = "refresh";
-  var EVENT_UPDATED = "updated";
-  var EVENT_MEDIA = "media";
-  var EVENT_RESIZE = "resize";
-  var EVENT_RESIZED = "resized";
-  var EVENT_REPOSITIONED = "repositioned";
-  var EVENT_DRAG = "drag";
-  var EVENT_DRAGGING = "dragging";
-  var EVENT_DRAGGED = "dragged";
-  var EVENT_SCROLL = "scroll";
-  var EVENT_SCROLLED = "scrolled";
-  var EVENT_DESTROY = "destroy";
-  var EVENT_ARROWS_MOUNTED = "arrows:mounted";
-  var EVENT_ARROWS_UPDATED = "arrows:updated";
-  var EVENT_PAGINATION_MOUNTED = "pagination:mounted";
-  var EVENT_PAGINATION_UPDATED = "pagination:updated";
-  var EVENT_NAVIGATION_MOUNTED = "navigation:mounted";
-  var EVENT_AUTOPLAY_PLAY = "autoplay:play";
-  var EVENT_AUTOPLAY_PLAYING = "autoplay:playing";
-  var EVENT_AUTOPLAY_PAUSE = "autoplay:pause";
-  var EVENT_LAZYLOAD_LOADED = "lazyload:loaded";
   var CREATED = 1;
   var MOUNTED = 2;
   var IDLE = 3;
@@ -68,10 +36,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
   function slice(arrayLike, start, end) {
     return Array.prototype.slice.call(arrayLike, start, end);
-  }
-
-  function find(arrayLike, predicate) {
-    return slice(arrayLike).filter(predicate)[0];
   }
 
   function apply(func) {
@@ -167,9 +131,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     return selector ? children(parent, selector)[0] : parent.firstElementChild;
   }
 
+  var ownKeys = Object.keys;
+
   function forOwn(object, iteratee, right) {
     if (object) {
-      var keys = Object.keys(object);
+      var keys = ownKeys(object);
       keys = right ? keys.reverse() : keys;
 
       for (var i = 0; i < keys.length; i++) {
@@ -440,6 +406,38 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     };
   }
 
+  var EVENT_MOUNTED = "mounted";
+  var EVENT_READY = "ready";
+  var EVENT_MOVE = "move";
+  var EVENT_MOVED = "moved";
+  var EVENT_SHIFTED = "shifted";
+  var EVENT_CLICK = "click";
+  var EVENT_ACTIVE = "active";
+  var EVENT_INACTIVE = "inactive";
+  var EVENT_VISIBLE = "visible";
+  var EVENT_HIDDEN = "hidden";
+  var EVENT_SLIDE_KEYDOWN = "slide:keydown";
+  var EVENT_REFRESH = "refresh";
+  var EVENT_UPDATED = "updated";
+  var EVENT_RESIZE = "resize";
+  var EVENT_RESIZED = "resized";
+  var EVENT_REPOSITIONED = "repositioned";
+  var EVENT_DRAG = "drag";
+  var EVENT_DRAGGING = "dragging";
+  var EVENT_DRAGGED = "dragged";
+  var EVENT_SCROLL = "scroll";
+  var EVENT_SCROLLED = "scrolled";
+  var EVENT_DESTROY = "destroy";
+  var EVENT_ARROWS_MOUNTED = "arrows:mounted";
+  var EVENT_ARROWS_UPDATED = "arrows:updated";
+  var EVENT_PAGINATION_MOUNTED = "pagination:mounted";
+  var EVENT_PAGINATION_UPDATED = "pagination:updated";
+  var EVENT_NAVIGATION_MOUNTED = "navigation:mounted";
+  var EVENT_AUTOPLAY_PLAY = "autoplay:play";
+  var EVENT_AUTOPLAY_PLAYING = "autoplay:playing";
+  var EVENT_AUTOPLAY_PAUSE = "autoplay:pause";
+  var EVENT_LAZYLOAD_LOADED = "lazyload:loaded";
+
   function EventInterface(Splide2) {
     var bus = Splide2 ? Splide2.event.bus : document.createDocumentFragment();
     var binder = EventBinder();
@@ -585,18 +583,24 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   function Media(Splide2, Components2, options) {
     var binder = EventBinder();
     var breakpoints = options.breakpoints || {};
-    var initialOptions = merge({}, options);
+    var initialOptions = Splide2._io;
     var queries = [];
 
     function setup() {
       var isMin = options.mediaQuery === "min";
-      register(Object.keys(breakpoints).sort(function (n, m) {
-        return isMin ? +m - +n : +n - +m;
-      }).map(function (key) {
-        return [breakpoints[key], "(" + (isMin ? "min" : "max") + "-width:" + key + "px)"];
-      }));
-      register([[options.reducedMotion, "(prefers-reduced-motion: reduce)"]]);
+      ownKeys(breakpoints).sort(function (n, m) {
+        return isMin ? +n - +m : +m - +n;
+      }).forEach(function (key) {
+        register(breakpoints[key], "(" + (isMin ? "min" : "max") + "-width:" + key + "px)");
+      });
+      register(options.reducedMotion || {}, "(prefers-reduced-motion: reduce)");
       update();
+    }
+
+    function reset() {
+      ownKeys(options).forEach(function (key) {
+        !(key in initialOptions) && delete options[key];
+      });
     }
 
     function destroy(completely) {
@@ -605,20 +609,18 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }
     }
 
-    function register(entries) {
-      queries.push(entries.map(function (entry) {
-        var query = matchMedia(entry[1]);
-        binder.bind(query, "change", update);
-        return [entry[0], query];
-      }));
+    function register(options2, query) {
+      var queryList = matchMedia(query);
+      binder.bind(queryList, "change", update);
+      queries.push([options2, queryList]);
     }
 
     function update() {
       var options2 = accumulate();
       var destruction = options2.destroy;
+      reset();
 
       if (destruction) {
-        Splide2.options = initialOptions;
         Splide2.destroy(destruction === "completely");
       } else if (Splide2.state.is(DESTROYED)) {
         destroy(true);
@@ -631,12 +633,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function accumulate() {
-      return queries.reduce(function (merged, entries) {
-        var entry = find(entries, function (entry2) {
-          return entry2[1].matches;
-        }) || [];
-        entry[1] && Splide2.emit(EVENT_MEDIA, entry[1]);
-        return merge(merged, entry[0] || {});
+      return queries.reduce(function (merged, entry) {
+        return merge(merged, entry[1].matches ? entry[0] : {});
       }, merge({}, initialOptions));
     }
 
@@ -2277,7 +2275,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function isDraggable(target2) {
       var noDrag = options.noDrag;
-      return !matches(target2, "." + CLASS_PAGINATION_PAGE + ", ." + CLASS_ARROW) && !noDrag || !matches(target2, noDrag);
+      return !matches(target2, "." + CLASS_PAGINATION_PAGE + ", ." + CLASS_ARROW) && (!noDrag || !matches(target2, noDrag));
     }
 
     function isTouchEvent(e) {
@@ -2964,6 +2962,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         assert(false, "Invalid JSON");
       }
 
+      this._io = merge({}, options);
       this._options = options;
     }
 

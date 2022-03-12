@@ -1,9 +1,8 @@
-import { EVENT_MEDIA } from '../../constants/events';
 import { DESTROYED } from '../../constants/states';
 import { EventBinder } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { find, merge, noop } from '../../utils';
+import { merge, noop, ownKeys } from '../../utils';
 
 
 /**
@@ -17,7 +16,7 @@ export interface MediaComponent extends BaseComponent {
 /**
  * The component for observing media queries and update options if necessary.
  *
- * @since 3.0.0
+ * @since 4.0.0
  *
  * @param Splide     - A Splide instance.
  * @param Components - A collection of components.
@@ -32,12 +31,12 @@ export function Media( Splide: Splide, Components: Components, options: Options 
   /**
    * Keeps the initial options to apply when no matched query exists.
    */
-  const initialOptions = merge( {}, options );
+  const initialOptions = Splide._io;
 
   /**
    * Stores options and MediaQueryList object.
    */
-  const queries: Array<[ Options, MediaQueryList ][]> = [];
+  const queries: Array<[ Options, MediaQueryList ]> = [];
 
   /**
    * Called when the component is constructed.
@@ -45,13 +44,23 @@ export function Media( Splide: Splide, Components: Components, options: Options 
   function setup(): void {
     const isMin = options.mediaQuery === 'min';
 
-    register( Object.keys( breakpoints )
-      .sort( ( n, m ) => isMin ? +m - +n : +n - +m )
-      .map<[ Options, string ]>( key => [ breakpoints[ key ], `(${ isMin ? 'min' : 'max' }-width:${ key }px)` ] ) );
+    ownKeys( breakpoints )
+      .sort( ( n, m ) => isMin ? +n - +m  : +m - +n )
+      .forEach( key => {
+        register( breakpoints[ key ], `(${ isMin ? 'min' : 'max' }-width:${ key }px)` );
+      } );
 
-    register( [ [ options.reducedMotion, '(prefers-reduced-motion: reduce)' ] ] );
-
+    register( options.reducedMotion || {}, '(prefers-reduced-motion: reduce)' );
     update();
+  }
+
+  /**
+   * Remove all keys from current options that initial options do not include.
+   */
+  function reset(): void {
+    ownKeys( options ).forEach( key => {
+      ! ( key in initialOptions ) && delete options[ key ];
+    } );
   }
 
   /**
@@ -68,14 +77,13 @@ export function Media( Splide: Splide, Components: Components, options: Options 
   /**
    * Registers entries as [ Options, media query string ].
    *
-   * @param entries - An array with entries.
+   * @param options - Options.
+   * @param query   - A query string.
    */
-  function register( entries: [ Options, string? ][] ): void {
-    queries.push( entries.map<[ Options, MediaQueryList ]>( entry => {
-      const query = matchMedia( entry[ 1 ] );
-      binder.bind( query, 'change', update );
-      return [ entry[ 0 ], query ];
-    } ) );
+  function register( options: Options, query: string ): void {
+    const queryList = matchMedia( query );
+    binder.bind( queryList, 'change', update );
+    queries.push( [ options, queryList ] );
   }
 
   /**
@@ -85,8 +93,9 @@ export function Media( Splide: Splide, Components: Components, options: Options 
     const options = accumulate();
     const { destroy: destruction } = options;
 
+    reset();
+
     if ( destruction ) {
-      Splide.options = initialOptions;
       Splide.destroy( destruction === 'completely' );
     } else if ( Splide.state.is( DESTROYED ) ) {
       destroy( true );
@@ -105,10 +114,8 @@ export function Media( Splide: Splide, Components: Components, options: Options 
    * @return Merged options.
    */
   function accumulate(): Options {
-    return queries.reduce<Options>( ( merged, entries ) => {
-      const entry = find( entries, entry => entry[ 1 ].matches ) || [];
-      entry[ 1 ] && Splide.emit( EVENT_MEDIA, entry[ 1 ] );
-      return merge( merged, entry[ 0 ] || {} );
+    return queries.reduce<Options>( ( merged, entry ) => {
+      return merge( merged, entry[ 1 ].matches ? entry[ 0 ] : {} );
     }, merge( {}, initialOptions ) );
   }
 

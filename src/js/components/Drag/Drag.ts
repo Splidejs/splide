@@ -367,8 +367,9 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    */
   function isDraggable( target: EventTarget ): boolean {
     const { noDrag } = options;
+
     return ! matches( target, `.${ CLASS_PAGINATION_PAGE }, .${ CLASS_ARROW }` )
-      && ! noDrag || ! matches( target, noDrag );
+      && ( ! noDrag || ! matches( target, noDrag ) );
   }
 
   /**

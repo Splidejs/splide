@@ -11,7 +11,6 @@ export const EVENT_HIDDEN             = 'hidden';
 export const EVENT_SLIDE_KEYDOWN      = 'slide:keydown';
 export const EVENT_REFRESH            = 'refresh';
 export const EVENT_UPDATED            = 'updated';
-export const EVENT_MEDIA              = 'media';
 export const EVENT_RESIZE             = 'resize';
 export const EVENT_RESIZED            = 'resized';
 export const EVENT_REPOSITIONED       = 'repositioned';
