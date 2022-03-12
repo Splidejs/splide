@@ -959,12 +959,6 @@ declare class Splide {
      */
     readonly splides: SyncTarget[];
     /**
-     * Keeps the initial options.
-     *
-     * @internal
-     */
-    readonly _io: Options;
-    /**
      * The current options.
      */
     private readonly _options;

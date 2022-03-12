@@ -1,6 +1,7 @@
 import { CLASS_ARROW, CLASS_PAGINATION_PAGE } from '../../constants/classes';
 import { EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_MOUNTED, EVENT_UPDATED } from '../../constants/events';
 import { SCROLL_LISTENER_OPTIONS } from '../../constants/listener-options';
+import { MEDIA_PREFERS_REDUCED_MOTION } from '../../constants/media';
 import { DRAGGING, IDLE, MOVING, SCROLLING } from '../../constants/states';
 import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
@@ -228,11 +229,11 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
     const velocity    = computeVelocity( e );
     const destination = computeDestination( velocity );
     const rewind      = options.rewind && options.rewindByDrag;
-    const reduced     = Components.Media.matches( 'motion' );
+    const reduced     = Components.Media.matches( MEDIA_PREFERS_REDUCED_MOTION );
     const { go } = Controller;
 
     if ( reduced ) {
-      options.speed = Splide._io.speed;
+      delete options.speed;
     }
 
     if ( isFree ) {

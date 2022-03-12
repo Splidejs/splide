@@ -54,13 +54,6 @@ export class Splide {
   readonly splides: SyncTarget[] = [];
 
   /**
-   * Keeps the initial options.
-   *
-   * @internal
-   */
-  readonly _io: Options;
-
-  /**
    * The current options.
    */
   private readonly _options: Options = {};
@@ -100,8 +93,7 @@ export class Splide {
       assert( false, 'Invalid JSON' );
     }
 
-    this._io      = merge( {}, options );
-    this._options = options;
+    this._options = Object.create( merge( {}, options ) );
   }
 
   /**

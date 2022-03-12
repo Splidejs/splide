@@ -8,6 +8,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
+var MEDIA_PREFERS_REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
 var CREATED = 1;
 var MOUNTED = 2;
 var IDLE = 3;
@@ -577,7 +578,6 @@ function Throttle(func, duration) {
 function Media(Splide2, Components2, options) {
   var binder = EventBinder();
   var breakpoints = options.breakpoints || {};
-  var initialOptions = Splide2._io;
   var queries = [];
 
   function setup() {
@@ -585,9 +585,9 @@ function Media(Splide2, Components2, options) {
     ownKeys(breakpoints).sort(function (n, m) {
       return isMin ? +n - +m : +m - +n;
     }).forEach(function (key) {
-      register(key, breakpoints[key], "(" + (isMin ? "min" : "max") + "-width:" + key + "px)");
+      register(breakpoints[key], "(" + (isMin ? "min" : "max") + "-width:" + key + "px)");
     });
-    register("motion", options.reducedMotion || {}, "(prefers-reduced-motion: reduce)");
+    register(options.reducedMotion || {}, MEDIA_PREFERS_REDUCED_MOTION);
     update();
   }
 
@@ -597,40 +597,36 @@ function Media(Splide2, Components2, options) {
     }
   }
 
-  function register(key, options2, query) {
+  function register(options2, query) {
     var queryList = matchMedia(query);
     binder.bind(queryList, "change", update);
-    queries.push([key, options2, queryList]);
+    queries.push([options2, queryList]);
   }
 
   function update() {
-    var merged = accumulate();
     var direction = options.direction;
-    var destruction = merged.destroy;
+    var merged = queries.reduce(function (merged2, entry) {
+      return merge(merged2, entry[1].matches ? entry[0] : {});
+    }, {});
     forOwn(options, function (value, key) {
-      !(key in initialOptions) && delete options[key];
+      delete options[key];
     });
+    merge(options, merged);
 
-    if (destruction) {
-      Splide2.destroy(destruction === "completely");
+    if (options.destroy) {
+      Splide2.destroy(options.destroy === "completely");
     } else if (Splide2.state.is(DESTROYED)) {
       destroy(true);
       Splide2.mount();
     } else {
       Splide2.options = merged;
-      direction !== merged.direction && Splide2.refresh();
+      direction !== options.direction && Splide2.refresh();
     }
   }
 
-  function accumulate() {
-    return queries.reduce(function (merged, entry) {
-      return merge(merged, entry[2].matches ? entry[1] : {});
-    }, merge({}, initialOptions));
-  }
-
-  function matches(key) {
+  function matches(media) {
     return queries.some(function (entry) {
-      return entry[0] === key && entry[2].matches;
+      return entry[1].media === media && entry[1].matches;
     });
   }
 
@@ -2209,11 +2205,11 @@ function Drag(Splide2, Components2, options) {
     var velocity = computeVelocity(e);
     var destination = computeDestination(velocity);
     var rewind = options.rewind && options.rewindByDrag;
-    var reduced = Components2.Media.matches("motion");
+    var reduced = Components2.Media.matches(MEDIA_PREFERS_REDUCED_MOTION);
     var go = Controller.go;
 
     if (reduced) {
-      options.speed = Splide2._io.speed;
+      delete options.speed;
     }
 
     if (isFree) {
@@ -2969,8 +2965,7 @@ var _Splide = /*#__PURE__*/function () {
       assert(false, "Invalid JSON");
     }
 
-    this._io = merge({}, options);
-    this._options = options;
+    this._options = Object.create(merge({}, options));
   }
 
   var _proto = _Splide.prototype;
