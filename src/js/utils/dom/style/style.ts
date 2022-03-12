@@ -35,11 +35,6 @@ export function style(
   }
 
   if ( ! isNull( value ) ) {
-    const { style } = elm;
-    value = `${ value }`;
-
-    if ( style[ prop ] !== value ) {
-      style[ prop ] = value;
-    }
+    elm.style[ prop ] = `${ value }`;
   }
 }

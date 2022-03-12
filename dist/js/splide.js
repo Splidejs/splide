@@ -213,12 +213,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     if (!isNull(value)) {
-      var style2 = elm.style;
-      value = "" + value;
-
-      if (style2[prop] !== value) {
-        style2[prop] = value;
-      }
+      elm.style[prop] = "" + value;
     }
   }
 
@@ -1206,8 +1201,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       if (!rootRect || rootRect.width !== newRect.width || rootRect.height !== newRect.height) {
         style(track, "height", cssTrackHeight());
         styleSlides(resolve("marginRight"), unit(options.gap));
-        styleSlides("width", cssSlideWidth() || null);
-        styleSlides("height", cssSlideHeight() || null, true);
+        styleSlides("width", cssSlideWidth());
+        styleSlides("height", cssSlideHeight(), true);
         rootRect = newRect;
         emit(EVENT_RESIZED);
       }

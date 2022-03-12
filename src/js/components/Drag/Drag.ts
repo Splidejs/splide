@@ -1,5 +1,4 @@
 import { CLASS_ARROW, CLASS_PAGINATION_PAGE } from '../../constants/classes';
-import { DEFAULTS } from '../../constants/defaults';
 import { EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_MOUNTED, EVENT_UPDATED } from '../../constants/events';
 import { SCROLL_LISTENER_OPTIONS } from '../../constants/listener-options';
 import { DRAGGING, IDLE, MOVING, SCROLLING } from '../../constants/states';

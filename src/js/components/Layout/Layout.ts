@@ -82,8 +82,8 @@ export function Layout( Splide: Splide, Components: Components, options: Options
       style( track, 'height', cssTrackHeight() );
 
       styleSlides( resolve( 'marginRight' ), unit( options.gap ) );
-      styleSlides( 'width', cssSlideWidth() || null );
-      styleSlides( 'height', cssSlideHeight() || null, true );
+      styleSlides( 'width', cssSlideWidth() );
+      styleSlides( 'height', cssSlideHeight(), true );
 
       rootRect = newRect;
       emit( EVENT_RESIZED );

@@ -8,38 +8,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
-var EVENT_MOUNTED = "mounted";
-var EVENT_READY = "ready";
-var EVENT_MOVE = "move";
-var EVENT_MOVED = "moved";
-var EVENT_SHIFTED = "shifted";
-var EVENT_CLICK = "click";
-var EVENT_ACTIVE = "active";
-var EVENT_INACTIVE = "inactive";
-var EVENT_VISIBLE = "visible";
-var EVENT_HIDDEN = "hidden";
-var EVENT_SLIDE_KEYDOWN = "slide:keydown";
-var EVENT_REFRESH = "refresh";
-var EVENT_UPDATED = "updated";
-var EVENT_MEDIA = "media";
-var EVENT_RESIZE = "resize";
-var EVENT_RESIZED = "resized";
-var EVENT_REPOSITIONED = "repositioned";
-var EVENT_DRAG = "drag";
-var EVENT_DRAGGING = "dragging";
-var EVENT_DRAGGED = "dragged";
-var EVENT_SCROLL = "scroll";
-var EVENT_SCROLLED = "scrolled";
-var EVENT_DESTROY = "destroy";
-var EVENT_ARROWS_MOUNTED = "arrows:mounted";
-var EVENT_ARROWS_UPDATED = "arrows:updated";
-var EVENT_PAGINATION_MOUNTED = "pagination:mounted";
-var EVENT_PAGINATION_UPDATED = "pagination:updated";
-var EVENT_NAVIGATION_MOUNTED = "navigation:mounted";
-var EVENT_AUTOPLAY_PLAY = "autoplay:play";
-var EVENT_AUTOPLAY_PLAYING = "autoplay:playing";
-var EVENT_AUTOPLAY_PAUSE = "autoplay:pause";
-var EVENT_LAZYLOAD_LOADED = "lazyload:loaded";
 var CREATED = 1;
 var MOUNTED = 2;
 var IDLE = 3;
@@ -63,10 +31,6 @@ function empty(array) {
 
 function slice(arrayLike, start, end) {
   return Array.prototype.slice.call(arrayLike, start, end);
-}
-
-function find(arrayLike, predicate) {
-  return slice(arrayLike).filter(predicate)[0];
 }
 
 function apply(func) {
@@ -162,9 +126,11 @@ function child(parent, selector) {
   return selector ? children(parent, selector)[0] : parent.firstElementChild;
 }
 
+var ownKeys = Object.keys;
+
 function forOwn(object, iteratee, right) {
   if (object) {
-    var keys = Object.keys(object);
+    var keys = ownKeys(object);
     keys = right ? keys.reverse() : keys;
 
     for (var i = 0; i < keys.length; i++) {
@@ -242,12 +208,7 @@ function style(elm, prop, value) {
   }
 
   if (!isNull(value)) {
-    var style2 = elm.style;
-    value = "" + value;
-
-    if (style2[prop] !== value) {
-      style2[prop] = value;
-    }
+    elm.style[prop] = "" + value;
   }
 }
 
@@ -439,6 +400,38 @@ function EventBinder() {
   };
 }
 
+var EVENT_MOUNTED = "mounted";
+var EVENT_READY = "ready";
+var EVENT_MOVE = "move";
+var EVENT_MOVED = "moved";
+var EVENT_SHIFTED = "shifted";
+var EVENT_CLICK = "click";
+var EVENT_ACTIVE = "active";
+var EVENT_INACTIVE = "inactive";
+var EVENT_VISIBLE = "visible";
+var EVENT_HIDDEN = "hidden";
+var EVENT_SLIDE_KEYDOWN = "slide:keydown";
+var EVENT_REFRESH = "refresh";
+var EVENT_UPDATED = "updated";
+var EVENT_RESIZE = "resize";
+var EVENT_RESIZED = "resized";
+var EVENT_REPOSITIONED = "repositioned";
+var EVENT_DRAG = "drag";
+var EVENT_DRAGGING = "dragging";
+var EVENT_DRAGGED = "dragged";
+var EVENT_SCROLL = "scroll";
+var EVENT_SCROLLED = "scrolled";
+var EVENT_DESTROY = "destroy";
+var EVENT_ARROWS_MOUNTED = "arrows:mounted";
+var EVENT_ARROWS_UPDATED = "arrows:updated";
+var EVENT_PAGINATION_MOUNTED = "pagination:mounted";
+var EVENT_PAGINATION_UPDATED = "pagination:updated";
+var EVENT_NAVIGATION_MOUNTED = "navigation:mounted";
+var EVENT_AUTOPLAY_PLAY = "autoplay:play";
+var EVENT_AUTOPLAY_PLAYING = "autoplay:playing";
+var EVENT_AUTOPLAY_PAUSE = "autoplay:pause";
+var EVENT_LAZYLOAD_LOADED = "lazyload:loaded";
+
 function EventInterface(Splide2) {
   var bus = Splide2 ? Splide2.event.bus : document.createDocumentFragment();
   var binder = EventBinder();
@@ -584,20 +577,17 @@ function Throttle(func, duration) {
 function Media(Splide2, Components2, options) {
   var binder = EventBinder();
   var breakpoints = options.breakpoints || {};
-  var initialOptions = merge({}, options);
+  var initialOptions = Splide2._io;
   var queries = [];
 
   function setup() {
     var isMin = options.mediaQuery === "min";
-    register(Object.keys(breakpoints).sort(function (n, m) {
-      return isMin ? +m - +n : +n - +m;
-    }).map(function (key) {
-      return [breakpoints[key], "(" + (isMin ? "min" : "max") + "-width:" + key + "px)"];
-    }));
-    register([[{
-      speed: 0,
-      autoplay: "pause"
-    }, "(prefers-reduced-motion: reduce)"]]);
+    ownKeys(breakpoints).sort(function (n, m) {
+      return isMin ? +n - +m : +m - +n;
+    }).forEach(function (key) {
+      register(key, breakpoints[key], "(" + (isMin ? "min" : "max") + "-width:" + key + "px)");
+    });
+    register("motion", options.reducedMotion || {}, "(prefers-reduced-motion: reduce)");
     update();
   }
 
@@ -607,45 +597,48 @@ function Media(Splide2, Components2, options) {
     }
   }
 
-  function register(entries) {
-    queries.push(entries.map(function (entry) {
-      var query = matchMedia(entry[1]);
-      binder.bind(query, "change", update);
-      return [entry[0], query];
-    }));
+  function register(key, options2, query) {
+    var queryList = matchMedia(query);
+    binder.bind(queryList, "change", update);
+    queries.push([key, options2, queryList]);
   }
 
   function update() {
-    var options2 = accumulate();
-    var _destroy = options2.destroy;
+    var merged = accumulate();
+    var direction = options.direction;
+    var destruction = merged.destroy;
+    forOwn(options, function (value, key) {
+      !(key in initialOptions) && delete options[key];
+    });
 
-    if (_destroy) {
-      Splide2.options = initialOptions;
-      Splide2.destroy(_destroy === "completely");
+    if (destruction) {
+      Splide2.destroy(destruction === "completely");
     } else if (Splide2.state.is(DESTROYED)) {
       destroy(true);
       Splide2.mount();
     } else {
-      var oriented = Splide2.options.direction !== options2.direction;
-      Splide2.options = options2;
-      oriented && Splide2.refresh();
+      Splide2.options = merged;
+      direction !== merged.direction && Splide2.refresh();
     }
   }
 
   function accumulate() {
-    return queries.reduce(function (merged, entries) {
-      var entry = find(entries, function (entry2) {
-        return entry2[1].matches;
-      }) || [];
-      entry[1] && Splide2.emit(EVENT_MEDIA, entry[1]);
-      return merge(merged, entry[0] || {});
+    return queries.reduce(function (merged, entry) {
+      return merge(merged, entry[2].matches ? entry[1] : {});
     }, merge({}, initialOptions));
+  }
+
+  function matches(key) {
+    return queries.some(function (entry) {
+      return entry[0] === key && entry[2].matches;
+    });
   }
 
   return {
     setup: setup,
     mount: noop,
-    destroy: destroy
+    destroy: destroy,
+    matches: matches
   };
 }
 
@@ -862,7 +855,8 @@ function Slide$1(Splide2, index, slideIndex, slide) {
   var isNavigation = options.isNavigation,
       updateOnMove = options.updateOnMove,
       i18n = options.i18n,
-      pagination = options.pagination;
+      pagination = options.pagination,
+      slideFocus = options.slideFocus;
   var resolve = Components.Direction.resolve;
   var styles = getAttribute(slide, "style");
   var label = getAttribute(slide, ARIA_LABEL);
@@ -913,7 +907,7 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     }).join(" ");
     setAttribute(slide, ARIA_LABEL, format(i18n.slideX, (isClone ? slideIndex : index) + 1));
     setAttribute(slide, ARIA_CONTROLS, controls);
-    setAttribute(slide, ROLE, options.slideFocus ? "button" : "");
+    setAttribute(slide, ROLE, slideFocus ? "button" : "");
     updateA11y();
   }
 
@@ -962,8 +956,11 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     var hidden = !isVisible() && (!active || isClone);
     setAttribute(slide, ARIA_CURRENT, isNavigation && active || "");
     setAttribute(slide, ARIA_HIDDEN, hidden || "");
-    setAttribute(slide, TAB_INDEX, !hidden && options.slideFocus ? 0 : "");
     setAttribute(queryAll(slide, options.focusableNodes || ""), TAB_INDEX, hidden ? -1 : "");
+
+    if (slideFocus) {
+      setAttribute(slide, TAB_INDEX, hidden ? -1 : 0);
+    }
 
     if (options.live) {
       hidden ? remove(sr) : before(sr, child(slide));
@@ -1203,8 +1200,8 @@ function Layout(Splide2, Components2, options) {
     if (!rootRect || rootRect.width !== newRect.width || rootRect.height !== newRect.height) {
       style(track, "height", cssTrackHeight());
       styleSlides(resolve("marginRight"), unit(options.gap));
-      styleSlides("width", cssSlideWidth() || null);
-      styleSlides("height", cssSlideHeight() || null, true);
+      styleSlides("width", cssSlideWidth());
+      styleSlides("height", cssSlideHeight(), true);
       rootRect = newRect;
       emit(EVENT_RESIZED);
     }
@@ -1577,11 +1574,11 @@ function Controller(Splide2, Components2, options) {
   function go(control, allowSameIndex, callback) {
     if (!isBusy()) {
       var dest = parse(control);
-      var index = validate(dest);
+      var index = loop(dest);
 
       if (index > -1 && (allowSameIndex || index !== currIndex)) {
         setIndex(index);
-        options.useScroll ? scrollTo(dest, options.speed, callback) : Move.move(dest, index, prevIndex, callback);
+        Move.move(dest, index, prevIndex, callback);
       }
     }
   }
@@ -1593,10 +1590,6 @@ function Controller(Splide2, Components2, options) {
     });
   }
 
-  function scrollTo(index, duration, callback) {
-    scroll(toPosition(index, true), duration, false, callback);
-  }
-
   function parse(control) {
     var index = currIndex;
 
@@ -1606,7 +1599,7 @@ function Controller(Splide2, Components2, options) {
           number = _ref[2];
 
       if (indicator === "+" || indicator === "-") {
-        index = computeDestIndex(currIndex + +("" + indicator + (+number || 1)), currIndex, true);
+        index = computeDestIndex(currIndex + +("" + indicator + (+number || 1)), currIndex);
       } else if (indicator === ">") {
         index = number ? toIndex(+number) : getNext(true);
       } else if (indicator === "<") {
@@ -1621,7 +1614,7 @@ function Controller(Splide2, Components2, options) {
 
   function getAdjacent(prev, destination) {
     var number = perMove || (hasFocus() ? 1 : perPage);
-    var dest = computeDestIndex(currIndex + number * (prev ? -1 : 1), currIndex);
+    var dest = computeDestIndex(currIndex + number * (prev ? -1 : 1), currIndex, !(perMove || hasFocus()));
 
     if (dest === -1 && isSlide) {
       if (!approximatelyEqual(getPosition(), getLimit(!prev), 1)) {
@@ -1632,16 +1625,23 @@ function Controller(Splide2, Components2, options) {
     return destination ? dest : loop(dest);
   }
 
-  function computeDestIndex(dest, from, incremental) {
+  function computeDestIndex(dest, from, snapPage) {
     if (isEnough()) {
       var end = getEnd();
+      var index = computeMovableDestIndex(dest);
+
+      if (index !== dest) {
+        from = dest;
+        dest = index;
+        snapPage = false;
+      }
 
       if (dest < 0 || dest > end) {
         if (between(0, dest, from, true) || between(end, from, dest, true)) {
           dest = toIndex(toPage(dest));
         } else {
           if (isLoop) {
-            dest = perMove || hasFocus() ? dest : dest < 0 ? -(slideCount % perPage || perPage) : slideCount;
+            dest = snapPage ? dest < 0 ? -(slideCount % perPage || perPage) : slideCount : dest;
           } else if (options.rewind) {
             dest = dest < 0 ? end : 0;
           } else {
@@ -1649,8 +1649,8 @@ function Controller(Splide2, Components2, options) {
           }
         }
       } else {
-        if (!incremental && dest !== from) {
-          dest = perMove ? dest : toIndex(toPage(from) + (dest < from ? -1 : 1));
+        if (snapPage && dest !== from) {
+          dest = toIndex(toPage(from) + (dest < from ? -1 : 1));
         }
       }
     } else {
@@ -1660,16 +1660,16 @@ function Controller(Splide2, Components2, options) {
     return dest;
   }
 
-  function validate(dest) {
-    if (options.trimSpace === "move" && dest !== currIndex) {
+  function computeMovableDestIndex(dest) {
+    if (isSlide && options.trimSpace === "move" && dest !== currIndex) {
       var position = getPosition();
 
-      while (position === toPosition(dest, true) && between(dest, 0, Splide2.length - 1, true)) {
+      while (position === toPosition(dest, true) && between(dest, 0, Splide2.length - 1)) {
         dest < currIndex ? --dest : ++dest;
       }
     }
 
-    return loop(dest);
+    return dest;
   }
 
   function loop(index) {
@@ -1716,7 +1716,6 @@ function Controller(Splide2, Components2, options) {
     mount: mount,
     go: go,
     scroll: scroll,
-    scrollTo: scrollTo,
     getNext: getNext,
     getPrev: getPrev,
     getAdjacent: getAdjacent,
@@ -2018,8 +2017,9 @@ function Scroll(Splide2, Components2, options) {
       destination = Move.toPosition(Components2.Controller.toDest(destination % size)) + offset;
     }
 
+    var noDistance = approximatelyEqual(from, destination, 1);
     friction = 1;
-    duration = duration || max(abs(destination - from) / BASE_VELOCITY, MIN_DURATION);
+    duration = noDistance ? 0 : duration || max(abs(destination - from) / BASE_VELOCITY, MIN_DURATION);
     callback = onScrolled;
     interval = RequestInterval(duration, onEnd, apply(update, from, destination, noConstrain), 1);
     set(SCROLLING);
@@ -2209,7 +2209,12 @@ function Drag(Splide2, Components2, options) {
     var velocity = computeVelocity(e);
     var destination = computeDestination(velocity);
     var rewind = options.rewind && options.rewindByDrag;
+    var reduced = Components2.Media.matches("motion");
     var go = Controller.go;
+
+    if (reduced) {
+      options.speed = Splide2._io.speed;
+    }
 
     if (isFree) {
       Controller.scroll(destination, 0, options.snap);
@@ -2219,6 +2224,10 @@ function Drag(Splide2, Components2, options) {
       go(exceededLimit(true) ? ">" : "<");
     } else {
       go(Controller.toDest(destination), true);
+    }
+
+    if (reduced) {
+      options.speed = 0;
     }
   }
 
@@ -2272,7 +2281,7 @@ function Drag(Splide2, Components2, options) {
 
   function isDraggable(target2) {
     var noDrag = options.noDrag;
-    return !matches(target2, "." + CLASS_PAGINATION_PAGE + ", ." + CLASS_ARROW) && !noDrag || !matches(target2, noDrag);
+    return !matches(target2, "." + CLASS_PAGINATION_PAGE + ", ." + CLASS_ARROW) && (!noDrag || !matches(target2, noDrag));
   }
 
   function isTouchEvent(e) {
@@ -2839,7 +2848,12 @@ var DEFAULTS = {
   focusableNodes: "a, button, textarea, input, select, iframe",
   live: true,
   classes: CLASSES,
-  i18n: I18N
+  i18n: I18N,
+  reducedMotion: {
+    speed: 0,
+    rewindSpeed: 0,
+    autoplay: "pause"
+  }
 };
 
 function Fade(Splide2, Components2, options) {
@@ -2875,8 +2889,10 @@ function Slide(Splide2, Components2, options) {
       bind = _EventInterface16.bind;
 
   var Move = Components2.Move,
-      Controller = Components2.Controller;
+      Controller = Components2.Controller,
+      Scroll = Components2.Scroll;
   var list = Components2.Elements.list;
+  var transition = apply(style, list, "transition");
   var endCallback;
 
   function mount() {
@@ -2894,9 +2910,13 @@ function Slide(Splide2, Components2, options) {
     var speed = getSpeed(index);
 
     if (abs(destination - position) >= 1 && speed >= 1) {
-      apply("transform " + speed + "ms " + options.easing);
-      Move.translate(destination, true);
-      endCallback = done;
+      if (options.useScroll) {
+        Scroll.scroll(destination, speed, false, done);
+      } else {
+        transition("transform " + speed + "ms " + options.easing);
+        Move.translate(destination, true);
+        endCallback = done;
+      }
     } else {
       Move.jump(index);
       done();
@@ -2904,7 +2924,8 @@ function Slide(Splide2, Components2, options) {
   }
 
   function cancel() {
-    apply("");
+    transition("");
+    Scroll.cancel();
   }
 
   function getSpeed(index) {
@@ -2920,10 +2941,6 @@ function Slide(Splide2, Components2, options) {
     }
 
     return options.speed;
-  }
-
-  function apply(transition) {
-    style(list, "transition", transition);
   }
 
   return {
@@ -2952,6 +2969,7 @@ var _Splide = /*#__PURE__*/function () {
       assert(false, "Invalid JSON");
     }
 
+    this._io = merge({}, options);
     this._options = options;
   }
 
@@ -3623,4 +3641,4 @@ var SplideRenderer = /*#__PURE__*/function () {
   return SplideRenderer;
 }();
 
-export { CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_AUTOPLAY, CLASS_CLONE, CLASS_CONTAINER, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PAUSE, CLASS_PLAY, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SPINNER, CLASS_SR, CLASS_TRACK, CLASS_VISIBLE, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MEDIA, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, EventBinder, EventInterface, RequestInterval, STATUS_CLASSES, Splide, SplideRenderer, State, Throttle, Splide as default };
+export { CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_AUTOPLAY, CLASS_CLONE, CLASS_CONTAINER, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PAUSE, CLASS_PLAY, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SPINNER, CLASS_SR, CLASS_TRACK, CLASS_VISIBLE, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, EventBinder, EventInterface, RequestInterval, STATUS_CLASSES, Splide, SplideRenderer, State, Throttle, Splide as default };

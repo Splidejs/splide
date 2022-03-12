@@ -110,7 +110,7 @@ export function Media( Splide: Splide, Components: Components, options: Options 
    */
   function accumulate(): Options {
     return queries.reduce( ( merged, entry ) => {
-      return merge( merged, entry[ 2 ].matches ? entry[ 1 ] : {} )
+      return merge( merged, entry[ 2 ].matches ? entry[ 1 ] : {} );
     }, merge( {}, initialOptions ) );
   }
 
