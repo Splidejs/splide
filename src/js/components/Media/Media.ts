@@ -2,7 +2,7 @@ import { DESTROYED } from '../../constants/states';
 import { EventBinder } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { merge, noop, ownKeys } from '../../utils';
+import { forOwn, merge, noop, ownKeys } from '../../utils';
 
 
 /**
@@ -11,7 +11,7 @@ import { merge, noop, ownKeys } from '../../utils';
  * @since 3.0.0
  */
 export interface MediaComponent extends BaseComponent {
-  matches( key: string ): void;
+  matches( key: string ): boolean;
 }
 
 /**
@@ -37,7 +37,7 @@ export function Media( Splide: Splide, Components: Components, options: Options 
   /**
    * Stores options and MediaQueryList object.
    */
-  const queries: Record<string, [ Options, MediaQueryList ]> = {};
+  const queries: Array<[ string, Options, MediaQueryList ]> = [];
 
   /**
    * Called when the component is constructed.
@@ -46,22 +46,13 @@ export function Media( Splide: Splide, Components: Components, options: Options 
     const isMin = options.mediaQuery === 'min';
 
     ownKeys( breakpoints )
-      .sort( ( n, m ) => isMin ? +n - +m  : +m - +n )
+      .sort( ( n, m ) => isMin ? +n - +m : +m - +n )
       .forEach( key => {
         register( key, breakpoints[ key ], `(${ isMin ? 'min' : 'max' }-width:${ key }px)` );
       } );
 
     register( 'motion', options.reducedMotion || {}, '(prefers-reduced-motion: reduce)' );
     update();
-  }
-
-  /**
-   * Remove all keys from current options that initial options do not include.
-   */
-  function reset(): void {
-    ownKeys( options ).forEach( key => {
-      ! ( key in initialOptions ) && delete options[ key ];
-    } );
   }
 
   /**
@@ -85,17 +76,20 @@ export function Media( Splide: Splide, Components: Components, options: Options 
   function register( key: string, options: Options, query: string ): void {
     const queryList = matchMedia( query );
     binder.bind( queryList, 'change', update );
-    queries[ key ] = [ options, queryList ];
+    queries.push( [ key, options, queryList ] );
   }
 
   /**
    * Checks all media queries in entries and updates options.
    */
   function update(): void {
-    const options = accumulate();
-    const { destroy: destruction } = options;
+    const merged    = accumulate();
+    const direction = options.direction;
+    const { destroy: destruction } = merged;
 
-    reset();
+    forOwn( options, ( value, key ) => {
+      ! ( key in initialOptions ) && delete options[ key ];
+    } );
 
     if ( destruction ) {
       Splide.destroy( destruction === 'completely' );
@@ -103,9 +97,8 @@ export function Media( Splide: Splide, Components: Components, options: Options 
       destroy( true );
       Splide.mount();
     } else {
-      const oriented = Splide.options.direction !== options.direction;
-      Splide.options = options;
-      oriented && Splide.refresh();
+      Splide.options = merged;
+      direction !== merged.direction && Splide.refresh();
     }
   }
 
@@ -116,21 +109,20 @@ export function Media( Splide: Splide, Components: Components, options: Options 
    * @return Merged options.
    */
   function accumulate(): Options {
-    return ownKeys( queries )
-      .reduce( ( merged, key ) => merge( merged, matches( key ) || {} ), merge( {}, initialOptions ) );
+    return queries.reduce( ( merged, entry ) => {
+      return merge( merged, entry[ 2 ].matches ? entry[ 1 ] : {} )
+    }, merge( {}, initialOptions ) );
   }
 
   /**
-   * Finds the entry, `[ options, query ]` registered by the specified key,
-   * and returns options if the query matches the current media.
+   * Checks if the query registered by the specified key matches the current media or not.
    *
    * @param key - A key.
    *
-   * @return An object with options if found, or otherwise `null`.
+   * @return `true` if the query matches the media, or otherwise `false`.
    */
-  function matches( key: string ): Options | null {
-    const entry = queries[ key ];
-    return ( entry && entry[ 1 ].matches ) ? entry[ 0 ] : null;
+  function matches( key: string ): boolean {
+    return queries.some( entry => entry[ 0 ] === key && entry[ 2 ].matches );
   }
 
   return {

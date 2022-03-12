@@ -584,7 +584,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var binder = EventBinder();
     var breakpoints = options.breakpoints || {};
     var initialOptions = Splide2._io;
-    var queries = {};
+    var queries = [];
 
     function setup() {
       var isMin = options.mediaQuery === "min";
@@ -597,12 +597,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       update();
     }
 
-    function reset() {
-      ownKeys(options).forEach(function (key) {
-        !(key in initialOptions) && delete options[key];
-      });
-    }
-
     function destroy(completely) {
       if (completely) {
         binder.destroy();
@@ -612,13 +606,16 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function register(key, options2, query) {
       var queryList = matchMedia(query);
       binder.bind(queryList, "change", update);
-      queries[key] = [options2, queryList];
+      queries.push([key, options2, queryList]);
     }
 
     function update() {
-      var options2 = accumulate();
-      var destruction = options2.destroy;
-      reset();
+      var merged = accumulate();
+      var direction = options.direction;
+      var destruction = merged.destroy;
+      forOwn(options, function (value, key) {
+        !(key in initialOptions) && delete options[key];
+      });
 
       if (destruction) {
         Splide2.destroy(destruction === "completely");
@@ -626,21 +623,21 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         destroy(true);
         Splide2.mount();
       } else {
-        var oriented = Splide2.options.direction !== options2.direction;
-        Splide2.options = options2;
-        oriented && Splide2.refresh();
+        Splide2.options = merged;
+        direction !== merged.direction && Splide2.refresh();
       }
     }
 
     function accumulate() {
-      return ownKeys(queries).reduce(function (merged, key) {
-        return merge(merged, matches(key) || {});
+      return queries.reduce(function (merged, entry) {
+        return merge(merged, entry[2].matches ? entry[1] : {});
       }, merge({}, initialOptions));
     }
 
     function matches(key) {
-      var entry = queries[key];
-      return entry && entry[1].matches ? entry[0] : null;
+      return queries.some(function (entry) {
+        return entry[0] === key && entry[2].matches;
+      });
     }
 
     return {
