@@ -31,6 +31,7 @@ $settings = get_settings();
 	      direction   : 'ltr',
 	      height      : undefined,
 	      paginationDirection: 'ttb',
+	      rewindSpeed : 2000,
 
 	      breakpoints: {
 					1200: {
@@ -39,7 +40,7 @@ $settings = get_settings();
 						perPage  : 2,
 					},
 		      1000: {
-						destroy: true,
+			      direction: 'ltr',
 		      }
 	      }
       } );

@@ -7,16 +7,17 @@ import { merge, omit, ownKeys } from '../../utils';
 
 
 /**
- * The interface for the Options component.
+ * The interface for the Media component.
  *
- * @since 3.0.0
+ * @since 4.0.0
  */
 export interface MediaComponent extends BaseComponent {
   reduce( reduced: boolean ): void;
 }
 
 /**
- * The component for observing media queries and update options if necessary.
+ * The component for observing media queries and updating options if necessary.
+ * This used to be the Options component.
  *
  * @since 4.0.0
  *

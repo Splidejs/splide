@@ -16,25 +16,39 @@ $settings = get_settings();
   <link rel="stylesheet" href="../../assets/css/styles.css">
   <script src="../../../../../dist/js/splide.js"></script>
 
+	<style>
+		.splide__slide {
+			overflow: hidden;
+		}
+	</style>
+
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
 			const options = {
 				perPage    : 3,
 				arrows     : false,
 				mediaQuery : 'max',
+				// destroy: true,
 				breakpoints: {
 					1200: {
 						perPage: 1,
 						gap    : '1rem',
 						arrows : true,
 						padding: 50,
+						// direction: 'ttb',
+						height: 500,
+						destroy: false,
+						// paginationDirection: 'ltr',
 					},
 					1000: {
+						// direction: 'ltr',
 						perPage   : 2,
 						gap       : 0,
 						arrows    : false,
 						padding   : 0,
 						pagination: false,
+						// destroy: false,
+						// height: undefined,
 					},
 					800 : {
 						destroy: true,
