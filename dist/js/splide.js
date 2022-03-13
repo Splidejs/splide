@@ -177,6 +177,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     return object;
   }
 
+  function omit(object, keys) {
+    toArray(keys || ownKeys(object)).forEach(function (key) {
+      delete object[key];
+    });
+  }
+
   function removeAttribute(elms, attrs) {
     forEach(elms, function (elm) {
       forEach(attrs, function (attr) {
@@ -577,6 +583,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   function Media(Splide2, Components2, options) {
+    var reducedMotion = options.reducedMotion || {};
     var binder = EventBinder();
     var breakpoints = options.breakpoints || {};
     var queries = [];
@@ -588,7 +595,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }).forEach(function (key) {
         register(breakpoints[key], "(" + (isMin ? "min" : "max") + "-width:" + key + "px)");
       });
-      register(options.reducedMotion || {}, MEDIA_PREFERS_REDUCED_MOTION);
+      register(reducedMotion, MEDIA_PREFERS_REDUCED_MOTION);
       update();
     }
 
@@ -609,9 +616,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var merged = queries.reduce(function (merged2, entry) {
         return merge(merged2, entry[1].matches ? entry[0] : {});
       }, {});
-      forOwn(options, function (value, key) {
-        delete options[key];
-      });
+      omit(options);
       merge(options, merged);
 
       if (options.destroy) {
@@ -625,17 +630,16 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }
     }
 
-    function matches(media) {
-      return queries.some(function (entry) {
-        return entry[1].media === media && entry[1].matches;
-      });
+    function reduce(enable) {
+      if (matchMedia(MEDIA_PREFERS_REDUCED_MOTION).matches) {
+        enable ? merge(options, reducedMotion) : omit(options, ownKeys(reducedMotion));
+      }
     }
 
     return {
       setup: setup,
-      mount: noop,
       destroy: destroy,
-      matches: matches
+      reduce: reduce
     };
   }
 
@@ -2091,8 +2095,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var state = Splide2.state;
     var Move = Components2.Move,
         Scroll = Components2.Scroll,
-        Controller = Components2.Controller;
-    var track = Components2.Elements.track;
+        Controller = Components2.Controller,
+        track = Components2.Elements.track,
+        reduce = Components2.Media.reduce;
     var _Components2$Directio2 = Components2.Direction,
         resolve = _Components2$Directio2.resolve,
         orient = _Components2$Directio2.orient;
@@ -2206,26 +2211,19 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var velocity = computeVelocity(e);
       var destination = computeDestination(velocity);
       var rewind = options.rewind && options.rewindByDrag;
-      var reduced = Components2.Media.matches(MEDIA_PREFERS_REDUCED_MOTION);
-      var go = Controller.go;
-
-      if (reduced) {
-        delete options.speed;
-      }
+      reduce(false);
 
       if (isFree) {
         Controller.scroll(destination, 0, options.snap);
       } else if (Splide2.is(FADE)) {
-        go(orient(sign(velocity)) < 0 ? rewind ? "<" : "-" : rewind ? ">" : "+");
+        Controller.go(orient(sign(velocity)) < 0 ? rewind ? "<" : "-" : rewind ? ">" : "+");
       } else if (Splide2.is(SLIDE) && exceeded && rewind) {
-        go(exceededLimit(true) ? ">" : "<");
+        Controller.go(exceededLimit(true) ? ">" : "<");
       } else {
-        go(Controller.toDest(destination), true);
+        Controller.go(Controller.toDest(destination), true);
       }
 
-      if (reduced) {
-        options.speed = 0;
-      }
+      reduce(true);
     }
 
     function shouldStart(e) {

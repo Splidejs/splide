@@ -1,7 +1,6 @@
 import { CLASS_ARROW, CLASS_PAGINATION_PAGE } from '../../constants/classes';
 import { EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_MOUNTED, EVENT_UPDATED } from '../../constants/events';
 import { SCROLL_LISTENER_OPTIONS } from '../../constants/listener-options';
-import { MEDIA_PREFERS_REDUCED_MOTION } from '../../constants/media';
 import { DRAGGING, IDLE, MOVING, SCROLLING } from '../../constants/states';
 import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
@@ -35,8 +34,7 @@ export interface DragComponent extends BaseComponent {
 export function Drag( Splide: Splide, Components: Components, options: Options ): DragComponent {
   const { on, emit, bind, unbind } = EventInterface( Splide );
   const { state } = Splide;
-  const { Move, Scroll, Controller } = Components;
-  const { track } = Components.Elements;
+  const { Move, Scroll, Controller, Elements: { track }, Media: { reduce } } = Components;
   const { resolve, orient } = Components.Direction;
   const { getPosition, exceededLimit } = Move;
 
@@ -229,26 +227,20 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
     const velocity    = computeVelocity( e );
     const destination = computeDestination( velocity );
     const rewind      = options.rewind && options.rewindByDrag;
-    const reduced     = Components.Media.matches( MEDIA_PREFERS_REDUCED_MOTION );
-    const { go } = Controller;
 
-    if ( reduced ) {
-      delete options.speed;
-    }
+    reduce( false );
 
     if ( isFree ) {
       Controller.scroll( destination, 0, options.snap );
     } else if ( Splide.is( FADE ) ) {
-      go( orient( sign( velocity ) ) < 0 ? ( rewind ? '<' : '-' ) : ( rewind ? '>' : '+' ) );
+      Controller.go( orient( sign( velocity ) ) < 0 ? ( rewind ? '<' : '-' ) : ( rewind ? '>' : '+' ) );
     } else if ( Splide.is( SLIDE ) && exceeded && rewind ) {
-      go( exceededLimit( true ) ? '>' : '<' );
+      Controller.go( exceededLimit( true ) ? '>' : '<' );
     } else {
-      go( Controller.toDest( destination ), true );
+      Controller.go( Controller.toDest( destination ), true );
     }
 
-    if ( reduced ) {
-      options.speed = 0;
-    }
+    reduce( true );
   }
 
   /**

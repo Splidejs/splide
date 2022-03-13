@@ -3,7 +3,7 @@ import { DESTROYED } from '../../constants/states';
 import { EventBinder } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { forOwn, merge, noop, ownKeys } from '../../utils';
+import { merge, omit, ownKeys } from '../../utils';
 
 
 /**
@@ -12,7 +12,7 @@ import { forOwn, merge, noop, ownKeys } from '../../utils';
  * @since 3.0.0
  */
 export interface MediaComponent extends BaseComponent {
-  matches( key: string ): boolean;
+  reduce( reduced: boolean ): void;
 }
 
 /**
@@ -27,8 +27,9 @@ export interface MediaComponent extends BaseComponent {
  * @return A Media component object.
  */
 export function Media( Splide: Splide, Components: Components, options: Options ): MediaComponent {
-  const binder      = EventBinder();
-  const breakpoints = options.breakpoints || {};
+  const reducedMotion = options.reducedMotion || {};
+  const binder        = EventBinder();
+  const breakpoints   = options.breakpoints || {};
 
   /**
    * Stores options and MediaQueryList object.
@@ -47,7 +48,7 @@ export function Media( Splide: Splide, Components: Components, options: Options 
         register( breakpoints[ key ], `(${ isMin ? 'min' : 'max' }-width:${ key }px)` );
       } );
 
-    register( options.reducedMotion || {}, MEDIA_PREFERS_REDUCED_MOTION );
+    register( reducedMotion, MEDIA_PREFERS_REDUCED_MOTION );
     update();
   }
 
@@ -83,7 +84,7 @@ export function Media( Splide: Splide, Components: Components, options: Options 
       return merge( merged, entry[ 1 ].matches ? entry[ 0 ] : {} );
     }, {} );
 
-    forOwn( options, ( value, key ) => { delete options[ key ] } );
+    omit( options );
     merge( options, merged );
 
     if ( options.destroy ) {
@@ -98,20 +99,20 @@ export function Media( Splide: Splide, Components: Components, options: Options 
   }
 
   /**
-   * Checks if the document matches the registered media query or not.
+   * Disables or enables `reducedMotion` options.
+   * This method does nothing when the document does not match the query.
    *
-   * @param media - A registered media query.
-   *
-   * @return `true` if the document matches the query, or otherwise `false`.
+   * @param enable - Determines whether to apply `reducedMotion` options or not.
    */
-  function matches( media: string ): boolean {
-    return queries.some( entry => entry[ 1 ].media === media && entry[ 1 ].matches );
+  function reduce( enable: boolean ): void {
+    if ( matchMedia( MEDIA_PREFERS_REDUCED_MOTION ).matches ) {
+      enable ? merge( options, reducedMotion ) : omit( options, ownKeys( reducedMotion ) );
+    }
   }
 
   return {
     setup,
-    mount: noop,
     destroy,
-    matches,
+    reduce,
   };
 }

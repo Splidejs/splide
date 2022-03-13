@@ -2,7 +2,7 @@ import { DESTROYED } from '../../../constants/states';
 import { init } from '../../../test';
 
 
-describe( 'Options', () => {
+describe( 'Media', () => {
   beforeAll( () => {
     window.matchMedia = () => ( {
       matches            : true, // All queries match the media string.
@@ -29,6 +29,28 @@ describe( 'Options', () => {
   test( 'can merge options for prefers-reduced-motion:reduce.', () => {
     const splide = init();
     expect( splide.options.speed ).toBe( 0 );
+    expect( splide.options.rewindSpeed ).toBe( 0 );
+    expect( splide.options.autoplay ).toBe( 'pause' );
+  } );
+
+  test( 'can enable or disable `reducedMotion` option by `reduce()`.', () => {
+    const splide = init( { speed: 1000, rewindSpeed: 2000, autoplay: true } );
+    const { reduce } = splide.Components.Media;
+
+    expect( splide.options.speed ).toBe( 0 );
+    expect( splide.options.rewindSpeed ).toBe( 0 );
+    expect( splide.options.autoplay ).toBe( 'pause' );
+
+    reduce( false );
+
+    expect( splide.options.speed ).toBe( 1000 );
+    expect( splide.options.rewindSpeed ).toBe( 2000 );
+    expect( splide.options.autoplay ).toBe( true );
+
+    reduce( true );
+
+    expect( splide.options.speed ).toBe( 0 );
+    expect( splide.options.rewindSpeed ).toBe( 0 );
     expect( splide.options.autoplay ).toBe( 'pause' );
   } );
 } );

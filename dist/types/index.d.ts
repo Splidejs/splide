@@ -4,7 +4,7 @@
  * @since 3.0.0
  */
 interface MediaComponent extends BaseComponent {
-    matches(key: string): boolean;
+    reduce(reduced: boolean): void;
 }
 
 /**
