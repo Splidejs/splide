@@ -127,13 +127,8 @@ export const HTML_PROGRESS = `
 `;
 
 export const HTML_AUTOPLAY = `
-<div class="splide__autoplay">
-  <button class="splide__play">
-    Play
-  </button>
-
-  <button class="splide__pause">
-    Pause
-  </button>
-</div>
+<button class="splide__toggle">
+  <span class="splide__toggle__play">Play</span>
+  <span class="splide__toggle__pause">Pause</span>
+</button>
 `;

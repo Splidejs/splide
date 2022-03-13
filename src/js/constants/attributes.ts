@@ -12,7 +12,6 @@ export const ARIA_ORIENTATION     = `${ ARIA_PREFIX }orientation`;
 export const ARIA_ROLEDESCRIPTION = `${ ARIA_PREFIX }roledescription`;
 export const ARIA_ATOMIC          = `${ ARIA_PREFIX }atomic`;
 export const ARIA_LIVE            = `${ ARIA_PREFIX }live`;
-export const ARIA_PRESSED         = `${ ARIA_PREFIX }pressed`;
 
 /**
  * The array with all attributes.

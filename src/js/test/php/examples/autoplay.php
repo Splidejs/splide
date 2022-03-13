@@ -21,34 +21,36 @@ $settings = get_settings();
       var splide = new Splide( '#splide01', {
         // rewind       : true,
         type         : 'loop',
-        autoplay     : true,
-        pauseOnHover : false,
-        resetProgress: false,
+	      autoplay     : true,
+        // autoplay     : 'pause',
+        // pauseOnHover : false,
+        // resetProgress: false,
       } );
 
-      var toggleButton = document.querySelector( '.splide__toggle' );
+      // var toggleButton = document.querySelector( '.splide__toggle' );
 
-      splide.on( 'autoplay:play', function () {
-        toggleButton.classList.add( 'is-active' );
-        toggleButton.setAttribute( 'aria-label', 'Pause autoplay' );
-        toggleButton.textContent = 'Pause';
-      } );
+      // splide.on( 'autoplay:play', function () {
+      //   toggleButton.classList.add( 'is-active' );
+      //   toggleButton.setAttribute( 'aria-label', 'Pause autoplay' );
+      //   toggleButton.textContent = 'Pause';
+      // } );
+			//
+      // splide.on( 'autoplay:pause', function () {
+      //   toggleButton.classList.remove( 'is-active' );
+      //   toggleButton.setAttribute( 'aria-label', 'Start autoplay' );
+      //   toggleButton.textContent = 'Play';
+      // } );
 
-      splide.on( 'autoplay:pause', function () {
-        toggleButton.classList.remove( 'is-active' );
-        toggleButton.setAttribute( 'aria-label', 'Start autoplay' );
-        toggleButton.textContent = 'Play';
-      } );
+      // toggleButton.addEventListener( 'click', function () {
+      //   var Autoplay = splide.Components.Autoplay;
+			//
+      //   if ( Autoplay.isPaused() ) {
+      //     Autoplay.play();
+      //   } else {
+      //     Autoplay.pause();
+      //   }
+      // } );
 
-      toggleButton.addEventListener( 'click', function () {
-        var Autoplay = splide.Components.Autoplay;
-
-        if ( Autoplay.isPaused() ) {
-          Autoplay.play();
-        } else {
-          Autoplay.pause();
-        }
-      } );
 
       splide.mount();
     } );
@@ -79,15 +81,11 @@ $settings = get_settings();
     <div class="splide__progress__bar"></div>
   </div>
 
-  <div class="splide__autoplay">
-    <button class="splide__play">Play</button>
-    <button class="splide__pause">Pause</button>
-  </div>
+  <button class="splide__toggle" type="button">
+	  <span class="splide__toggle__play">Play</span>
+	  <span class="splide__toggle__pause">Pause</span>
+  </button>
 </div>
-
-<button class="splide__toggle is-active" type="button">
-  Pause
-</button>
 
 </body>
 </html>

@@ -692,7 +692,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var ARIA_ROLEDESCRIPTION = ARIA_PREFIX + "roledescription";
   var ARIA_ATOMIC = ARIA_PREFIX + "atomic";
   var ARIA_LIVE = ARIA_PREFIX + "live";
-  var ARIA_PRESSED = ARIA_PREFIX + "pressed";
   var ALL_ATTRIBUTES = [ROLE, TAB_INDEX, DISABLED, ARIA_CONTROLS, ARIA_CURRENT, ARIA_LABEL, ARIA_HIDDEN, ARIA_ORIENTATION, ARIA_ROLEDESCRIPTION, ARIA_ATOMIC, ARIA_LIVE];
   var CLASS_ROOT = PROJECT_CODE;
   var CLASS_TRACK = PROJECT_CODE + "__track";
@@ -1924,7 +1923,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function update() {
       if (toggle) {
         toggleClass(toggle, CLASS_ACTIVE, !stopped);
-        setAttribute(toggle, ARIA_PRESSED, !stopped);
         setAttribute(toggle, ARIA_LABEL, options.i18n[stopped ? "play" : "pause"]);
       }
     }

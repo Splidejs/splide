@@ -1,5 +1,5 @@
-import { ARIA_CONTROLS, ARIA_LABEL, ARIA_PRESSED } from '../../constants/attributes';
-import { CLASS_ACTIVE, CLASS_TOGGLE_PAUSE, CLASS_TOGGLE_PLAY } from '../../constants/classes';
+import { ARIA_CONTROLS, ARIA_LABEL } from '../../constants/attributes';
+import { CLASS_ACTIVE } from '../../constants/classes';
 import {
   EVENT_AUTOPLAY_PAUSE,
   EVENT_AUTOPLAY_PLAY,
@@ -11,7 +11,7 @@ import {
 import { EventInterface, RequestInterval } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { display, getAttribute, query, setAttribute, style, toggleClass } from '../../utils';
+import { getAttribute, setAttribute, style, toggleClass } from '../../utils';
 import { INTERVAL_DATA_ATTRIBUTE } from './constants';
 
 
@@ -143,7 +143,6 @@ export function Autoplay( Splide: Splide, Components: Components, options: Optio
   function update(): void {
     if ( toggle ) {
       toggleClass( toggle, CLASS_ACTIVE, ! stopped );
-      setAttribute( toggle, ARIA_PRESSED, ! stopped );
       setAttribute( toggle, ARIA_LABEL, options.i18n[ stopped ? 'play' : 'pause' ] );
     }
   }

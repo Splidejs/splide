@@ -8,7 +8,6 @@ describe( 'Autoplay toggle button.', () => {
     const { toggle } = splide.Components.Elements;
 
     expect( toggle.classList.contains( CLASS_ACTIVE ) ).toBe( true );
-    expect( toggle.getAttribute( 'aria-pressed' ) ).toBe( 'true' );
   } );
 
   test( 'should be inactive if `autoplay` option is `false`.', () => {
@@ -16,7 +15,6 @@ describe( 'Autoplay toggle button.', () => {
     const { toggle } = splide.Components.Elements;
 
     expect( toggle.classList.contains( CLASS_ACTIVE ) ).toBe( false );
-    expect( toggle.getAttribute( 'aria-pressed' ) ).toBe( 'false' );
   } );
 
   test( 'can start/pause autoplay and update the button status.', () => {
@@ -29,17 +27,14 @@ describe( 'Autoplay toggle button.', () => {
     fire( toggle, 'click' );
     expect( Autoplay.isPaused() ).toBe( true );
     expect( toggle.classList.contains( CLASS_ACTIVE ) ).toBe( false );
-    expect( toggle.getAttribute( 'aria-pressed' ) ).toBe( 'false' );
 
     fire( toggle, 'click' );
     expect( Autoplay.isPaused() ).toBe( false );
     expect( toggle.classList.contains( CLASS_ACTIVE ) ).toBe( true );
-    expect( toggle.getAttribute( 'aria-pressed' ) ).toBe( 'true' );
 
     fire( toggle, 'click' );
     expect( Autoplay.isPaused() ).toBe( true );
     expect( toggle.classList.contains( CLASS_ACTIVE ) ).toBe( false );
-    expect( toggle.getAttribute( 'aria-pressed' ) ).toBe( 'false' );
   } );
 
   test( 'should not be inactive("Play" button) when the autoplay is just paused.', () => {
@@ -52,18 +47,15 @@ describe( 'Autoplay toggle button.', () => {
     fire( splide.Components.Elements.root, 'focusin' );
     expect( Autoplay.isPaused() ).toBe( true ); // Paused but not stopped
     expect( toggle.classList.contains( CLASS_ACTIVE ) ).toBe( true );
-    expect( toggle.getAttribute( 'aria-pressed' ) ).toBe( 'true' );
 
     // Clicks the "pause" button, which stops the autoplay
     fire( toggle, 'click' );
     expect( Autoplay.isPaused() ).toBe( true );
     expect( toggle.classList.contains( CLASS_ACTIVE ) ).toBe( false );
-    expect( toggle.getAttribute( 'aria-pressed' ) ).toBe( 'false' );
 
     // Resumes autoplay but it still stops
     fire( splide.Components.Elements.root, 'focusout' );
     expect( Autoplay.isPaused() ).toBe( true );
     expect( toggle.classList.contains( CLASS_ACTIVE ) ).toBe( false );
-    expect( toggle.getAttribute( 'aria-pressed' ) ).toBe( 'false' );
   } );
 } );
