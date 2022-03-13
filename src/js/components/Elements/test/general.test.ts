@@ -3,10 +3,8 @@ import {
   CLASS_ARROW_NEXT,
   CLASS_ARROW_PREV,
   CLASS_LIST,
-  CLASS_PAUSE,
-  CLASS_PLAY,
   CLASS_PROGRESS_BAR,
-  CLASS_ROOT,
+  CLASS_ROOT, CLASS_TOGGLE,
   CLASS_TRACK,
 } from '../../../constants/classes';
 import { RTL } from '../../../constants/directions';
@@ -25,8 +23,7 @@ describe( 'Elements', () => {
     expect( Elements.prev.classList.contains( CLASS_ARROW_PREV ) ).toBe( true );
     expect( Elements.next.classList.contains( CLASS_ARROW_NEXT ) ).toBe( true );
     expect( Elements.bar.classList.contains( CLASS_PROGRESS_BAR ) ).toBe( true );
-    expect( Elements.play.classList.contains( CLASS_PLAY ) ).toBe( true );
-    expect( Elements.pause.classList.contains( CLASS_PAUSE ) ).toBe( true );
+    expect( Elements.toggle.classList.contains( CLASS_TOGGLE ) ).toBe( true );
   } );
 
   test( 'can assign unique IDs to root, track and list elements.', () => {

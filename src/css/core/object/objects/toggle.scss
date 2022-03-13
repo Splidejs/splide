@@ -1,0 +1,22 @@
+.splide {
+  &__toggle {
+    $parent: &;
+
+    &__play {
+    }
+
+    &__pause {
+      display: none;
+    }
+
+    &.is-active {
+      #{ $parent }__play {
+        display: none;
+      }
+
+      #{ $parent }__pause {
+        display: inline;
+      }
+    }
+  }
+}

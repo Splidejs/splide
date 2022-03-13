@@ -4,15 +4,13 @@ import {
   CLASS_ARROW_NEXT,
   CLASS_ARROW_PREV,
   CLASS_ARROWS,
-  CLASS_AUTOPLAY,
   CLASS_CLONE,
   CLASS_LIST,
   CLASS_PAGINATION,
-  CLASS_PAUSE,
-  CLASS_PLAY,
   CLASS_PROGRESS_BAR,
   CLASS_ROOT,
   CLASS_SLIDE,
+  CLASS_TOGGLE,
   CLASS_TRACK,
 } from '../../constants/classes';
 import { EVENT_REFRESH, EVENT_UPDATED } from '../../constants/events';
@@ -48,14 +46,12 @@ export interface ElementCollection {
   track: HTMLElement;
   list: HTMLElement;
   slides: HTMLElement[];
-  arrows: HTMLElement | null;
-  pagination: HTMLUListElement | null;
-  prev: HTMLButtonElement | null;
-  next: HTMLButtonElement | null;
-  bar: HTMLElement | null;
-  autoplay: HTMLElement | null;
-  play: HTMLButtonElement | null;
-  pause: HTMLButtonElement | null;
+  arrows?: HTMLElement;
+  pagination?: HTMLUListElement;
+  prev?: HTMLButtonElement;
+  next?: HTMLButtonElement;
+  bar?: HTMLElement;
+  toggle?: HTMLElement;
 }
 
 /**
@@ -163,12 +159,10 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
     forOwn( {
       arrows    : CLASS_ARROWS,
       pagination: CLASS_PAGINATION,
-      autoplay  : CLASS_AUTOPLAY,
       prev      : CLASS_ARROW_PREV,
       next      : CLASS_ARROW_NEXT,
       bar       : CLASS_PROGRESS_BAR,
-      play      : CLASS_PLAY,
-      pause     : CLASS_PAUSE,
+      toggle    : CLASS_TOGGLE,
     }, ( className, key ) => {
       elements[ key ] = find( `.${ className }` );
     } );
@@ -195,9 +189,9 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
    *
    * @return A found element or null.
    */
-  function find( selector: string ): HTMLElement | null {
+  function find( selector: string ): HTMLElement | undefined {
     const elm = query<HTMLElement>( root, selector );
-    return elm && closest( elm, `.${ CLASS_ROOT }` ) === root ? elm : null;
+    return elm && closest( elm, `.${ CLASS_ROOT }` ) === root ? elm : undefined;
   }
 
   /**

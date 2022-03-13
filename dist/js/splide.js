@@ -692,6 +692,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var ARIA_ROLEDESCRIPTION = ARIA_PREFIX + "roledescription";
   var ARIA_ATOMIC = ARIA_PREFIX + "atomic";
   var ARIA_LIVE = ARIA_PREFIX + "live";
+  var ARIA_PRESSED = ARIA_PREFIX + "pressed";
   var ALL_ATTRIBUTES = [ROLE, TAB_INDEX, DISABLED, ARIA_CONTROLS, ARIA_CURRENT, ARIA_LABEL, ARIA_HIDDEN, ARIA_ORIENTATION, ARIA_ROLEDESCRIPTION, ARIA_ATOMIC, ARIA_LIVE];
   var CLASS_ROOT = PROJECT_CODE;
   var CLASS_TRACK = PROJECT_CODE + "__track";
@@ -707,9 +708,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var CLASS_PAGINATION_PAGE = CLASS_PAGINATION + "__page";
   var CLASS_PROGRESS = PROJECT_CODE + "__progress";
   var CLASS_PROGRESS_BAR = CLASS_PROGRESS + "__bar";
-  var CLASS_AUTOPLAY = PROJECT_CODE + "__autoplay";
-  var CLASS_PLAY = PROJECT_CODE + "__play";
-  var CLASS_PAUSE = PROJECT_CODE + "__pause";
+  var CLASS_TOGGLE = PROJECT_CODE + "__toggle";
   var CLASS_SPINNER = PROJECT_CODE + "__spinner";
   var CLASS_SR = PROJECT_CODE + "__sr";
   var CLASS_INITIALIZED = "is-initialized";
@@ -798,12 +797,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       forOwn({
         arrows: CLASS_ARROWS,
         pagination: CLASS_PAGINATION,
-        autoplay: CLASS_AUTOPLAY,
         prev: CLASS_ARROW_PREV,
         next: CLASS_ARROW_NEXT,
         bar: CLASS_PROGRESS_BAR,
-        play: CLASS_PLAY,
-        pause: CLASS_PAUSE
+        toggle: CLASS_TOGGLE
       }, function (className, key) {
         elements[key] = find("." + className);
       });
@@ -827,7 +824,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function find(selector) {
       var elm = query(root, selector);
-      return elm && closest(elm, "." + CLASS_ROOT) === root ? elm : null;
+      return elm && closest(elm, "." + CLASS_ROOT) === root ? elm : void 0;
     }
 
     function getClasses(base) {
@@ -1850,37 +1847,27 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         bind = _EventInterface7.bind,
         emit = _EventInterface7.emit;
 
-    var interval = RequestInterval(options.interval, Splide2.go.bind(Splide2, ">"), update);
+    var interval = RequestInterval(options.interval, Splide2.go.bind(Splide2, ">"), onAnimationFrame);
     var isPaused = interval.isPaused;
-    var Elements = Components2.Elements;
+    var Elements = Components2.Elements,
+        _Components2$Elements4 = Components2.Elements,
+        root = _Components2$Elements4.root,
+        toggle = _Components2$Elements4.toggle;
     var autoplay = options.autoplay;
     var hovered;
     var focused;
-    var paused = autoplay === "pause";
+    var stopped = autoplay === "pause";
 
     function mount() {
       if (autoplay) {
-        initButton(true);
-        initButton(false);
         listen();
-        !paused && play();
-      }
-    }
-
-    function initButton(forPause) {
-      var prop = forPause ? "pause" : "play";
-      var button = Elements[prop];
-
-      if (button) {
-        setAttribute(button, ARIA_CONTROLS, Elements.track.id);
-        setAttribute(button, ARIA_LABEL, options.i18n[prop]);
-        bind(button, "click", forPause ? pause : play);
+        toggle && setAttribute(toggle, ARIA_CONTROLS, Elements.track.id);
+        stopped || play();
+        update();
       }
     }
 
     function listen() {
-      var root = Elements.root;
-
       if (options.pauseOnHover) {
         bind(root, "mouseenter mouseleave", function (e) {
           hovered = e.type === "mouseenter";
@@ -1895,49 +1882,61 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         });
       }
 
+      if (toggle) {
+        bind(toggle, "click", function () {
+          stopped ? play() : pause(true);
+        });
+      }
+
       on([EVENT_MOVE, EVENT_SCROLL, EVENT_REFRESH], interval.rewind);
-      on(EVENT_MOVE, updateInterval);
+      on(EVENT_MOVE, onMove);
     }
 
     function play() {
       if (isPaused() && Components2.Slides.isEnough()) {
         interval.start(!options.resetProgress);
-        focused = hovered = paused = false;
+        focused = hovered = stopped = false;
+        update();
         emit(EVENT_AUTOPLAY_PLAY);
       }
     }
 
-    function pause(manual) {
-      if (manual === void 0) {
-        manual = true;
+    function pause(stop) {
+      if (stop === void 0) {
+        stop = true;
       }
+
+      stopped = !!stop;
+      update();
 
       if (!isPaused()) {
         interval.pause();
         emit(EVENT_AUTOPLAY_PAUSE);
       }
-
-      paused = manual;
     }
 
     function autoToggle() {
-      if (!paused) {
-        if (!hovered && !focused) {
-          play();
-        } else {
-          pause(false);
-        }
+      if (!stopped) {
+        hovered || focused ? pause(false) : play();
       }
     }
 
-    function update(rate) {
+    function update() {
+      if (toggle) {
+        toggleClass(toggle, CLASS_ACTIVE, !stopped);
+        setAttribute(toggle, ARIA_PRESSED, !stopped);
+        setAttribute(toggle, ARIA_LABEL, options.i18n[stopped ? "play" : "pause"]);
+      }
+    }
+
+    function onAnimationFrame(rate) {
       var bar = Elements.bar;
       bar && style(bar, "width", rate * 100 + "%");
       emit(EVENT_AUTOPLAY_PLAYING, rate);
     }
 
-    function updateInterval() {
-      var Slide = Components2.Slides.getAt(Splide2.index);
+    function onMove(index) {
+      var Slide = Components2.Slides.getAt(index);
       interval.set(Slide && +getAttribute(Slide.slide, INTERVAL_DATA_ATTRIBUTE) || options.interval);
     }
 

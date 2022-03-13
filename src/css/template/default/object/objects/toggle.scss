@@ -1,0 +1,11 @@
+@use '../../foundation/mixins';
+
+.splide {
+  &__toggle {
+    cursor: pointer;
+
+    &:focus-visible {
+      @include mixins.focus-outline;
+    }
+  }
+}
