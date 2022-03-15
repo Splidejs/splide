@@ -1233,11 +1233,11 @@ function Layout(Splide2, Components2, options) {
   }
 
   function cssSlideWidth() {
-    return options.autoWidth ? "" : unit(options.fixedWidth) || (vertical ? "" : cssSlideSize());
+    return options.autoWidth ? null : unit(options.fixedWidth) || (vertical ? "" : cssSlideSize());
   }
 
   function cssSlideHeight() {
-    return unit(options.fixedHeight) || (vertical ? options.autoHeight ? "" : cssSlideSize() : cssHeight());
+    return unit(options.fixedHeight) || (vertical ? options.autoHeight ? null : cssSlideSize() : cssHeight());
   }
 
   function cssSlideSize() {

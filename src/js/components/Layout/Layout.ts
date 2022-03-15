@@ -135,8 +135,8 @@ export function Layout( Splide: Splide, Components: Components, options: Options
    *
    * @return The width of the slide.
    */
-  function cssSlideWidth(): string {
-    return options.autoWidth ? '' : unit( options.fixedWidth ) || ( vertical ? '' : cssSlideSize() );
+  function cssSlideWidth(): string | null {
+    return options.autoWidth ? null : unit( options.fixedWidth ) || ( vertical ? '' : cssSlideSize() );
   }
 
   /**
@@ -144,9 +144,9 @@ export function Layout( Splide: Splide, Components: Components, options: Options
    *
    * @return The height of the slide.
    */
-  function cssSlideHeight(): string {
+  function cssSlideHeight(): string | null {
     return unit( options.fixedHeight )
-      || ( vertical ? ( options.autoHeight ? '' : cssSlideSize() ) : cssHeight() );
+      || ( vertical ? ( options.autoHeight ? null : cssSlideSize() ) : cssHeight() );
   }
 
   /**
