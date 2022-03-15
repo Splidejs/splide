@@ -1860,7 +1860,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function mount() {
       if (autoplay) {
         listen();
-        toggle && setAttribute(toggle, ARIA_CONTROLS, Elements.track.id);
+        toggle && setAttribute(toggle, ARIA_CONTROLS, Elements.list.id);
         stopped || play();
         update();
       }

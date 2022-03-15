@@ -66,7 +66,7 @@ export function Autoplay( Splide: Splide, Components: Components, options: Optio
   function mount(): void {
     if ( autoplay ) {
       listen();
-      toggle && setAttribute( toggle, ARIA_CONTROLS, Elements.track.id );
+      toggle && setAttribute( toggle, ARIA_CONTROLS, Elements.list.id );
       stopped || play();
       update();
     }

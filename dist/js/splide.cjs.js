@@ -177,6 +177,12 @@ function merge(object) {
   return object;
 }
 
+function omit(object, keys) {
+  toArray(keys || ownKeys(object)).forEach(function (key) {
+    delete object[key];
+  });
+}
+
 function removeAttribute(elms, attrs) {
   forEach(elms, function (elm) {
     forEach(attrs, function (attr) {
@@ -580,12 +586,6 @@ function Throttle(func, duration) {
   return throttled;
 }
 
-function omit(object, keys) {
-  toArray(keys || ownKeys(object)).forEach(function (key) {
-    delete object[key];
-  });
-}
-
 function Media(Splide2, Components2, options) {
   var reducedMotion = options.reducedMotion || {};
   var binder = EventBinder();
@@ -711,9 +711,9 @@ var CLASS_PAGINATION = PROJECT_CODE + "__pagination";
 var CLASS_PAGINATION_PAGE = CLASS_PAGINATION + "__page";
 var CLASS_PROGRESS = PROJECT_CODE + "__progress";
 var CLASS_PROGRESS_BAR = CLASS_PROGRESS + "__bar";
-var CLASS_AUTOPLAY = PROJECT_CODE + "__autoplay";
-var CLASS_PLAY = PROJECT_CODE + "__play";
-var CLASS_PAUSE = PROJECT_CODE + "__pause";
+var CLASS_TOGGLE = PROJECT_CODE + "__toggle";
+var CLASS_TOGGLE_PLAY = CLASS_TOGGLE + "__play";
+var CLASS_TOGGLE_PAUSE = CLASS_TOGGLE + "__pause";
 var CLASS_SPINNER = PROJECT_CODE + "__spinner";
 var CLASS_SR = PROJECT_CODE + "__sr";
 var CLASS_INITIALIZED = "is-initialized";
@@ -802,12 +802,10 @@ function Elements(Splide2, Components2, options) {
     forOwn({
       arrows: CLASS_ARROWS,
       pagination: CLASS_PAGINATION,
-      autoplay: CLASS_AUTOPLAY,
       prev: CLASS_ARROW_PREV,
       next: CLASS_ARROW_NEXT,
       bar: CLASS_PROGRESS_BAR,
-      play: CLASS_PLAY,
-      pause: CLASS_PAUSE
+      toggle: CLASS_TOGGLE
     }, function (className, key) {
       elements[key] = find("." + className);
     });
@@ -831,7 +829,7 @@ function Elements(Splide2, Components2, options) {
 
   function find(selector) {
     var elm = query(root, selector);
-    return elm && closest(elm, "." + CLASS_ROOT) === root ? elm : null;
+    return elm && closest(elm, "." + CLASS_ROOT) === root ? elm : void 0;
   }
 
   function getClasses(base) {
@@ -1854,37 +1852,27 @@ function Autoplay(Splide2, Components2, options) {
       bind = _EventInterface7.bind,
       emit = _EventInterface7.emit;
 
-  var interval = RequestInterval(options.interval, Splide2.go.bind(Splide2, ">"), update);
+  var interval = RequestInterval(options.interval, Splide2.go.bind(Splide2, ">"), onAnimationFrame);
   var isPaused = interval.isPaused;
-  var Elements = Components2.Elements;
+  var Elements = Components2.Elements,
+      _Components2$Elements4 = Components2.Elements,
+      root = _Components2$Elements4.root,
+      toggle = _Components2$Elements4.toggle;
   var autoplay = options.autoplay;
   var hovered;
   var focused;
-  var paused = autoplay === "pause";
+  var stopped = autoplay === "pause";
 
   function mount() {
     if (autoplay) {
-      initButton(true);
-      initButton(false);
       listen();
-      !paused && play();
-    }
-  }
-
-  function initButton(forPause) {
-    var prop = forPause ? "pause" : "play";
-    var button = Elements[prop];
-
-    if (button) {
-      setAttribute(button, ARIA_CONTROLS, Elements.track.id);
-      setAttribute(button, ARIA_LABEL, options.i18n[prop]);
-      bind(button, "click", forPause ? pause : play);
+      toggle && setAttribute(toggle, ARIA_CONTROLS, Elements.list.id);
+      stopped || play();
+      update();
     }
   }
 
   function listen() {
-    var root = Elements.root;
-
     if (options.pauseOnHover) {
       bind(root, "mouseenter mouseleave", function (e) {
         hovered = e.type === "mouseenter";
@@ -1899,49 +1887,60 @@ function Autoplay(Splide2, Components2, options) {
       });
     }
 
+    if (toggle) {
+      bind(toggle, "click", function () {
+        stopped ? play() : pause(true);
+      });
+    }
+
     on([EVENT_MOVE, EVENT_SCROLL, EVENT_REFRESH], interval.rewind);
-    on(EVENT_MOVE, updateInterval);
+    on(EVENT_MOVE, onMove);
   }
 
   function play() {
     if (isPaused() && Components2.Slides.isEnough()) {
       interval.start(!options.resetProgress);
-      focused = hovered = paused = false;
+      focused = hovered = stopped = false;
+      update();
       emit(EVENT_AUTOPLAY_PLAY);
     }
   }
 
-  function pause(manual) {
-    if (manual === void 0) {
-      manual = true;
+  function pause(stop) {
+    if (stop === void 0) {
+      stop = true;
     }
+
+    stopped = !!stop;
+    update();
 
     if (!isPaused()) {
       interval.pause();
       emit(EVENT_AUTOPLAY_PAUSE);
     }
-
-    paused = manual;
   }
 
   function autoToggle() {
-    if (!paused) {
-      if (!hovered && !focused) {
-        play();
-      } else {
-        pause(false);
-      }
+    if (!stopped) {
+      hovered || focused ? pause(false) : play();
     }
   }
 
-  function update(rate) {
+  function update() {
+    if (toggle) {
+      toggleClass(toggle, CLASS_ACTIVE, !stopped);
+      setAttribute(toggle, ARIA_LABEL, options.i18n[stopped ? "play" : "pause"]);
+    }
+  }
+
+  function onAnimationFrame(rate) {
     var bar = Elements.bar;
     bar && style(bar, "width", rate * 100 + "%");
     emit(EVENT_AUTOPLAY_PLAYING, rate);
   }
 
-  function updateInterval() {
-    var Slide = Components2.Slides.getAt(Splide2.index);
+  function onMove(index) {
+    var Slide = Components2.Slides.getAt(index);
     interval.set(Slide && +getAttribute(Slide.slide, INTERVAL_DATA_ATTRIBUTE) || options.interval);
   }
 
@@ -3645,7 +3644,6 @@ exports.CLASS_ARROW = CLASS_ARROW;
 exports.CLASS_ARROWS = CLASS_ARROWS;
 exports.CLASS_ARROW_NEXT = CLASS_ARROW_NEXT;
 exports.CLASS_ARROW_PREV = CLASS_ARROW_PREV;
-exports.CLASS_AUTOPLAY = CLASS_AUTOPLAY;
 exports.CLASS_CLONE = CLASS_CLONE;
 exports.CLASS_CONTAINER = CLASS_CONTAINER;
 exports.CLASS_INITIALIZED = CLASS_INITIALIZED;
@@ -3654,8 +3652,6 @@ exports.CLASS_LOADING = CLASS_LOADING;
 exports.CLASS_NEXT = CLASS_NEXT;
 exports.CLASS_PAGINATION = CLASS_PAGINATION;
 exports.CLASS_PAGINATION_PAGE = CLASS_PAGINATION_PAGE;
-exports.CLASS_PAUSE = CLASS_PAUSE;
-exports.CLASS_PLAY = CLASS_PLAY;
 exports.CLASS_PREV = CLASS_PREV;
 exports.CLASS_PROGRESS = CLASS_PROGRESS;
 exports.CLASS_PROGRESS_BAR = CLASS_PROGRESS_BAR;
@@ -3663,6 +3659,9 @@ exports.CLASS_ROOT = CLASS_ROOT;
 exports.CLASS_SLIDE = CLASS_SLIDE;
 exports.CLASS_SPINNER = CLASS_SPINNER;
 exports.CLASS_SR = CLASS_SR;
+exports.CLASS_TOGGLE = CLASS_TOGGLE;
+exports.CLASS_TOGGLE_PAUSE = CLASS_TOGGLE_PAUSE;
+exports.CLASS_TOGGLE_PLAY = CLASS_TOGGLE_PLAY;
 exports.CLASS_TRACK = CLASS_TRACK;
 exports.CLASS_VISIBLE = CLASS_VISIBLE;
 exports.EVENT_ACTIVE = EVENT_ACTIVE;

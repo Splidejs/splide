@@ -1,7 +1,7 @@
 /**
- * The interface for the Options component.
+ * The interface for the Media component.
  *
- * @since 3.0.0
+ * @since 4.0.0
  */
 interface MediaComponent extends BaseComponent {
     reduce(reduced: boolean): void;
@@ -27,14 +27,12 @@ interface ElementCollection {
     track: HTMLElement;
     list: HTMLElement;
     slides: HTMLElement[];
-    arrows: HTMLElement | null;
-    pagination: HTMLUListElement | null;
-    prev: HTMLButtonElement | null;
-    next: HTMLButtonElement | null;
-    bar: HTMLElement | null;
-    autoplay: HTMLElement | null;
-    play: HTMLButtonElement | null;
-    pause: HTMLButtonElement | null;
+    arrows?: HTMLElement;
+    pagination?: HTMLUListElement;
+    prev?: HTMLButtonElement;
+    next?: HTMLButtonElement;
+    bar?: HTMLElement;
+    toggle?: HTMLElement;
 }
 /**
  * The interface for the Elements component.
@@ -1587,9 +1585,9 @@ declare const CLASS_PAGINATION: string;
 declare const CLASS_PAGINATION_PAGE: string;
 declare const CLASS_PROGRESS: string;
 declare const CLASS_PROGRESS_BAR: string;
-declare const CLASS_AUTOPLAY: string;
-declare const CLASS_PLAY: string;
-declare const CLASS_PAUSE: string;
+declare const CLASS_TOGGLE: string;
+declare const CLASS_TOGGLE_PLAY: string;
+declare const CLASS_TOGGLE_PAUSE: string;
 declare const CLASS_SPINNER: string;
 declare const CLASS_SR: string;
 declare const CLASS_INITIALIZED = "is-initialized";
@@ -1621,4 +1619,4 @@ declare const CLASSES: {
     spinner: string;
 };
 
-export { AnyFunction, ArrowsComponent, AutoplayComponent, BaseComponent, CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_AUTOPLAY, CLASS_CLONE, CLASS_CONTAINER, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PAUSE, CLASS_PLAY, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SPINNER, CLASS_SR, CLASS_TRACK, CLASS_VISIBLE, Cast, ClonesComponent, ComponentConstructor, Components, ControllerComponent, CoverComponent, DirectionComponent, DragComponent, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, ElementsComponent, EventBinder, EventBinderObject, EventInterface, EventInterfaceObject, EventMap, Head, KeyboardComponent, LayoutComponent, LazyLoadComponent, LiveComponent, MediaComponent, MoveComponent, Options, PaginationComponent, PaginationData, PaginationItem, Push, RequestInterval, RequestIntervalInterface, Resolve, ResponsiveOptions, STATUS_CLASSES, ScrollComponent, Shift, ShiftN, SlideComponent, SlidesComponent, Splide, SplideRenderer, State, StateObject, SyncComponent, SyncTarget, Throttle, ThrottleInstance, TransitionComponent, WheelComponent, Splide as default };
+export { AnyFunction, ArrowsComponent, AutoplayComponent, BaseComponent, CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_CLONE, CLASS_CONTAINER, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SPINNER, CLASS_SR, CLASS_TOGGLE, CLASS_TOGGLE_PAUSE, CLASS_TOGGLE_PLAY, CLASS_TRACK, CLASS_VISIBLE, Cast, ClonesComponent, ComponentConstructor, Components, ControllerComponent, CoverComponent, DirectionComponent, DragComponent, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, ElementsComponent, EventBinder, EventBinderObject, EventInterface, EventInterfaceObject, EventMap, Head, KeyboardComponent, LayoutComponent, LazyLoadComponent, LiveComponent, MediaComponent, MoveComponent, Options, PaginationComponent, PaginationData, PaginationItem, Push, RequestInterval, RequestIntervalInterface, Resolve, ResponsiveOptions, STATUS_CLASSES, ScrollComponent, Shift, ShiftN, SlideComponent, SlidesComponent, Splide, SplideRenderer, State, StateObject, SyncComponent, SyncTarget, Throttle, ThrottleInstance, TransitionComponent, WheelComponent, Splide as default };
