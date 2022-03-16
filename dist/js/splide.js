@@ -423,7 +423,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var EVENT_UPDATED = "updated";
   var EVENT_RESIZE = "resize";
   var EVENT_RESIZED = "resized";
-  var EVENT_REPOSITIONED = "repositioned";
   var EVENT_DRAG = "drag";
   var EVENT_DRAGGING = "dragging";
   var EVENT_DRAGGED = "dragged";
@@ -567,12 +566,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var interval;
 
     function throttled() {
-      var _this = this;
-
       if (!interval) {
-        var args = slice(arguments);
         interval = RequestInterval(duration || 0, function () {
-          func.apply(_this, args);
+          func();
           interval = null;
         }, null, 1);
         interval.start();
@@ -853,23 +849,26 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         updateOnMove = options.updateOnMove,
         i18n = options.i18n,
         pagination = options.pagination,
-        slideFocus = options.slideFocus;
+        slideFocus = options.slideFocus,
+        live = options.live;
     var resolve = Components.Direction.resolve;
     var styles = getAttribute(slide, "style");
     var label = getAttribute(slide, ARIA_LABEL);
+    var slideLabel = label || format(i18n.slideLabel, [index + 1, Splide2.length]);
     var isClone = slideIndex > -1;
     var container = child(slide, "." + CLASS_CONTAINER);
-    var sr = create("span", CLASS_SR, child(slide));
+    var sr = create("span", CLASS_SR);
+    var focusableNodes = queryAll(slide, options.focusableNodes || "");
     var destroyed;
 
     function mount() {
       if (!isClone) {
-        var slideLabel = label || format(i18n.slideLabel, [index + 1, Splide2.length]);
+        var noDescription = pagination || options.slideFocus || isNavigation;
         slide.id = root.id + "-slide" + pad(index + 1);
         setAttribute(slide, ROLE, pagination ? "tabpanel" : "group");
-        setAttribute(slide, ARIA_ROLEDESCRIPTION, pagination ? "" : i18n.slide);
+        setAttribute(slide, ARIA_ROLEDESCRIPTION, noDescription ? "" : i18n.slide);
         setAttribute(slide, ARIA_LABEL, slideLabel);
-        sr.textContent = slideLabel;
+        live && before(sr, child(slide));
       }
 
       listen();
@@ -878,7 +877,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function listen() {
       bind(slide, "click", apply(emit, EVENT_CLICK, self));
       bind(slide, "keydown", apply(emit, EVENT_SLIDE_KEYDOWN, self));
-      on([EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_MOVED, EVENT_SCROLLED], apply(update, false));
+      on([EVENT_MOVED, EVENT_SCROLLED], apply(update, false));
       on(EVENT_SHIFTED, apply(update, true));
       on(EVENT_NAVIGATION_MOUNTED, initNavigation);
 
@@ -953,14 +952,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var hidden = !isVisible() && (!active || isClone);
       setAttribute(slide, ARIA_CURRENT, isNavigation && active || "");
       setAttribute(slide, ARIA_HIDDEN, hidden || "");
-      setAttribute(queryAll(slide, options.focusableNodes || ""), TAB_INDEX, hidden ? -1 : "");
+      setAttribute(focusableNodes, TAB_INDEX, hidden ? -1 : "");
 
       if (slideFocus) {
         setAttribute(slide, TAB_INDEX, hidden ? -1 : 0);
       }
 
-      if (options.live) {
-        hidden ? remove(sr) : before(sr, child(slide));
+      if (live) {
+        sr.textContent = hidden ? "" : slideLabel;
       }
     }
 
@@ -1396,7 +1395,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       if (!Components2.Controller.isBusy()) {
         Components2.Scroll.cancel();
         jump(Splide2.index);
-        emit(EVENT_REPOSITIONED);
+        Components2.Slides.update();
       }
     }
 
@@ -2647,15 +2646,22 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var TRIGGER_KEYS = [" ", "Enter"];
 
   function Sync(Splide2, Components2, options) {
-    var list = Components2.Elements.list;
+    var isNavigation = options.isNavigation;
     var events = [];
+
+    function setup() {
+      options.slideFocus = isNavigation && isUndefined(options.slideFocus);
+    }
 
     function mount() {
       Splide2.splides.forEach(function (target) {
-        !target.isParent && sync(target.splide);
+        if (!target.isParent) {
+          sync(Splide2, target.splide);
+          sync(target.splide, Splide2);
+        }
       });
 
-      if (options.isNavigation) {
+      if (isNavigation) {
         navigate();
       }
     }
@@ -2672,15 +2678,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       mount();
     }
 
-    function sync(splide) {
-      [Splide2, splide].forEach(function (instance) {
-        var event = EventInterface(instance);
-        var target = instance === Splide2 ? splide : Splide2;
-        event.on(EVENT_MOVE, function (index, prev, dest) {
-          target.go(target.is(LOOP) ? dest : index);
-        });
-        events.push(event);
+    function sync(splide, target) {
+      var event = EventInterface(splide);
+      event.on(EVENT_MOVE, function (index, prev, dest) {
+        target.go(target.is(LOOP) ? dest : index);
       });
+      events.push(event);
     }
 
     function navigate() {
@@ -2694,7 +2697,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function update() {
-      setAttribute(list, ARIA_ORIENTATION, options.direction === TTB ? "vertical" : "");
+      setAttribute(Components2.Elements.list, ARIA_ORIENTATION, options.direction === TTB ? "vertical" : "");
     }
 
     function onClick(Slide) {
@@ -2709,6 +2712,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     return {
+      setup: setup,
       mount: mount,
       destroy: destroy,
       remount: remount
@@ -2967,7 +2971,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var _proto = _Splide.prototype;
 
     _proto.mount = function mount(Extensions, Transition) {
-      var _this2 = this;
+      var _this = this;
 
       var state = this.state,
           Components2 = this.Components;
@@ -2980,7 +2984,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         Transition: this._Transition
       });
       forOwn(Constructors, function (Component, key) {
-        var component = Component(_this2, Components2, _this2._options);
+        var component = Component(_this, Components2, _this._options);
         Components2[key] = component;
         component.setup && component.setup();
       });

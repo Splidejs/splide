@@ -13,7 +13,6 @@ export const EVENT_REFRESH            = 'refresh';
 export const EVENT_UPDATED            = 'updated';
 export const EVENT_RESIZE             = 'resize';
 export const EVENT_RESIZED            = 'resized';
-export const EVENT_REPOSITIONED       = 'repositioned';
 export const EVENT_DRAG               = 'drag';
 export const EVENT_DRAGGING           = 'dragging';
 export const EVENT_DRAGGED            = 'dragged';

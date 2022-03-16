@@ -3,13 +3,13 @@ import { init } from '../../../test';
 
 
 describe( 'The SR field', () => {
-  test( 'should be prepended to the active slide when `live` option is `true`.', () => {
+  test( 'should be prepended to each slide when `live` option is `true`.', () => {
     const splide   = init();
     const Slides   = splide.Components.Slides;
     const callback = jest.fn();
 
     Slides.forEach( Slide => {
-      expect( Slide.slide.firstElementChild.classList.contains( CLASS_SR ) ).toBe( Slide.index === 0 );
+      expect( Slide.slide.firstElementChild.classList.contains( CLASS_SR ) ).toBe( true );
       callback();
     } );
 
@@ -37,13 +37,17 @@ describe( 'The SR field', () => {
     const Slide2 = Slides.getAt( 2 );
 
     expect( Slide0.slide.firstElementChild.textContent ).toBe( `1 of ${ splide.length }` );
+    expect( Slide1.slide.firstElementChild.textContent ).toBe( '' );
+    expect( Slide2.slide.firstElementChild.textContent ).toBe( '' );
 
     splide.go( 1 );
-
+    expect( Slide0.slide.firstElementChild.textContent ).toBe( '' );
     expect( Slide1.slide.firstElementChild.textContent ).toBe( `2 of ${ splide.length }` );
+    expect( Slide2.slide.firstElementChild.textContent ).toBe( '' );
 
     splide.go( 2 );
-
+    expect( Slide0.slide.firstElementChild.textContent ).toBe( '' );
+    expect( Slide1.slide.firstElementChild.textContent ).toBe( '' );
     expect( Slide2.slide.firstElementChild.textContent ).toBe( `3 of ${ splide.length }` );
   } );
 } );

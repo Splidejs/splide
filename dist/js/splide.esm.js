@@ -422,7 +422,6 @@ var EVENT_REFRESH = "refresh";
 var EVENT_UPDATED = "updated";
 var EVENT_RESIZE = "resize";
 var EVENT_RESIZED = "resized";
-var EVENT_REPOSITIONED = "repositioned";
 var EVENT_DRAG = "drag";
 var EVENT_DRAGGING = "dragging";
 var EVENT_DRAGGED = "dragged";
@@ -566,12 +565,9 @@ function Throttle(func, duration) {
   var interval;
 
   function throttled() {
-    var _this = this;
-
     if (!interval) {
-      var args = slice(arguments);
       interval = RequestInterval(duration || 0, function () {
-        func.apply(_this, args);
+        func();
         interval = null;
       }, null, 1);
       interval.start();
@@ -854,23 +850,26 @@ function Slide$1(Splide2, index, slideIndex, slide) {
       updateOnMove = options.updateOnMove,
       i18n = options.i18n,
       pagination = options.pagination,
-      slideFocus = options.slideFocus;
+      slideFocus = options.slideFocus,
+      live = options.live;
   var resolve = Components.Direction.resolve;
   var styles = getAttribute(slide, "style");
   var label = getAttribute(slide, ARIA_LABEL);
+  var slideLabel = label || format(i18n.slideLabel, [index + 1, Splide2.length]);
   var isClone = slideIndex > -1;
   var container = child(slide, "." + CLASS_CONTAINER);
-  var sr = create("span", CLASS_SR, child(slide));
+  var sr = create("span", CLASS_SR);
+  var focusableNodes = queryAll(slide, options.focusableNodes || "");
   var destroyed;
 
   function mount() {
     if (!isClone) {
-      var slideLabel = label || format(i18n.slideLabel, [index + 1, Splide2.length]);
+      var noDescription = pagination || options.slideFocus || isNavigation;
       slide.id = root.id + "-slide" + pad(index + 1);
       setAttribute(slide, ROLE, pagination ? "tabpanel" : "group");
-      setAttribute(slide, ARIA_ROLEDESCRIPTION, pagination ? "" : i18n.slide);
+      setAttribute(slide, ARIA_ROLEDESCRIPTION, noDescription ? "" : i18n.slide);
       setAttribute(slide, ARIA_LABEL, slideLabel);
-      sr.textContent = slideLabel;
+      live && before(sr, child(slide));
     }
 
     listen();
@@ -879,7 +878,7 @@ function Slide$1(Splide2, index, slideIndex, slide) {
   function listen() {
     bind(slide, "click", apply(emit, EVENT_CLICK, self));
     bind(slide, "keydown", apply(emit, EVENT_SLIDE_KEYDOWN, self));
-    on([EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_MOVED, EVENT_SCROLLED], apply(update, false));
+    on([EVENT_MOVED, EVENT_SCROLLED], apply(update, false));
     on(EVENT_SHIFTED, apply(update, true));
     on(EVENT_NAVIGATION_MOUNTED, initNavigation);
 
@@ -954,14 +953,14 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     var hidden = !isVisible() && (!active || isClone);
     setAttribute(slide, ARIA_CURRENT, isNavigation && active || "");
     setAttribute(slide, ARIA_HIDDEN, hidden || "");
-    setAttribute(queryAll(slide, options.focusableNodes || ""), TAB_INDEX, hidden ? -1 : "");
+    setAttribute(focusableNodes, TAB_INDEX, hidden ? -1 : "");
 
     if (slideFocus) {
       setAttribute(slide, TAB_INDEX, hidden ? -1 : 0);
     }
 
-    if (options.live) {
-      hidden ? remove(sr) : before(sr, child(slide));
+    if (live) {
+      sr.textContent = hidden ? "" : slideLabel;
     }
   }
 
@@ -1397,7 +1396,7 @@ function Move(Splide2, Components2, options) {
     if (!Components2.Controller.isBusy()) {
       Components2.Scroll.cancel();
       jump(Splide2.index);
-      emit(EVENT_REPOSITIONED);
+      Components2.Slides.update();
     }
   }
 
@@ -2648,15 +2647,22 @@ function Pagination(Splide2, Components2, options) {
 var TRIGGER_KEYS = [" ", "Enter"];
 
 function Sync(Splide2, Components2, options) {
-  var list = Components2.Elements.list;
+  var isNavigation = options.isNavigation;
   var events = [];
+
+  function setup() {
+    options.slideFocus = isNavigation && isUndefined(options.slideFocus);
+  }
 
   function mount() {
     Splide2.splides.forEach(function (target) {
-      !target.isParent && sync(target.splide);
+      if (!target.isParent) {
+        sync(Splide2, target.splide);
+        sync(target.splide, Splide2);
+      }
     });
 
-    if (options.isNavigation) {
+    if (isNavigation) {
       navigate();
     }
   }
@@ -2673,15 +2679,12 @@ function Sync(Splide2, Components2, options) {
     mount();
   }
 
-  function sync(splide) {
-    [Splide2, splide].forEach(function (instance) {
-      var event = EventInterface(instance);
-      var target = instance === Splide2 ? splide : Splide2;
-      event.on(EVENT_MOVE, function (index, prev, dest) {
-        target.go(target.is(LOOP) ? dest : index);
-      });
-      events.push(event);
+  function sync(splide, target) {
+    var event = EventInterface(splide);
+    event.on(EVENT_MOVE, function (index, prev, dest) {
+      target.go(target.is(LOOP) ? dest : index);
     });
+    events.push(event);
   }
 
   function navigate() {
@@ -2695,7 +2698,7 @@ function Sync(Splide2, Components2, options) {
   }
 
   function update() {
-    setAttribute(list, ARIA_ORIENTATION, options.direction === TTB ? "vertical" : "");
+    setAttribute(Components2.Elements.list, ARIA_ORIENTATION, options.direction === TTB ? "vertical" : "");
   }
 
   function onClick(Slide) {
@@ -2710,6 +2713,7 @@ function Sync(Splide2, Components2, options) {
   }
 
   return {
+    setup: setup,
     mount: mount,
     destroy: destroy,
     remount: remount
@@ -2968,7 +2972,7 @@ var _Splide = /*#__PURE__*/function () {
   var _proto = _Splide.prototype;
 
   _proto.mount = function mount(Extensions, Transition) {
-    var _this2 = this;
+    var _this = this;
 
     var state = this.state,
         Components2 = this.Components;
@@ -2981,7 +2985,7 @@ var _Splide = /*#__PURE__*/function () {
       Transition: this._Transition
     });
     forOwn(Constructors, function (Component, key) {
-      var component = Component(_this2, Components2, _this2._options);
+      var component = Component(_this, Components2, _this._options);
       Components2[key] = component;
       component.setup && component.setup();
     });
@@ -3135,7 +3139,7 @@ var Style = /*#__PURE__*/function () {
   };
 
   _proto2.build = function build() {
-    var _this3 = this;
+    var _this2 = this;
 
     var css = "";
 
@@ -3144,11 +3148,11 @@ var Style = /*#__PURE__*/function () {
     }
 
     Object.keys(this.styles).sort(function (n, m) {
-      return _this3.options.mediaQuery === "min" ? +n - +m : +m - +n;
+      return _this2.options.mediaQuery === "min" ? +n - +m : +m - +n;
     }).forEach(function (breakpoint) {
       if (breakpoint !== "default") {
         css += "@media screen and (max-width: " + breakpoint + "px) {";
-        css += _this3.buildSelectors(_this3.styles[breakpoint]);
+        css += _this2.buildSelectors(_this2.styles[breakpoint]);
         css += "}";
       }
     });
@@ -3156,11 +3160,11 @@ var Style = /*#__PURE__*/function () {
   };
 
   _proto2.buildSelectors = function buildSelectors(selectors) {
-    var _this4 = this;
+    var _this3 = this;
 
     var css = "";
     forOwn(selectors, function (styles, selector) {
-      selector = ("#" + _this4.id + " " + selector).trim();
+      selector = ("#" + _this3.id + " " + selector).trim();
       css += selector + " {";
       forOwn(styles, function (value, prop) {
         if (value || value === 0) {
@@ -3215,7 +3219,7 @@ var SplideRenderer = /*#__PURE__*/function () {
   };
 
   _proto3.initSlides = function initSlides() {
-    var _this5 = this;
+    var _this4 = this;
 
     push(this.slides, this.contents.map(function (content, index) {
       content = isString(content) ? {
@@ -3224,12 +3228,12 @@ var SplideRenderer = /*#__PURE__*/function () {
       content.styles = content.styles || {};
       content.attrs = content.attrs || {};
 
-      _this5.cover(content);
+      _this4.cover(content);
 
-      var classes = _this5.options.classes.slide + " " + (index === 0 ? CLASS_ACTIVE : "");
+      var classes = _this4.options.classes.slide + " " + (index === 0 ? CLASS_ACTIVE : "");
       assign(content.attrs, {
         class: (classes + " " + (content.attrs.class || "")).trim(),
-        style: _this5.buildStyles(content.styles)
+        style: _this4.buildStyles(content.styles)
       });
       return content;
     }));
@@ -3240,57 +3244,57 @@ var SplideRenderer = /*#__PURE__*/function () {
   };
 
   _proto3.registerRootStyles = function registerRootStyles() {
-    var _this6 = this;
+    var _this5 = this;
 
     this.breakpoints.forEach(function (_ref2) {
       var width = _ref2[0],
           options = _ref2[1];
 
-      _this6.Style.rule(" ", "max-width", unit(options.width), width);
+      _this5.Style.rule(" ", "max-width", unit(options.width), width);
     });
   };
 
   _proto3.registerTrackStyles = function registerTrackStyles() {
-    var _this7 = this;
+    var _this6 = this;
 
     var Style2 = this.Style;
     var selector = "." + CLASS_TRACK;
     this.breakpoints.forEach(function (_ref3) {
       var width = _ref3[0],
           options = _ref3[1];
-      Style2.rule(selector, _this7.resolve("paddingLeft"), _this7.cssPadding(options, false), width);
-      Style2.rule(selector, _this7.resolve("paddingRight"), _this7.cssPadding(options, true), width);
-      Style2.rule(selector, "height", _this7.cssTrackHeight(options), width);
+      Style2.rule(selector, _this6.resolve("paddingLeft"), _this6.cssPadding(options, false), width);
+      Style2.rule(selector, _this6.resolve("paddingRight"), _this6.cssPadding(options, true), width);
+      Style2.rule(selector, "height", _this6.cssTrackHeight(options), width);
     });
   };
 
   _proto3.registerListStyles = function registerListStyles() {
-    var _this8 = this;
+    var _this7 = this;
 
     var Style2 = this.Style;
     var selector = "." + CLASS_LIST;
     this.breakpoints.forEach(function (_ref4) {
       var width = _ref4[0],
           options = _ref4[1];
-      Style2.rule(selector, "transform", _this8.buildTranslate(options), width);
+      Style2.rule(selector, "transform", _this7.buildTranslate(options), width);
 
-      if (!_this8.cssSlideHeight(options)) {
-        Style2.rule(selector, "aspect-ratio", _this8.cssAspectRatio(options), width);
+      if (!_this7.cssSlideHeight(options)) {
+        Style2.rule(selector, "aspect-ratio", _this7.cssAspectRatio(options), width);
       }
     });
   };
 
   _proto3.registerSlideStyles = function registerSlideStyles() {
-    var _this9 = this;
+    var _this8 = this;
 
     var Style2 = this.Style;
     var selector = "." + CLASS_SLIDE;
     this.breakpoints.forEach(function (_ref5) {
       var width = _ref5[0],
           options = _ref5[1];
-      Style2.rule(selector, "width", _this9.cssSlideWidth(options), width);
-      Style2.rule(selector, "height", _this9.cssSlideHeight(options) || "100%", width);
-      Style2.rule(selector, _this9.resolve("marginRight"), unit(options.gap) || "0px", width);
+      Style2.rule(selector, "width", _this8.cssSlideWidth(options), width);
+      Style2.rule(selector, "height", _this8.cssSlideHeight(options) || "100%", width);
+      Style2.rule(selector, _this8.resolve("marginRight"), unit(options.gap) || "0px", width);
       Style2.rule(selector + " > img", "display", options.cover ? "none" : "inline", width);
     });
   };
@@ -3448,14 +3452,14 @@ var SplideRenderer = /*#__PURE__*/function () {
   };
 
   _proto3.parseBreakpoints = function parseBreakpoints() {
-    var _this10 = this;
+    var _this9 = this;
 
     var breakpoints = this.options.breakpoints;
     this.breakpoints.push(["default", this.options]);
 
     if (breakpoints) {
       forOwn(breakpoints, function (options, width) {
-        _this10.breakpoints.push([width, merge(merge({}, _this10.options), options)]);
+        _this9.breakpoints.push([width, merge(merge({}, _this9.options), options)]);
       });
     }
   };
@@ -3508,11 +3512,11 @@ var SplideRenderer = /*#__PURE__*/function () {
   };
 
   _proto3.renderSlides = function renderSlides() {
-    var _this11 = this;
+    var _this10 = this;
 
     var tag = this.config.slideTag;
     return this.slides.map(function (content) {
-      return "<" + tag + " " + _this11.buildAttrs(content.attrs) + ">" + (content.html || "") + "</" + tag + ">";
+      return "<" + tag + " " + _this10.buildAttrs(content.attrs) + ">" + (content.html || "") + "</" + tag + ">";
     }).join("");
   };
 
@@ -3633,4 +3637,4 @@ var SplideRenderer = /*#__PURE__*/function () {
   return SplideRenderer;
 }();
 
-export { CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_CLONE, CLASS_CONTAINER, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SPINNER, CLASS_SR, CLASS_TOGGLE, CLASS_TOGGLE_PAUSE, CLASS_TOGGLE_PLAY, CLASS_TRACK, CLASS_VISIBLE, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, EventBinder, EventInterface, RequestInterval, STATUS_CLASSES, Splide, SplideRenderer, State, Throttle, Splide as default };
+export { CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_CLONE, CLASS_CONTAINER, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SPINNER, CLASS_SR, CLASS_TOGGLE, CLASS_TOGGLE_PAUSE, CLASS_TOGGLE_PLAY, CLASS_TRACK, CLASS_VISIBLE, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, EventBinder, EventInterface, RequestInterval, STATUS_CLASSES, Splide, SplideRenderer, State, Throttle, Splide as default };

@@ -25,8 +25,6 @@ import {
   EVENT_MOVE,
   EVENT_MOVED,
   EVENT_NAVIGATION_MOUNTED,
-  EVENT_REFRESH,
-  EVENT_REPOSITIONED,
   EVENT_SCROLLED,
   EVENT_SHIFTED,
   EVENT_SLIDE_KEYDOWN,
@@ -93,13 +91,15 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   const event = EventInterface( Splide );
   const { on, emit, bind } = event;
   const { Components, root, options } = Splide;
-  const { isNavigation, updateOnMove, i18n, pagination, slideFocus } = options;
+  const { isNavigation, updateOnMove, i18n, pagination, slideFocus, live } = options;
   const { resolve } = Components.Direction;
-  const styles    = getAttribute( slide, 'style' );
-  const label     = getAttribute( slide, ARIA_LABEL );
-  const isClone   = slideIndex > -1;
-  const container = child( slide, `.${ CLASS_CONTAINER }` );
-  const sr        = create( 'span', CLASS_SR, child( slide ) );
+  const styles         = getAttribute( slide, 'style' );
+  const label          = getAttribute( slide, ARIA_LABEL );
+  const slideLabel     = label || format( i18n.slideLabel, [ index + 1, Splide.length ] );
+  const isClone        = slideIndex > -1;
+  const container      = child( slide, `.${ CLASS_CONTAINER }` );
+  const sr             = create( 'span', CLASS_SR );
+  const focusableNodes = queryAll( slide, options.focusableNodes || '' );
 
   /**
    * Turns into `true` when the component is destroyed.
@@ -111,13 +111,13 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    */
   function mount( this: SlideComponent ): void {
     if ( ! isClone ) {
-      const slideLabel = label || format( i18n.slideLabel, [ index + 1, Splide.length ] );
+      const noDescription = pagination || options.slideFocus || isNavigation;
 
       slide.id = `${ root.id }-slide${ pad( index + 1 ) }`;
       setAttribute( slide, ROLE, pagination ? 'tabpanel' : 'group' );
-      setAttribute( slide, ARIA_ROLEDESCRIPTION, pagination ? '' : i18n.slide );
+      setAttribute( slide, ARIA_ROLEDESCRIPTION, noDescription ? '' : i18n.slide );
       setAttribute( slide, ARIA_LABEL, slideLabel );
-      sr.textContent = slideLabel;
+      live && before( sr, child( slide ) );
     }
 
     listen();
@@ -129,7 +129,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   function listen(): void {
     bind( slide, 'click', apply( emit, EVENT_CLICK, self ) );
     bind( slide, 'keydown', apply( emit, EVENT_SLIDE_KEYDOWN, self ) );
-    on( [ EVENT_REFRESH, EVENT_REPOSITIONED, EVENT_MOVED, EVENT_SCROLLED ], apply( update, false ) );
+    on( [ EVENT_MOVED, EVENT_SCROLLED ], apply( update, false ) );
     on( EVENT_SHIFTED, apply( update, true ) );
     on( EVENT_NAVIGATION_MOUNTED, initNavigation );
 
@@ -232,14 +232,14 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
 
     setAttribute( slide, ARIA_CURRENT, isNavigation && active || '' );
     setAttribute( slide, ARIA_HIDDEN, hidden || '' );
-    setAttribute( queryAll( slide, options.focusableNodes || '' ), TAB_INDEX, hidden ? -1 : '' );
+    setAttribute( focusableNodes, TAB_INDEX, hidden ? -1 : '' );
 
     if ( slideFocus ) {
       setAttribute( slide, TAB_INDEX, hidden ? -1 : 0 );
     }
 
-    if ( options.live ) {
-      hidden ? remove( sr ) : before( sr, child( slide ) );
+    if ( live ) {
+      sr.textContent = hidden ? '' : slideLabel;
     }
   }
 

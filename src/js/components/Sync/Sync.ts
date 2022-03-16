@@ -12,7 +12,7 @@ import { LOOP } from '../../constants/types';
 import { EventInterface, EventInterfaceObject } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { empty, includes, prevent, setAttribute } from '../../utils';
+import { empty, includes, isUndefined, prevent, setAttribute } from '../../utils';
 import { normalizeKey } from '../../utils/dom/normalizeKey/normalizeKey';
 import { SlideComponent } from '../Slides/Slide';
 
@@ -45,18 +45,32 @@ const TRIGGER_KEYS = [ ' ', 'Enter' ];
  * @return A Sync component object.
  */
 export function Sync( Splide: Splide, Components: Components, options: Options ): SyncComponent {
-  const { list } = Components.Elements;
+  const { isNavigation } = options;
+
+  /**
+   * Stores event objects.
+   */
   const events: EventInterfaceObject[] = [];
+
+  /**
+   * Called when the component is constructed.
+   */
+  function setup(): void {
+    options.slideFocus = isNavigation && isUndefined( options.slideFocus );
+  }
 
   /**
    * Called when the component is mounted.
    */
   function mount(): void {
     Splide.splides.forEach( target => {
-      ! target.isParent && sync( target.splide );
+      if ( ! target.isParent ) {
+        sync( Splide, target.splide );
+        sync( target.splide, Splide );
+      }
     } );
 
-    if ( options.isNavigation ) {
+    if ( isNavigation ) {
       navigate();
     }
   }
@@ -83,18 +97,16 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
    * Syncs the current index with a provided child splide instance.
    *
    * @param splide - A splide instance to sync with.
+   * @param target - A target splide instance.
    */
-  function sync( splide: Splide ): void {
-    [ Splide, splide ].forEach( instance => {
-      const event  = EventInterface( instance );
-      const target = instance === Splide ? splide : Splide;
+  function sync( splide: Splide, target: Splide ): void {
+    const event = EventInterface( splide );
 
-      event.on( EVENT_MOVE, ( index, prev, dest ) => {
-        target.go( target.is( LOOP ) ? dest : index );
-      } );
-
-      events.push( event );
+    event.on( EVENT_MOVE, ( index, prev, dest ) => {
+      target.go( target.is( LOOP ) ? dest : index );
     } );
+
+    events.push( event );
   }
 
   /**
@@ -117,7 +129,7 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
    * Update attributes.
    */
   function update(): void {
-    setAttribute( list, ARIA_ORIENTATION, options.direction === TTB ? 'vertical' : '' );
+    setAttribute( Components.Elements.list, ARIA_ORIENTATION, options.direction === TTB ? 'vertical' : '' );
   }
 
   /**
@@ -143,6 +155,7 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
   }
 
   return {
+    setup,
     mount,
     destroy,
     remount,

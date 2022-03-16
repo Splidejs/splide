@@ -3,7 +3,6 @@ import {
   EVENT_MOVE,
   EVENT_MOVED,
   EVENT_REFRESH,
-  EVENT_REPOSITIONED,
   EVENT_RESIZED,
   EVENT_SHIFTED,
   EVENT_UPDATED,
@@ -78,7 +77,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
     if ( ! Components.Controller.isBusy() ) {
       Components.Scroll.cancel();
       jump( Splide.index );
-      emit( EVENT_REPOSITIONED );
+      Components.Slides.update();
     }
   }
 
