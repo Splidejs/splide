@@ -1,9 +1,10 @@
-import { ARIA_ATOMIC, ARIA_LIVE } from '../../constants/attributes';
-import { EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY } from '../../constants/events';
+import { ARIA_LIVE } from '../../constants/attributes';
+import { CLASS_SR } from '../../constants/classes';
+import { EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_MOVED, EVENT_SCROLLED } from '../../constants/events';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { apply, setAttribute } from '../../utils';
+import { append, apply, create, remove, setAttribute } from '../../utils';
 
 
 /**
@@ -30,13 +31,18 @@ export interface LiveComponent extends BaseComponent {
  */
 export function Live( Splide: Splide, Components: Components, options: Options ): LiveComponent {
   const { on } = EventInterface( Splide );
-  const { list } = Components.Elements;
+  const { track } = Components.Elements;
   const { live } = options;
 
   /**
    * Indicates whether the live region is enabled or not.
    */
   const enabled = live && ! options.isNavigation;
+
+  /**
+   * The span element for the SR only text.
+   */
+  const sr = create( 'span', CLASS_SR );
 
   /**
    * Called when the component is mounted.
@@ -46,10 +52,10 @@ export function Live( Splide: Splide, Components: Components, options: Options )
    */
   function mount(): void {
     if ( enabled ) {
-      setAttribute( list, ARIA_ATOMIC, false );
       disable( ! Components.Autoplay.isPaused() );
       on( EVENT_AUTOPLAY_PLAY, apply( disable, true ) );
       on( EVENT_AUTOPLAY_PAUSE, apply( disable, false ) );
+      on( [ EVENT_MOVED, EVENT_SCROLLED ], update );
     }
   }
 
@@ -61,12 +67,21 @@ export function Live( Splide: Splide, Components: Components, options: Options )
    */
   function disable( disabled: boolean ): void {
     if ( enabled ) {
-      setAttribute( list, ARIA_LIVE, disabled ? 'off' : 'polite' );
+      setAttribute( track, ARIA_LIVE, disabled ? 'off' : 'polite' );
     }
+  }
+
+  /**
+   * Updates the live region status with unreadable texts.
+   */
+  function update(): void {
+    append( track, sr );
+    sr.textContent = '…';
   }
 
   return {
     mount,
     disable,
+    destroy: apply( remove, sr ),
   };
 }

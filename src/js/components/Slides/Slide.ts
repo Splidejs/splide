@@ -13,7 +13,6 @@ import {
   CLASS_CONTAINER,
   CLASS_NEXT,
   CLASS_PREV,
-  CLASS_SR,
   CLASS_VISIBLE,
   STATUS_CLASSES,
 } from '../../constants/classes';
@@ -30,6 +29,7 @@ import {
   EVENT_SLIDE_KEYDOWN,
   EVENT_VISIBLE,
 } from '../../constants/events';
+import { MOVING, SCROLLING } from '../../constants/states';
 import { FADE, LOOP } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
@@ -37,10 +37,8 @@ import { BaseComponent } from '../../types';
 import {
   abs,
   apply,
-  before,
   ceil,
   child,
-  create,
   floor,
   focus,
   format,
@@ -50,7 +48,6 @@ import {
   pad,
   queryAll,
   rect,
-  remove,
   removeAttribute,
   removeClass,
   setAttribute,
@@ -91,14 +88,12 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   const event = EventInterface( Splide );
   const { on, emit, bind } = event;
   const { Components, root, options } = Splide;
-  const { isNavigation, updateOnMove, i18n, pagination, slideFocus, live } = options;
+  const { isNavigation, updateOnMove, i18n, pagination, slideFocus } = options;
   const { resolve } = Components.Direction;
   const styles         = getAttribute( slide, 'style' );
   const label          = getAttribute( slide, ARIA_LABEL );
-  const slideLabel     = label || format( i18n.slideLabel, [ index + 1, Splide.length ] );
   const isClone        = slideIndex > -1;
   const container      = child( slide, `.${ CLASS_CONTAINER }` );
-  const sr             = create( 'span', CLASS_SR );
   const focusableNodes = queryAll( slide, options.focusableNodes || '' );
 
   /**
@@ -116,8 +111,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
       slide.id = `${ root.id }-slide${ pad( index + 1 ) }`;
       setAttribute( slide, ROLE, pagination ? 'tabpanel' : 'group' );
       setAttribute( slide, ARIA_ROLEDESCRIPTION, noDescription ? '' : i18n.slide );
-      setAttribute( slide, ARIA_LABEL, slideLabel );
-      live && before( sr, child( slide ) );
+      setAttribute( slide, ARIA_LABEL, label || format( i18n.slideLabel, [ index + 1, Splide.length ] ) );
     }
 
     listen();
@@ -129,8 +123,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   function listen(): void {
     bind( slide, 'click', apply( emit, EVENT_CLICK, self ) );
     bind( slide, 'keydown', apply( emit, EVENT_SLIDE_KEYDOWN, self ) );
-    on( [ EVENT_MOVED, EVENT_SCROLLED ], apply( update, false ) );
-    on( EVENT_SHIFTED, apply( update, true ) );
+    on( [ EVENT_MOVED, EVENT_SHIFTED, EVENT_SCROLLED ], update );
     on( EVENT_NAVIGATION_MOUNTED, initNavigation );
 
     if ( updateOnMove ) {
@@ -144,7 +137,6 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   function destroy(): void {
     destroyed = true;
     event.destroy();
-    remove( sr );
     removeClass( slide, STATUS_CLASSES );
     removeAttribute( slide, ALL_ATTRIBUTES );
     setAttribute( slide, 'style', styles );
@@ -163,7 +155,6 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
     setAttribute( slide, ARIA_LABEL, format( i18n.slideX, ( isClone ? slideIndex : index ) + 1 ) );
     setAttribute( slide, ARIA_CONTROLS, controls );
     setAttribute( slide, ROLE, slideFocus ? 'button' : '' );
-    updateA11y();
   }
 
   /**
@@ -171,16 +162,14 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    */
   function onMove(): void {
     if ( ! destroyed ) {
-      update( true );
+      update();
     }
   }
 
   /**
    * Updates attribute and classes of the slide.
-   *
-   * @param excludeA11y - If `true`, attributes will be not updated.
    */
-  function update( excludeA11y?: boolean ): void {
+  function update(): void {
     if ( ! destroyed ) {
       const { index: curr } = Splide;
 
@@ -188,7 +177,6 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
       updateVisibility();
       toggleClass( slide, CLASS_PREV, index === curr - 1 );
       toggleClass( slide, CLASS_NEXT, index === curr + 1 );
-      ! excludeA11y && updateA11y();
     }
   }
 
@@ -200,16 +188,29 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
 
     if ( active !== hasClass( slide, CLASS_ACTIVE ) ) {
       toggleClass( slide, CLASS_ACTIVE, active );
+      setAttribute( slide, ARIA_CURRENT, isNavigation && active || '' );
       emit( active ? EVENT_ACTIVE : EVENT_INACTIVE, self );
     }
   }
 
   /**
    * Updates classes and attributes related with visibility.
-   * If the slide has focus and gets hidden, moves focus to the active slide.
+   * - Do not update aria-hidden on shifting to avoid Window Narrator from start reading contents.
+   * - If the slide has focus and gets hidden, moves focus to the active slide.
    */
   function updateVisibility(): void {
     const visible = isVisible();
+    const hidden = ! visible && ( ! isActive() || isClone );
+
+    if ( ! Splide.state.is( [ MOVING, SCROLLING ] ) ) {
+      setAttribute( slide, ARIA_HIDDEN, hidden || '' );
+    }
+
+    setAttribute( focusableNodes, TAB_INDEX, hidden ? -1 : '' );
+
+    if ( slideFocus ) {
+      setAttribute( slide, TAB_INDEX, hidden ? -1 : 0 );
+    }
 
     if ( visible !== hasClass( slide, CLASS_VISIBLE ) ) {
       toggleClass( slide, CLASS_VISIBLE, visible );
@@ -219,27 +220,6 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
     if ( ! visible && document.activeElement === slide ) {
       const Slide = Components.Slides.getAt( Splide.index );
       Slide && focus( Slide.slide );
-    }
-  }
-
-  /**
-   * Updates attributes.
-   * Do not call this on "shifted" event to avoid SR from reading clone's contents.
-   */
-  function updateA11y(): void {
-    const active = isActive();
-    const hidden = ! isVisible() && ( ! active || isClone );
-
-    setAttribute( slide, ARIA_CURRENT, isNavigation && active || '' );
-    setAttribute( slide, ARIA_HIDDEN, hidden || '' );
-    setAttribute( focusableNodes, TAB_INDEX, hidden ? -1 : '' );
-
-    if ( slideFocus ) {
-      setAttribute( slide, TAB_INDEX, hidden ? -1 : 0 );
-    }
-
-    if ( live ) {
-      sr.textContent = hidden ? '' : slideLabel;
     }
   }
 

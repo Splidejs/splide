@@ -100,7 +100,7 @@ export interface Options extends ResponsiveOptions {
    * - 'focused': Listens to the `keydown` event of the slider root element with adding `tabindex="0"` to it.
    * - `false`: Disables keyboard shortcuts (default).
    */
-  keyboard?: boolean | string;
+  keyboard?: boolean | 'global' | 'focused';
 
   /**
    * Enables navigation by the mouse wheel.

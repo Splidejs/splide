@@ -849,15 +849,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         updateOnMove = options.updateOnMove,
         i18n = options.i18n,
         pagination = options.pagination,
-        slideFocus = options.slideFocus,
-        live = options.live;
+        slideFocus = options.slideFocus;
     var resolve = Components.Direction.resolve;
     var styles = getAttribute(slide, "style");
     var label = getAttribute(slide, ARIA_LABEL);
-    var slideLabel = label || format(i18n.slideLabel, [index + 1, Splide2.length]);
     var isClone = slideIndex > -1;
     var container = child(slide, "." + CLASS_CONTAINER);
-    var sr = create("span", CLASS_SR);
     var focusableNodes = queryAll(slide, options.focusableNodes || "");
     var destroyed;
 
@@ -867,8 +864,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         slide.id = root.id + "-slide" + pad(index + 1);
         setAttribute(slide, ROLE, pagination ? "tabpanel" : "group");
         setAttribute(slide, ARIA_ROLEDESCRIPTION, noDescription ? "" : i18n.slide);
-        setAttribute(slide, ARIA_LABEL, slideLabel);
-        live && before(sr, child(slide));
+        setAttribute(slide, ARIA_LABEL, label || format(i18n.slideLabel, [index + 1, Splide2.length]));
       }
 
       listen();
@@ -877,8 +873,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function listen() {
       bind(slide, "click", apply(emit, EVENT_CLICK, self));
       bind(slide, "keydown", apply(emit, EVENT_SLIDE_KEYDOWN, self));
-      on([EVENT_MOVED, EVENT_SCROLLED], apply(update, false));
-      on(EVENT_SHIFTED, apply(update, true));
+      on([EVENT_MOVED, EVENT_SHIFTED, EVENT_SCROLLED], update);
       on(EVENT_NAVIGATION_MOUNTED, initNavigation);
 
       if (updateOnMove) {
@@ -889,7 +884,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function destroy() {
       destroyed = true;
       event.destroy();
-      remove(sr);
       removeClass(slide, STATUS_CLASSES);
       removeAttribute(slide, ALL_ATTRIBUTES);
       setAttribute(slide, "style", styles);
@@ -904,23 +898,21 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       setAttribute(slide, ARIA_LABEL, format(i18n.slideX, (isClone ? slideIndex : index) + 1));
       setAttribute(slide, ARIA_CONTROLS, controls);
       setAttribute(slide, ROLE, slideFocus ? "button" : "");
-      updateA11y();
     }
 
     function onMove() {
       if (!destroyed) {
-        update(true);
+        update();
       }
     }
 
-    function update(excludeA11y) {
+    function update() {
       if (!destroyed) {
         var curr = Splide2.index;
         updateActivity();
         updateVisibility();
         toggleClass(slide, CLASS_PREV, index === curr - 1);
         toggleClass(slide, CLASS_NEXT, index === curr + 1);
-        !excludeA11y && updateA11y();
       }
     }
 
@@ -929,12 +921,24 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       if (active !== hasClass(slide, CLASS_ACTIVE)) {
         toggleClass(slide, CLASS_ACTIVE, active);
+        setAttribute(slide, ARIA_CURRENT, isNavigation && active || "");
         emit(active ? EVENT_ACTIVE : EVENT_INACTIVE, self);
       }
     }
 
     function updateVisibility() {
       var visible = isVisible();
+      var hidden = !visible && (!isActive() || isClone);
+
+      if (!Splide2.state.is([MOVING, SCROLLING])) {
+        setAttribute(slide, ARIA_HIDDEN, hidden || "");
+      }
+
+      setAttribute(focusableNodes, TAB_INDEX, hidden ? -1 : "");
+
+      if (slideFocus) {
+        setAttribute(slide, TAB_INDEX, hidden ? -1 : 0);
+      }
 
       if (visible !== hasClass(slide, CLASS_VISIBLE)) {
         toggleClass(slide, CLASS_VISIBLE, visible);
@@ -944,22 +948,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       if (!visible && document.activeElement === slide) {
         var Slide2 = Components.Slides.getAt(Splide2.index);
         Slide2 && focus(Slide2.slide);
-      }
-    }
-
-    function updateA11y() {
-      var active = isActive();
-      var hidden = !isVisible() && (!active || isClone);
-      setAttribute(slide, ARIA_CURRENT, isNavigation && active || "");
-      setAttribute(slide, ARIA_HIDDEN, hidden || "");
-      setAttribute(focusableNodes, TAB_INDEX, hidden ? -1 : "");
-
-      if (slideFocus) {
-        setAttribute(slide, TAB_INDEX, hidden ? -1 : 0);
-      }
-
-      if (live) {
-        sr.textContent = hidden ? "" : slideLabel;
       }
     }
 
@@ -1739,7 +1727,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         i18n = options.i18n;
     var Elements = Components2.Elements,
         Controller = Components2.Controller;
-    var userArrows = Elements.arrows;
+    var userArrows = Elements.arrows,
+        track = Elements.track;
     var wrapper = userArrows;
     var prev = Elements.prev;
     var next = Elements.next;
@@ -1775,7 +1764,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         if (enabled) {
           listen();
           update();
-          setAttribute([prev, next], ARIA_CONTROLS, Elements.list.id);
+          setAttribute([prev, next], ARIA_CONTROLS, track.id);
           emit(EVENT_ARROWS_MOUNTED, prev, next);
         }
       }
@@ -1809,7 +1798,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       next = createArrow(false);
       created = true;
       append(wrapper, [prev, next]);
-      !userArrows && before(wrapper, Elements.track);
+      !userArrows && before(wrapper, track);
     }
 
     function createArrow(prev2) {
@@ -1859,7 +1848,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function mount() {
       if (autoplay) {
         listen();
-        toggle && setAttribute(toggle, ARIA_CONTROLS, Elements.list.id);
+        toggle && setAttribute(toggle, ARIA_CONTROLS, Elements.track.id);
         stopped || play();
         update();
       }
@@ -2763,28 +2752,35 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var _EventInterface14 = EventInterface(Splide2),
         on = _EventInterface14.on;
 
-    var list = Components2.Elements.list;
+    var track = Components2.Elements.track;
     var live = options.live;
     var enabled = live && !options.isNavigation;
+    var sr = create("span", CLASS_SR);
 
     function mount() {
       if (enabled) {
-        setAttribute(list, ARIA_ATOMIC, false);
         disable(!Components2.Autoplay.isPaused());
         on(EVENT_AUTOPLAY_PLAY, apply(disable, true));
         on(EVENT_AUTOPLAY_PAUSE, apply(disable, false));
+        on([EVENT_MOVED, EVENT_SCROLLED], update);
       }
     }
 
     function disable(disabled) {
       if (enabled) {
-        setAttribute(list, ARIA_LIVE, disabled ? "off" : "polite");
+        setAttribute(track, ARIA_LIVE, disabled ? "off" : "polite");
       }
+    }
+
+    function update() {
+      append(track, sr);
+      sr.textContent = "\u2026";
     }
 
     return {
       mount: mount,
-      disable: disable
+      disable: disable,
+      destroy: apply(remove, sr)
     };
   }
 

@@ -53,7 +53,7 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
   const { on, bind, emit } = event;
   const { classes, i18n } = options;
   const { Elements, Controller } = Components;
-  const userArrows = Elements.arrows;
+  const { arrows: userArrows, track } = Elements;
 
   /**
    * The wrapper element.
@@ -119,7 +119,7 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
       if ( enabled ) {
         listen();
         update();
-        setAttribute( [ prev, next ], ARIA_CONTROLS, Elements.list.id );
+        setAttribute( [ prev, next ], ARIA_CONTROLS, track.id );
         emit( EVENT_ARROWS_MOUNTED, prev, next );
       }
     }
@@ -168,7 +168,7 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
     created = true;
 
     append( wrapper, [ prev, next ] );
-    ! userArrows && before( wrapper, Elements.track );
+    ! userArrows && before( wrapper, track );
   }
 
   /**
