@@ -240,7 +240,8 @@ export interface ResponsiveOptions {
   speed?: number;
 
   /**
-   * Determines whether to rewind the slider or not.
+   * Determines whether to rewind the carousel or not.
+   * This is ignored when the `type` option is `'loop'`.
    */
   rewind?: boolean;
 
@@ -250,8 +251,7 @@ export interface ResponsiveOptions {
   rewindSpeed?: number;
 
   /**
-   * Allows to rewind by drag.
-   * The slider `type` must be `slide` (or `undefined`) and the `drag` option must be enabled.
+   * Allows to rewind a carousel by drag if the `rewind` option is enabled.
    */
   rewindByDrag?: boolean;
 
