@@ -248,7 +248,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
     if ( isSlide && options.trimSpace === 'move' && dest !== currIndex ) {
       const position = getPosition();
 
-      while ( position === toPosition( dest, true ) && between( dest, 0, Splide.length - 1 ) ) {
+      while ( position === toPosition( dest, true ) && between( dest, 0, Splide.length - 1, ! options.rewind ) ) {
         dest < currIndex ? --dest : ++dest;
       }
     }

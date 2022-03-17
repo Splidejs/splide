@@ -1648,7 +1648,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       if (isSlide && options.trimSpace === "move" && dest !== currIndex) {
         var position = getPosition();
 
-        while (position === toPosition(dest, true) && between(dest, 0, Splide2.length - 1)) {
+        while (position === toPosition(dest, true) && between(dest, 0, Splide2.length - 1, !options.rewind)) {
           dest < currIndex ? --dest : ++dest;
         }
       }

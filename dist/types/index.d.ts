@@ -349,7 +349,7 @@ interface Options extends ResponsiveOptions {
      * - 'focused': Listens to the `keydown` event of the slider root element with adding `tabindex="0"` to it.
      * - `false`: Disables keyboard shortcuts (default).
      */
-    keyboard?: boolean | string;
+    keyboard?: boolean | 'global' | 'focused';
     /**
      * Enables navigation by the mouse wheel.
      * Set `waitForTransition` to `ture` or provide the `wheelSleep` duration.
@@ -467,7 +467,8 @@ interface ResponsiveOptions {
      */
     speed?: number;
     /**
-     * Determines whether to rewind the slider or not.
+     * Determines whether to rewind the carousel or not.
+     * This is ignored when the `type` option is `'loop'`.
      */
     rewind?: boolean;
     /**
@@ -475,8 +476,7 @@ interface ResponsiveOptions {
      */
     rewindSpeed?: number;
     /**
-     * Allows to rewind by drag.
-     * The slider `type` must be `slide` (or `undefined`) and the `drag` option must be enabled.
+     * Allows to rewind a carousel by drag if the `rewind` option is enabled.
      */
     rewindByDrag?: boolean;
     /**
