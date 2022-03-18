@@ -759,6 +759,7 @@ function Elements(Splide2, Components2, options) {
   var slides = [];
   var rootClasses = [];
   var trackClasses = [];
+  var rootRole;
   var track;
   var list;
 
@@ -779,6 +780,7 @@ function Elements(Splide2, Components2, options) {
     removeClass(root, rootClasses);
     removeClass(track, trackClasses);
     removeAttribute([root, track, list], ALL_ATTRIBUTES.concat("style"));
+    setAttribute(root, ROLE, rootRole);
   }
 
   function update() {
@@ -818,9 +820,10 @@ function Elements(Splide2, Components2, options) {
     root.id = id;
     track.id = track.id || id + "-track";
     list.id = list.id || id + "-list";
+    rootRole = getAttribute(root, ROLE);
     setAttribute(root, ARIA_ROLEDESCRIPTION, i18n.carousel);
-    setAttribute(root, ROLE, root.tagName !== "SECTION" && options.role || "");
-    setAttribute(list, ROLE, "none");
+    setAttribute(root, ROLE, rootRole || root.tagName !== "SECTION" && options.role || "");
+    setAttribute(list, ROLE, "presentation");
   }
 
   function find(selector) {
@@ -2555,7 +2558,7 @@ function Pagination(Splide2, Components2, options) {
         bind(button, "keydown", apply(onKeydown, i));
       }
 
-      setAttribute(li, ROLE, "none");
+      setAttribute(li, ROLE, "presentation");
       setAttribute(button, ROLE, "tab");
       setAttribute(button, ARIA_CONTROLS, controls.join(" "));
       setAttribute(button, ARIA_LABEL, format(text, i + 1));

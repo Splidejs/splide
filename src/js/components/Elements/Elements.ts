@@ -26,6 +26,7 @@ import {
   children,
   empty,
   forOwn,
+  getAttribute,
   push,
   query,
   removeAttribute,
@@ -95,6 +96,11 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
   let trackClasses: string[] = [];
 
   /**
+   * Keeps the role provided by HTML.
+   */
+  let rootRole: string;
+
+  /**
    * The track element.
    */
   let track: HTMLElement;
@@ -130,6 +136,7 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
     removeClass( root, rootClasses );
     removeClass( track, trackClasses );
     removeAttribute( [ root, track, list ], ALL_ATTRIBUTES.concat( 'style' ) );
+    setAttribute( root, ROLE, rootRole );
   }
 
   /**
@@ -178,10 +185,11 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
     root.id  = id;
     track.id = track.id || `${ id }-track`;
     list.id  = list.id || `${ id }-list`;
+    rootRole = getAttribute( root, ROLE );
 
     setAttribute( root, ARIA_ROLEDESCRIPTION, i18n.carousel );
-    setAttribute( root, ROLE, root.tagName !== 'SECTION' && options.role || '' );
-    setAttribute( list, ROLE, 'none' );
+    setAttribute( root, ROLE, rootRole || root.tagName !== 'SECTION' && options.role || '' );
+    setAttribute( list, ROLE, 'presentation' );
   }
 
   /**
