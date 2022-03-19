@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>HTML</title>
+	<link rel="stylesheet" href="../../../../dist/css/themes/splide-default.min.css">
+	<link rel="stylesheet" href="./src/js/test/assets/css/styles.css">
+	<script type="text/javascript" src="../../../../dist/js/splide.js"></script>
+
+	<script>
+		document.addEventListener( 'DOMContentLoaded', function () {
+			const splide = new Splide( '#splide01', {
+				isNavigation: true,
+				fixedWidth: 100,
+				pagination: false,
+			} );
+
+			splide.mount();
+		} );
+	</script>
+</head>
+<body>
+
+<section id="splide01" class="splide">
+	<div class="splide__track">
+		<ul class="splide__list">
+			<li class="splide__slide">
+				<img src="./src/js/test/assets/images/pics/slide01.jpg">
+			</li>
+			<li class="splide__slide">
+				<img src="./src/js/test/assets/images/pics/slide02.jpg">
+			</li>
+			<li class="splide__slide">
+				<img src="./src/js/test/assets/images/pics/slide03.jpg">
+			</li>
+			<li class="splide__slide">
+				<img src="./src/js/test/assets/images/pics/slide04.jpg">
+			</li>
+			<li class="splide__slide">
+				<img src="./src/js/test/assets/images/pics/slide05.jpg">
+			</li>
+			<li class="splide__slide">
+				<img src="./src/js/test/assets/images/pics/slide06.jpg">
+			</li>
+			<li class="splide__slide">
+				<img src="./src/js/test/assets/images/pics/slide07.jpg">
+			</li>
+			<li class="splide__slide">
+				<img src="./src/js/test/assets/images/pics/slide08.jpg">
+			</li>
+			<li class="splide__slide">
+				<img src="./src/js/test/assets/images/pics/slide09.jpg">
+			</li>
+			<li class="splide__slide">
+				<img src="./src/js/test/assets/images/pics/slide10.jpg">
+			</li>
+		</ul>
+	</div>
+</section>
+
+</body>
+</html>

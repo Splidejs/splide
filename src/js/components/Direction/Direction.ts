@@ -1,3 +1,4 @@
+import { ARROW_DOWN, ARROW_LEFT, ARROW_RIGHT, ARROW_UP } from '../../constants/arrows';
 import { RTL, TTB } from '../../constants/directions';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
@@ -19,20 +20,14 @@ export interface DirectionComponent extends BaseComponent {
  * @since 3.0.0
  */
 export const ORIENTATION_MAP = {
-  marginRight : [ 'marginBottom', 'marginLeft' ],
-  autoWidth   : [ 'autoHeight' ],
-  fixedWidth  : [ 'fixedHeight' ],
-  paddingLeft : [ 'paddingTop', 'paddingRight' ],
-  paddingRight: [ 'paddingBottom', 'paddingLeft' ],
-  width       : [ 'height' ],
-  Width       : [ 'Height' ],
-  left        : [ 'top', 'right' ],
-  right       : [ 'bottom', 'left' ],
-  x           : [ 'y' ],
-  X           : [ 'Y' ],
-  Y           : [ 'X' ],
-  ArrowLeft   : [ 'ArrowUp', 'ArrowRight' ],
-  ArrowRight  : [ 'ArrowDown', 'ArrowLeft' ],
+  width     : [ 'height' ],
+  left      : [ 'top', 'right' ],
+  right     : [ 'bottom', 'left' ],
+  x         : [ 'y' ],
+  X         : [ 'Y' ],
+  Y         : [ 'X' ],
+  ArrowLeft : [ ARROW_UP, ARROW_RIGHT ],
+  ArrowRight: [ ARROW_DOWN, ARROW_LEFT ],
 };
 
 /**
@@ -57,7 +52,12 @@ export function Direction( Splide: Splide, Components: Components, options: Opti
   function resolve( prop: string, axisOnly?: boolean, direction?: Options['direction'] ): string {
     direction = direction || options.direction;
     const index = direction === RTL && ! axisOnly ? 1 : direction === TTB ? 0 : -1;
-    return ORIENTATION_MAP[ prop ][ index ] || prop;
+
+    return ORIENTATION_MAP[ prop ] && ORIENTATION_MAP[ prop ][ index ]
+      || prop.replace( /width|left|right/i, ( match, offset ) => {
+        const replacement = ORIENTATION_MAP[ match.toLowerCase() ][ index ] || match;
+        return offset > 0 ? replacement.charAt( 0 ).toUpperCase() + replacement.slice( 1 ) : replacement;
+      } );
   }
 
   /**

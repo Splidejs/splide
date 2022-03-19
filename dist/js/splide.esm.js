@@ -638,30 +638,32 @@ function Media(Splide2, Components2, options) {
   };
 }
 
+var ARROW = "Arrow";
+var ARROW_LEFT = ARROW + "Left";
+var ARROW_RIGHT = ARROW + "Right";
+var ARROW_UP = ARROW + "Up";
+var ARROW_DOWN = ARROW + "Down";
 var RTL = "rtl";
 var TTB = "ttb";
 var ORIENTATION_MAP = {
-  marginRight: ["marginBottom", "marginLeft"],
-  autoWidth: ["autoHeight"],
-  fixedWidth: ["fixedHeight"],
-  paddingLeft: ["paddingTop", "paddingRight"],
-  paddingRight: ["paddingBottom", "paddingLeft"],
   width: ["height"],
-  Width: ["Height"],
   left: ["top", "right"],
   right: ["bottom", "left"],
   x: ["y"],
   X: ["Y"],
   Y: ["X"],
-  ArrowLeft: ["ArrowUp", "ArrowRight"],
-  ArrowRight: ["ArrowDown", "ArrowLeft"]
+  ArrowLeft: [ARROW_UP, ARROW_RIGHT],
+  ArrowRight: [ARROW_DOWN, ARROW_LEFT]
 };
 
 function Direction(Splide2, Components2, options) {
   function resolve(prop, axisOnly, direction) {
     direction = direction || options.direction;
     var index = direction === RTL && !axisOnly ? 1 : direction === TTB ? 0 : -1;
-    return ORIENTATION_MAP[prop][index] || prop;
+    return ORIENTATION_MAP[prop] && ORIENTATION_MAP[prop][index] || prop.replace(/width|left|right/i, function (match, offset) {
+      var replacement = ORIENTATION_MAP[match.toLowerCase()][index] || match;
+      return offset > 0 ? replacement.charAt(0).toUpperCase() + replacement.slice(1) : replacement;
+    });
   }
 
   function orient(value) {
@@ -713,7 +715,8 @@ var CLASS_PREV = "is-prev";
 var CLASS_NEXT = "is-next";
 var CLASS_VISIBLE = "is-visible";
 var CLASS_LOADING = "is-loading";
-var STATUS_CLASSES = [CLASS_ACTIVE, CLASS_VISIBLE, CLASS_PREV, CLASS_NEXT, CLASS_LOADING];
+var CLASS_FOCUS_VISIBLE = "has-focus-visible";
+var STATUS_CLASSES = [CLASS_ACTIVE, CLASS_VISIBLE, CLASS_PREV, CLASS_NEXT, CLASS_LOADING, CLASS_FOCUS_VISIBLE];
 var CLASSES = {
   slide: CLASS_SLIDE,
   clone: CLASS_CLONE,
@@ -744,9 +747,16 @@ function closest(from, selector) {
   return elm;
 }
 
+var FRICTION = 5;
+var LOG_INTERVAL = 200;
+var POINTER_DOWN_EVENTS = "touchstart mousedown";
+var POINTER_MOVE_EVENTS = "touchmove mousemove";
+var POINTER_UP_EVENTS = "touchend touchcancel mouseup";
+
 function Elements(Splide2, Components2, options) {
   var _EventInterface = EventInterface(Splide2),
-      on = _EventInterface.on;
+      on = _EventInterface.on,
+      bind = _EventInterface.bind;
 
   var root = Splide2.root;
   var i18n = options.i18n;
@@ -757,6 +767,7 @@ function Elements(Splide2, Components2, options) {
   var rootRole;
   var track;
   var list;
+  var isUsingKey;
 
   function setup() {
     collect();
@@ -768,6 +779,14 @@ function Elements(Splide2, Components2, options) {
     on(EVENT_REFRESH, destroy);
     on(EVENT_REFRESH, setup);
     on(EVENT_UPDATED, update);
+    bind(document, POINTER_DOWN_EVENTS + " keydown", function (e) {
+      isUsingKey = e.type === "keydown";
+    }, {
+      capture: true
+    });
+    bind(root, "focusin", function () {
+      toggleClass(root, CLASS_FOCUS_VISIBLE, !!isUsingKey);
+    });
   }
 
   function destroy() {
@@ -2068,11 +2087,6 @@ var SCROLL_LISTENER_OPTIONS = {
   passive: false,
   capture: true
 };
-var FRICTION = 5;
-var LOG_INTERVAL = 200;
-var POINTER_DOWN_EVENTS = "touchstart mousedown";
-var POINTER_MOVE_EVENTS = "touchmove mousemove";
-var POINTER_UP_EVENTS = "touchend touchcancel mouseup";
 
 function Drag(Splide2, Components2, options) {
   var _EventInterface10 = EventInterface(Splide2),
@@ -2289,10 +2303,10 @@ function Drag(Splide2, Components2, options) {
 
 var NORMALIZATION_MAP = {
   Spacebar: " ",
-  Right: "ArrowRight",
-  Left: "ArrowLeft",
-  Up: "ArrowUp",
-  Down: "ArrowDown"
+  Right: ARROW_RIGHT,
+  Left: ARROW_LEFT,
+  Up: ARROW_UP,
+  Down: ARROW_DOWN
 };
 
 function normalizeKey(key) {
@@ -2349,9 +2363,9 @@ function Keyboard(Splide2, Components2, options) {
     if (!disabled) {
       var key = normalizeKey(e);
 
-      if (key === resolve("ArrowLeft")) {
+      if (key === resolve(ARROW_LEFT)) {
         Splide2.go("<");
-      } else if (key === resolve("ArrowRight")) {
+      } else if (key === resolve(ARROW_RIGHT)) {
         Splide2.go(">");
       }
     }
@@ -2576,9 +2590,9 @@ function Pagination(Splide2, Components2, options) {
     var dir = getDirection();
     var nextPage = -1;
 
-    if (key === resolve("ArrowRight", false, dir)) {
+    if (key === resolve(ARROW_RIGHT, false, dir)) {
       nextPage = ++page % length;
-    } else if (key === resolve("ArrowLeft", false, dir)) {
+    } else if (key === resolve(ARROW_LEFT, false, dir)) {
       nextPage = (--page + length) % length;
     } else if (key === "Home") {
       nextPage = 0;
@@ -3636,4 +3650,4 @@ var SplideRenderer = /*#__PURE__*/function () {
   return SplideRenderer;
 }();
 
-export { CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_CLONE, CLASS_CONTAINER, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SPINNER, CLASS_SR, CLASS_TOGGLE, CLASS_TOGGLE_PAUSE, CLASS_TOGGLE_PLAY, CLASS_TRACK, CLASS_VISIBLE, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, EventBinder, EventInterface, RequestInterval, STATUS_CLASSES, Splide, SplideRenderer, State, Throttle, Splide as default };
+export { CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_CLONE, CLASS_CONTAINER, CLASS_FOCUS_VISIBLE, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SPINNER, CLASS_SR, CLASS_TOGGLE, CLASS_TOGGLE_PAUSE, CLASS_TOGGLE_PLAY, CLASS_TRACK, CLASS_VISIBLE, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, EventBinder, EventInterface, RequestInterval, STATUS_CLASSES, Splide, SplideRenderer, State, Throttle, Splide as default };

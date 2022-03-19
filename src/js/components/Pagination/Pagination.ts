@@ -1,3 +1,4 @@
+import { ARROW_LEFT, ARROW_RIGHT } from '../../constants/arrows';
 import {
   ARIA_CONTROLS,
   ARIA_LABEL,
@@ -197,9 +198,9 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
 
     let nextPage = -1;
 
-    if ( key === resolve( 'ArrowRight', false, dir ) ) {
+    if ( key === resolve( ARROW_RIGHT, false, dir ) ) {
       nextPage = ++page % length;
-    } else if ( key === resolve( 'ArrowLeft', false, dir ) ) {
+    } else if ( key === resolve( ARROW_LEFT, false, dir ) ) {
       nextPage = ( --page + length ) % length;
     } else if ( key === 'Home' ) {
       nextPage = 0;

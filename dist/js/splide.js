@@ -639,30 +639,32 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     };
   }
 
+  var ARROW = "Arrow";
+  var ARROW_LEFT = ARROW + "Left";
+  var ARROW_RIGHT = ARROW + "Right";
+  var ARROW_UP = ARROW + "Up";
+  var ARROW_DOWN = ARROW + "Down";
   var RTL = "rtl";
   var TTB = "ttb";
   var ORIENTATION_MAP = {
-    marginRight: ["marginBottom", "marginLeft"],
-    autoWidth: ["autoHeight"],
-    fixedWidth: ["fixedHeight"],
-    paddingLeft: ["paddingTop", "paddingRight"],
-    paddingRight: ["paddingBottom", "paddingLeft"],
     width: ["height"],
-    Width: ["Height"],
     left: ["top", "right"],
     right: ["bottom", "left"],
     x: ["y"],
     X: ["Y"],
     Y: ["X"],
-    ArrowLeft: ["ArrowUp", "ArrowRight"],
-    ArrowRight: ["ArrowDown", "ArrowLeft"]
+    ArrowLeft: [ARROW_UP, ARROW_RIGHT],
+    ArrowRight: [ARROW_DOWN, ARROW_LEFT]
   };
 
   function Direction(Splide2, Components2, options) {
     function resolve(prop, axisOnly, direction) {
       direction = direction || options.direction;
       var index = direction === RTL && !axisOnly ? 1 : direction === TTB ? 0 : -1;
-      return ORIENTATION_MAP[prop][index] || prop;
+      return ORIENTATION_MAP[prop] && ORIENTATION_MAP[prop][index] || prop.replace(/width|left|right/i, function (match, offset) {
+        var replacement = ORIENTATION_MAP[match.toLowerCase()][index] || match;
+        return offset > 0 ? replacement.charAt(0).toUpperCase() + replacement.slice(1) : replacement;
+      });
     }
 
     function orient(value) {
@@ -2300,10 +2302,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
   var NORMALIZATION_MAP = {
     Spacebar: " ",
-    Right: "ArrowRight",
-    Left: "ArrowLeft",
-    Up: "ArrowUp",
-    Down: "ArrowDown"
+    Right: ARROW_RIGHT,
+    Left: ARROW_LEFT,
+    Up: ARROW_UP,
+    Down: ARROW_DOWN
   };
 
   function normalizeKey(key) {
@@ -2360,9 +2362,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       if (!disabled) {
         var key = normalizeKey(e);
 
-        if (key === resolve("ArrowLeft")) {
+        if (key === resolve(ARROW_LEFT)) {
           Splide2.go("<");
-        } else if (key === resolve("ArrowRight")) {
+        } else if (key === resolve(ARROW_RIGHT)) {
           Splide2.go(">");
         }
       }
@@ -2587,9 +2589,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var dir = getDirection();
       var nextPage = -1;
 
-      if (key === resolve("ArrowRight", false, dir)) {
+      if (key === resolve(ARROW_RIGHT, false, dir)) {
         nextPage = ++page % length;
-      } else if (key === resolve("ArrowLeft", false, dir)) {
+      } else if (key === resolve(ARROW_LEFT, false, dir)) {
         nextPage = (--page + length) % length;
       } else if (key === "Home") {
         nextPage = 0;

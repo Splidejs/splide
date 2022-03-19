@@ -1,3 +1,4 @@
+import { ARROW_LEFT, ARROW_RIGHT } from '../../constants/arrows';
 import { EVENT_MOVE, EVENT_UPDATED } from '../../constants/events';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
@@ -105,9 +106,9 @@ export function Keyboard( Splide: Splide, Components: Components, options: Optio
     if ( ! disabled ) {
       const key = normalizeKey( e );
 
-      if ( key === resolve( 'ArrowLeft' ) ) {
+      if ( key === resolve( ARROW_LEFT ) ) {
         Splide.go( '<' );
-      } else if ( key === resolve( 'ArrowRight' ) ) {
+      } else if ( key === resolve( ARROW_RIGHT ) ) {
         Splide.go( '>' );
       }
     }

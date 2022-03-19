@@ -1,3 +1,4 @@
+import { ARROW_DOWN, ARROW_LEFT, ARROW_RIGHT, ARROW_UP } from '../../../constants/arrows';
 import { isString } from '../../type/type';
 
 
@@ -8,10 +9,10 @@ import { isString } from '../../type/type';
  */
 export const NORMALIZATION_MAP = {
   Spacebar: ' ',
-  Right   : 'ArrowRight',
-  Left    : 'ArrowLeft',
-  Up      : 'ArrowUp',
-  Down    : 'ArrowDown',
+  Right   : ARROW_RIGHT,
+  Left    : ARROW_LEFT,
+  Up      : ARROW_UP,
+  Down    : ARROW_DOWN,
 };
 
 /**

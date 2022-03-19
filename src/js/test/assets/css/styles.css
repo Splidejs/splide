@@ -1,6 +1,6 @@
 body {
   background : #eee;
-  height: 200vh;
+  /*height: 200vh;*/
   font-family: Roboto, sans-serif;
   line-height: 1.5;
   padding: 2rem;
@@ -11,9 +11,9 @@ img {
   height: auto;
 }
 
-button:focus {
-  outline: 2px solid yellowgreen;
-}
+/*button:focus {*/
+/*  outline: 2px solid yellowgreen;*/
+/*}*/
 
 .splide {
   margin: 2rem auto;
@@ -30,9 +30,9 @@ button:focus {
   border: 2px solid darkgray;
 }
 
-.splide__slide.is-active {
-  border: 2px solid yellowgreen;
-}
+/*.splide__slide.is-active {*/
+/*  border: 2px solid yellowgreen;*/
+/*}*/
 
 /*.splide__slide:focus, .splide__arrow:focus, .splide__pagination__page:focus {*/
 /*  border: 2px solid tomato !important;*/

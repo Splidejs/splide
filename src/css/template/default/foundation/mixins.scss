@@ -5,7 +5,7 @@ $outline-offset: 3px !default;
 $outline-offset-inset: -3px !default;
 
 @mixin ie-only {
-  @media screen and ( -ms-high-contrast: none ) {
+  @media screen and (-ms-high-contrast: none) {
     @content;
   }
 }
