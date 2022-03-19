@@ -5,13 +5,37 @@ $border-radius: false !default;
 $outline-offset: -2px !default;
 
 .splide {
+  $root: &;
+
   &__slide {
+    -webkit-tap-highlight-color: transparent;
+
     @if $border-radius {
       border-radius: $border-radius;
     }
 
+    &:focus {
+      outline: 0;
+    }
+
     &:focus-visible {
       @include mixins.focus-outline-inset;
+    }
+  }
+
+  &.has-focus-visible {
+    #{ $root }__slide:focus {
+      @include mixins.focus-outline-inset;
+    }
+
+    #{ $root }__track {
+      > #{ $root }__list {
+        > #{ $root }__slide:focus {
+          @include mixins.ie-only {
+            border-color: colors.$focus;
+          }
+        }
+      }
     }
   }
 }

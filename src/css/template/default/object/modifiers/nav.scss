@@ -31,10 +31,6 @@ $opacity-active: false !default;
             opacity: $opacity-active;
           }
         }
-
-        &:focus-visible {
-          @include mixins.focus-outline-inset;
-        }
       }
     }
   }

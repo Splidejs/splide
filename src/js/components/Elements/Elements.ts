@@ -4,7 +4,7 @@ import {
   CLASS_ARROW_NEXT,
   CLASS_ARROW_PREV,
   CLASS_ARROWS,
-  CLASS_CLONE,
+  CLASS_CLONE, CLASS_FOCUS_VISIBLE,
   CLASS_LIST,
   CLASS_PAGINATION,
   CLASS_PROGRESS_BAR,
@@ -31,10 +31,11 @@ import {
   query,
   removeAttribute,
   removeClass,
-  setAttribute,
+  setAttribute, toggleClass,
   uniqueId,
 } from '../../utils';
 import { closest } from '../../utils/dom/closest/closest';
+import { POINTER_DOWN_EVENTS } from '../Drag/constants';
 
 
 /**
@@ -75,7 +76,7 @@ export interface ElementsComponent extends BaseComponent, ElementCollection {
  * @return An Elements component object.
  */
 export function Elements( Splide: Splide, Components: Components, options: Options ): ElementsComponent {
-  const { on } = EventInterface( Splide );
+  const { on, bind } = EventInterface( Splide );
   const { root } = Splide;
   const { i18n } = options;
   const elements: ElementCollection = {} as ElementCollection;
@@ -111,6 +112,11 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
   let list: HTMLElement;
 
   /**
+   * Turns into `true` when detecting keydown, and `false` when detecting pointerdown.
+   */
+  let isUsingKey: boolean;
+
+  /**
    * Called when the component is constructed.
    */
   function setup(): void {
@@ -126,6 +132,14 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
     on( EVENT_REFRESH, destroy );
     on( EVENT_REFRESH, setup );
     on( EVENT_UPDATED, update );
+
+    bind( document, `${ POINTER_DOWN_EVENTS } keydown`, e => {
+      isUsingKey = e.type === 'keydown';
+    }, { capture: true } );
+
+    bind( root, 'focusin', () => {
+      toggleClass( root, CLASS_FOCUS_VISIBLE, !! isUsingKey );
+    } );
   }
 
   /**

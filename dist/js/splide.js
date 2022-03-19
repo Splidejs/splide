@@ -712,7 +712,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var CLASS_NEXT = "is-next";
   var CLASS_VISIBLE = "is-visible";
   var CLASS_LOADING = "is-loading";
-  var STATUS_CLASSES = [CLASS_ACTIVE, CLASS_VISIBLE, CLASS_PREV, CLASS_NEXT, CLASS_LOADING];
+  var CLASS_FOCUS_VISIBLE = "has-focus-visible";
+  var STATUS_CLASSES = [CLASS_ACTIVE, CLASS_VISIBLE, CLASS_PREV, CLASS_NEXT, CLASS_LOADING, CLASS_FOCUS_VISIBLE];
   var CLASSES = {
     slide: CLASS_SLIDE,
     clone: CLASS_CLONE,
@@ -743,9 +744,16 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     return elm;
   }
 
+  var FRICTION = 5;
+  var LOG_INTERVAL = 200;
+  var POINTER_DOWN_EVENTS = "touchstart mousedown";
+  var POINTER_MOVE_EVENTS = "touchmove mousemove";
+  var POINTER_UP_EVENTS = "touchend touchcancel mouseup";
+
   function Elements(Splide2, Components2, options) {
     var _EventInterface = EventInterface(Splide2),
-        on = _EventInterface.on;
+        on = _EventInterface.on,
+        bind = _EventInterface.bind;
 
     var root = Splide2.root;
     var i18n = options.i18n;
@@ -756,6 +764,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var rootRole;
     var track;
     var list;
+    var isUsingKey;
 
     function setup() {
       collect();
@@ -767,6 +776,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       on(EVENT_REFRESH, destroy);
       on(EVENT_REFRESH, setup);
       on(EVENT_UPDATED, update);
+      bind(document, POINTER_DOWN_EVENTS + " keydown", function (e) {
+        isUsingKey = e.type === "keydown";
+      }, {
+        capture: true
+      });
+      bind(root, "focusin", function () {
+        toggleClass(root, CLASS_FOCUS_VISIBLE, !!isUsingKey);
+      });
     }
 
     function destroy() {
@@ -2067,11 +2084,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     passive: false,
     capture: true
   };
-  var FRICTION = 5;
-  var LOG_INTERVAL = 200;
-  var POINTER_DOWN_EVENTS = "touchstart mousedown";
-  var POINTER_MOVE_EVENTS = "touchmove mousemove";
-  var POINTER_UP_EVENTS = "touchend touchcancel mouseup";
 
   function Drag(Splide2, Components2, options) {
     var _EventInterface10 = EventInterface(Splide2),
