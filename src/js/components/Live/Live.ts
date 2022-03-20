@@ -1,6 +1,13 @@
 import { ARIA_LIVE } from '../../constants/attributes';
 import { CLASS_SR } from '../../constants/classes';
-import { EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_MOVED, EVENT_SCROLLED } from '../../constants/events';
+import {
+  EVENT_AUTOPLAY_PAUSE,
+  EVENT_AUTOPLAY_PLAY,
+  EVENT_MOUNTED,
+  EVENT_MOVED,
+  EVENT_REFRESH,
+  EVENT_SCROLLED,
+} from '../../constants/events';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
@@ -52,11 +59,19 @@ export function Live( Splide: Splide, Components: Components, options: Options )
    */
   function mount(): void {
     if ( enabled ) {
-      disable( ! Components.Autoplay.isPaused() );
       on( EVENT_AUTOPLAY_PLAY, apply( disable, true ) );
       on( EVENT_AUTOPLAY_PAUSE, apply( disable, false ) );
+      on( [ EVENT_MOUNTED, EVENT_REFRESH ], init );
       on( [ EVENT_MOVED, EVENT_SCROLLED ], update );
     }
+  }
+
+  /**
+   * Initializes the component.
+   * Only when autoplay is paused, enables a live region.
+   */
+  function init(): void {
+    disable( ! Components.Autoplay.isPaused() );
   }
 
   /**

@@ -2776,11 +2776,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function mount() {
       if (enabled) {
-        disable(!Components2.Autoplay.isPaused());
         on(EVENT_AUTOPLAY_PLAY, apply(disable, true));
         on(EVENT_AUTOPLAY_PAUSE, apply(disable, false));
+        on([EVENT_MOUNTED, EVENT_REFRESH], init);
         on([EVENT_MOVED, EVENT_SCROLLED], update);
       }
+    }
+
+    function init() {
+      disable(!Components2.Autoplay.isPaused());
     }
 
     function disable(disabled) {
