@@ -32,4 +32,12 @@ describe( 'Elements', () => {
     const splide = init( {}, { html: buildHtml( { tag: 'section' } ) } );
     expect( splide.root.getAttribute( ROLE ) ).toBeNull();
   } );
+
+  test( 'should not remove the role attribute by soft destruction.', () => {
+    const splide = init();
+    expect( splide.root.getAttribute( ROLE ) ).toBe( 'region' );
+
+    splide.destroy( false );
+    expect( splide.root.getAttribute( ROLE ) ).toBe( 'region' );
+  } );
 } );

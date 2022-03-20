@@ -692,9 +692,9 @@ var ARIA_LABEL = ARIA_PREFIX + "label";
 var ARIA_HIDDEN = ARIA_PREFIX + "hidden";
 var ARIA_ORIENTATION = ARIA_PREFIX + "orientation";
 var ARIA_ROLEDESCRIPTION = ARIA_PREFIX + "roledescription";
-var ARIA_ATOMIC = ARIA_PREFIX + "atomic";
 var ARIA_LIVE = ARIA_PREFIX + "live";
-var ALL_ATTRIBUTES = [ROLE, TAB_INDEX, DISABLED, ARIA_CONTROLS, ARIA_CURRENT, ARIA_LABEL, ARIA_HIDDEN, ARIA_ORIENTATION, ARIA_ROLEDESCRIPTION, ARIA_ATOMIC, ARIA_LIVE];
+var ARIA_RELEVANT = ARIA_PREFIX + "relevant";
+var ALL_ATTRIBUTES = [ROLE, TAB_INDEX, DISABLED, ARIA_CONTROLS, ARIA_CURRENT, ARIA_LABEL, ARIA_HIDDEN, ARIA_ORIENTATION, ARIA_ROLEDESCRIPTION];
 var CLASS_ROOT = PROJECT_CODE;
 var CLASS_TRACK = PROJECT_CODE + "__track";
 var CLASS_LIST = PROJECT_CODE + "__list";
@@ -767,9 +767,10 @@ function Elements(Splide2, Components2, options) {
   var i18n = options.i18n;
   var elements = {};
   var slides = [];
+  var rootRole = getAttribute(root, ROLE);
+  var rootLabel = getAttribute(root, ARIA_LABEL);
   var rootClasses = [];
   var trackClasses = [];
-  var rootRole;
   var track;
   var list;
   var isUsingKey;
@@ -794,12 +795,19 @@ function Elements(Splide2, Components2, options) {
     });
   }
 
-  function destroy() {
+  function destroy(completely) {
     empty(slides);
     removeClass(root, rootClasses);
     removeClass(track, trackClasses);
-    removeAttribute([root, track, list], ALL_ATTRIBUTES.concat("style"));
-    setAttribute(root, ROLE, rootRole);
+    removeAttribute([track, list], ALL_ATTRIBUTES.concat("style"));
+    removeAttribute(root, "style");
+
+    if (completely) {
+      removeAttribute(root, ALL_ATTRIBUTES);
+      setAttribute(root, ROLE, rootRole);
+    }
+
+    setAttribute(root, ARIA_LABEL, rootLabel);
   }
 
   function update() {
@@ -836,12 +844,12 @@ function Elements(Splide2, Components2, options) {
 
   function init() {
     var id = root.id || uniqueId(PROJECT_CODE);
+    var role = rootRole || root.tagName !== "SECTION" && options.role || "";
     root.id = id;
     track.id = track.id || id + "-track";
     list.id = list.id || id + "-list";
-    rootRole = getAttribute(root, ROLE);
     setAttribute(root, ARIA_ROLEDESCRIPTION, i18n.carousel);
-    setAttribute(root, ROLE, rootRole || root.tagName !== "SECTION" && options.role || "");
+    getAttribute(root, ROLE) || setAttribute(root, ROLE, role);
     setAttribute(list, ROLE, "presentation");
   }
 
@@ -2782,15 +2790,18 @@ function Live(Splide2, Components2, options) {
 
   function mount() {
     if (enabled) {
+      disable(!Components2.Autoplay.isPaused());
+      setAttribute(track, ARIA_RELEVANT, "additions");
+      sr.textContent = "\u2026";
       on(EVENT_AUTOPLAY_PLAY, apply(disable, true));
       on(EVENT_AUTOPLAY_PAUSE, apply(disable, false));
-      on([EVENT_MOUNTED, EVENT_REFRESH], init);
-      on([EVENT_MOVED, EVENT_SCROLLED], update);
+      on([EVENT_MOVED, EVENT_SCROLLED], apply(append, track, sr));
     }
   }
 
-  function init() {
-    disable(!Components2.Autoplay.isPaused());
+  function destroy() {
+    removeAttribute(track, [ARIA_LIVE, ARIA_RELEVANT]);
+    remove(sr);
   }
 
   function disable(disabled) {
@@ -2799,15 +2810,10 @@ function Live(Splide2, Components2, options) {
     }
   }
 
-  function update() {
-    append(track, sr);
-    sr.textContent = "\u2026";
-  }
-
   return {
     mount: mount,
     disable: disable,
-    destroy: apply(remove, sr)
+    destroy: destroy
   };
 }
 

@@ -22,6 +22,11 @@ export interface Options extends ResponsiveOptions {
   role?: string;
 
   /**
+   * The label for the root element.
+   */
+  label?: string;
+
+  /**
    * Determines whether to disable any actions while the slider is transitioning.
    * Even if `false`, the slider forcibly waits for transition on the loop points.
    */

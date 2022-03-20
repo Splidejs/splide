@@ -1,10 +1,11 @@
-import { ALL_ATTRIBUTES, ARIA_ROLEDESCRIPTION, ROLE } from '../../constants/attributes';
+import { ALL_ATTRIBUTES, ARIA_LABEL, ARIA_ROLEDESCRIPTION, ROLE } from '../../constants/attributes';
 import {
   CLASS_ACTIVE,
   CLASS_ARROW_NEXT,
   CLASS_ARROW_PREV,
   CLASS_ARROWS,
-  CLASS_CLONE, CLASS_FOCUS_VISIBLE,
+  CLASS_CLONE,
+  CLASS_FOCUS_VISIBLE,
   CLASS_LIST,
   CLASS_PAGINATION,
   CLASS_PROGRESS_BAR,
@@ -31,7 +32,8 @@ import {
   query,
   removeAttribute,
   removeClass,
-  setAttribute, toggleClass,
+  setAttribute,
+  toggleClass,
   uniqueId,
 } from '../../utils';
 import { closest } from '../../utils/dom/closest/closest';
@@ -87,6 +89,16 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
   const slides: HTMLElement[] = [];
 
   /**
+   * Keeps the root role in HTML.
+   */
+  const rootRole = getAttribute( root, ROLE );
+
+  /**
+   * Keeps the root label in HTML.
+   */
+  const rootLabel = getAttribute( root, ARIA_LABEL );
+
+  /**
    * Stores all root classes.
    */
   let rootClasses: string[] = [];
@@ -95,11 +107,6 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
    * Stores all list classes.
    */
   let trackClasses: string[] = [];
-
-  /**
-   * Keeps the role provided by HTML.
-   */
-  let rootRole: string;
 
   /**
    * The track element.
@@ -144,13 +151,22 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
 
   /**
    * Destroys the component.
+   *
+   * @param completely - Whether to destroy the component completely or not.
    */
-  function destroy(): void {
+  function destroy( completely?: boolean ): void {
     empty( slides );
     removeClass( root, rootClasses );
     removeClass( track, trackClasses );
-    removeAttribute( [ root, track, list ], ALL_ATTRIBUTES.concat( 'style' ) );
-    setAttribute( root, ROLE, rootRole );
+    removeAttribute( [ track, list ], ALL_ATTRIBUTES.concat( 'style' ) );
+    removeAttribute( root, 'style' );
+
+    if ( completely ) {
+      removeAttribute( root, ALL_ATTRIBUTES );
+      setAttribute( root, ROLE, rootRole );
+    }
+
+    setAttribute( root, ARIA_LABEL, rootLabel );
   }
 
   /**
@@ -193,16 +209,19 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
 
   /**
    * Initializes essential elements.
+   * Note that do not change the role of the root element,
+   * which removes the region from the accessibility tree.
    */
   function init(): void {
-    const id = root.id || uniqueId( PROJECT_CODE );
+    const id   = root.id || uniqueId( PROJECT_CODE );
+    const role = rootRole || root.tagName !== 'SECTION' && options.role || '';
+
     root.id  = id;
     track.id = track.id || `${ id }-track`;
     list.id  = list.id || `${ id }-list`;
-    rootRole = getAttribute( root, ROLE );
 
     setAttribute( root, ARIA_ROLEDESCRIPTION, i18n.carousel );
-    setAttribute( root, ROLE, rootRole || root.tagName !== 'SECTION' && options.role || '' );
+    getAttribute( root, ROLE ) || setAttribute( root, ROLE, role );
     setAttribute( list, ROLE, 'presentation' );
   }
 

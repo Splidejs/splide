@@ -1,6 +1,6 @@
 <?php
 function render( $id = 'splide01', $number = 10, $text = false ) {
-  printf( '<div id="%s" class="splide">', $id );
+  printf( '<div id="%s" class="splide" aria-label="Sample">', $id );
   echo '<div class="splide__track">';
   echo '<ul class="splide__list">';
 

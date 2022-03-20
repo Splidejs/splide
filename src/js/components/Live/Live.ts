@@ -1,17 +1,10 @@
-import { ARIA_LIVE } from '../../constants/attributes';
+import { ARIA_LIVE, ARIA_RELEVANT } from '../../constants/attributes';
 import { CLASS_SR } from '../../constants/classes';
-import {
-  EVENT_AUTOPLAY_PAUSE,
-  EVENT_AUTOPLAY_PLAY,
-  EVENT_MOUNTED,
-  EVENT_MOVED,
-  EVENT_REFRESH,
-  EVENT_SCROLLED,
-} from '../../constants/events';
+import { EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_MOVED, EVENT_SCROLLED } from '../../constants/events';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { append, apply, create, remove, setAttribute } from '../../utils';
+import { append, apply, create, remove, removeAttribute, setAttribute } from '../../utils';
 
 
 /**
@@ -53,25 +46,26 @@ export function Live( Splide: Splide, Components: Components, options: Options )
 
   /**
    * Called when the component is mounted.
-   * Explicitly sets `aria-atomic` to avoid SR from reading the content twice.
-   *
-   * @link https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-atomic
+   * The `aria-relevant` attribute is important to prevent SR from reading contents twice.
    */
   function mount(): void {
     if ( enabled ) {
+      disable( ! Components.Autoplay.isPaused() );
+      setAttribute( track, ARIA_RELEVANT, 'additions' );
+      sr.textContent = '…';
+
       on( EVENT_AUTOPLAY_PLAY, apply( disable, true ) );
       on( EVENT_AUTOPLAY_PAUSE, apply( disable, false ) );
-      on( [ EVENT_MOUNTED, EVENT_REFRESH ], init );
-      on( [ EVENT_MOVED, EVENT_SCROLLED ], update );
+      on( [ EVENT_MOVED, EVENT_SCROLLED ], apply( append, track, sr ) );
     }
   }
 
   /**
-   * Initializes the component.
-   * Only when autoplay is paused, enables a live region.
+   * Destroys the component.
    */
-  function init(): void {
-    disable( ! Components.Autoplay.isPaused() );
+  function destroy(): void {
+    removeAttribute( track, [ ARIA_LIVE, ARIA_RELEVANT ] );
+    remove( sr );
   }
 
   /**
@@ -86,17 +80,9 @@ export function Live( Splide: Splide, Components: Components, options: Options )
     }
   }
 
-  /**
-   * Updates the live region status with unreadable texts.
-   */
-  function update(): void {
-    append( track, sr );
-    sr.textContent = '…';
-  }
-
   return {
     mount,
     disable,
-    destroy: apply( remove, sr ),
+    destroy,
   };
 }
