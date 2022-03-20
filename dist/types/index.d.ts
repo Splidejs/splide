@@ -963,19 +963,19 @@ declare class Splide {
     /**
      * The current options.
      */
-    private readonly _options;
+    private readonly _o;
     /**
      * The collection of all components.
      */
-    private _Components;
+    private _C;
     /**
      * The collection of extensions.
      */
-    private _Extensions;
+    private _E;
     /**
      * The Transition component.
      */
-    private _Transition;
+    private _T;
     /**
      * The Splide constructor.
      *

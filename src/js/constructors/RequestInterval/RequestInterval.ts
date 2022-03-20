@@ -1,4 +1,4 @@
-import { raf } from '../../utils';
+import { min, raf } from '../../utils';
 
 
 /**
@@ -63,21 +63,12 @@ export function RequestInterval(
    */
   function update(): void {
     if ( ! paused ) {
-      const elapsed = now() - startTime;
+      rate = min( ( now() - startTime ) / interval, 1 );
+      onUpdate && onUpdate( rate );
 
-      if ( elapsed >= interval ) {
-        rate      = 1;
-        startTime = now();
-      } else {
-        rate = elapsed / interval;
-      }
-
-      if ( onUpdate ) {
-        onUpdate( rate );
-      }
-
-      if ( rate === 1 ) {
+      if ( rate >= 1 ) {
         onInterval();
+        startTime = now();
 
         if ( limit && ++count >= limit ) {
           return pause();
@@ -123,7 +114,7 @@ export function RequestInterval(
    * Cancels the interval.
    */
   function cancel() {
-    cancelAnimationFrame( id );
+    id && cancelAnimationFrame( id );
     rate   = 0;
     id     = 0;
     paused = true;

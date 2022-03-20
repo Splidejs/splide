@@ -1,4 +1,3 @@
-import { ROLE } from '../../constants/attributes';
 import { CLASS_LOADING } from '../../constants/classes';
 import {
   EVENT_LAZYLOAD_LOADED,
@@ -13,9 +12,11 @@ import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import {
   addClass,
+  apply,
   child,
   create,
   display,
+  empty,
   getAttribute,
   queryAll,
   remove,
@@ -36,17 +37,12 @@ export interface LazyLoadComponent extends BaseComponent {
 }
 
 /**
- * The interface for all components.
+ * The type for each entry.
+ * Use tuple for better compression.
  *
- * @since 3.0.0
+ * @since 4.0.0
  */
-export interface LazyLoadImagesData {
-  _img: HTMLImageElement;
-  _spinner: HTMLSpanElement;
-  _Slide: SlideComponent;
-  src: string | null;
-  srcset: string | null;
-}
+type LazyLoadEntry = [ HTMLImageElement, SlideComponent, HTMLSpanElement ];
 
 /**
  * The component for lazily loading images.
@@ -62,16 +58,12 @@ export interface LazyLoadImagesData {
 export function LazyLoad( Splide: Splide, Components: Components, options: Options ): LazyLoadComponent {
   const { on, off, bind, emit } = EventInterface( Splide );
   const isSequential = options.lazyLoad === 'sequential';
+  const events       = [ EVENT_MOUNTED, EVENT_REFRESH, EVENT_MOVED, EVENT_SCROLLED ];
 
   /**
    * Stores data of images.
    */
-  let images: LazyLoadImagesData[] = [];
-
-  /**
-   * The current index of images.
-   */
-  let index = 0;
+  let entries: LazyLoadEntry[] = [];
 
   /**
    * Called when the component is mounted.
@@ -79,47 +71,35 @@ export function LazyLoad( Splide: Splide, Components: Components, options: Optio
   function mount(): void {
     if ( options.lazyLoad ) {
       init();
-      on( EVENT_REFRESH, destroy );
       on( EVENT_REFRESH, init );
-
-      if ( ! isSequential ) {
-        on( [ EVENT_MOUNTED, EVENT_REFRESH, EVENT_MOVED, EVENT_SCROLLED ], observe );
-      }
+      isSequential || on( events, observe );
     }
   }
 
   /**
-   * Finds images that contain specific data attributes.
+   * Finds images to register entries.
+   * Note that spinner can be already available because of `refresh()`.
    */
   function init() {
-    Components.Slides.forEach( _Slide => {
-      queryAll<HTMLImageElement>( _Slide.slide, IMAGE_SELECTOR ).forEach( _img => {
-        const src    = getAttribute( _img, SRC_DATA_ATTRIBUTE );
-        const srcset = getAttribute( _img, SRCSET_DATA_ATTRIBUTE );
+    empty( entries );
 
-        if ( src !== _img.src || srcset !== _img.srcset ) {
+    Components.Slides.forEach( Slide => {
+      queryAll<HTMLImageElement>( Slide.slide, IMAGE_SELECTOR ).forEach( img => {
+        const src    = getAttribute( img, SRC_DATA_ATTRIBUTE );
+        const srcset = getAttribute( img, SRCSET_DATA_ATTRIBUTE );
+
+        if ( src !== img.src || srcset !== img.srcset ) {
           const className = options.classes.spinner;
-          const parent    = _img.parentElement;
-          const _spinner  = child( parent, `.${ className }` ) || create( 'span', className, parent );
+          const parent    = img.parentElement;
+          const spinner   = child( parent, `.${ className }` ) || create( 'span', className, parent );
 
-          setAttribute( _spinner, ROLE, 'presentation' );
-          images.push( { _img, _Slide, src, srcset, _spinner } );
-          ! _img.src && display( _img, 'none' );
+          entries.push( [ img, Slide, spinner ] );
+          img.src || display( img, 'none' );
         }
       } );
     } );
 
-    if ( isSequential ) {
-      loadNext();
-    }
-  }
-
-  /**
-   * Destroys the component.
-   */
-  function destroy() {
-    index  = 0;
-    images = [];
+    isSequential && loadNext();
   }
 
   /**
@@ -127,74 +107,61 @@ export function LazyLoad( Splide: Splide, Components: Components, options: Optio
    * The last `+1` is for the current page.
    */
   function observe(): void {
-    images = images.filter( data => {
+    entries = entries.filter( data => {
       const distance = options.perPage * ( ( options.preloadPages || 1 ) + 1 ) - 1;
-
-      if ( data._Slide.isWithin( Splide.index, distance ) ) {
-        return load( data );
-      }
-
-      return true;
+      return data[ 1 ].isWithin( Splide.index, distance ) ? load( data ) : true;
     } );
 
-    if ( ! images.length ) {
-      off( EVENT_MOVED );
-    }
+    entries.length || off( events );
   }
 
   /**
    * Starts loading the image in the data.
    *
-   * @param data - A LazyLoadImagesData object.
+   * @param data - A LazyLoadEntry object.
    */
-  function load( data: LazyLoadImagesData ): void {
-    const { _img } = data;
+  function load( data: LazyLoadEntry ): void {
+    const [ img ] = data;
 
-    addClass( data._Slide.slide, CLASS_LOADING );
-    bind( _img, 'load error', e => { onLoad( data, e.type === 'error' ) } );
+    addClass( data[ 1 ].slide, CLASS_LOADING );
+    bind( img, 'load error', apply( onLoad, data ) );
 
-    [ 'srcset', 'src' ].forEach( name => {
-      if ( data[ name ] ) {
-        setAttribute( _img, name, data[ name ] );
-        removeAttribute( _img, name === 'src' ? SRC_DATA_ATTRIBUTE : SRCSET_DATA_ATTRIBUTE );
-      }
-    } );
+    setAttribute( img, 'src', getAttribute( img, SRC_DATA_ATTRIBUTE ) );
+    setAttribute( img, 'srcset', getAttribute( img, SRCSET_DATA_ATTRIBUTE ) );
+    removeAttribute( img, SRC_DATA_ATTRIBUTE );
+    removeAttribute( img, SRCSET_DATA_ATTRIBUTE );
   }
 
   /**
    * Called when the image is loaded or any error occurs.
    *
-   * @param data  - A LazyLoadImagesData object.
-   * @param error - `true` if this method is called on error.
+   * @param data - A LazyLoadEntry object.
+   * @param e    - An Event object.
    */
-  function onLoad( data: LazyLoadImagesData, error: boolean ): void {
-    const { _Slide } = data;
+  function onLoad( data: LazyLoadEntry, e: Event ): void {
+    const [ img, Slide ] = data;
 
-    removeClass( _Slide.slide, CLASS_LOADING );
+    removeClass( Slide.slide, CLASS_LOADING );
 
-    if ( ! error ) {
-      remove( data._spinner );
-      display( data._img, '' );
-      emit( EVENT_LAZYLOAD_LOADED, data._img, _Slide );
+    if ( e.type !== 'error' ) {
+      remove( data[ 2 ] );
+      display( img, '' );
+      emit( EVENT_LAZYLOAD_LOADED, img, Slide );
       emit( EVENT_RESIZE );
     }
 
-    if ( isSequential ) {
-      loadNext();
-    }
+    isSequential && loadNext();
   }
 
   /**
    * Starts loading a next image.
    */
   function loadNext(): void {
-    if ( index < images.length ) {
-      load( images[ index++ ] );
-    }
+    entries.length && load( entries.shift() );
   }
 
   return {
     mount,
-    destroy,
+    destroy: apply( empty, entries ),
   };
 }

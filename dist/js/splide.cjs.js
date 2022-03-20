@@ -479,21 +479,12 @@ function RequestInterval(interval, onInterval, onUpdate, limit) {
 
   function update() {
     if (!paused) {
-      var elapsed = now() - startTime;
+      rate = min((now() - startTime) / interval, 1);
+      onUpdate && onUpdate(rate);
 
-      if (elapsed >= interval) {
-        rate = 1;
-        startTime = now();
-      } else {
-        rate = elapsed / interval;
-      }
-
-      if (onUpdate) {
-        onUpdate(rate);
-      }
-
-      if (rate === 1) {
+      if (rate >= 1) {
         onInterval();
+        startTime = now();
 
         if (limit && ++count >= limit) {
           return pause();
@@ -525,7 +516,7 @@ function RequestInterval(interval, onInterval, onUpdate, limit) {
   }
 
   function cancel() {
-    cancelAnimationFrame(id);
+    id && cancelAnimationFrame(id);
     rate = 0;
     id = 0;
     paused = true;
@@ -2403,111 +2394,76 @@ function LazyLoad(Splide2, Components2, options) {
       emit = _EventInterface12.emit;
 
   var isSequential = options.lazyLoad === "sequential";
-  var images = [];
-  var index = 0;
+  var events = [EVENT_MOUNTED, EVENT_REFRESH, EVENT_MOVED, EVENT_SCROLLED];
+  var entries = [];
 
   function mount() {
     if (options.lazyLoad) {
       init();
-      on(EVENT_REFRESH, destroy);
       on(EVENT_REFRESH, init);
-
-      if (!isSequential) {
-        on([EVENT_MOUNTED, EVENT_REFRESH, EVENT_MOVED, EVENT_SCROLLED], observe);
-      }
+      isSequential || on(events, observe);
     }
   }
 
   function init() {
-    Components2.Slides.forEach(function (_Slide) {
-      queryAll(_Slide.slide, IMAGE_SELECTOR).forEach(function (_img) {
-        var src = getAttribute(_img, SRC_DATA_ATTRIBUTE);
-        var srcset = getAttribute(_img, SRCSET_DATA_ATTRIBUTE);
+    empty(entries);
+    Components2.Slides.forEach(function (Slide) {
+      queryAll(Slide.slide, IMAGE_SELECTOR).forEach(function (img) {
+        var src = getAttribute(img, SRC_DATA_ATTRIBUTE);
+        var srcset = getAttribute(img, SRCSET_DATA_ATTRIBUTE);
 
-        if (src !== _img.src || srcset !== _img.srcset) {
+        if (src !== img.src || srcset !== img.srcset) {
           var className = options.classes.spinner;
-          var parent = _img.parentElement;
-
-          var _spinner = child(parent, "." + className) || create("span", className, parent);
-
-          setAttribute(_spinner, ROLE, "presentation");
-          images.push({
-            _img: _img,
-            _Slide: _Slide,
-            src: src,
-            srcset: srcset,
-            _spinner: _spinner
-          });
-          !_img.src && display(_img, "none");
+          var parent = img.parentElement;
+          var spinner = child(parent, "." + className) || create("span", className, parent);
+          entries.push([img, Slide, spinner]);
+          img.src || display(img, "none");
         }
       });
     });
-
-    if (isSequential) {
-      loadNext();
-    }
-  }
-
-  function destroy() {
-    index = 0;
-    images = [];
+    isSequential && loadNext();
   }
 
   function observe() {
-    images = images.filter(function (data) {
+    entries = entries.filter(function (data) {
       var distance = options.perPage * ((options.preloadPages || 1) + 1) - 1;
-
-      if (data._Slide.isWithin(Splide2.index, distance)) {
-        return load(data);
-      }
-
-      return true;
+      return data[1].isWithin(Splide2.index, distance) ? load(data) : true;
     });
-
-    if (!images.length) {
-      off(EVENT_MOVED);
-    }
+    entries.length || off(events);
   }
 
   function load(data) {
-    var _img = data._img;
-    addClass(data._Slide.slide, CLASS_LOADING);
-    bind(_img, "load error", function (e) {
-      onLoad(data, e.type === "error");
-    });
-    ["srcset", "src"].forEach(function (name) {
-      if (data[name]) {
-        setAttribute(_img, name, data[name]);
-        removeAttribute(_img, name === "src" ? SRC_DATA_ATTRIBUTE : SRCSET_DATA_ATTRIBUTE);
-      }
-    });
+    var img = data[0];
+    addClass(data[1].slide, CLASS_LOADING);
+    bind(img, "load error", apply(onLoad, data));
+    setAttribute(img, "src", getAttribute(img, SRC_DATA_ATTRIBUTE));
+    setAttribute(img, "srcset", getAttribute(img, SRCSET_DATA_ATTRIBUTE));
+    removeAttribute(img, SRC_DATA_ATTRIBUTE);
+    removeAttribute(img, SRCSET_DATA_ATTRIBUTE);
   }
 
-  function onLoad(data, error) {
-    var _Slide = data._Slide;
-    removeClass(_Slide.slide, CLASS_LOADING);
+  function onLoad(data, e) {
+    var img = data[0],
+        Slide = data[1];
+    removeClass(Slide.slide, CLASS_LOADING);
 
-    if (!error) {
-      remove(data._spinner);
-      display(data._img, "");
-      emit(EVENT_LAZYLOAD_LOADED, data._img, _Slide);
+    if (e.type !== "error") {
+      remove(data[2]);
+      display(img, "");
+      emit(EVENT_LAZYLOAD_LOADED, img, Slide);
       emit(EVENT_RESIZE);
     }
 
-    if (isSequential) {
-      loadNext();
-    }
+    isSequential && loadNext();
   }
 
   function loadNext() {
-    if (index < images.length) {
-      load(images[index++]);
-    }
+    entries.length && load(entries.shift());
   }
 
   return {
     mount: mount,
-    destroy: destroy
+    destroy: apply(empty, entries)
   };
 }
 
@@ -2981,8 +2937,8 @@ var _Splide = /*#__PURE__*/function () {
     this.Components = {};
     this.state = State(CREATED);
     this.splides = [];
-    this._options = {};
-    this._Extensions = {};
+    this._o = {};
+    this._E = {};
     var root = isString(target) ? query(document, target) : target;
     assert(root, root + " is invalid.");
     this.root = root;
@@ -2994,7 +2950,7 @@ var _Splide = /*#__PURE__*/function () {
       assert(false, "Invalid JSON");
     }
 
-    this._options = Object.create(merge({}, options));
+    this._o = Object.create(merge({}, options));
   }
 
   var _proto = _Splide.prototype;
@@ -3006,14 +2962,14 @@ var _Splide = /*#__PURE__*/function () {
         Components2 = this.Components;
     assert(state.is([CREATED, DESTROYED]), "Already mounted!");
     state.set(CREATED);
-    this._Components = Components2;
-    this._Transition = Transition || this._Transition || (this.is(FADE) ? Fade : Slide);
-    this._Extensions = Extensions || this._Extensions;
-    var Constructors = assign({}, ComponentConstructors, this._Extensions, {
-      Transition: this._Transition
+    this._C = Components2;
+    this._T = Transition || this._T || (this.is(FADE) ? Fade : Slide);
+    this._E = Extensions || this._E;
+    var Constructors = assign({}, ComponentConstructors, this._E, {
+      Transition: this._T
     });
     forOwn(Constructors, function (Component, key) {
-      var component = Component(_this, Components2, _this._options);
+      var component = Component(_this, Components2, _this._o);
       Components2[key] = component;
       component.setup && component.setup();
     });
@@ -3037,7 +2993,7 @@ var _Splide = /*#__PURE__*/function () {
     });
 
     if (this.state.is(IDLE)) {
-      this._Components.Sync.remount();
+      this._C.Sync.remount();
 
       splide.Components.Sync.remount();
     }
@@ -3046,7 +3002,7 @@ var _Splide = /*#__PURE__*/function () {
   };
 
   _proto.go = function go(control) {
-    this._Components.Controller.go(control);
+    this._C.Controller.go(control);
 
     return this;
   };
@@ -3070,19 +3026,19 @@ var _Splide = /*#__PURE__*/function () {
   };
 
   _proto.add = function add(slides, index) {
-    this._Components.Slides.add(slides, index);
+    this._C.Slides.add(slides, index);
 
     return this;
   };
 
   _proto.remove = function remove(matcher) {
-    this._Components.Slides.remove(matcher);
+    this._C.Slides.remove(matcher);
 
     return this;
   };
 
   _proto.is = function is(type) {
-    return this._options.type === type;
+    return this._o.type === type;
   };
 
   _proto.refresh = function refresh() {
@@ -3101,7 +3057,7 @@ var _Splide = /*#__PURE__*/function () {
     if (state.is(CREATED)) {
       EventInterface(this).on(EVENT_READY, this.destroy.bind(this, completely));
     } else {
-      forOwn(this._Components, function (component) {
+      forOwn(this._C, function (component) {
         component.destroy && component.destroy(completely);
       }, true);
       event.emit(EVENT_DESTROY);
@@ -3116,25 +3072,25 @@ var _Splide = /*#__PURE__*/function () {
   _createClass(_Splide, [{
     key: "options",
     get: function get() {
-      return this._options;
+      return this._o;
     },
     set: function set(options) {
-      var _options = this._options;
-      merge(_options, options);
+      var _o = this._o;
+      merge(_o, options);
 
       if (!this.state.is(CREATED)) {
-        this.emit(EVENT_UPDATED, _options);
+        this.emit(EVENT_UPDATED, _o);
       }
     }
   }, {
     key: "length",
     get: function get() {
-      return this._Components.Slides.getLength(true);
+      return this._C.Slides.getLength(true);
     }
   }, {
     key: "index",
     get: function get() {
-      return this._Components.Controller.getIndex();
+      return this._C.Controller.getIndex();
     }
   }]);
 
