@@ -84,5 +84,11 @@
     "src/js/transitions",
     "src/js/types",
     "src/js/utils"
-  ]
+  ],
+  "exports": {
+    ".": "./dist/js/splide.esm.js",
+    "./css": "./dist/css/splide.min.css",
+    "./css/core": "./dist/css/splide-core.min.css",
+    "./css/*": "./dist/css/themes/splide-*.min.css"
+  }
 }
