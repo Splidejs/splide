@@ -14,16 +14,13 @@ $outline-offset: -2px !default;
       border-radius: $border-radius;
     }
 
+    // Gets rid of a focus ring in IE and Safari
     &:focus {
       outline: 0;
     }
-
-    &:focus-visible {
-      @include mixins.focus-outline-inset;
-    }
   }
 
-  &.has-focus-visible {
+  &.is-focus-in {
     #{ $root }__slide:focus {
       @include mixins.focus-outline-inset;
     }

@@ -379,7 +379,7 @@ function EventBinder() {
       });
     } else {
       e = document.createEvent("CustomEvent");
-      e.initEvent(type, bubbles, false);
+      e.initCustomEvent(type, bubbles, false, detail);
     }
 
     target.dispatchEvent(e);
@@ -711,8 +711,8 @@ var CLASS_PREV = "is-prev";
 var CLASS_NEXT = "is-next";
 var CLASS_VISIBLE = "is-visible";
 var CLASS_LOADING = "is-loading";
-var CLASS_FOCUS_VISIBLE = "has-focus-visible";
-var STATUS_CLASSES = [CLASS_ACTIVE, CLASS_VISIBLE, CLASS_PREV, CLASS_NEXT, CLASS_LOADING, CLASS_FOCUS_VISIBLE];
+var CLASS_FOCUS_IN = "is-focus-in";
+var STATUS_CLASSES = [CLASS_ACTIVE, CLASS_VISIBLE, CLASS_PREV, CLASS_NEXT, CLASS_LOADING, CLASS_FOCUS_IN];
 var CLASSES = {
   slide: CLASS_SLIDE,
   clone: CLASS_CLONE,
@@ -782,7 +782,7 @@ function Elements(Splide2, Components2, options) {
       capture: true
     });
     bind(root, "focusin", function () {
-      toggleClass(root, CLASS_FOCUS_VISIBLE, !!isUsingKey);
+      toggleClass(root, CLASS_FOCUS_IN, !!isUsingKey);
     });
   }
 
@@ -887,10 +887,9 @@ function Slide$1(Splide2, index, slideIndex, slide) {
 
   function mount() {
     if (!isClone) {
-      var noDescription = pagination || options.slideFocus || isNavigation;
       slide.id = root.id + "-slide" + pad(index + 1);
       setAttribute(slide, ROLE, pagination ? "tabpanel" : "group");
-      setAttribute(slide, ARIA_ROLEDESCRIPTION, noDescription ? "" : i18n.slide);
+      setAttribute(slide, ARIA_ROLEDESCRIPTION, i18n.slide);
       setAttribute(slide, ARIA_LABEL, label || format(i18n.slideLabel, [index + 1, Splide2.length]));
     }
 
@@ -925,6 +924,7 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     setAttribute(slide, ARIA_LABEL, format(i18n.slideX, (isClone ? slideIndex : index) + 1));
     setAttribute(slide, ARIA_CONTROLS, controls);
     setAttribute(slide, ROLE, slideFocus ? "button" : "");
+    slideFocus && removeAttribute(slide, ARIA_ROLEDESCRIPTION);
   }
 
   function onMove() {
@@ -1829,7 +1829,7 @@ function Arrows(Splide2, Components2, options) {
   }
 
   function createArrow(prev2) {
-    var arrow = "<button class=\"" + classes.arrow + " " + (prev2 ? classes.prev : classes.next) + "\" type=\"button\"><svg xmlns=\"" + XML_NAME_SPACE + "\" viewBox=\"0 0 " + SIZE + " " + SIZE + "\" width=\"" + SIZE + "\" height=\"" + SIZE + "\"><path d=\"" + (options.arrowPath || PATH) + "\" />";
+    var arrow = "<button class=\"" + classes.arrow + " " + (prev2 ? classes.prev : classes.next) + "\" type=\"button\"><svg xmlns=\"" + XML_NAME_SPACE + "\" viewBox=\"0 0 " + SIZE + " " + SIZE + "\" width=\"" + SIZE + "\" height=\"" + SIZE + "\" focusable=\"false\"><path d=\"" + (options.arrowPath || PATH) + "\" />";
     return parseHtml(arrow);
   }
 
@@ -2626,7 +2626,8 @@ function Sync(Splide2, Components2, options) {
   var events = [];
 
   function setup() {
-    options.slideFocus = isNavigation && isUndefined(options.slideFocus);
+    var slideFocus = options.slideFocus;
+    options.slideFocus = isUndefined(slideFocus) ? isNavigation : slideFocus;
   }
 
   function mount() {
@@ -3629,7 +3630,7 @@ exports.CLASS_ARROW_NEXT = CLASS_ARROW_NEXT;
 exports.CLASS_ARROW_PREV = CLASS_ARROW_PREV;
 exports.CLASS_CLONE = CLASS_CLONE;
 exports.CLASS_CONTAINER = CLASS_CONTAINER;
-exports.CLASS_FOCUS_VISIBLE = CLASS_FOCUS_VISIBLE;
+exports.CLASS_FOCUS_IN = CLASS_FOCUS_IN;
 exports.CLASS_INITIALIZED = CLASS_INITIALIZED;
 exports.CLASS_LIST = CLASS_LIST;
 exports.CLASS_LOADING = CLASS_LOADING;

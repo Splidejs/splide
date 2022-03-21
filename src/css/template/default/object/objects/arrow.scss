@@ -19,6 +19,8 @@ $left: 1em !default;
 $right: 1em !default;
 
 .splide {
+  $root: &;
+
   &__arrow {
     background: $button-background;
     border: $button-border;
@@ -72,10 +74,6 @@ $right: 1em !default;
       }
     }
 
-    &:focus-visible {
-      @include mixins.focus-outline;
-    }
-
     &:disabled {
       @if $opacity-disabled {
         opacity: $opacity-disabled;
@@ -92,6 +90,12 @@ $right: 1em !default;
 
     &--next {
       right: $right;
+    }
+  }
+
+  &.is-focus-in {
+    #{ $root }__arrow:focus {
+      @include mixins.focus-outline;
     }
   }
 }

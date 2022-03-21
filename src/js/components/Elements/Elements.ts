@@ -5,7 +5,7 @@ import {
   CLASS_ARROW_PREV,
   CLASS_ARROWS,
   CLASS_CLONE,
-  CLASS_FOCUS_VISIBLE,
+  CLASS_FOCUS_IN,
   CLASS_LIST,
   CLASS_PAGINATION,
   CLASS_PROGRESS_BAR,
@@ -145,7 +145,7 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
     }, { capture: true } );
 
     bind( root, 'focusin', () => {
-      toggleClass( root, CLASS_FOCUS_VISIBLE, !! isUsingKey );
+      toggleClass( root, CLASS_FOCUS_IN, !! isUsingKey );
     } );
   }
 

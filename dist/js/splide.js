@@ -375,7 +375,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         });
       } else {
         e = document.createEvent("CustomEvent");
-        e.initEvent(type, bubbles, false);
+        e.initCustomEvent(type, bubbles, false, detail);
       }
 
       target.dispatchEvent(e);
@@ -705,8 +705,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var CLASS_NEXT = "is-next";
   var CLASS_VISIBLE = "is-visible";
   var CLASS_LOADING = "is-loading";
-  var CLASS_FOCUS_VISIBLE = "has-focus-visible";
-  var STATUS_CLASSES = [CLASS_ACTIVE, CLASS_VISIBLE, CLASS_PREV, CLASS_NEXT, CLASS_LOADING, CLASS_FOCUS_VISIBLE];
+  var CLASS_FOCUS_IN = "is-focus-in";
+  var STATUS_CLASSES = [CLASS_ACTIVE, CLASS_VISIBLE, CLASS_PREV, CLASS_NEXT, CLASS_LOADING, CLASS_FOCUS_IN];
   var CLASSES = {
     slide: CLASS_SLIDE,
     clone: CLASS_CLONE,
@@ -776,7 +776,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         capture: true
       });
       bind(root, "focusin", function () {
-        toggleClass(root, CLASS_FOCUS_VISIBLE, !!isUsingKey);
+        toggleClass(root, CLASS_FOCUS_IN, !!isUsingKey);
       });
     }
 
@@ -1823,7 +1823,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function createArrow(prev2) {
-      var arrow = "<button class=\"" + classes.arrow + " " + (prev2 ? classes.prev : classes.next) + "\" type=\"button\"><svg xmlns=\"" + XML_NAME_SPACE + "\" viewBox=\"0 0 " + SIZE + " " + SIZE + "\" width=\"" + SIZE + "\" height=\"" + SIZE + "\"><path d=\"" + (options.arrowPath || PATH) + "\" />";
+      var arrow = "<button class=\"" + classes.arrow + " " + (prev2 ? classes.prev : classes.next) + "\" type=\"button\"><svg xmlns=\"" + XML_NAME_SPACE + "\" viewBox=\"0 0 " + SIZE + " " + SIZE + "\" width=\"" + SIZE + "\" height=\"" + SIZE + "\" focusable=\"false\"><path d=\"" + (options.arrowPath || PATH) + "\" />";
       return parseHtml(arrow);
     }
 

@@ -17,6 +17,8 @@ $dot-transition: transform .2s linear !default;
 $dot-transform-active: scale( 1.4 ) !default;
 
 .splide {
+  $root: &;
+
   &__pagination {
     bottom: $bottom;
     left: 0;
@@ -61,8 +63,12 @@ $dot-transform-active: scale( 1.4 ) !default;
           background: $dot-background-hover;
         }
       }
+    }
+  }
 
-      &:focus-visible {
+  &.is-focus-in {
+    #{ $root }__pagination {
+      &__page:focus {
         @include mixins.focus-outline;
       }
     }

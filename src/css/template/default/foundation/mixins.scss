@@ -10,15 +10,14 @@ $outline-offset-inset: -3px !default;
   }
 }
 
-@mixin focus-outline {
+@mixin focus-outline( $offset: $outline-offset ) {
   outline: $outline;
-  outline-offset: $outline-offset;
+  outline-offset: $offset;
 }
 
 @mixin focus-outline-inset {
   @supports ( outline-offset: $outline-offset-inset ) {
-    @include focus-outline;
-    outline-offset: $outline-offset-inset;
+    @include focus-outline( $outline-offset-inset );
   }
 
   /* IE does not support outline-offset */

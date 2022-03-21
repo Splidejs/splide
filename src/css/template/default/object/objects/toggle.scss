@@ -1,10 +1,14 @@
 @use '../../foundation/mixins';
 
 .splide {
+  $root: &;
+
   &__toggle {
     cursor: pointer;
+  }
 
-    &:focus-visible {
+  &.is-focus-in {
+    #{ $root }__toggle:focus {
       @include mixins.focus-outline;
     }
   }

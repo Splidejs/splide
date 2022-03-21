@@ -173,6 +173,7 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
 
   /**
    * Creates an arrow button.
+   * In IE, A SVG element is focusable.
    *
    * @param prev - Determines whether to create a previous or next arrow.
    *
@@ -180,7 +181,7 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
    */
   function createArrow( prev: boolean ): HTMLButtonElement {
     const arrow = `<button class="${ classes.arrow } ${ prev ? classes.prev : classes.next }" type="button">`
-      +	`<svg xmlns="${ XML_NAME_SPACE }" viewBox="0 0 ${ SIZE } ${ SIZE }" width="${ SIZE }" height="${ SIZE }">`
+      +	`<svg xmlns="${ XML_NAME_SPACE }" viewBox="0 0 ${ SIZE } ${ SIZE }" width="${ SIZE }" height="${ SIZE }" focusable="false">`
       + `<path d="${ options.arrowPath || PATH }" />`;
 
     return parseHtml<HTMLButtonElement>( arrow );

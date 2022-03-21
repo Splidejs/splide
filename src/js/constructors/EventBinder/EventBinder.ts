@@ -107,7 +107,7 @@ export function EventBinder(): EventBinderObject {
       e = new CustomEvent( type, { bubbles, detail } );
     } else {
       e = document.createEvent( 'CustomEvent' );
-      e.initEvent( type, bubbles, false );
+      e.initCustomEvent( type, bubbles, false, detail );
     }
 
     target.dispatchEvent( e );

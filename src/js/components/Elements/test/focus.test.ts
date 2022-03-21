@@ -1,4 +1,4 @@
-import { CLASS_FOCUS_VISIBLE } from '../../../constants/classes';
+import { CLASS_FOCUS_IN } from '../../../constants/classes';
 import { fire, init } from '../../../test';
 
 
@@ -9,7 +9,7 @@ describe( 'Focus', () => {
     fire( document, 'keydown' );
     fire( splide.root, 'focusin' );
 
-    expect( splide.root.classList.contains( CLASS_FOCUS_VISIBLE ) ).toBe( true );
+    expect( splide.root.classList.contains( CLASS_FOCUS_IN ) ).toBe( true );
   } );
 
   test( 'can remove the status class from the root when detecting pointerdown.', () => {
@@ -18,12 +18,12 @@ describe( 'Focus', () => {
     fire( document, 'keydown' );
     fire( splide.root, 'focusin' );
 
-    expect( splide.root.classList.contains( CLASS_FOCUS_VISIBLE ) ).toBe( true );
+    expect( splide.root.classList.contains( CLASS_FOCUS_IN ) ).toBe( true );
 
     fire( splide.root, 'mousedown' );
     fire( splide.root, 'focusin' );
 
-    expect( splide.root.classList.contains( CLASS_FOCUS_VISIBLE ) ).toBe( false );
+    expect( splide.root.classList.contains( CLASS_FOCUS_IN ) ).toBe( false );
   } );
 
   test( 'should not add the status class when focus comes into the root by pointing devices.', () => {
@@ -32,6 +32,6 @@ describe( 'Focus', () => {
     fire( document, 'mousedown' );
     fire( splide.root, 'focusin' );
 
-    expect( splide.root.classList.contains( CLASS_FOCUS_VISIBLE ) ).toBe( false );
+    expect( splide.root.classList.contains( CLASS_FOCUS_IN ) ).toBe( false );
   } );
 } );

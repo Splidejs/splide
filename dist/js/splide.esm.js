@@ -374,7 +374,7 @@ function EventBinder() {
       });
     } else {
       e = document.createEvent("CustomEvent");
-      e.initEvent(type, bubbles, false);
+      e.initCustomEvent(type, bubbles, false, detail);
     }
 
     target.dispatchEvent(e);
@@ -706,8 +706,8 @@ var CLASS_PREV = "is-prev";
 var CLASS_NEXT = "is-next";
 var CLASS_VISIBLE = "is-visible";
 var CLASS_LOADING = "is-loading";
-var CLASS_FOCUS_VISIBLE = "has-focus-visible";
-var STATUS_CLASSES = [CLASS_ACTIVE, CLASS_VISIBLE, CLASS_PREV, CLASS_NEXT, CLASS_LOADING, CLASS_FOCUS_VISIBLE];
+var CLASS_FOCUS_IN = "is-focus-in";
+var STATUS_CLASSES = [CLASS_ACTIVE, CLASS_VISIBLE, CLASS_PREV, CLASS_NEXT, CLASS_LOADING, CLASS_FOCUS_IN];
 var CLASSES = {
   slide: CLASS_SLIDE,
   clone: CLASS_CLONE,
@@ -777,7 +777,7 @@ function Elements(Splide2, Components2, options) {
       capture: true
     });
     bind(root, "focusin", function () {
-      toggleClass(root, CLASS_FOCUS_VISIBLE, !!isUsingKey);
+      toggleClass(root, CLASS_FOCUS_IN, !!isUsingKey);
     });
   }
 
@@ -882,10 +882,9 @@ function Slide$1(Splide2, index, slideIndex, slide) {
 
   function mount() {
     if (!isClone) {
-      var noDescription = pagination || options.slideFocus || isNavigation;
       slide.id = root.id + "-slide" + pad(index + 1);
       setAttribute(slide, ROLE, pagination ? "tabpanel" : "group");
-      setAttribute(slide, ARIA_ROLEDESCRIPTION, noDescription ? "" : i18n.slide);
+      setAttribute(slide, ARIA_ROLEDESCRIPTION, i18n.slide);
       setAttribute(slide, ARIA_LABEL, label || format(i18n.slideLabel, [index + 1, Splide2.length]));
     }
 
@@ -920,6 +919,7 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     setAttribute(slide, ARIA_LABEL, format(i18n.slideX, (isClone ? slideIndex : index) + 1));
     setAttribute(slide, ARIA_CONTROLS, controls);
     setAttribute(slide, ROLE, slideFocus ? "button" : "");
+    slideFocus && removeAttribute(slide, ARIA_ROLEDESCRIPTION);
   }
 
   function onMove() {
@@ -1824,7 +1824,7 @@ function Arrows(Splide2, Components2, options) {
   }
 
   function createArrow(prev2) {
-    var arrow = "<button class=\"" + classes.arrow + " " + (prev2 ? classes.prev : classes.next) + "\" type=\"button\"><svg xmlns=\"" + XML_NAME_SPACE + "\" viewBox=\"0 0 " + SIZE + " " + SIZE + "\" width=\"" + SIZE + "\" height=\"" + SIZE + "\"><path d=\"" + (options.arrowPath || PATH) + "\" />";
+    var arrow = "<button class=\"" + classes.arrow + " " + (prev2 ? classes.prev : classes.next) + "\" type=\"button\"><svg xmlns=\"" + XML_NAME_SPACE + "\" viewBox=\"0 0 " + SIZE + " " + SIZE + "\" width=\"" + SIZE + "\" height=\"" + SIZE + "\" focusable=\"false\"><path d=\"" + (options.arrowPath || PATH) + "\" />";
     return parseHtml(arrow);
   }
 
@@ -2621,7 +2621,8 @@ function Sync(Splide2, Components2, options) {
   var events = [];
 
   function setup() {
-    options.slideFocus = isNavigation && isUndefined(options.slideFocus);
+    var slideFocus = options.slideFocus;
+    options.slideFocus = isUndefined(slideFocus) ? isNavigation : slideFocus;
   }
 
   function mount() {
@@ -3616,4 +3617,4 @@ var SplideRenderer = /*#__PURE__*/function () {
   return SplideRenderer;
 }();
 
-export { CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_CLONE, CLASS_CONTAINER, CLASS_FOCUS_VISIBLE, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SPINNER, CLASS_SR, CLASS_TOGGLE, CLASS_TOGGLE_PAUSE, CLASS_TOGGLE_PLAY, CLASS_TRACK, CLASS_VISIBLE, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, EventBinder, EventInterface, RequestInterval, STATUS_CLASSES, Splide, SplideRenderer, State, Throttle, Splide as default };
+export { CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_CLONE, CLASS_CONTAINER, CLASS_FOCUS_IN, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SPINNER, CLASS_SR, CLASS_TOGGLE, CLASS_TOGGLE_PAUSE, CLASS_TOGGLE_PLAY, CLASS_TRACK, CLASS_VISIBLE, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, EventBinder, EventInterface, RequestInterval, STATUS_CLASSES, Splide, SplideRenderer, State, Throttle, Splide as default };

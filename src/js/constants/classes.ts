@@ -26,7 +26,7 @@ export const CLASS_PREV            = 'is-prev';
 export const CLASS_NEXT            = 'is-next';
 export const CLASS_VISIBLE         = 'is-visible';
 export const CLASS_LOADING         = 'is-loading';
-export const CLASS_FOCUS_VISIBLE   = 'has-focus-visible';
+export const CLASS_FOCUS_IN        = 'is-focus-in';
 
 
 /**
@@ -40,7 +40,7 @@ export const STATUS_CLASSES = [
   CLASS_PREV,
   CLASS_NEXT,
   CLASS_LOADING,
-  CLASS_FOCUS_VISIBLE,
+  CLASS_FOCUS_IN,
 ];
 
 /**
