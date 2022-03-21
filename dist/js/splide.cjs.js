@@ -2514,7 +2514,7 @@ function Pagination(Splide2, Components2, options) {
         i18n = options.i18n,
         perPage = options.perPage;
     var max = hasFocus() ? length : ceil(length / perPage);
-    list = Elements.pagination || create("ul", classes.pagination, Elements.root);
+    list = Elements.pagination || create("ul", classes.pagination, Elements.track.parentElement);
     addClass(list, paginationClasses = CLASS_PAGINATION + "--" + getDirection());
     setAttribute(list, ROLE, "tablist");
     setAttribute(list, ARIA_LABEL, i18n.select);

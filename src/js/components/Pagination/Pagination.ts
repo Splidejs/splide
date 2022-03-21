@@ -142,7 +142,7 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
     const { classes, i18n, perPage } = options;
     const max = hasFocus() ? length : ceil( length / perPage );
 
-    list = Elements.pagination || create( 'ul', classes.pagination, Elements.root );
+    list = Elements.pagination || create( 'ul', classes.pagination, Elements.track.parentElement );
 
     addClass( list, ( paginationClasses = `${ CLASS_PAGINATION }--${ getDirection() }` ) );
     setAttribute( list, ROLE, 'tablist' );
