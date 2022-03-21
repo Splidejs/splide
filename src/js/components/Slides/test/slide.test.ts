@@ -256,16 +256,15 @@ describe( 'Slide', () => {
   } );
 
 
-  test( 'should assign the tabpanel role without `aria-roledescription` if the pagination option is enabled.', () => {
+  test( 'should assign the tabpanel role if the pagination option is enabled.', () => {
     const splide = init( { pagination: true } );
 
     splide.Components.Slides.forEach( ( { slide } ) => {
       expect( slide.getAttribute( 'role' ) ).toBe( 'tabpanel' );
-      expect( slide.getAttribute( 'aria-roledescription' ) ).toBeNull();
     } );
   } );
 
-  test( 'should assign assign group tab role with `aria-roledescription` if the pagination option is disabled.', () => {
+  test( 'should assign group tab role with `aria-roledescription` if the pagination option is disabled.', () => {
     const splide = init( { pagination: false } );
 
     splide.Components.Slides.forEach( ( { slide } ) => {
