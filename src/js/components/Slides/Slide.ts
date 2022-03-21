@@ -106,11 +106,9 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    */
   function mount( this: SlideComponent ): void {
     if ( ! isClone ) {
-      const noDescription = pagination || options.slideFocus || isNavigation;
-
       slide.id = `${ root.id }-slide${ pad( index + 1 ) }`;
       setAttribute( slide, ROLE, pagination ? 'tabpanel' : 'group' );
-      setAttribute( slide, ARIA_ROLEDESCRIPTION, noDescription ? '' : i18n.slide );
+      setAttribute( slide, ARIA_ROLEDESCRIPTION, i18n.slide );
       setAttribute( slide, ARIA_LABEL, label || format( i18n.slideLabel, [ index + 1, Splide.length ] ) );
     }
 
@@ -155,6 +153,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
     setAttribute( slide, ARIA_LABEL, format( i18n.slideX, ( isClone ? slideIndex : index ) + 1 ) );
     setAttribute( slide, ARIA_CONTROLS, controls );
     setAttribute( slide, ROLE, slideFocus ? 'button' : '' );
+    slideFocus && removeAttribute( slide, ARIA_ROLEDESCRIPTION );
   }
 
   /**

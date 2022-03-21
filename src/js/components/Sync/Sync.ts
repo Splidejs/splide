@@ -56,7 +56,8 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
    * Called when the component is constructed.
    */
   function setup(): void {
-    options.slideFocus = isNavigation && isUndefined( options.slideFocus );
+    const { slideFocus } = options;
+    options.slideFocus = isUndefined( slideFocus ) ? isNavigation : slideFocus;
   }
 
   /**

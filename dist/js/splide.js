@@ -881,10 +881,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function mount() {
       if (!isClone) {
-        var noDescription = pagination || options.slideFocus || isNavigation;
         slide.id = root.id + "-slide" + pad(index + 1);
         setAttribute(slide, ROLE, pagination ? "tabpanel" : "group");
-        setAttribute(slide, ARIA_ROLEDESCRIPTION, noDescription ? "" : i18n.slide);
+        setAttribute(slide, ARIA_ROLEDESCRIPTION, i18n.slide);
         setAttribute(slide, ARIA_LABEL, label || format(i18n.slideLabel, [index + 1, Splide2.length]));
       }
 
@@ -919,6 +918,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       setAttribute(slide, ARIA_LABEL, format(i18n.slideX, (isClone ? slideIndex : index) + 1));
       setAttribute(slide, ARIA_CONTROLS, controls);
       setAttribute(slide, ROLE, slideFocus ? "button" : "");
+      slideFocus && removeAttribute(slide, ARIA_ROLEDESCRIPTION);
     }
 
     function onMove() {
@@ -2620,7 +2620,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var events = [];
 
     function setup() {
-      options.slideFocus = isNavigation && isUndefined(options.slideFocus);
+      var slideFocus = options.slideFocus;
+      options.slideFocus = isUndefined(slideFocus) ? isNavigation : slideFocus;
     }
 
     function mount() {

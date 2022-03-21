@@ -157,6 +157,22 @@ describe( 'Slide', () => {
     expect( visibleSlides ).toEqual( [ Slide0, Slide1 ] );
   } );
 
+  test( 'can toggle `tabindex` by visibility if `slideFocus` is enabled.', () => {
+    const splide = init( { speed: 0, slideFocus: true } );
+    const { Slides } = splide.Components;
+
+    const Slide0 = Slides.getAt( 0 );
+    const Slide1 = Slides.getAt( 1 );
+
+    expect( Slide0.slide.tabIndex ).toBe( 0 );
+    expect( Slide1.slide.tabIndex ).toBe( -1 );
+
+    splide.go( 1 );
+
+    expect( Slide0.slide.tabIndex ).toBe( -1 );
+    expect( Slide1.slide.tabIndex ).toBe( 0 );
+  } );
+
   test( 'can disable focus of focusable descendants when the slide gets hidden.', () => {
     const splide = init( { speed: 0 }, { mount: false } );
     const slide0 = document.querySelector( `.${ CLASS_SLIDE }` );
