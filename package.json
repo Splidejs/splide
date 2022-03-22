@@ -92,6 +92,7 @@
     "./css/*": "./dist/css/themes/splide-*.min.css",
     "./dist/js/*": "./dist/js/*",
     "./dist/css/*": "./dist/css/*",
-    "./dist/css/themes/*": "./dist/css/themes/*"
+    "./dist/css/themes/*": "./dist/css/themes/*",
+    "./utils": "./src/js/utils/index.ts"
   }
 }
