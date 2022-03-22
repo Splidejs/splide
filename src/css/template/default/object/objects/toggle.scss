@@ -5,6 +5,10 @@
 
   &__toggle {
     cursor: pointer;
+
+    &:focus-visible {
+      @include mixins.focus-outline;
+    }
   }
 
   &.is-focus-in {

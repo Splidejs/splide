@@ -18,6 +18,10 @@ $outline-offset: -2px !default;
     &:focus {
       outline: 0;
     }
+
+    &:focus-visible {
+      @include mixins.focus-outline-inset;
+    }
   }
 
   &.is-focus-in {

@@ -80,6 +80,10 @@ $right: 1em !default;
       }
     }
 
+    &:focus-visible {
+      @include mixins.focus-outline;
+    }
+
     &--prev {
       left: $left;
 
