@@ -89,6 +89,9 @@
     ".": "./dist/js/splide.esm.js",
     "./css": "./dist/css/splide.min.css",
     "./css/core": "./dist/css/splide-core.min.css",
-    "./css/*": "./dist/css/themes/splide-*.min.css"
+    "./css/*": "./dist/css/themes/splide-*.min.css",
+    "./dist/js/*": "./dist/js/*",
+    "./dist/css/*": "./dist/css/*",
+    "./dist/css/themes/*": "./dist/css/themes/*"
   }
 }
