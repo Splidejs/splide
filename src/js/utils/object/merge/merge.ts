@@ -15,9 +15,7 @@ import { forOwn } from '../forOwn/forOwn';
 export type Merge<T extends object, U extends object> = Omit<T, keyof U> & {
   [ K in ( keyof T & keyof U ) ]: U[ K ] extends object
     ? U[ K ] extends any[]
-      ? T[ K ] extends any[]
-        ? Array<T[ K ][ number ] | U[ K ][ number ]>
-        : U[ K ]
+      ? U[ K ]
       : T[ K ] extends object
         ? Merge<T[ K ], U[ K ]> extends infer A ? Resolve<Cast<A, object>> : never
         : U[ K ]
@@ -54,7 +52,7 @@ export function merge<T extends object, U extends object[]>(
  */
 export function merge<T extends object>( object: T ): any {
   // eslint-disable-next-line prefer-rest-params
-  slice( arguments ).forEach( source => {
+  slice( arguments, 1 ).forEach( source => {
     forOwn( source, ( value, key ) => {
       if ( isArray( value ) ) {
         object[ key ] = value.slice();
