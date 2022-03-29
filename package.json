@@ -86,13 +86,16 @@
     "src/js/utils"
   ],
   "exports": {
-    ".": "./dist/js/splide.esm.js",
+    ".": {
+      "node": "./dist/js/splide.cjs.js",
+      "default": "./dist/js/splide.esm.js"
+    },
     "./css": "./dist/css/splide.min.css",
     "./css/core": "./dist/css/splide-core.min.css",
     "./css/*": "./dist/css/themes/splide-*.min.css",
-    "./dist/js/*": "./dist/js/*",
-    "./dist/css/*": "./dist/css/*",
-    "./dist/css/themes/*": "./dist/css/themes/*",
-    "./src/js/utils": "./src/js/utils/index.ts"
+    "./dist": "./dist",
+    "./src/js/utils": "./src/js/utils",
+    "./src/css/template": "./src/css/template",
+    "./package.json": "./package.json"
   }
 }
