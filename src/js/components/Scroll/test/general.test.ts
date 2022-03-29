@@ -12,7 +12,7 @@ describe( 'Scroll', () => {
 
     splide.Components.Scroll.scroll( -100, duration );
 
-    await wait( duration + 10 );
+    await wait( duration + 50 );
 
     expect( Math.round( splide.Components.Move.getPosition() ) ).toBe( -100 );
 
@@ -32,7 +32,7 @@ describe( 'Scroll', () => {
 
     expect( getPosition() ).toBeGreaterThan( -100 );
 
-    await wait( duration / 2 + 10 );
+    await wait( duration / 2 + 50 );
 
     expect( Math.round( getPosition() ) ).toBe( -100 );
 
