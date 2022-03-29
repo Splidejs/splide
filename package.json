@@ -93,9 +93,9 @@
     "./css": "./dist/css/splide.min.css",
     "./css/core": "./dist/css/splide-core.min.css",
     "./css/*": "./dist/css/themes/splide-*.min.css",
-    "./dist": "./dist",
-    "./src/js/utils": "./src/js/utils",
-    "./src/css/template": "./src/css/template",
+    "./dist/": "./dist/",
+    "./src/js/utils": "./src/js/utils/index.ts",
+    "./src/css/template/": "./src/css/template/",
     "./package.json": "./package.json"
   }
 }
