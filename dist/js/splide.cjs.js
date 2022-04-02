@@ -830,12 +830,13 @@ function Elements(Splide2, Components2, options) {
 
   function init() {
     var id = root.id || uniqueId(PROJECT_CODE);
+    var role = options.role;
     root.id = id;
     track.id = track.id || id + "-track";
     list.id = list.id || id + "-list";
 
-    if (!getAttribute(root, ROLE)) {
-      setAttribute(root, ROLE, root.tagName !== "SECTION" && options.role || "");
+    if (!getAttribute(root, ROLE) && root.tagName !== "SECTION" && role) {
+      setAttribute(root, ROLE, role);
     }
 
     setAttribute(root, ARIA_ROLEDESCRIPTION, i18n.carousel);
@@ -2805,7 +2806,7 @@ var I18N = {
   pause: "Pause autoplay",
   carousel: "carousel",
   slide: "slide",
-  select: "Select slide to show",
+  select: "Select a slide to show",
   slideLabel: "%s of %s"
 };
 var DEFAULTS = {

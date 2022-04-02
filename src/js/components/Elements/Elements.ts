@@ -201,14 +201,15 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
    * which removes the region from the accessibility tree.
    */
   function init(): void {
-    const id = root.id || uniqueId( PROJECT_CODE );
+    const id   = root.id || uniqueId( PROJECT_CODE );
+    const role = options.role;
 
     root.id  = id;
     track.id = track.id || `${ id }-track`;
     list.id  = list.id || `${ id }-list`;
 
-    if ( ! getAttribute( root, ROLE ) ) {
-      setAttribute( root, ROLE, root.tagName !== 'SECTION' && options.role || '' );
+    if ( ! getAttribute( root, ROLE ) && root.tagName !== 'SECTION' && role ) {
+      setAttribute( root, ROLE, role );
     }
 
     setAttribute( root, ARIA_ROLEDESCRIPTION, i18n.carousel );
