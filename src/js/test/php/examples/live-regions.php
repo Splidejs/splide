@@ -35,7 +35,7 @@ $settings = get_settings();
 <body>
 
 <div class="wrapper">
-	<div id="splide01" class="splide" aria-label="Planets gallery">
+	<div id="splide01" class="splide" aria-label="Planets gallery carousel">
 		<div class="splide__track">
 			<ul class="splide__list">
 				<li class="splide__slide">

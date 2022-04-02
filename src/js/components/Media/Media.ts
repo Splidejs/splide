@@ -80,21 +80,21 @@ export function Media( Splide: Splide, Components: Components, options: Options 
    * Checks all media queries in entries and updates options.
    */
   function update(): void {
+    const destroyed = Splide.state.is( DESTROYED );
     const direction = options.direction;
     const merged = queries.reduce<Options>( ( merged, entry ) => {
       return merge( merged, entry[ 1 ].matches ? entry[ 0 ] : {} );
     }, {} );
 
     omit( options );
-    merge( options, merged );
+    Splide.options = merged;
 
     if ( options.destroy ) {
       Splide.destroy( options.destroy === 'completely' );
-    } else if ( Splide.state.is( DESTROYED ) ) {
+    } else if ( destroyed ) {
       destroy( true );
       Splide.mount();
     } else {
-      Splide.options = merged;
       direction !== options.direction && Splide.refresh();
     }
   }

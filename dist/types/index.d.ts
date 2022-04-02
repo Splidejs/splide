@@ -283,10 +283,6 @@ interface Options extends ResponsiveOptions {
      */
     role?: string;
     /**
-     * The label for the root element.
-     */
-    label?: string;
-    /**
      * Determines whether to disable any actions while the slider is transitioning.
      * Even if `false`, the slider forcibly waits for transition on the loop points.
      */
@@ -466,6 +462,15 @@ interface ResponsiveOptions {
      * Accepts arbitrary properties for extensions, although it's not ideal typing.
      */
     [key: string]: any;
+    /**
+     * The label for the root element.
+     * Use `labelledby` instead if there is a visible label.
+     */
+    label?: string;
+    /**
+     * The ID for the element that used as the label of the carousel.
+     */
+    labelledby?: string;
     /**
      * The transition speed in milliseconds.
      */

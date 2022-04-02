@@ -24,40 +24,35 @@ $settings = get_settings();
 
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
-			const options = {
-				perPage    : 3,
-				arrows     : false,
-				mediaQuery : 'max',
-				// destroy: true,
-				breakpoints: {
-					1200: {
-						perPage: 1,
-						gap    : '1rem',
-						arrows : true,
-						padding: 50,
-						// direction: 'ttb',
-						height: 500,
-						destroy: false,
-						// paginationDirection: 'ltr',
-					},
-					1000: {
-						// direction: 'ltr',
-						perPage   : 2,
-						gap       : 0,
-						arrows    : false,
-						padding   : 0,
-						pagination: false,
-						// destroy: false,
-						// height: undefined,
-					},
-					800 : {
-						destroy: true,
-					},
-				},
-			}
+      const options = {
+        perPage: 3,
+        arrows: false,
+        mediaQuery: 'max',
+        // destroy: true,
+        breakpoints: {
+          1200: {
+            perPage: 1,
+            gap: '1rem',
+            arrows: true,
+            padding: 50,
+            height: 500,
+            destroy: false,
+          },
+          1000: {
+            perPage: 2,
+            gap: 0,
+            arrows: false,
+            padding: 0,
+            pagination: false,
+          },
+          800: {
+            destroy: true,
+          },
+        },
+      }
 
-	    new Splide( '#splide01', options ).mount();
-	    new Splide( '#splide02', options ).mount();
+      new Splide( '#splide01', options ).mount();
+      new Splide( '#splide02', options ).mount();
     } );
   </script>
 </head>

@@ -1,4 +1,4 @@
-import { ALL_ATTRIBUTES, ARIA_LABEL, ARIA_ROLEDESCRIPTION, ROLE } from '../../constants/attributes';
+import { ALL_ATTRIBUTES, ARIA_LABEL, ARIA_LABELLEDBY, ARIA_ROLEDESCRIPTION, ROLE } from '../../constants/attributes';
 import {
   CLASS_ACTIVE,
   CLASS_ARROW_NEXT,
@@ -89,16 +89,6 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
   const slides: HTMLElement[] = [];
 
   /**
-   * Keeps the root role in HTML.
-   */
-  const rootRole = getAttribute( root, ROLE );
-
-  /**
-   * Keeps the root label in HTML.
-   */
-  const rootLabel = getAttribute( root, ARIA_LABEL );
-
-  /**
    * Stores all root classes.
    */
   let rootClasses: string[] = [];
@@ -155,18 +145,13 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
    * @param completely - Whether to destroy the component completely or not.
    */
   function destroy( completely?: boolean ): void {
+    const attrs = ALL_ATTRIBUTES.concat( 'style' );
+
     empty( slides );
     removeClass( root, rootClasses );
     removeClass( track, trackClasses );
-    removeAttribute( [ track, list ], ALL_ATTRIBUTES.concat( 'style' ) );
-    removeAttribute( root, 'style' );
-
-    if ( completely ) {
-      removeAttribute( root, ALL_ATTRIBUTES );
-      setAttribute( root, ROLE, rootRole );
-    }
-
-    setAttribute( root, ARIA_LABEL, rootLabel );
+    removeAttribute( [ track, list ], attrs );
+    removeAttribute( root, completely ? attrs : [ 'style', ARIA_ROLEDESCRIPTION ] );
   }
 
   /**
@@ -181,6 +166,9 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
 
     addClass( root, rootClasses );
     addClass( track, trackClasses );
+
+    setAttribute( root, ARIA_LABEL, options.label );
+    setAttribute( root, ARIA_LABELLEDBY, options.labelledby );
   }
 
   /**
@@ -213,15 +201,17 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
    * which removes the region from the accessibility tree.
    */
   function init(): void {
-    const id   = root.id || uniqueId( PROJECT_CODE );
-    const role = rootRole || root.tagName !== 'SECTION' && options.role || '';
+    const id = root.id || uniqueId( PROJECT_CODE );
 
     root.id  = id;
     track.id = track.id || `${ id }-track`;
     list.id  = list.id || `${ id }-list`;
 
+    if ( ! getAttribute( root, ROLE ) ) {
+      setAttribute( root, ROLE, root.tagName !== 'SECTION' && options.role || '' );
+    }
+
     setAttribute( root, ARIA_ROLEDESCRIPTION, i18n.carousel );
-    getAttribute( root, ROLE ) || setAttribute( root, ROLE, role );
     setAttribute( list, ROLE, 'presentation' );
   }
 

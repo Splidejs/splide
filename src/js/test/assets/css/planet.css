@@ -56,7 +56,7 @@ cite {
 }
 
 .splide__heading {
-  font-family: Splide Heading, sans-serif;
+  font-family: SplideHeading, sans-serif;
   color: #fff;
   margin: 0;
   padding: 1rem 1.5rem .5rem;
@@ -111,10 +111,10 @@ cite {
 }
 
 .splide__arrow:focus-visible {
-  outline: #fff dotted 3px;
+  outline: #fff dotted 3px !important;
 }
 
 .splide__slide:focus-visible {
-  outline: #fff dotted 3px;
+  outline: #fff dotted 3px !important;
 }
 

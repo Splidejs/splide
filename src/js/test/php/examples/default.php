@@ -21,33 +21,37 @@ $settings = get_settings();
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
-	      width       : 800,
-	      // type        : 'loop',
-	      perPage     : 3,
-	      rewind      : true,
-	      rewindByDrag: true,
-	      padding     : 40,
-	      updateOnMove: true,
-	      direction   : 'ltr',
-	      height      : undefined,
-	      paginationDirection: 'ttb',
-	      rewindSpeed : 2000,
+        width: 800,
+        // type        : 'loop',
+        perPage: 3,
+        // rewind: true,
+        // rewindByDrag: true,
+        padding: { left: '3rem', right: '2rem' },
+        updateOnMove: true,
+        direction: 'ltr',
+        height: undefined,
+        paginationDirection: 'ttb',
+        rewindSpeed: 2000,
 
-	      breakpoints: {
-					1200: {
-						direction: 'ttb',
-						height   : 500,
-						perPage  : 2,
-					},
-		      1000: {
-			      direction: 'ltr',
-		      }
-	      }
+        breakpoints: {
+          1200: {
+            // padding: 5,
+          },
+          1000: {
+            label: 'The destroyed carousel',
+            destroy: true,
+          },
+        },
+
+        classes: {
+          arrows: 'splide__arrows custom-arrows',
+          pagination: 'splide__pagination custom-pagination',
+        },
       } );
 
-	    // splide.on( 'move', function () {
-		  //   console.log( 'move' );
-	    // } );
+      // splide.on( 'destroy', function () {
+      //     console.log( 'destroy' );
+      // } );
 	    //
       // splide.on( 'moved', function ( index, prev, dest ) {
       //   console.log( 'moved', index, prev, dest );

@@ -163,7 +163,7 @@ function assign(object) {
 }
 
 function merge(object) {
-  slice(arguments).forEach(function (source) {
+  slice(arguments, 1).forEach(function (source) {
     forOwn(source, function (value, key) {
       if (isArray(value)) {
         object[key] = value.slice();
@@ -603,20 +603,20 @@ function Media(Splide2, Components2, options) {
   }
 
   function update() {
+    var destroyed = Splide2.state.is(DESTROYED);
     var direction = options.direction;
     var merged = queries.reduce(function (merged2, entry) {
       return merge(merged2, entry[1].matches ? entry[0] : {});
     }, {});
     omit(options);
-    merge(options, merged);
+    Splide2.options = merged;
 
     if (options.destroy) {
       Splide2.destroy(options.destroy === "completely");
-    } else if (Splide2.state.is(DESTROYED)) {
+    } else if (destroyed) {
       destroy(true);
       Splide2.mount();
     } else {
-      Splide2.options = merged;
       direction !== options.direction && Splide2.refresh();
     }
   }
@@ -680,12 +680,13 @@ var ARIA_CONTROLS = ARIA_PREFIX + "controls";
 var ARIA_CURRENT = ARIA_PREFIX + "current";
 var ARIA_SELECTED = ARIA_PREFIX + "selected";
 var ARIA_LABEL = ARIA_PREFIX + "label";
+var ARIA_LABELLEDBY = ARIA_PREFIX + "labelledby";
 var ARIA_HIDDEN = ARIA_PREFIX + "hidden";
 var ARIA_ORIENTATION = ARIA_PREFIX + "orientation";
 var ARIA_ROLEDESCRIPTION = ARIA_PREFIX + "roledescription";
 var ARIA_LIVE = ARIA_PREFIX + "live";
 var ARIA_RELEVANT = ARIA_PREFIX + "relevant";
-var ALL_ATTRIBUTES = [ROLE, TAB_INDEX, DISABLED, ARIA_CONTROLS, ARIA_CURRENT, ARIA_LABEL, ARIA_HIDDEN, ARIA_ORIENTATION, ARIA_ROLEDESCRIPTION];
+var ALL_ATTRIBUTES = [ROLE, TAB_INDEX, DISABLED, ARIA_CONTROLS, ARIA_CURRENT, ARIA_LABEL, ARIA_LABELLEDBY, ARIA_HIDDEN, ARIA_ORIENTATION, ARIA_ROLEDESCRIPTION];
 var CLASS_ROOT = PROJECT_CODE;
 var CLASS_TRACK = PROJECT_CODE + "__track";
 var CLASS_LIST = PROJECT_CODE + "__list";
@@ -758,8 +759,6 @@ function Elements(Splide2, Components2, options) {
   var i18n = options.i18n;
   var elements = {};
   var slides = [];
-  var rootRole = getAttribute(root, ROLE);
-  var rootLabel = getAttribute(root, ARIA_LABEL);
   var rootClasses = [];
   var trackClasses = [];
   var track;
@@ -787,18 +786,12 @@ function Elements(Splide2, Components2, options) {
   }
 
   function destroy(completely) {
+    var attrs = ALL_ATTRIBUTES.concat("style");
     empty(slides);
     removeClass(root, rootClasses);
     removeClass(track, trackClasses);
-    removeAttribute([track, list], ALL_ATTRIBUTES.concat("style"));
-    removeAttribute(root, "style");
-
-    if (completely) {
-      removeAttribute(root, ALL_ATTRIBUTES);
-      setAttribute(root, ROLE, rootRole);
-    }
-
-    setAttribute(root, ARIA_LABEL, rootLabel);
+    removeAttribute([track, list], attrs);
+    removeAttribute(root, completely ? attrs : ["style", ARIA_ROLEDESCRIPTION]);
   }
 
   function update() {
@@ -808,6 +801,8 @@ function Elements(Splide2, Components2, options) {
     trackClasses = getClasses(CLASS_TRACK);
     addClass(root, rootClasses);
     addClass(track, trackClasses);
+    setAttribute(root, ARIA_LABEL, options.label);
+    setAttribute(root, ARIA_LABELLEDBY, options.labelledby);
   }
 
   function collect() {
@@ -835,12 +830,15 @@ function Elements(Splide2, Components2, options) {
 
   function init() {
     var id = root.id || uniqueId(PROJECT_CODE);
-    var role = rootRole || root.tagName !== "SECTION" && options.role || "";
     root.id = id;
     track.id = track.id || id + "-track";
     list.id = list.id || id + "-list";
+
+    if (!getAttribute(root, ROLE)) {
+      setAttribute(root, ROLE, root.tagName !== "SECTION" && options.role || "");
+    }
+
     setAttribute(root, ARIA_ROLEDESCRIPTION, i18n.carousel);
-    getAttribute(root, ROLE) || setAttribute(root, ROLE, role);
     setAttribute(list, ROLE, "presentation");
   }
 
@@ -2943,7 +2941,10 @@ var _Splide = /*#__PURE__*/function () {
     var root = isString(target) ? query(document, target) : target;
     assert(root, root + " is invalid.");
     this.root = root;
-    options = merge({}, DEFAULTS, _Splide.defaults, options || {});
+    options = merge({
+      label: getAttribute(root, ARIA_LABEL) || "",
+      labelledby: getAttribute(root, ARIA_LABELLEDBY) || ""
+    }, DEFAULTS, _Splide.defaults, options || {});
 
     try {
       merge(options, JSON.parse(getAttribute(root, DATA_ATTRIBUTE)));

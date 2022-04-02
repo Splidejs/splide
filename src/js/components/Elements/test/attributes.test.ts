@@ -1,12 +1,27 @@
-import { ALL_ATTRIBUTES, ARIA_ROLEDESCRIPTION, ROLE } from '../../../constants/attributes';
+import { ALL_ATTRIBUTES } from '../../../constants/attributes';
 import { buildHtml, init } from '../../../test';
 
 
 describe( 'Elements', () => {
   test( 'can assign aria attributes.', () => {
     const splide = init();
-    expect( splide.root.getAttribute( ROLE ) ).toBe( 'region' );
-    expect( splide.root.getAttribute( ARIA_ROLEDESCRIPTION ) ).toBe( 'carousel' );
+    expect( splide.root.getAttribute( 'role' ) ).toBe( 'region' );
+    expect( splide.root.getAttribute( 'aria-roledescription' ) ).toBe( 'carousel' );
+  } );
+
+  test( 'can set a role.', () => {
+    const splide = init( { role: 'navigation' } );
+    expect( splide.root.getAttribute( 'role' ) ).toBe( 'navigation' );
+  } );
+
+  test( 'can set aria-label.', () => {
+    const splide = init( { label: 'Splide carousel' } );
+    expect( splide.root.getAttribute( 'aria-label' ) ).toBe( 'Splide carousel' );
+  } );
+
+  test( 'can set aria-labelledby.', () => {
+    const splide = init( { labelledby: 'heading' } );
+    expect( splide.root.getAttribute( 'aria-labelledby' ) ).toBe( 'heading' );
   } );
 
   test( 'can remove assigned attributes.', () => {
@@ -30,14 +45,14 @@ describe( 'Elements', () => {
 
   test( 'should not assign the role if the root element is section.', () => {
     const splide = init( {}, { html: buildHtml( { tag: 'section' } ) } );
-    expect( splide.root.getAttribute( ROLE ) ).toBeNull();
+    expect( splide.root.getAttribute( 'role' ) ).toBeNull();
   } );
 
   test( 'should not remove the role attribute by soft destruction.', () => {
     const splide = init();
-    expect( splide.root.getAttribute( ROLE ) ).toBe( 'region' );
+    expect( splide.root.getAttribute( 'role' ) ).toBe( 'region' );
 
     splide.destroy( false );
-    expect( splide.root.getAttribute( ROLE ) ).toBe( 'region' );
+    expect( splide.root.getAttribute( 'role' ) ).toBe( 'region' );
   } );
 } );
