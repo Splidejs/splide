@@ -22,26 +22,28 @@ $settings = get_settings();
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
         width: 800,
-        // type        : 'loop',
-        perPage: 3,
+        type        : 'loop',
+        perPage: 2,
         // rewind: true,
         // rewindByDrag: true,
-        padding: { left: '3rem', right: '2rem' },
+        padding: '3rem',
         updateOnMove: true,
         direction: 'ltr',
         height: undefined,
         paginationDirection: 'ttb',
         rewindSpeed: 2000,
+        // role: '',
+        label: '1',
 
-        breakpoints: {
-          1200: {
-            // padding: 5,
-          },
-          1000: {
-            label: 'The destroyed carousel',
-            destroy: true,
-          },
-        },
+        // breakpoints: {
+        //   1200: {
+        //     // padding: 5,
+        //   },
+        //   1000: {
+        //     label: 'The destroyed carousel',
+        //     destroy: true,
+        //   },
+        // },
 
         classes: {
           arrows: 'splide__arrows custom-arrows',
