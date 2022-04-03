@@ -479,7 +479,7 @@ function RequestInterval(interval, onInterval, onUpdate, limit) {
 
   function update() {
     if (!paused) {
-      rate = min((now() - startTime) / interval, 1);
+      rate = interval ? min((now() - startTime) / interval, 1) : 1;
       onUpdate && onUpdate(rate);
 
       if (rate >= 1) {
