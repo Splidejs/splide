@@ -13,11 +13,11 @@ function buildModule( type ) {
     plugins: [
       resolve(),
       esbuild(),
-	    babel.getBabelOutputPlugin( {
-		    configFile: path.resolve( __dirname, '../.babelrc' ),
-		    allowAllFormats: true,
-	    } ),
-    ]
+      babel.getBabelOutputPlugin( {
+        configFile: path.resolve( __dirname, '../.babelrc' ),
+        allowAllFormats: true,
+      } ),
+    ],
   } ).then( bundle => {
     return bundle.write( {
       banner,

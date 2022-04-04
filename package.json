@@ -62,7 +62,7 @@
     "build:module": "node scripts/build-module.js",
     "build:types": "node scripts/build-types.js",
     "build:css": "node scripts/build-css.js",
-    "build:all": "npm run build:js && npm run build:module && npm run build:css && npm run build:types",
+    "build:all": "npm run build:js && npm run build:module && npm run build:css && npm run build:types && node scripts/build-utils.js",
     "check:types": "tsc --noEmit",
     "jest": "jest --clearCache && jest",
     "eslint": "eslint src",
@@ -94,7 +94,11 @@
     "./css/core": "./dist/css/splide-core.min.css",
     "./css/*": "./dist/css/themes/splide-*.min.css",
     "./dist/": "./dist/",
-    "./src/js/utils": "./src/js/utils/index.ts",
+    "./src/js/utils": {
+      "node": "./dist/js/utils/splide-utils.cjs.js",
+      "default": "./dist/js/utils/splide-utils.esm.js",
+      "types": "./src/js/utils/index.ts"
+    },
     "./src/css/template/": "./src/css/template/",
     "./package.json": "./package.json"
   }
