@@ -88,11 +88,13 @@
   ],
   "exports": {
     ".": {
-      "node": "./dist/js/splide.cjs.js",
+      "require": "./dist/js/splide.cjs.js",
+      "import": "./dist/js/splide.esm.js",
       "default": "./dist/js/splide.esm.js"
     },
     "./src/js/utils": {
-      "node": "./dist/js/utils/splide-utils.cjs.js",
+      "require": "./dist/js/utils/splide-utils.cjs.js",
+      "import": "./dist/js/utils/splide-utils.esm.js",
       "default": "./dist/js/utils/splide-utils.esm.js",
       "types": "./src/js/utils/index.ts"
     },
