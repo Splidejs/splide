@@ -6,3 +6,6 @@ export * from './constructors';
 export * from './types';
 export * from './constants/events';
 export * from './constants/classes';
+export * from './constants/defaults';
+export * from './constants/directions';
+export * from './constants/types';

@@ -7,6 +7,7 @@
   "main": "dist/js/splide.cjs.js",
   "module": "dist/js/splide.esm.js",
   "types": "dist/types/index.d.ts",
+  "svelte": "dist/js/splide.esm.js",
   "jsdelivr": "dist/js/splide.min.js",
   "keywords": [
     "splide",
@@ -90,15 +91,15 @@
       "node": "./dist/js/splide.cjs.js",
       "default": "./dist/js/splide.esm.js"
     },
-    "./css": "./dist/css/splide.min.css",
-    "./css/core": "./dist/css/splide-core.min.css",
-    "./css/*": "./dist/css/themes/splide-*.min.css",
-    "./dist/": "./dist/",
     "./src/js/utils": {
       "node": "./dist/js/utils/splide-utils.cjs.js",
       "default": "./dist/js/utils/splide-utils.esm.js",
       "types": "./src/js/utils/index.ts"
     },
+    "./css": "./dist/css/splide.min.css",
+    "./css/core": "./dist/css/splide-core.min.css",
+    "./css/*": "./dist/css/themes/splide-*.min.css",
+    "./dist/": "./dist/",
     "./src/css/template/": "./src/css/template/",
     "./package.json": "./package.json"
   }
