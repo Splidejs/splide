@@ -70,10 +70,6 @@ No dependencies, no Lighthouse errors.
 </p>
 </div>
 
-## 🚨Notice🚨
-
-Now I'm updating Splide to v4.
-
 ## Support Splide
 
 Please support the project if you like it! 
