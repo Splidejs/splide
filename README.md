@@ -23,7 +23,7 @@ No dependencies, no Lighthouse errors.
   <br>
   <a href="https://splidejs.com/guides/themes/">Themes</a>
   <br>
-  <a href="https://splidejs.com/guides/version3/">About v3</a>
+  <a href="https://splidejs.com/guides/version4/">About v4</a>
   <br>
   <a href="https://github.com/Splidejs/splide/discussions">Discussions/Q&A</a>
 </p>
@@ -70,6 +70,10 @@ No dependencies, no Lighthouse errors.
 </p>
 </div>
 
+## 🚨Notice🚨
+
+Now I'm updating Splide to v4.
+
 ## Support Splide
 
 Please support the project if you like it! 
@@ -79,15 +83,14 @@ Please support the project if you like it!
 
 - Written in TypeScript
 - No dependencies
-- Lightweight, 27kB (11kB gzipped)
+- Lightweight, 29kB (12kB gzipped)
 - Flexible and extensible
 - Protected by 300+ test cases
 - Multiple slides
 - Slide or fade transition by CSS
 - Supports breakpoints
 - Accepts CSS relative units
-- No need to crop images
-- Autoplay with progress bar and play/pause buttons
+- Autoplay with progress bar and a play-pause toggle button
 - RTL and vertical direction
 - Mouse drag and touch swipe
 - Free drag mode
@@ -97,6 +100,7 @@ Please support the project if you like it!
 - Thumbnail slider
 - Auto width and height
 - Accessibility friendly
+- Live Region
 - Internet Explorer 10
 
 
