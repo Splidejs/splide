@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 4.0.0
+ * Version  : 4.0.1
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
@@ -168,7 +168,7 @@ function merge(object) {
       if (isArray(value)) {
         object[key] = value.slice();
       } else if (isObject(value)) {
-        object[key] = merge(isObject(object[key]) ? object[key] : {}, value);
+        object[key] = merge({}, isObject(object[key]) ? object[key] : {}, value);
       } else {
         object[key] = value;
       }
@@ -574,9 +574,10 @@ function Throttle(func, duration) {
 }
 
 function Media(Splide2, Components2, options) {
+  var state = Splide2.state;
+  var breakpoints = options.breakpoints || {};
   var reducedMotion = options.reducedMotion || {};
   var binder = EventBinder();
-  var breakpoints = options.breakpoints || {};
   var queries = [];
 
   function setup() {
@@ -603,13 +604,17 @@ function Media(Splide2, Components2, options) {
   }
 
   function update() {
-    var destroyed = Splide2.state.is(DESTROYED);
+    var destroyed = state.is(DESTROYED);
     var direction = options.direction;
     var merged = queries.reduce(function (merged2, entry) {
       return merge(merged2, entry[1].matches ? entry[0] : {});
     }, {});
     omit(options);
-    Splide2.options = merged;
+    merge(options, merged);
+
+    if (!state.is(CREATED)) {
+      Splide2.emit(EVENT_UPDATED, options);
+    }
 
     if (options.destroy) {
       Splide2.destroy(options.destroy === "completely");
@@ -2500,12 +2505,13 @@ function Pagination(Splide2, Components2, options) {
 
   function destroy() {
     if (list) {
-      event.destroy();
       remove(Elements.pagination ? slice(list.children) : list);
       removeClass(list, paginationClasses);
       empty(items);
       list = null;
     }
+
+    event.destroy();
   }
 
   function createPagination() {
@@ -2622,12 +2628,14 @@ function Pagination(Splide2, Components2, options) {
 var TRIGGER_KEYS = [" ", "Enter"];
 
 function Sync(Splide2, Components2, options) {
-  var isNavigation = options.isNavigation;
+  var isNavigation = options.isNavigation,
+      slideFocus = options.slideFocus;
   var events = [];
 
   function setup() {
-    var slideFocus = options.slideFocus;
-    options.slideFocus = isUndefined(slideFocus) ? isNavigation : slideFocus;
+    Splide2.options = {
+      slideFocus: isUndefined(slideFocus) ? isNavigation : slideFocus
+    };
   }
 
   function mount() {
@@ -3081,6 +3089,7 @@ var _Splide = /*#__PURE__*/function () {
     set: function set(options) {
       var _o = this._o;
       merge(_o, options);
+      merge(Object.getPrototypeOf(_o), options);
 
       if (!this.state.is(CREATED)) {
         this.emit(EVENT_UPDATED, _o);

@@ -133,7 +133,7 @@ function merge(object) {
       if (isArray(value)) {
         object[key] = value.slice();
       } else if (isObject(value)) {
-        object[key] = merge(isObject(object[key]) ? object[key] : {}, value);
+        object[key] = merge({}, isObject(object[key]) ? object[key] : {}, value);
       } else {
         object[key] = value;
       }

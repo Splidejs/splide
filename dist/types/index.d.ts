@@ -4,6 +4,7 @@
  * @since 4.0.0
  */
 interface MediaComponent extends BaseComponent {
+    /** @internal */
     reduce(reduced: boolean): void;
 }
 

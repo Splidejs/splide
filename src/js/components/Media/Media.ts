@@ -1,9 +1,10 @@
 import { MEDIA_PREFERS_REDUCED_MOTION } from '../../constants/media';
-import { DESTROYED } from '../../constants/states';
+import { CREATED, DESTROYED } from '../../constants/states';
 import { EventBinder } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import { merge, omit, ownKeys } from '../../utils';
+import { EVENT_UPDATED } from "../../constants/events";
 
 
 /**
@@ -12,6 +13,7 @@ import { merge, omit, ownKeys } from '../../utils';
  * @since 4.0.0
  */
 export interface MediaComponent extends BaseComponent {
+  /** @internal */
   reduce( reduced: boolean ): void;
 }
 
@@ -28,9 +30,10 @@ export interface MediaComponent extends BaseComponent {
  * @return A Media component object.
  */
 export function Media( Splide: Splide, Components: Components, options: Options ): MediaComponent {
+  const { state } = Splide;
+  const breakpoints   = options.breakpoints || {};
   const reducedMotion = options.reducedMotion || {};
   const binder        = EventBinder();
-  const breakpoints   = options.breakpoints || {};
 
   /**
    * Stores options and MediaQueryList object.
@@ -80,14 +83,18 @@ export function Media( Splide: Splide, Components: Components, options: Options 
    * Checks all media queries in entries and updates options.
    */
   function update(): void {
-    const destroyed = Splide.state.is( DESTROYED );
+    const destroyed = state.is( DESTROYED );
     const direction = options.direction;
     const merged = queries.reduce<Options>( ( merged, entry ) => {
       return merge( merged, entry[ 1 ].matches ? entry[ 0 ] : {} );
     }, {} );
 
     omit( options );
-    Splide.options = merged;
+    merge( options, merged );
+
+    if ( ! state.is( CREATED ) ) {
+      Splide.emit( EVENT_UPDATED, options );
+    }
 
     if ( options.destroy ) {
       Splide.destroy( options.destroy === 'completely' );

@@ -45,7 +45,7 @@ const TRIGGER_KEYS = [ ' ', 'Enter' ];
  * @return A Sync component object.
  */
 export function Sync( Splide: Splide, Components: Components, options: Options ): SyncComponent {
-  const { isNavigation } = options;
+  const { isNavigation, slideFocus } = options;
 
   /**
    * Stores event objects.
@@ -56,8 +56,7 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
    * Called when the component is constructed.
    */
   function setup(): void {
-    const { slideFocus } = options;
-    options.slideFocus = isUndefined( slideFocus ) ? isNavigation : slideFocus;
+    Splide.options = { slideFocus: isUndefined( slideFocus ) ? isNavigation : slideFocus };
   }
 
   /**

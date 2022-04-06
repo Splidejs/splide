@@ -126,12 +126,13 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
    */
   function destroy(): void {
     if ( list ) {
-      event.destroy();
       remove( Elements.pagination ? slice( list.children ) : list );
       removeClass( list, paginationClasses );
       empty( items );
       list = null;
     }
+
+    event.destroy();
   }
 
   /**

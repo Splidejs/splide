@@ -381,6 +381,7 @@ export class Splide {
   set options( options: Options ) {
     const { _o } = this;
     merge( _o, options );
+    merge( Object.getPrototypeOf( _o ), options );
 
     if ( ! this.state.is( CREATED ) ) {
       this.emit( EVENT_UPDATED, _o );

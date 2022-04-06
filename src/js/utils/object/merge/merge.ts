@@ -57,7 +57,7 @@ export function merge<T extends object>( object: T ): any {
       if ( isArray( value ) ) {
         object[ key ] = value.slice();
       } else if ( isObject( value ) ) {
-        object[ key ] = merge( isObject( object[ key ] ) ? object[ key ] : {}, value );
+        object[ key ] = merge( {}, isObject( object[ key ] ) ? object[ key ] : {}, value );
       } else {
         object[ key ] = value;
       }

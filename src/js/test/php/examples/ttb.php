@@ -30,10 +30,8 @@ $settings = get_settings();
         // wheel       : true,
 	      waitForTransition: false,
         releaseWheel: true,
-	      wheel       : {
-					// min: 99,
-		      sleep: 500,
-	      },
+        wheel: true,
+        wheelSleep: 500,
       } );
 
       splide.mount();
