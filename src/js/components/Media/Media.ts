@@ -15,6 +15,7 @@ import { EVENT_UPDATED } from "../../constants/events";
 export interface MediaComponent extends BaseComponent {
   /** @internal */
   reduce( reduced: boolean ): void;
+  set( options: Options, userOptions?: boolean ): void;
 }
 
 /**
@@ -90,11 +91,7 @@ export function Media( Splide: Splide, Components: Components, options: Options 
     }, {} );
 
     omit( options );
-    merge( options, merged );
-
-    if ( ! state.is( CREATED ) ) {
-      Splide.emit( EVENT_UPDATED, options );
-    }
+    set( merged );
 
     if ( options.destroy ) {
       Splide.destroy( options.destroy === 'completely' );
@@ -110,6 +107,8 @@ export function Media( Splide: Splide, Components: Components, options: Options 
    * Disables or enables `reducedMotion` options.
    * This method does nothing when the document does not match the query.
    *
+   * @internal
+   *
    * @param enable - Determines whether to apply `reducedMotion` options or not.
    */
   function reduce( enable: boolean ): void {
@@ -118,9 +117,27 @@ export function Media( Splide: Splide, Components: Components, options: Options 
     }
   }
 
+  /**
+   * Sets options.
+   *
+   * @internal
+   *
+   * @param opts - New options.
+   * @param user - Optional. Determines whether to also update user options or not.
+   */
+  function set( opts: Options, user?: boolean ): void {
+    merge( options, opts );
+    user && merge( Object.getPrototypeOf( options ), opts );
+
+    if ( ! state.is( CREATED ) ) {
+      Splide.emit( EVENT_UPDATED, options );
+    }
+  }
+
   return {
     setup,
     destroy,
     reduce,
+    set,
   };
 }

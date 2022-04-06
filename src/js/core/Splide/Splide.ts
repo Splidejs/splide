@@ -2,7 +2,7 @@ import * as ComponentConstructors from '../../components';
 import { SlideMatcher } from '../../components/Slides/Slides';
 import { CLASS_INITIALIZED } from '../../constants/classes';
 import { DEFAULTS } from '../../constants/defaults';
-import { EVENT_DESTROY, EVENT_MOUNTED, EVENT_READY, EVENT_REFRESH, EVENT_UPDATED } from '../../constants/events';
+import { EVENT_DESTROY, EVENT_MOUNTED, EVENT_READY, EVENT_REFRESH } from '../../constants/events';
 import { DATA_ATTRIBUTE } from '../../constants/project';
 import { CREATED, DESTROYED, IDLE, STATES } from '../../constants/states';
 import { FADE } from '../../constants/types';
@@ -379,13 +379,7 @@ export class Splide {
    * @param options - An object with new options.
    */
   set options( options: Options ) {
-    const { _o } = this;
-    merge( _o, options );
-    merge( Object.getPrototypeOf( _o ), options );
-
-    if ( ! this.state.is( CREATED ) ) {
-      this.emit( EVENT_UPDATED, _o );
-    }
+    this._C.Media.set( options, true );
   }
 
   /**

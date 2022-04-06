@@ -610,11 +610,7 @@ function Media(Splide2, Components2, options) {
       return merge(merged2, entry[1].matches ? entry[0] : {});
     }, {});
     omit(options);
-    merge(options, merged);
-
-    if (!state.is(CREATED)) {
-      Splide2.emit(EVENT_UPDATED, options);
-    }
+    set(merged);
 
     if (options.destroy) {
       Splide2.destroy(options.destroy === "completely");
@@ -632,10 +628,20 @@ function Media(Splide2, Components2, options) {
     }
   }
 
+  function set(opts, user) {
+    merge(options, opts);
+    user && merge(Object.getPrototypeOf(options), opts);
+
+    if (!state.is(CREATED)) {
+      Splide2.emit(EVENT_UPDATED, options);
+    }
+  }
+
   return {
     setup: setup,
     destroy: destroy,
-    reduce: reduce
+    reduce: reduce,
+    set: set
   };
 }
 
@@ -3087,13 +3093,7 @@ var _Splide = /*#__PURE__*/function () {
       return this._o;
     },
     set: function set(options) {
-      var _o = this._o;
-      merge(_o, options);
-      merge(Object.getPrototypeOf(_o), options);
-
-      if (!this.state.is(CREATED)) {
-        this.emit(EVENT_UPDATED, _o);
-      }
+      this._C.Media.set(options, true);
     }
   }, {
     key: "length",

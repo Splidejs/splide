@@ -6,6 +6,7 @@
 interface MediaComponent extends BaseComponent {
     /** @internal */
     reduce(reduced: boolean): void;
+    set(options: Options, userOptions?: boolean): void;
 }
 
 /**
