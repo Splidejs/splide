@@ -10,7 +10,7 @@ import { EventInterface, EventInterfaceObject, State, StateObject } from '../../
 import { Fade, Slide } from '../../transitions';
 import { AnyFunction, ComponentConstructor, Components, EventMap, Options, SyncTarget } from '../../types';
 import { addClass, assert, assign, empty, forOwn, getAttribute, isString, merge, query, slice } from '../../utils';
-import { ARIA_LABEL, ARIA_LABELLEDBY } from "../../constants/attributes";
+import { ARIA_LABEL, ARIA_LABELLEDBY } from '../../constants/attributes';
 
 
 /**

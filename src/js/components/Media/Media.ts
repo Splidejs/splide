@@ -4,7 +4,7 @@ import { EventBinder } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import { merge, omit, ownKeys } from '../../utils';
-import { EVENT_UPDATED } from "../../constants/events";
+import { EVENT_UPDATED } from '../../constants/events';
 
 
 /**
