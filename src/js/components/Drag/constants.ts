@@ -28,7 +28,8 @@ export const POINTER_MOVE_EVENTS = 'touchmove mousemove';
 
 /**
  * End events for dragging.
+ * The `click` event is required because the browser sometimes dispatches `drag` events instead of `mouse`.
  *
  * @since 3.0.0
  */
-export const POINTER_UP_EVENTS = 'touchend touchcancel mouseup';
+export const POINTER_UP_EVENTS = 'touchend touchcancel mouseup click';

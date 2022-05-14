@@ -1,6 +1,6 @@
 {
   "name": "@splidejs/splide",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "Splide is a lightweight, flexible and accessible slider/carousel. No dependencies, no Lighthouse errors.",
   "author": "Naotoshi Fujita",
   "license": "MIT",
@@ -20,6 +20,7 @@
     "responsive",
     "typescript"
   ],
+  "homepage": "https://splidejs.com/",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Splidejs/splide.git"

@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 4.0.1
+ * Version  : 4.0.2
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
@@ -755,7 +755,7 @@ var FRICTION = 5;
 var LOG_INTERVAL = 200;
 var POINTER_DOWN_EVENTS = "touchstart mousedown";
 var POINTER_MOVE_EVENTS = "touchmove mousemove";
-var POINTER_UP_EVENTS = "touchend touchcancel mouseup";
+var POINTER_UP_EVENTS = "touchend touchcancel mouseup click";
 
 function Elements(Splide2, Components2, options) {
   var _EventInterface = EventInterface(Splide2),
