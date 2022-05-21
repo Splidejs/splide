@@ -12,7 +12,7 @@ import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, BaseComponent, Components, Options, TransitionComponent } from '../../types';
-import { abs, ceil, clamp, isUndefined, rect, style } from '../../utils';
+import { abs, ceil, clamp, isUndefined, rect, sign, style } from '../../utils';
 
 
 /**
@@ -91,10 +91,11 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    */
   function move( dest: number, index: number, prev: number, callback?: AnyFunction ): void {
     const position = getPosition();
+    const crossing = sign( dest - prev ) * orient( toPosition( dest ) - position ) < 0;
 
-    if ( dest !== index && canShift( dest > index ) ) {
+    if ( ( dest !== index || crossing ) && canShift( dest > prev ) ) {
       cancel();
-      translate( shift( position, dest > index ), true );
+      translate( shift( position, dest > prev ), true );
     }
 
     set( MOVING );

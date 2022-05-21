@@ -1427,10 +1427,11 @@ function Move(Splide2, Components2, options) {
 
   function move(dest, index, prev, callback) {
     var position = getPosition();
+    var crossing = sign(dest - prev) * orient(toPosition(dest) - position) < 0;
 
-    if (dest !== index && canShift(dest > index)) {
+    if ((dest !== index || crossing) && canShift(dest > prev)) {
       cancel();
-      translate(shift(position, dest > index), true);
+      translate(shift(position, dest > prev), true);
     }
 
     set(MOVING);
