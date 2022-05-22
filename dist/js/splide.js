@@ -1523,7 +1523,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function canShift(backwards) {
       var shifted = orient(shift(getPosition(), backwards));
-      return backwards ? shifted >= 0 : shifted <= list["scroll" + resolve("Width")] - rect(track)[resolve("width")];
+      return backwards ? shifted >= 0 : shifted <= list[resolve("scrollWidth")] - rect(track)[resolve("width")];
     }
 
     function exceededLimit(max, position) {

@@ -271,7 +271,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
     const shifted = orient( shift( getPosition(), backwards ) );
     return backwards
       ? shifted >= 0
-      : shifted <= list[ `scroll${ resolve( 'Width' ) }` ] - rect( track )[ resolve( 'width' ) ];
+      : shifted <= list[ resolve( 'scrollWidth' ) ] - rect( track )[ resolve( 'width' ) ];
   }
 
   /**
