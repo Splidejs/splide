@@ -1,4 +1,4 @@
-import { ARIA_LIVE, ARIA_RELEVANT } from '../../constants/attributes';
+import { ARIA_HIDDEN, ARIA_LIVE, ARIA_RELEVANT } from '../../constants/attributes';
 import { CLASS_SR } from '../../constants/classes';
 import { EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_MOVED, EVENT_SCROLLED } from '../../constants/events';
 import { EventInterface } from '../../constructors';
@@ -17,6 +17,11 @@ export interface LiveComponent extends BaseComponent {
 }
 
 /**
+ * Delay in milliseconds before removing the SR field for Windows Narrator.
+ */
+const SR_REMOVAL_DELAY = 50;
+
+/**
  * The component for implementing Live Region to the slider.
  *
  * @link https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Live_Regions
@@ -32,12 +37,11 @@ export interface LiveComponent extends BaseComponent {
 export function Live( Splide: Splide, Components: Components, options: Options ): LiveComponent {
   const { on } = EventInterface( Splide );
   const { track } = Components.Elements;
-  const { live } = options;
 
   /**
    * Indicates whether the live region is enabled or not.
    */
-  const enabled = live && ! options.isNavigation;
+  const enabled = options.live && ! options.isNavigation;
 
   /**
    * The span element for the SR only text.
@@ -45,8 +49,14 @@ export function Live( Splide: Splide, Components: Components, options: Options )
   const sr = create( 'span', CLASS_SR );
 
   /**
+   * Keeps the timer ID.
+   */
+  let timer: number;
+
+  /**
    * Called when the component is mounted.
-   * The `aria-relevant` attribute is important to prevent SR from reading contents twice.
+   * - The `aria-relevant` attribute is important to prevent NVDA from reading contents twice
+   * - Immediately assigning `aria-hidden` makes Windows Narrator silent, hence requires the delay around 50ms.
    */
   function mount(): void {
     if ( enabled ) {
@@ -56,7 +66,13 @@ export function Live( Splide: Splide, Components: Components, options: Options )
 
       on( EVENT_AUTOPLAY_PLAY, apply( disable, true ) );
       on( EVENT_AUTOPLAY_PAUSE, apply( disable, false ) );
-      on( [ EVENT_MOVED, EVENT_SCROLLED ], apply( append, track, sr ) );
+
+      on( [ EVENT_MOVED, EVENT_SCROLLED ], () => {
+        setAttribute( sr, ARIA_HIDDEN, false );
+        append( track, sr );
+        timer && clearTimeout( timer );
+        timer = setTimeout( setAttribute, SR_REMOVAL_DELAY, sr, ARIA_HIDDEN, true );
+      } );
     }
   }
 

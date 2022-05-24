@@ -17,7 +17,7 @@ export const ARIA_RELEVANT        = `${ ARIA_PREFIX }relevant`;
 /**
  * The array with all attributes to remove later.
  * Need to manually remove attributes that are not in this.
- * Note that removing aria-live disables the live region until the page reload.
+ * Note that removing `aria-live` disables the live region until the page reload.
  *
  * @since 3.0.0
  */

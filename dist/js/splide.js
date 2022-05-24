@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 4.0.2
+ * Version  : 4.0.3
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
@@ -2744,14 +2744,16 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     };
   }
 
+  var SR_REMOVAL_DELAY = 50;
+
   function Live(Splide2, Components2, options) {
     var _EventInterface14 = EventInterface(Splide2),
         on = _EventInterface14.on;
 
     var track = Components2.Elements.track;
-    var live = options.live;
-    var enabled = live && !options.isNavigation;
+    var enabled = options.live && !options.isNavigation;
     var sr = create("span", CLASS_SR);
+    var timer;
 
     function mount() {
       if (enabled) {
@@ -2760,7 +2762,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         sr.textContent = "\u2026";
         on(EVENT_AUTOPLAY_PLAY, apply(disable, true));
         on(EVENT_AUTOPLAY_PAUSE, apply(disable, false));
-        on([EVENT_MOVED, EVENT_SCROLLED], apply(append, track, sr));
+        on([EVENT_MOVED, EVENT_SCROLLED], function () {
+          setAttribute(sr, ARIA_HIDDEN, false);
+          append(track, sr);
+          timer && clearTimeout(timer);
+          timer = setTimeout(setAttribute, SR_REMOVAL_DELAY, sr, ARIA_HIDDEN, true);
+        });
       }
     }
 
