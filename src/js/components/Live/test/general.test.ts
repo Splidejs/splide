@@ -1,22 +1,35 @@
-import { ARIA_RELEVANT, ARIA_LIVE } from '../../../constants/attributes';
+import { ARIA_ATOMIC, ARIA_LIVE, ARIA_BUSY } from '../../../constants/attributes';
 import { CLASS_SR } from '../../../constants/classes';
-import { init } from '../../../test';
+import { init, wait } from '../../../test';
 
 
 describe( 'Live', () => {
-  test( 'can append a SR text to the track element after move.', () => {
+  test( 'can append a SR text and add aria-busy="true" to the track element after move.', () => {
     const splide = init( { live: true, speed: 0 } );
+    const { track } = splide.Components.Elements;
 
     splide.go( 1 );
-    expect( splide.Components.Elements.track.getElementsByClassName( CLASS_SR ).length ).toBe( 1 );
+    expect( track.getElementsByClassName( CLASS_SR ).length ).toBe( 1 );
+    expect( track.getAttribute( ARIA_BUSY ) ).toBe( 'true' );
   } );
 
-  test( 'can assign aria-live="polite" and aria-relevant="additions" to the list element.', () => {
+  test( 'can remove a SR text and aria-busy from the track element.', async () => {
+    const splide = init( { live: true, speed: 0 } );
+    const { track } = splide.Components.Elements;
+
+    splide.go( 1 );
+
+    await wait( 200 );
+    expect( track.getElementsByClassName( CLASS_SR ).length ).toBe( 0 );
+    expect( track.getAttribute( ARIA_BUSY ) ).toBe( 'false' );
+  } );
+
+  test( 'can assign aria-live="polite" and aria-atomic="true" to the list element.', () => {
     const splide = init( { live: true } );
     const { track } = splide.Components.Elements;
 
     expect( track.getAttribute( ARIA_LIVE ) ).toBe( 'polite' );
-    expect( track.getAttribute( ARIA_RELEVANT ) ).toBe( 'additions' );
+    expect( track.getAttribute( ARIA_ATOMIC ) ).toBe( 'true' );
   } );
 
   test( 'can remove aria attributes on destroy.', () => {
@@ -26,7 +39,8 @@ describe( 'Live', () => {
     splide.destroy();
 
     expect( track.getAttribute( ARIA_LIVE ) ).toBeNull();
-    expect( track.getAttribute( ARIA_RELEVANT ) ).toBeNull();
+    expect( track.getAttribute( ARIA_ATOMIC ) ).toBeNull();
+    expect( track.getAttribute( ARIA_BUSY ) ).toBeNull();
   } );
 
   test( 'should assign aria attribute again on refresh.', () => {
@@ -36,7 +50,7 @@ describe( 'Live', () => {
     splide.refresh();
 
     expect( track.getAttribute( ARIA_LIVE ) ).toBe( 'polite' );
-    expect( track.getAttribute( ARIA_RELEVANT ) ).toBe( 'additions' );
+    expect( track.getAttribute( ARIA_ATOMIC ) ).toBe( 'true' );
   } );
 
   test( 'can assign aria-live="off" to the list element when the autoplay is `true`.', () => {

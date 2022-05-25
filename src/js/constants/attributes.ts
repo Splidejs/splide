@@ -12,7 +12,8 @@ export const ARIA_HIDDEN          = `${ ARIA_PREFIX }hidden`;
 export const ARIA_ORIENTATION     = `${ ARIA_PREFIX }orientation`;
 export const ARIA_ROLEDESCRIPTION = `${ ARIA_PREFIX }roledescription`;
 export const ARIA_LIVE            = `${ ARIA_PREFIX }live`;
-export const ARIA_RELEVANT        = `${ ARIA_PREFIX }relevant`;
+export const ARIA_BUSY            = `${ ARIA_PREFIX }busy`;
+export const ARIA_ATOMIC          = `${ ARIA_PREFIX }atomic`;
 
 /**
  * The array with all attributes to remove later.

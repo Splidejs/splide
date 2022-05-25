@@ -1,7 +1,7 @@
-import { ARIA_HIDDEN, ARIA_LIVE, ARIA_RELEVANT } from '../../constants/attributes';
+import { ARIA_ATOMIC, ARIA_BUSY, ARIA_LIVE } from '../../constants/attributes';
 import { CLASS_SR } from '../../constants/classes';
 import { EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_MOVED, EVENT_SCROLLED } from '../../constants/events';
-import { EventInterface } from '../../constructors';
+import { EventInterface, RequestInterval } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import { append, apply, create, remove, removeAttribute, setAttribute } from '../../utils';
@@ -19,7 +19,7 @@ export interface LiveComponent extends BaseComponent {
 /**
  * Delay in milliseconds before removing the SR field for Windows Narrator.
  */
-const SR_REMOVAL_DELAY = 50;
+const SR_REMOVAL_DELAY = 90;
 
 /**
  * The component for implementing Live Region to the slider.
@@ -49,30 +49,40 @@ export function Live( Splide: Splide, Components: Components, options: Options )
   const sr = create( 'span', CLASS_SR );
 
   /**
-   * Keeps the timer ID.
+   * Holds the RequestInterval instance.
    */
-  let timer: number;
+  const interval = RequestInterval( SR_REMOVAL_DELAY, apply( toggle, false ) );
 
   /**
    * Called when the component is mounted.
-   * - The `aria-relevant` attribute is important to prevent NVDA from reading contents twice
-   * - Immediately assigning `aria-hidden` makes Windows Narrator silent, hence requires the delay around 50ms.
+   * - JAWS needs `aria-atomic` to make the `aria-busy` work.
+   * - Immediately removing the SR makes Windows Narrator silent, hence requires the delay around 50ms.
    */
   function mount(): void {
     if ( enabled ) {
       disable( ! Components.Autoplay.isPaused() );
-      setAttribute( track, ARIA_RELEVANT, 'additions' );
+      setAttribute( track, ARIA_ATOMIC, true );
       sr.textContent = '…';
 
       on( EVENT_AUTOPLAY_PLAY, apply( disable, true ) );
       on( EVENT_AUTOPLAY_PAUSE, apply( disable, false ) );
+      on( [ EVENT_MOVED, EVENT_SCROLLED ], apply( toggle, true ) );
+    }
+  }
 
-      on( [ EVENT_MOVED, EVENT_SCROLLED ], () => {
-        setAttribute( sr, ARIA_HIDDEN, false );
-        append( track, sr );
-        timer && clearTimeout( timer );
-        timer = setTimeout( setAttribute, SR_REMOVAL_DELAY, sr, ARIA_HIDDEN, true );
-      } );
+  /**
+   * Toggles the SR field and `aria-busy`.
+   *
+   * @param active - Determines whether to activate the field or not.
+   */
+  function toggle( active: boolean ): void {
+    setAttribute( track, ARIA_BUSY, active );
+
+    if ( active ) {
+      append( track, sr );
+      interval.start();
+    } else {
+      remove( sr );
     }
   }
 
@@ -80,7 +90,7 @@ export function Live( Splide: Splide, Components: Components, options: Options )
    * Destroys the component.
    */
   function destroy(): void {
-    removeAttribute( track, [ ARIA_LIVE, ARIA_RELEVANT ] );
+    removeAttribute( track, [ ARIA_LIVE, ARIA_ATOMIC, ARIA_BUSY ] );
     remove( sr );
   }
 
