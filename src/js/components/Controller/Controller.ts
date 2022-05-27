@@ -124,7 +124,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
   /**
    * Scrolls the slider to the specified destination with updating indices.
    *
-   * @param destination - An index to scroll the slider to.
+   * @param destination - The position to scroll the slider to.
    * @param duration    - Optional. Specifies the scroll duration.
    * @param snap        - Optional. Whether to snap the slider to the closest slide or not.
    * @param callback    - Optional. A callback function invoked after scroll ends.

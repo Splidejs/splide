@@ -124,7 +124,7 @@ export function Scroll( Splide: Splide, Components: Components, options: Options
       friction *= FRICTION_FACTOR;
 
       if ( abs( diff ) < BOUNCE_DIFF_THRESHOLD ) {
-        scroll( getLimit( exceededLimit( true ) ), BOUNCE_DURATION, false, undefined, true );
+        scroll( getLimit( exceededLimit( true ) ), BOUNCE_DURATION, false, callback, true );
       }
     }
   }

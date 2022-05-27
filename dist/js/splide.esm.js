@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 4.0.3
+ * Version  : 4.0.4
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
@@ -2064,7 +2064,7 @@ function Scroll(Splide2, Components2, options) {
       friction *= FRICTION_FACTOR;
 
       if (abs(diff) < BOUNCE_DIFF_THRESHOLD) {
-        scroll(getLimit(exceededLimit(true)), BOUNCE_DURATION, false, void 0, true);
+        scroll(getLimit(exceededLimit(true)), BOUNCE_DURATION, false, callback, true);
       }
     }
   }
