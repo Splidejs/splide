@@ -12,7 +12,7 @@ import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, BaseComponent, Components, Options, TransitionComponent } from '../../types';
-import { abs, ceil, clamp, isUndefined, rect, sign, style } from '../../utils';
+import { abs, ceil, clamp, isUndefined, rect, style } from '../../utils';
 
 
 /**
@@ -90,12 +90,19 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * @param callback - Optional. A callback function invoked after transition ends.
    */
   function move( dest: number, index: number, prev: number, callback?: AnyFunction ): void {
-    const position = getPosition();
-    const crossing = sign( dest - prev ) * orient( toPosition( dest ) - position ) < 0;
+    const position    = getPosition();
+    const shifted     = shift( position, dest > prev );
+    const oriented    = orient( shifted );
+    const destination = toPosition( dest );
+    const shouldShift = dest !== index || abs( shifted - destination ) < abs( position - destination );
 
-    if ( ( dest !== index || crossing ) && canShift( dest > prev ) ) {
+    const canShift = dest > prev
+      ? oriented >= 0
+      : oriented <= list[ resolve( 'scrollWidth' ) ] - rect( track )[ resolve( 'width' ) ];
+
+    if ( shouldShift && canShift ) {
       cancel();
-      translate( shift( position, dest > prev ), true );
+      translate( shifted, true );
     }
 
     set( MOVING );
@@ -258,20 +265,6 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    */
   function getLimit( max: boolean ): number {
     return toPosition( max ? Components.Controller.getEnd() : 0, !! options.trimSpace );
-  }
-
-  /**
-   * Checks if there is enough width to shift the slider.
-   *
-   * @param backwards - `true` for checking backwards, or `false` for doing forwards.
-   *
-   * @return `true` if the slider can be shifted for the specified direction, or otherwise `false`.
-   */
-  function canShift( backwards: boolean ): boolean {
-    const shifted = orient( shift( getPosition(), backwards ) );
-    return backwards
-      ? shifted >= 0
-      : shifted <= list[ resolve( 'scrollWidth' ) ] - rect( track )[ resolve( 'width' ) ];
   }
 
   /**

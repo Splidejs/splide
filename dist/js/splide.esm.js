@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 4.0.4
+ * Version  : 4.0.5
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
@@ -1423,11 +1423,15 @@ function Move(Splide2, Components2, options) {
 
   function move(dest, index, prev, callback) {
     var position = getPosition();
-    var crossing = sign(dest - prev) * orient(toPosition(dest) - position) < 0;
+    var shifted = shift(position, dest > prev);
+    var oriented = orient(shifted);
+    var destination = toPosition(dest);
+    var shouldShift = dest !== index || abs(shifted - destination) < abs(position - destination);
+    var canShift = dest > prev ? oriented >= 0 : oriented <= list[resolve("scrollWidth")] - rect(track)[resolve("width")];
 
-    if ((dest !== index || crossing) && canShift(dest > prev)) {
+    if (shouldShift && canShift) {
       cancel();
-      translate(shift(position, dest > prev), true);
+      translate(shifted, true);
     }
 
     set(MOVING);
@@ -1524,11 +1528,6 @@ function Move(Splide2, Components2, options) {
     return toPosition(max ? Components2.Controller.getEnd() : 0, !!options.trimSpace);
   }
 
-  function canShift(backwards) {
-    var shifted = orient(shift(getPosition(), backwards));
-    return backwards ? shifted >= 0 : shifted <= list[resolve("scrollWidth")] - rect(track)[resolve("width")];
-  }
-
   function exceededLimit(max, position) {
     position = isUndefined(position) ? getPosition() : position;
     var exceededMin = max !== true && orient(position) < orient(getLimit(false));
@@ -1604,7 +1603,7 @@ function Controller(Splide2, Components2, options) {
 
   function scroll(destination, duration, snap, callback) {
     Components2.Scroll.scroll(destination, duration, snap, function () {
-      setIndex(loop(Move.toIndex(Move.getPosition())));
+      setIndex(loop(Move.toIndex(getPosition())));
       callback && callback();
     });
   }

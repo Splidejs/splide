@@ -17,7 +17,6 @@ export interface ControllerComponent extends BaseComponent {
   scroll( destination: number, duration?: number, snap?: boolean, callback?: AnyFunction ): void;
   getNext( destination?: boolean ): number;
   getPrev( destination?: boolean ): number;
-  getAdjacent( prev: boolean, destination?: boolean ): number;
   getEnd(): number;
   setIndex( index: number ): void;
   getIndex( prev?: boolean ): number;
@@ -26,6 +25,9 @@ export interface ControllerComponent extends BaseComponent {
   toDest( position: number ): number;
   hasFocus(): boolean;
   isBusy(): boolean;
+
+  /** @internal */
+  getAdjacent( prev: boolean, destination?: boolean ): number;
 }
 
 /**
@@ -84,7 +86,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
 
   /**
    * Initializes some parameters.
-   * Needs to check the slides length since the current index may be out of the range after refresh.
+   * Needs to check the number of slides since the current index may be out of the range after refresh.
    * The process order must be Elements -> Controller -> Move.
    */
   function init(): void {
@@ -131,7 +133,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    */
   function scroll( destination: number, duration?: number, snap?: boolean, callback?: AnyFunction ): void {
     Components.Scroll.scroll( destination, duration, snap, () => {
-      setIndex( loop( Move.toIndex( Move.getPosition() ) ) );
+      setIndex( loop( Move.toIndex( getPosition() ) ) );
       callback && callback();
     } );
   }

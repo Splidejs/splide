@@ -111,7 +111,6 @@ interface ControllerComponent extends BaseComponent {
     scroll(destination: number, duration?: number, snap?: boolean, callback?: AnyFunction): void;
     getNext(destination?: boolean): number;
     getPrev(destination?: boolean): number;
-    getAdjacent(prev: boolean, destination?: boolean): number;
     getEnd(): number;
     setIndex(index: number): void;
     getIndex(prev?: boolean): number;
@@ -120,6 +119,8 @@ interface ControllerComponent extends BaseComponent {
     toDest(position: number): number;
     hasFocus(): boolean;
     isBusy(): boolean;
+    /** @internal */
+    getAdjacent(prev: boolean, destination?: boolean): number;
 }
 
 /**
