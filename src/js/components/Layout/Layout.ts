@@ -162,7 +162,7 @@ export function Layout( Splide: Splide, Components: Components, options: Options
   /**
    * Returns the list width for the horizontal slider, or the height for the vertical slider.
    *
-   * @return The size of the track element in pixel.
+   * @return The size of the list element in pixel.
    */
   function listSize(): number {
     return rect( list )[ resolve( 'width' ) ];
