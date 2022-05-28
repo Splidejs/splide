@@ -90,19 +90,9 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * @param callback - Optional. A callback function invoked after transition ends.
    */
   function move( dest: number, index: number, prev: number, callback?: AnyFunction ): void {
-    const position    = getPosition();
-    const shifted     = shift( position, dest > prev );
-    const oriented    = orient( shifted );
-    const destination = toPosition( dest );
-    const shouldShift = dest !== index || abs( shifted - destination ) < abs( position - destination );
-
-    const canShift = dest > prev
-      ? oriented >= 0
-      : oriented <= list[ resolve( 'scrollWidth' ) ] - rect( track )[ resolve( 'width' ) ];
-
-    if ( shouldShift && canShift ) {
+    if ( dest !== index && canShift( dest > prev ) ) {
       cancel();
-      translate( shifted, true );
+      translate( shift( getPosition(), dest > prev ), true );
     }
 
     set( MOVING );
@@ -139,15 +129,15 @@ export function Move( Splide: Splide, Components: Components, options: Options )
   }
 
   /**
-   * Loops the provided position if it exceeds bounds.
+   * Loops the provided position if it exceeds bounds (limit indices).
    *
    * @param position - A position to loop.
    */
   function loop( position: number ): number {
     if ( Splide.is( LOOP ) ) {
-      const diff        = orient( position - getPosition() );
-      const exceededMin = exceededLimit( false, position ) && diff < 0;
-      const exceededMax = exceededLimit( true, position ) && diff > 0;
+      const index       = toIndex( position );
+      const exceededMax = index > Components.Controller.getEnd();
+      const exceededMin = index < 0;
 
       if ( exceededMin || exceededMax ) {
         position = shift( position, exceededMax );
@@ -265,6 +255,20 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    */
   function getLimit( max: boolean ): number {
     return toPosition( max ? Components.Controller.getEnd() : 0, !! options.trimSpace );
+  }
+
+  /**
+   * Checks if there is enough width to shift the slider.
+   *
+   * @param backwards - `true` for checking backwards, or `false` for doing forwards.
+   *
+   * @return `true` if the slider can be shifted for the specified direction, or otherwise `false`.
+   */
+  function canShift( backwards: boolean ): boolean {
+    const shifted = orient( shift( getPosition(), backwards ) );
+    return backwards
+      ? shifted >= 0
+      : shifted <= list[ resolve( 'scrollWidth' ) ] - rect( track )[ resolve( 'width' ) ];
   }
 
   /**

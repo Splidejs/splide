@@ -1,4 +1,4 @@
-import { init } from '../../../test';
+import { init, setSlidesRect } from '../../../test';
 
 
 describe( 'Move', () => {
@@ -31,11 +31,14 @@ describe( 'Move', () => {
   } );
 
   test( 'can loop the slider if it exceeds bounds.', () => {
-    // Note: All clones do not have dimensions.
     const width    = 200;
     const splide   = init( { type: 'loop', width, height: 100 } );
     const { Move } = splide.Components;
     const { list } = splide.Components.Elements;
+
+    // All clones do not have dimensions in this jest env. Forcibly sets them.
+    setSlidesRect( splide.Components.Slides.get().map( Slide => Slide.slide ), list, width, 1 );
+    Move.jump( 0 );
 
     Move.translate( width );
     expect( list.style.transform ).toBe( `translateX(${ -width * ( splide.length - 1 ) }px)` );

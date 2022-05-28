@@ -12,6 +12,18 @@ interface InitArgs extends BuildHtmlArgs {
   insertHtml?: boolean;
 }
 
+const DOM_RECT = {
+  x     : 0,
+  y     : 0,
+  width : 0,
+  height: 0,
+  top   : 0,
+  right : 0,
+  bottom: 0,
+  left  : 0,
+  toJSON: () => '',
+};
+
 /**
  * Creates a new splide instance.
  *
@@ -56,48 +68,25 @@ export function init( options: Options = {}, args: InitArgs = {} ): Splide {
 
   const root   = id ? document.getElementById( id ) : document.querySelector( `.${ CLASS_ROOT }` );
   const track  = root.querySelector( `.${ CLASS_TRACK }` );
-  const list   = root.querySelector( `.${ CLASS_LIST }` );
-  const slides = root.querySelectorAll( `.${ CLASS_SLIDE }` );
-
-  const domRect = {
-    x     : 0,
-    y     : 0,
-    width : 0,
-    height: 0,
-    top   : 0,
-    right : 0,
-    bottom: 0,
-    left  : 0,
-    toJSON: () => '',
-  };
+  const list   = root.querySelector<HTMLElement>( `.${ CLASS_LIST }` );
+  const slides = root.querySelectorAll<HTMLElement>( `.${ CLASS_SLIDE }` );
 
   root.getBoundingClientRect = (): DOMRect => {
-    return assign( {}, domRect, { width: +width } );
+    return assign( {}, DOM_RECT, { width: +width } );
   };
 
   track.getBoundingClientRect = (): DOMRect => {
-    return assign( {}, domRect, { width: +width, right: +width } );
+    return assign( {}, DOM_RECT, { width: +width, right: +width } );
   };
 
   list.getBoundingClientRect = (): DOMRect => {
-    return assign( {}, domRect, {
+    return assign( {}, DOM_RECT, {
       width: +width,
-      ...parseTransform( list as HTMLElement ),
+      ...parseTransform( list ),
     } );
   };
 
-  slides.forEach( ( slide, index ) => {
-    slide.getBoundingClientRect = (): DOMRect => {
-      const offsets = parseTransform( list as HTMLElement );
-
-      return assign( {}, domRect, {
-        width : slideWidth,
-        height: slideHeight,
-        left  : slideWidth * index + offsets.left,
-        right : slideWidth * index + slideWidth + offsets.left,
-      } );
-    };
-  } );
+  setSlidesRect( Array.from( slides ), list, slideWidth, slideHeight );
 
   const splide = new Splide( root as HTMLElement, options );
 
@@ -109,7 +98,30 @@ export function init( options: Options = {}, args: InitArgs = {} ): Splide {
 }
 
 /**
- * Converts translate values to positions.
+ * Forcibly sets dimensions of provided slides.
+ *
+ * @param slides - An array with slides.
+ * @param list   - A List element.
+ * @param width  - Width of each slide.
+ * @param height - Height of each slide.
+ */
+export function setSlidesRect( slides: HTMLElement[], list: HTMLElement, width: number, height: number ): void {
+  slides.forEach( ( slide, index ) => {
+    slide.getBoundingClientRect = (): DOMRect => {
+      const offsets = parseTransform( list );
+
+      return assign( {}, DOM_RECT, {
+        width : width,
+        height: height,
+        left  : width * index + offsets.left,
+        right : width * index + width + offsets.left,
+      } );
+    };
+  } );
+}
+
+/**
+ * Converts translate values to position.
  *
  * @param elm - An element to parse.
  *

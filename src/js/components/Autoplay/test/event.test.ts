@@ -67,6 +67,6 @@ describe( 'Autoplay', () => {
 
     // Around 2000ms
     await wait( 400 + 50 );
-    expect( progressRate ).toBeLessThan( 0.1 );
+    expect( progressRate ).toBeLessThan( 0.15 );
   } );
 } );

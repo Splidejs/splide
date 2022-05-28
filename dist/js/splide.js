@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 4.0.5
+ * Version  : 4.0.6
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
@@ -1420,16 +1420,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function move(dest, index, prev, callback) {
-      var position = getPosition();
-      var shifted = shift(position, dest > prev);
-      var oriented = orient(shifted);
-      var destination = toPosition(dest);
-      var shouldShift = dest !== index || abs(shifted - destination) < abs(position - destination);
-      var canShift = dest > prev ? oriented >= 0 : oriented <= list[resolve("scrollWidth")] - rect(track)[resolve("width")];
-
-      if (shouldShift && canShift) {
+      if (dest !== index && canShift(dest > prev)) {
         cancel();
-        translate(shifted, true);
+        translate(shift(getPosition(), dest > prev), true);
       }
 
       set(MOVING);
@@ -1455,9 +1448,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function loop(position) {
       if (Splide2.is(LOOP)) {
-        var diff = orient(position - getPosition());
-        var exceededMin = exceededLimit(false, position) && diff < 0;
-        var exceededMax = exceededLimit(true, position) && diff > 0;
+        var index = toIndex(position);
+        var exceededMax = index > Components2.Controller.getEnd();
+        var exceededMin = index < 0;
 
         if (exceededMin || exceededMax) {
           position = shift(position, exceededMax);
@@ -1524,6 +1517,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function getLimit(max) {
       return toPosition(max ? Components2.Controller.getEnd() : 0, !!options.trimSpace);
+    }
+
+    function canShift(backwards) {
+      var shifted = orient(shift(getPosition(), backwards));
+      return backwards ? shifted >= 0 : shifted <= list[resolve("scrollWidth")] - rect(track)[resolve("width")];
     }
 
     function exceededLimit(max, position) {
