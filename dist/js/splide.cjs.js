@@ -1658,7 +1658,7 @@ function Controller(Splide2, Components2, options) {
       }
 
       if (dest < 0 || dest > end) {
-        if (between(0, dest, from, true) || between(end, from, dest, true)) {
+        if (!perMove && (between(0, dest, from, true) || between(end, from, dest, true))) {
           dest = toIndex(toPage(dest));
         } else {
           if (isLoop) {

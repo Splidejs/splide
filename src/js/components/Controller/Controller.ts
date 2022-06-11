@@ -213,7 +213,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
       }
 
       if ( dest < 0 || dest > end ) {
-        if ( between( 0, dest, from, true ) || between( end, from, dest, true ) ) {
+        if ( ! perMove && ( between( 0, dest, from, true ) || between( end, from, dest, true ) ) ) {
           dest = toIndex( toPage( dest ) );
         } else {
           if ( isLoop ) {
