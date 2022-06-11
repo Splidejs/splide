@@ -253,8 +253,8 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
 
     const trackRect = rect( Components.Elements.track );
     const slideRect = rect( slide );
-    const left      = resolve( 'left' );
-    const right     = resolve( 'right' );
+    const left      = resolve( 'left', true );
+    const right     = resolve( 'right', true );
 
     return floor( trackRect[ left ] ) <= ceil( slideRect[ left ] )
       && floor( slideRect[ right ] ) <= ceil( trackRect[ right ] );

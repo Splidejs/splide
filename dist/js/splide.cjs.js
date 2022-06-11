@@ -1006,8 +1006,8 @@ function Slide$1(Splide2, index, slideIndex, slide) {
 
     var trackRect = rect(Components.Elements.track);
     var slideRect = rect(slide);
-    var left = resolve("left");
-    var right = resolve("right");
+    var left = resolve("left", true);
+    var right = resolve("right", true);
     return floor(trackRect[left]) <= ceil(slideRect[left]) && floor(slideRect[right]) <= ceil(trackRect[right]);
   }
 
