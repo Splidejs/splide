@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 4.0.7
+ * Version  : 4.0.8
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
@@ -894,7 +894,6 @@ function Slide$1(Splide2, index, slideIndex, slide) {
   var label = getAttribute(slide, ARIA_LABEL);
   var isClone = slideIndex > -1;
   var container = child(slide, "." + CLASS_CONTAINER);
-  var focusableNodes = queryAll(slide, options.focusableNodes || "");
   var destroyed;
 
   function mount() {
@@ -973,7 +972,7 @@ function Slide$1(Splide2, index, slideIndex, slide) {
       setAttribute(slide, ARIA_HIDDEN, hidden || "");
     }
 
-    setAttribute(focusableNodes, TAB_INDEX, hidden ? -1 : "");
+    setAttribute(queryAll(slide, options.focusableNodes || ""), TAB_INDEX, hidden ? -1 : "");
 
     if (slideFocus) {
       setAttribute(slide, TAB_INDEX, hidden ? -1 : 0);

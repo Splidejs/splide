@@ -73,7 +73,7 @@ export interface  SlideComponent extends BaseComponent {
 }
 
 /**
- * The sub component for managing each slide.
+ * The subcomponent for managing each slide.
  *
  * @since 3.0.0
  *
@@ -82,7 +82,7 @@ export interface  SlideComponent extends BaseComponent {
  * @param slideIndex - A slide index for clones. This must be `-1` if the slide is not a clone.
  * @param slide      - A slide element.
  *
- * @return A Slide sub component.
+ * @return A Slide subcomponent.
  */
 export function Slide( Splide: Splide, index: number, slideIndex: number, slide: HTMLElement ): SlideComponent {
   const event = EventInterface( Splide );
@@ -90,11 +90,10 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   const { Components, root, options } = Splide;
   const { isNavigation, updateOnMove, i18n, pagination, slideFocus } = options;
   const { resolve } = Components.Direction;
-  const styles         = getAttribute( slide, 'style' );
-  const label          = getAttribute( slide, ARIA_LABEL );
-  const isClone        = slideIndex > -1;
-  const container      = child( slide, `.${ CLASS_CONTAINER }` );
-  const focusableNodes = queryAll( slide, options.focusableNodes || '' );
+  const styles    = getAttribute( slide, 'style' );
+  const label     = getAttribute( slide, ARIA_LABEL );
+  const isClone   = slideIndex > -1;
+  const container = child( slide, `.${ CLASS_CONTAINER }` );
 
   /**
    * Turns into `true` when the component is destroyed.
@@ -205,7 +204,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
       setAttribute( slide, ARIA_HIDDEN, hidden || '' );
     }
 
-    setAttribute( focusableNodes, TAB_INDEX, hidden ? -1 : '' );
+    setAttribute( queryAll( slide, options.focusableNodes || '' ), TAB_INDEX, hidden ? -1 : '' );
 
     if ( slideFocus ) {
       setAttribute( slide, TAB_INDEX, hidden ? -1 : 0 );
