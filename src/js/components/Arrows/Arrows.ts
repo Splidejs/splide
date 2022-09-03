@@ -53,12 +53,12 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
   const { on, bind, emit } = event;
   const { classes, i18n } = options;
   const { Elements, Controller } = Components;
-  const { arrows: userArrows, track } = Elements;
+  const { arrows: placeholder, track } = Elements;
 
   /**
    * The wrapper element.
    */
-  let wrapper = userArrows;
+  let wrapper = placeholder;
 
   /**
    * The previous arrow element.
@@ -133,7 +133,7 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
     removeClass( wrapper, wrapperClasses );
 
     if ( created ) {
-      remove( userArrows ? [ prev, next ] : wrapper );
+      remove( placeholder ? [ prev, next ] : wrapper );
       prev = next = null;
     } else {
       removeAttribute( [ prev, next ], ALL_ATTRIBUTES );
@@ -162,13 +162,13 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
    * Create arrows and append them to the slider.
    */
   function createArrows(): void {
-    wrapper = userArrows || create( 'div', classes.arrows );
+    wrapper = placeholder || create( 'div', classes.arrows );
     prev    = createArrow( true );
     next    = createArrow( false );
     created = true;
 
     append( wrapper, [ prev, next ] );
-    ! userArrows && before( wrapper, track );
+    ! placeholder && before( wrapper, track );
   }
 
   /**

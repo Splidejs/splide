@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 4.0.8
+ * Version  : 4.0.9
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
@@ -1758,9 +1758,9 @@ function Arrows(Splide2, Components2, options) {
       i18n = options.i18n;
   var Elements = Components2.Elements,
       Controller = Components2.Controller;
-  var userArrows = Elements.arrows,
+  var placeholder = Elements.arrows,
       track = Elements.track;
-  var wrapper = userArrows;
+  var wrapper = placeholder;
   var prev = Elements.prev;
   var next = Elements.next;
   var created;
@@ -1806,7 +1806,7 @@ function Arrows(Splide2, Components2, options) {
     removeClass(wrapper, wrapperClasses);
 
     if (created) {
-      remove(userArrows ? [prev, next] : wrapper);
+      remove(placeholder ? [prev, next] : wrapper);
       prev = next = null;
     } else {
       removeAttribute([prev, next], ALL_ATTRIBUTES);
@@ -1824,12 +1824,12 @@ function Arrows(Splide2, Components2, options) {
   }
 
   function createArrows() {
-    wrapper = userArrows || create("div", classes.arrows);
+    wrapper = placeholder || create("div", classes.arrows);
     prev = createArrow(true);
     next = createArrow(false);
     created = true;
     append(wrapper, [prev, next]);
-    !userArrows && before(wrapper, track);
+    !placeholder && before(wrapper, track);
   }
 
   function createArrow(prev2) {
@@ -2483,6 +2483,7 @@ function Pagination(Splide2, Components2, options) {
       getIndex = Controller.getIndex,
       go = Controller.go;
   var resolve = Components2.Direction.resolve;
+  var placeholder = Elements.pagination;
   var items = [];
   var list;
   var paginationClasses;
@@ -2490,8 +2491,10 @@ function Pagination(Splide2, Components2, options) {
   function mount() {
     destroy();
     on([EVENT_UPDATED, EVENT_REFRESH], mount);
+    var enabled = options.pagination && Slides.isEnough();
+    placeholder && display(placeholder, enabled ? "" : "none");
 
-    if (options.pagination && Slides.isEnough()) {
+    if (enabled) {
       on([EVENT_MOVE, EVENT_SCROLL, EVENT_SCROLLED], update);
       createPagination();
       update();
@@ -2504,7 +2507,7 @@ function Pagination(Splide2, Components2, options) {
 
   function destroy() {
     if (list) {
-      remove(Elements.pagination ? slice(list.children) : list);
+      remove(placeholder ? slice(list.children) : list);
       removeClass(list, paginationClasses);
       empty(items);
       list = null;
@@ -2519,7 +2522,7 @@ function Pagination(Splide2, Components2, options) {
         i18n = options.i18n,
         perPage = options.perPage;
     var max = hasFocus() ? length : ceil(length / perPage);
-    list = Elements.pagination || create("ul", classes.pagination, Elements.track.parentElement);
+    list = placeholder || create("ul", classes.pagination, Elements.track.parentElement);
     addClass(list, paginationClasses = CLASS_PAGINATION + "--" + getDirection());
     setAttribute(list, ROLE, "tablist");
     setAttribute(list, ARIA_LABEL, i18n.select);

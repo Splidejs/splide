@@ -25,7 +25,7 @@ import {
   addClass,
   apply,
   ceil,
-  create,
+  create, display,
   empty,
   focus,
   format,
@@ -89,6 +89,7 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
   const { Slides, Elements, Controller } = Components;
   const { hasFocus, getIndex, go } = Controller;
   const { resolve } = Components.Direction;
+  const { pagination: placeholder } = Elements;
 
   /**
    * Stores all pagination items.
@@ -110,10 +111,12 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
    */
   function mount(): void {
     destroy();
-
     on( [ EVENT_UPDATED, EVENT_REFRESH ], mount );
 
-    if ( options.pagination && Slides.isEnough() ) {
+    const enabled = options.pagination && Slides.isEnough();
+    placeholder && display( placeholder, enabled ? '' : 'none' );
+
+    if ( enabled ) {
       on( [ EVENT_MOVE, EVENT_SCROLL, EVENT_SCROLLED ], update );
       createPagination();
       update();
@@ -126,7 +129,7 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
    */
   function destroy(): void {
     if ( list ) {
-      remove( Elements.pagination ? slice( list.children ) : list );
+      remove( placeholder ? slice( list.children ) : list );
       removeClass( list, paginationClasses );
       empty( items );
       list = null;
@@ -143,7 +146,7 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
     const { classes, i18n, perPage } = options;
     const max = hasFocus() ? length : ceil( length / perPage );
 
-    list = Elements.pagination || create( 'ul', classes.pagination, Elements.track.parentElement );
+    list = placeholder || create( 'ul', classes.pagination, Elements.track.parentElement );
 
     addClass( list, ( paginationClasses = `${ CLASS_PAGINATION }--${ getDirection() }` ) );
     setAttribute( list, ROLE, 'tablist' );
