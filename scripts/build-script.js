@@ -22,8 +22,8 @@ async function buildScript( compress, type = 'default' ) {
         configFile: path.resolve( __dirname, '../.babelrc' ),
         allowAllFormats: true,
       } ),
-      compress ? minify( { minify: { sourceMap: true } } ) : false,
-    ]
+      compress ? minify() : false,
+    ],
   } );
 
   await bundle.write( {
@@ -53,7 +53,7 @@ Promise.all( [
   buildScript(),
   buildScript( true ),
   buildScript( true, 'renderer' ),
-] ).catch( e => console.error( e ) );
+] ).catch( console.error );
 
 exports.buildJs       = () => buildScript();
 exports.buildMin      = () => buildScript( true );
