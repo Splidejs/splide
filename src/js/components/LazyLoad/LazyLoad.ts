@@ -1,7 +1,6 @@
 import { CLASS_LOADING } from '../../constants/classes';
 import {
   EVENT_LAZYLOAD_LOADED,
-  EVENT_MOUNTED,
   EVENT_MOVED,
   EVENT_REFRESH,
   EVENT_RESIZE,
@@ -60,7 +59,7 @@ type LazyLoadEntry = [ HTMLImageElement, SlideComponent, HTMLSpanElement ];
 export function LazyLoad( Splide: Splide, Components: Components, options: Options ): LazyLoadComponent {
   const { on, off, bind, emit } = EventInterface( Splide );
   const isSequential = options.lazyLoad === 'sequential';
-  const events       = [ EVENT_MOUNTED, EVENT_REFRESH, EVENT_MOVED, EVENT_SCROLLED ];
+  const events       = [ EVENT_MOVED, EVENT_SCROLLED ];
 
   /**
    * Stores data of images.
@@ -74,17 +73,31 @@ export function LazyLoad( Splide: Splide, Components: Components, options: Optio
     if ( options.lazyLoad ) {
       init();
       on( EVENT_REFRESH, init );
-      isSequential || on( events, check );
     }
   }
 
   /**
-   * Finds images to register entries.
-   * Note that spinner can be already available because of `refresh()`.
+   * Initializes the component and start loading images.
+   * Be aware that `refresh` also calls this method.
    */
   function init() {
     empty( entries );
+    register();
 
+    if ( isSequential ) {
+      loadNext();
+    } else {
+      off( events );
+      on( events, check );
+      check();
+    }
+  }
+
+  /**
+   * Finds images and register them as entries with creating spinner elements.
+   * Note that spinner can be already available because of `refresh()`.
+   */
+  function register(): void {
     Components.Slides.forEach( Slide => {
       queryAll<HTMLImageElement>( Slide.slide, IMAGE_SELECTOR ).forEach( img => {
         const src    = getAttribute( img, SRC_DATA_ATTRIBUTE );
@@ -100,8 +113,6 @@ export function LazyLoad( Splide: Splide, Components: Components, options: Optio
         }
       } );
     } );
-
-    isSequential && loadNext();
   }
 
   /**

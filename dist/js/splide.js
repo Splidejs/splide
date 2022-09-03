@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 4.0.11
+ * Version  : 4.0.12
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
@@ -2396,19 +2396,30 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         emit = _EventInterface12.emit;
 
     var isSequential = options.lazyLoad === "sequential";
-    var events = [EVENT_MOUNTED, EVENT_REFRESH, EVENT_MOVED, EVENT_SCROLLED];
+    var events = [EVENT_MOVED, EVENT_SCROLLED];
     var entries = [];
 
     function mount() {
       if (options.lazyLoad) {
         init();
         on(EVENT_REFRESH, init);
-        isSequential || on(events, check);
       }
     }
 
     function init() {
       empty(entries);
+      register();
+
+      if (isSequential) {
+        loadNext();
+      } else {
+        off(events);
+        on(events, check);
+        check();
+      }
+    }
+
+    function register() {
       Components2.Slides.forEach(function (Slide) {
         queryAll(Slide.slide, IMAGE_SELECTOR).forEach(function (img) {
           var src = getAttribute(img, SRC_DATA_ATTRIBUTE);
@@ -2423,7 +2434,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           }
         });
       });
-      isSequential && loadNext();
     }
 
     function check() {

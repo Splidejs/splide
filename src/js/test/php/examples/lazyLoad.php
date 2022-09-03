@@ -17,7 +17,7 @@ $settings = get_settings();
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide01 = new Splide( '#splide01', {
-        perPage    : 2,
+        perPage    : 1,
         // type       : 'fade',
         lazyLoad   : 'nearby',
         // cover      : true,
