@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 4.0.9
+ * Version  : 4.0.11
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
@@ -2405,7 +2405,7 @@ function LazyLoad(Splide2, Components2, options) {
     if (options.lazyLoad) {
       init();
       on(EVENT_REFRESH, init);
-      isSequential || on(events, observe);
+      isSequential || on(events, check);
     }
   }
 
@@ -2428,7 +2428,7 @@ function LazyLoad(Splide2, Components2, options) {
     isSequential && loadNext();
   }
 
-  function observe() {
+  function check() {
     entries = entries.filter(function (data) {
       var distance = options.perPage * ((options.preloadPages || 1) + 1) - 1;
       return data[1].isWithin(Splide2.index, distance) ? load(data) : true;
@@ -2467,7 +2467,8 @@ function LazyLoad(Splide2, Components2, options) {
 
   return {
     mount: mount,
-    destroy: apply(empty, entries)
+    destroy: apply(empty, entries),
+    check: check
   };
 }
 

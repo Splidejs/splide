@@ -189,6 +189,8 @@ interface KeyboardComponent extends BaseComponent {
  * @since 3.0.0
  */
 interface LazyLoadComponent extends BaseComponent {
+    /** @internal */
+    check(): void;
 }
 
 /**

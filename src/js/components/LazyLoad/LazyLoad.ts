@@ -34,11 +34,13 @@ import { IMAGE_SELECTOR, SRC_DATA_ATTRIBUTE, SRCSET_DATA_ATTRIBUTE } from './con
  * @since 3.0.0
  */
 export interface LazyLoadComponent extends BaseComponent {
+  /** @internal */
+  check(): void;
 }
 
 /**
  * The type for each entry.
- * Use tuple for better compression.
+ * Use a tuple for better compression.
  *
  * @since 4.0.0
  */
@@ -72,7 +74,7 @@ export function LazyLoad( Splide: Splide, Components: Components, options: Optio
     if ( options.lazyLoad ) {
       init();
       on( EVENT_REFRESH, init );
-      isSequential || on( events, observe );
+      isSequential || on( events, check );
     }
   }
 
@@ -106,7 +108,7 @@ export function LazyLoad( Splide: Splide, Components: Components, options: Optio
    * Checks how close each image is from the active slide, and determines whether to start loading or not.
    * The last `+1` is for the current page.
    */
-  function observe(): void {
+  function check(): void {
     entries = entries.filter( data => {
       const distance = options.perPage * ( ( options.preloadPages || 1 ) + 1 ) - 1;
       return data[ 1 ].isWithin( Splide.index, distance ) ? load( data ) : true;
@@ -116,7 +118,7 @@ export function LazyLoad( Splide: Splide, Components: Components, options: Optio
   }
 
   /**
-   * Starts loading the image in the data.
+   * Starts loading the image in the provided data.
    *
    * @param data - A LazyLoadEntry object.
    */
@@ -163,5 +165,6 @@ export function LazyLoad( Splide: Splide, Components: Components, options: Optio
   return {
     mount,
     destroy: apply( empty, entries ),
+    check,
   };
 }
