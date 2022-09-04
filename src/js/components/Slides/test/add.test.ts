@@ -64,4 +64,19 @@ describe( 'Slides#add()', () => {
     expect( Slides.getAt( 1 ).slide ).toBe( slide1 );
     expect( Slides.getAt( 2 ).slide ).toBe( slide2 );
   } );
+
+  test( 'should not break the order of Slides.', () => {
+    const splide = init( { type: 'loop' } );
+    const { Slides } = splide.Components;
+    const slide  = document.createElement( 'div' );
+    const slides = Slides.get();
+
+    expect( slides[ 0 ].index ).toBeLessThan( 0 ); // negative index for clones
+    expect( slides[ slides.length - 1 ].index ).toBeGreaterThanOrEqual( splide.length );
+
+    Slides.add( slide, 1 ); // This emits refresh.
+
+    expect( slides[ 0 ].index ).toBeLessThan( 0 ); // negative index for clones
+    expect( slides[ slides.length - 1 ].index ).toBeGreaterThanOrEqual( splide.length );
+  } );
 } );

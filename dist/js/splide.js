@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 4.0.14
+ * Version  : 4.0.15
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
@@ -1043,11 +1043,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       init();
       on(EVENT_REFRESH, destroy);
       on(EVENT_REFRESH, init);
-      on([EVENT_MOUNTED, EVENT_REFRESH], function () {
-        Slides2.sort(function (Slide1, Slide2) {
-          return Slide1.index - Slide2.index;
-        });
-      });
     }
 
     function init() {
@@ -1073,6 +1068,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var object = Slide$1(Splide2, index, slideIndex, slide);
       object.mount();
       Slides2.push(object);
+      Slides2.sort(function (Slide1, Slide2) {
+        return Slide1.index - Slide2.index;
+      });
     }
 
     function get(excludeClones) {

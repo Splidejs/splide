@@ -1,10 +1,11 @@
-import { EVENT_MOUNTED, EVENT_REFRESH, EVENT_RESIZE } from '../../constants/events';
+import { EVENT_REFRESH, EVENT_RESIZE } from '../../constants/events';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, BaseComponent, Components, Options } from '../../types';
 import {
   addClass,
-  append, apply,
+  append,
+  apply,
   before,
   between,
   empty,
@@ -90,9 +91,6 @@ export function Slides( Splide: Splide, Components: Components, options: Options
     init();
     on( EVENT_REFRESH, destroy );
     on( EVENT_REFRESH, init );
-    on( [ EVENT_MOUNTED, EVENT_REFRESH ], () => {
-      Slides.sort( ( Slide1, Slide2 ) => Slide1.index - Slide2.index );
-    } );
   }
 
   /**
@@ -119,6 +117,7 @@ export function Slides( Splide: Splide, Components: Components, options: Options
 
   /**
    * Registers a slide element and creates a Slide object.
+   * Needs to sort every time when a new slide is registered especially for clones.
    *
    * @param slide      - A slide element to register.
    * @param index      - A slide index.
@@ -128,6 +127,7 @@ export function Slides( Splide: Splide, Components: Components, options: Options
     const object = Slide( Splide, index, slideIndex, slide );
     object.mount();
     Slides.push( object );
+    Slides.sort( ( Slide1, Slide2 ) => Slide1.index - Slide2.index );
   }
 
   /**
