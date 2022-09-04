@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 4.0.13
+ * Version  : 4.0.14
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
@@ -1646,7 +1646,7 @@ function Controller(Splide2, Components2, options) {
   }
 
   function computeDestIndex(dest, from, snapPage) {
-    if (isEnough()) {
+    if (isEnough() || hasFocus()) {
       var end = getEnd();
       var index = computeMovableDestIndex(dest);
 

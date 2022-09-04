@@ -193,16 +193,17 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    * - If the `move` option is `true`, finds the dest index whose position is different with the current one.
    * - This may return clone indices if the editor is the loop mode,
    *   or `-1` if there is no slide to go.
-   * - There are still slides where the slider can go if borders are between `from` and `dest`.
+   * - There are still slides where the carousel can go if borders are between `from` and `dest`.
+   * - If `focus` is available, needs to calculate the dest index even if there are enough number of slides.
    *
-   * @param dest     - The desired destination.
+   * @param dest     - The desired destination index.
    * @param from     - A base index.
    * @param snapPage - Optional. Whether to snap a page or not.
    *
    * @return A converted destination index, including clones.
    */
   function computeDestIndex( dest: number, from: number, snapPage?: boolean ): number {
-    if ( isEnough() ) {
+    if ( isEnough() || hasFocus() ) {
       const end   = getEnd();
       const index = computeMovableDestIndex( dest );
 
@@ -239,7 +240,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
   }
 
   /**
-   * Finds the dest index whose position is different with the current one.
+   * Finds the dest index whose position is different with the current one for `trimSpace: 'move'`.
    * This can be negative or greater than `length - 1`.
    *
    * @param dest - A dest index.

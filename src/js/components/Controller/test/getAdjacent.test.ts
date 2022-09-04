@@ -92,4 +92,30 @@ describe( 'Controller#getAdjacent()', () => {
     expect( Controller.getNext() ).toBe( 0 );
     expect( Controller.getPrev() ).toBe( splide.length - 2 );
   } );
+
+  test( 'should return -1 if there are not enough slides.', () => {
+    const splide = init( { perPage: 3 }, { length: 3 } );
+    const { Controller } = splide.Components;
+
+    expect( Controller.getNext() ).toBe( -1 );
+    expect( Controller.getPrev() ).toBe( -1 );
+
+    splide.go( 1 );
+
+    expect( Controller.getNext() ).toBe( -1 );
+    expect( Controller.getPrev() ).toBe( -1 );
+  } );
+
+  test( 'should return adjacent indices if there are not enough slides but `focus` is provided.', () => {
+    const splide = init( { perPage: 3, focus: 'center' }, { length: 3 } );
+    const { Controller } = splide.Components;
+
+    expect( Controller.getNext() ).toBe( 1 );
+    expect( Controller.getPrev() ).toBe( -1 );
+
+    splide.go( 1 );
+
+    expect( Controller.getNext() ).toBe( 2 );
+    expect( Controller.getPrev() ).toBe( 0 );
+  } );
 } );

@@ -30,9 +30,9 @@ img {
   border: 2px solid darkgray;
 }
 
-/*.splide__slide.is-active {*/
-/*  border: 2px solid yellowgreen;*/
-/*}*/
+.splide__slide.is-active {
+  border: 2px solid yellowgreen;
+}
 
 /*.splide__slide:focus, .splide__arrow:focus, .splide__pagination__page:focus {*/
 /*  border: 2px solid tomato !important;*/
