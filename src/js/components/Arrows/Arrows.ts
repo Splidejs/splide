@@ -35,6 +35,9 @@ import { PATH, SIZE, XML_NAME_SPACE } from './path';
  */
 export interface ArrowsComponent extends BaseComponent {
   arrows: { prev?: HTMLButtonElement, next?: HTMLButtonElement };
+
+  /** @internal */
+  update(): void;
 }
 
 /**
@@ -210,5 +213,6 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
     arrows,
     mount,
     destroy,
+    update,
   };
 }

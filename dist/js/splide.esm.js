@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 4.0.16
+ * Version  : 4.0.17
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
@@ -1851,7 +1851,8 @@ function Arrows(Splide2, Components2, options) {
   return {
     arrows: arrows,
     mount: mount,
-    destroy: destroy
+    destroy: destroy,
+    update: update
   };
 }
 
