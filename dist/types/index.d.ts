@@ -133,6 +133,8 @@ interface ArrowsComponent extends BaseComponent {
         prev?: HTMLButtonElement;
         next?: HTMLButtonElement;
     };
+    /** @internal */
+    update(): void;
 }
 
 /**
