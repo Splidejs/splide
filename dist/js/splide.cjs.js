@@ -1,6 +1,6 @@
 /*!
  * Splide.js
- * Version  : 4.0.15
+ * Version  : 4.0.16
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
@@ -2018,6 +2018,7 @@ function Scroll(Splide2, Components2, options) {
       getLimit = Move.getLimit,
       exceededLimit = Move.exceededLimit,
       translate = Move.translate;
+  var isSlide = Splide2.is(SLIDE);
   var interval;
   var callback;
   var friction = 1;
@@ -2031,7 +2032,7 @@ function Scroll(Splide2, Components2, options) {
     var from = getPosition();
     clear();
 
-    if (snap) {
+    if (snap && (!isSlide || !exceededLimit())) {
       var size = Components2.Layout.sliderSize();
       var offset = sign(destination) * size * floor(abs(destination) / size) || 0;
       destination = Move.toPosition(Components2.Controller.toDest(destination % size)) + offset;
@@ -2059,7 +2060,7 @@ function Scroll(Splide2, Components2, options) {
     var diff = (target - position) * friction;
     translate(position + diff);
 
-    if (Splide2.is(SLIDE) && !noConstrain && exceededLimit()) {
+    if (isSlide && !noConstrain && exceededLimit()) {
       friction *= FRICTION_FACTOR;
 
       if (abs(diff) < BOUNCE_DIFF_THRESHOLD) {

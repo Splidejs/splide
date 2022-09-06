@@ -34,6 +34,7 @@ export function Scroll( Splide: Splide, Components: Components, options: Options
   const { state: { set } } = Splide;
   const { Move } = Components;
   const { getPosition, getLimit, exceededLimit, translate } = Move;
+  const isSlide = Splide.is( SLIDE );
 
   /**
    * Retains the active RequestInterval object.
@@ -78,7 +79,7 @@ export function Scroll( Splide: Splide, Components: Components, options: Options
 
     clear();
 
-    if ( snap ) {
+    if ( snap && ( ! isSlide || ! exceededLimit() ) ) {
       const size   = Components.Layout.sliderSize();
       const offset = sign( destination ) * size * floor( abs( destination ) / size ) || 0;
       destination = Move.toPosition( Components.Controller.toDest( destination % size ) ) + offset;
@@ -120,7 +121,7 @@ export function Scroll( Splide: Splide, Components: Components, options: Options
 
     translate( position + diff );
 
-    if ( Splide.is( SLIDE ) && ! noConstrain && exceededLimit() ) {
+    if ( isSlide && ! noConstrain && exceededLimit() ) {
       friction *= FRICTION_FACTOR;
 
       if ( abs( diff ) < BOUNCE_DIFF_THRESHOLD ) {
