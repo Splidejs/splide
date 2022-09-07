@@ -10,6 +10,7 @@ import {
 import { CLASS_ACTIVE, CLASS_PAGINATION } from '../../constants/classes';
 import { TTB } from '../../constants/directions';
 import {
+  EVENT_END_INDEX_CHANGED,
   EVENT_MOVE,
   EVENT_PAGINATION_MOUNTED,
   EVENT_PAGINATION_UPDATED,
@@ -112,7 +113,7 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
    */
   function mount(): void {
     destroy();
-    on( [ EVENT_UPDATED, EVENT_REFRESH ], mount );
+    on( [ EVENT_UPDATED, EVENT_REFRESH, EVENT_END_INDEX_CHANGED ], mount );
 
     const enabled = options.pagination && Slides.isEnough();
     placeholder && display( placeholder, enabled ? '' : 'none' );
@@ -145,7 +146,7 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
   function createPagination(): void {
     const { length } = Splide;
     const { classes, i18n, perPage } = options;
-    const max = hasFocus() ? length : ceil( length / perPage );
+    const max = hasFocus() ? Controller.getEnd() + 1 : ceil( length / perPage );
 
     list = placeholder || create( 'ul', classes.pagination, Elements.track.parentElement );
 

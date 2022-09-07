@@ -22,18 +22,21 @@ $settings = get_settings();
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
         width: 800,
-        type        : 'loop',
+        // type        : 'loop',
         perPage: 2,
+        // perMove: 3,
         // rewind: true,
         // rewindByDrag: true,
         padding: '3rem',
         updateOnMove: true,
         direction: 'ltr',
         height: undefined,
-        paginationDirection: 'ttb',
+        // paginationDirection: 'ttb',
         rewindSpeed: 2000,
         // role: '',
         label: '1',
+        focus: 0,
+        compact: true,
 
         // breakpoints: {
         //   1200: {
@@ -107,7 +110,7 @@ $settings = get_settings();
 </head>
 <body>
 
-<?php render( 'splide01', 10 ); ?>
+<?php render( 'splide01', 5 ); ?>
 
 <pre></pre>
 

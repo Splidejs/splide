@@ -1,10 +1,10 @@
-import { EVENT_REFRESH, EVENT_UPDATED } from '../../constants/events';
+import { EVENT_END_INDEX_CHANGED, EVENT_REFRESH, EVENT_RESIZED, EVENT_UPDATED } from '../../constants/events';
 import { MOVING, SCROLLING } from '../../constants/states';
 import { LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, BaseComponent, Components, Options } from '../../types';
-import { apply, approximatelyEqual, between, clamp, floor, isString, isUndefined, max } from '../../utils';
+import { apply, approximatelyEqual, between, clamp, floor, isString, isUndefined, min } from '../../utils';
 
 
 /**
@@ -42,10 +42,11 @@ export interface ControllerComponent extends BaseComponent {
  * @return A Controller component object.
  */
 export function Controller( Splide: Splide, Components: Components, options: Options ): ControllerComponent {
-  const { on } = EventInterface( Splide );
+  const { on, emit } = EventInterface( Splide );
   const { Move } = Components;
   const { getPosition, getLimit, toPosition } = Move;
   const { isEnough, getLength } = Components.Slides;
+  const { compact } = options;
   const isLoop  = Splide.is( LOOP );
   const isSlide = Splide.is( SLIDE );
   const getNext = apply( getAdjacent, false );
@@ -55,6 +56,11 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    * The current index.
    */
   let currIndex = options.start || 0;
+
+  /**
+   * The latest end index.
+   */
+  let endIndex: number;
 
   /**
    * The previous index.
@@ -81,7 +87,8 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    */
   function mount(): void {
     init();
-    on( [ EVENT_UPDATED, EVENT_REFRESH ], init );
+    on( [ EVENT_UPDATED, EVENT_REFRESH, EVENT_END_INDEX_CHANGED ], init );
+    on( EVENT_RESIZED, onResized );
   }
 
   /**
@@ -93,12 +100,23 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
     slideCount = getLength( true );
     perMove    = options.perMove;
     perPage    = options.perPage;
+    endIndex   = getEnd();
 
-    const index = clamp( currIndex, 0, slideCount - 1 );
+    const index = clamp( currIndex, 0, compact ? endIndex : slideCount - 1 );
 
     if ( index !== currIndex ) {
       currIndex = index;
       Move.reposition();
+    }
+  }
+
+  /**
+   * Called when the viewport width is changed.
+   * The end index can change if `autoWidth` or `fixedWidth` is enabled.
+   */
+  function onResized(): void {
+    if ( endIndex !== getEnd() ) {
+      emit( EVENT_END_INDEX_CHANGED );
     }
   }
 
@@ -133,7 +151,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    */
   function scroll( destination: number, duration?: number, snap?: boolean, callback?: AnyFunction ): void {
     Components.Scroll.scroll( destination, duration, snap, () => {
-      setIndex( loop( Move.toIndex( getPosition() ) ) );
+      setIndex( min( loop( Move.toIndex( getPosition() ) ), endIndex ) );
       callback && callback();
     } );
   }
@@ -159,7 +177,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
         index = getPrev( true );
       }
     } else {
-      index = isLoop ? control : clamp( control, 0, getEnd() );
+      index = isLoop ? control : clamp( control, 0, endIndex );
     }
 
     return index;
@@ -181,7 +199,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
 
     if ( dest === -1 && isSlide ) {
       if ( ! approximatelyEqual( getPosition(), getLimit( ! prev ), 1 ) ) {
-        return prev ? 0 : getEnd();
+        return prev ? 0 : endIndex;
       }
     }
 
@@ -204,7 +222,6 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    */
   function computeDestIndex( dest: number, from: number, snapPage?: boolean ): number {
     if ( isEnough() || hasFocus() ) {
-      const end   = getEnd();
       const index = computeMovableDestIndex( dest );
 
       if ( index !== dest ) {
@@ -213,8 +230,8 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
         snapPage = false;
       }
 
-      if ( dest < 0 || dest > end ) {
-        if ( ! perMove && ( between( 0, dest, from, true ) || between( end, from, dest, true ) ) ) {
+      if ( dest < 0 || dest > endIndex ) {
+        if ( ! perMove && ( between( 0, dest, from, true ) || between( endIndex, from, dest, true ) ) ) {
           dest = toIndex( toPage( dest ) );
         } else {
           if ( isLoop ) {
@@ -222,7 +239,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
               ? dest < 0 ? - ( slideCount % perPage || perPage ) : slideCount
               : dest;
           } else if ( options.rewind ) {
-            dest = dest < 0 ? end : 0;
+            dest = dest < 0 ? endIndex : 0;
           } else {
             dest = -1;
           }
@@ -274,11 +291,21 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    * Returns the end index where the slider can go.
    * For example, if the slider has 10 slides and the `perPage` option is 3,
    * the slider can go to the slide 8 (the index is 7).
+   * If the `compact` option is available, computes the index from the slide position.
    *
    * @return An end index.
    */
   function getEnd(): number {
-    return max( slideCount - ( hasFocus() || ( isLoop && perMove ) ? 1 : perPage ), 0 );
+    let end = slideCount - ( hasFocus() || ( isLoop && perMove ) ? 1 : perPage );
+
+    while ( compact && --end > 0 ) {
+      if ( toPosition( slideCount - 1, true ) !== toPosition( end, true ) ) {
+        end++;
+        break;
+      }
+    }
+
+    return clamp( end, 0, slideCount - 1 );
   }
 
   /**
@@ -289,7 +316,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    * @return A slide index.
    */
   function toIndex( page: number ): number {
-    return clamp( hasFocus() ? page : perPage * page, 0, getEnd() );
+    return clamp( hasFocus() ? page : perPage * page, 0, endIndex );
   }
 
   /**
@@ -301,8 +328,8 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    */
   function toPage( index: number ): number {
     return hasFocus()
-      ? index
-      : floor( ( index >= getEnd() ? slideCount - 1 : index ) / perPage );
+      ? min( index, endIndex )
+      : floor( ( index >= endIndex ? slideCount - 1 : index ) / perPage );
   }
 
   /**
@@ -314,7 +341,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    */
   function toDest( destination: number ): number {
     const closest = Move.toIndex( destination );
-    return isSlide ? clamp( closest, 0, getEnd() ) : closest;
+    return isSlide ? clamp( closest, 0, endIndex ) : closest;
   }
 
   /**

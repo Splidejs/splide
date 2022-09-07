@@ -408,17 +408,18 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     };
   }
 
+  var ARROWS = "arrows:";
+  var PAGINATION = "pagination:";
+  var AUTOPLAY = "autoplay:";
   var EVENT_MOUNTED = "mounted";
   var EVENT_READY = "ready";
   var EVENT_MOVE = "move";
   var EVENT_MOVED = "moved";
-  var EVENT_SHIFTED = "shifted";
   var EVENT_CLICK = "click";
   var EVENT_ACTIVE = "active";
   var EVENT_INACTIVE = "inactive";
   var EVENT_VISIBLE = "visible";
   var EVENT_HIDDEN = "hidden";
-  var EVENT_SLIDE_KEYDOWN = "slide:keydown";
   var EVENT_REFRESH = "refresh";
   var EVENT_UPDATED = "updated";
   var EVENT_RESIZE = "resize";
@@ -429,15 +430,18 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var EVENT_SCROLL = "scroll";
   var EVENT_SCROLLED = "scrolled";
   var EVENT_DESTROY = "destroy";
-  var EVENT_ARROWS_MOUNTED = "arrows:mounted";
-  var EVENT_ARROWS_UPDATED = "arrows:updated";
-  var EVENT_PAGINATION_MOUNTED = "pagination:mounted";
-  var EVENT_PAGINATION_UPDATED = "pagination:updated";
+  var EVENT_ARROWS_MOUNTED = ARROWS + "mounted";
+  var EVENT_ARROWS_UPDATED = ARROWS + "updated";
+  var EVENT_PAGINATION_MOUNTED = PAGINATION + "mounted";
+  var EVENT_PAGINATION_UPDATED = PAGINATION + "updated";
   var EVENT_NAVIGATION_MOUNTED = "navigation:mounted";
-  var EVENT_AUTOPLAY_PLAY = "autoplay:play";
-  var EVENT_AUTOPLAY_PLAYING = "autoplay:playing";
-  var EVENT_AUTOPLAY_PAUSE = "autoplay:pause";
+  var EVENT_AUTOPLAY_PLAY = AUTOPLAY + "play";
+  var EVENT_AUTOPLAY_PLAYING = AUTOPLAY + "playing";
+  var EVENT_AUTOPLAY_PAUSE = AUTOPLAY + "pause";
   var EVENT_LAZYLOAD_LOADED = "lazyload:loaded";
+  var EVENT_SLIDE_KEYDOWN = "sk";
+  var EVENT_SHIFTED = "sh";
+  var EVENT_END_INDEX_CHANGED = "ei";
 
   function EventInterface(Splide2) {
     var bus = Splide2 ? Splide2.event.bus : document.createDocumentFragment();
@@ -1546,7 +1550,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
   function Controller(Splide2, Components2, options) {
     var _EventInterface6 = EventInterface(Splide2),
-        on = _EventInterface6.on;
+        on = _EventInterface6.on,
+        emit = _EventInterface6.emit;
 
     var Move = Components2.Move;
     var getPosition = Move.getPosition,
@@ -1555,11 +1560,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var _Components2$Slides = Components2.Slides,
         isEnough = _Components2$Slides.isEnough,
         getLength = _Components2$Slides.getLength;
+    var compact = options.compact;
     var isLoop = Splide2.is(LOOP);
     var isSlide = Splide2.is(SLIDE);
     var getNext = apply(getAdjacent, false);
     var getPrev = apply(getAdjacent, true);
     var currIndex = options.start || 0;
+    var endIndex;
     var prevIndex = currIndex;
     var slideCount;
     var perMove;
@@ -1567,18 +1574,26 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function mount() {
       init();
-      on([EVENT_UPDATED, EVENT_REFRESH], init);
+      on([EVENT_UPDATED, EVENT_REFRESH, EVENT_END_INDEX_CHANGED], init);
+      on(EVENT_RESIZED, onResized);
     }
 
     function init() {
       slideCount = getLength(true);
       perMove = options.perMove;
       perPage = options.perPage;
-      var index = clamp(currIndex, 0, slideCount - 1);
+      endIndex = getEnd();
+      var index = clamp(currIndex, 0, compact ? endIndex : slideCount - 1);
 
       if (index !== currIndex) {
         currIndex = index;
         Move.reposition();
+      }
+    }
+
+    function onResized() {
+      if (endIndex !== getEnd()) {
+        emit(EVENT_END_INDEX_CHANGED);
       }
     }
 
@@ -1596,7 +1611,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function scroll(destination, duration, snap, callback) {
       Components2.Scroll.scroll(destination, duration, snap, function () {
-        setIndex(loop(Move.toIndex(getPosition())));
+        setIndex(min(loop(Move.toIndex(getPosition())), endIndex));
         callback && callback();
       });
     }
@@ -1617,7 +1632,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           index = getPrev(true);
         }
       } else {
-        index = isLoop ? control : clamp(control, 0, getEnd());
+        index = isLoop ? control : clamp(control, 0, endIndex);
       }
 
       return index;
@@ -1629,7 +1644,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       if (dest === -1 && isSlide) {
         if (!approximatelyEqual(getPosition(), getLimit(!prev), 1)) {
-          return prev ? 0 : getEnd();
+          return prev ? 0 : endIndex;
         }
       }
 
@@ -1638,7 +1653,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function computeDestIndex(dest, from, snapPage) {
       if (isEnough() || hasFocus()) {
-        var end = getEnd();
         var index = computeMovableDestIndex(dest);
 
         if (index !== dest) {
@@ -1647,14 +1661,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           snapPage = false;
         }
 
-        if (dest < 0 || dest > end) {
-          if (!perMove && (between(0, dest, from, true) || between(end, from, dest, true))) {
+        if (dest < 0 || dest > endIndex) {
+          if (!perMove && (between(0, dest, from, true) || between(endIndex, from, dest, true))) {
             dest = toIndex(toPage(dest));
           } else {
             if (isLoop) {
               dest = snapPage ? dest < 0 ? -(slideCount % perPage || perPage) : slideCount : dest;
             } else if (options.rewind) {
-              dest = dest < 0 ? end : 0;
+              dest = dest < 0 ? endIndex : 0;
             } else {
               dest = -1;
             }
@@ -1688,20 +1702,29 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function getEnd() {
-      return max(slideCount - (hasFocus() || isLoop && perMove ? 1 : perPage), 0);
+      var end = slideCount - (hasFocus() || isLoop && perMove ? 1 : perPage);
+
+      while (compact && --end > 0) {
+        if (toPosition(slideCount - 1, true) !== toPosition(end, true)) {
+          end++;
+          break;
+        }
+      }
+
+      return clamp(end, 0, slideCount - 1);
     }
 
     function toIndex(page) {
-      return clamp(hasFocus() ? page : perPage * page, 0, getEnd());
+      return clamp(hasFocus() ? page : perPage * page, 0, endIndex);
     }
 
     function toPage(index) {
-      return hasFocus() ? index : floor((index >= getEnd() ? slideCount - 1 : index) / perPage);
+      return hasFocus() ? min(index, endIndex) : floor((index >= endIndex ? slideCount - 1 : index) / perPage);
     }
 
     function toDest(destination) {
       var closest = Move.toIndex(destination);
-      return isSlide ? clamp(closest, 0, getEnd()) : closest;
+      return isSlide ? clamp(closest, 0, endIndex) : closest;
     }
 
     function setIndex(index) {
@@ -1810,7 +1833,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function listen() {
-      on([EVENT_MOVED, EVENT_REFRESH, EVENT_SCROLLED], update);
+      on([EVENT_MOVED, EVENT_REFRESH, EVENT_SCROLLED, EVENT_END_INDEX_CHANGED], update);
       bind(next, "click", apply(go, ">"));
       bind(prev, "click", apply(go, "<"));
     }
@@ -2499,7 +2522,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function mount() {
       destroy();
-      on([EVENT_UPDATED, EVENT_REFRESH], mount);
+      on([EVENT_UPDATED, EVENT_REFRESH, EVENT_END_INDEX_CHANGED], mount);
       var enabled = options.pagination && Slides.isEnough();
       placeholder && display(placeholder, enabled ? "" : "none");
 
@@ -2530,7 +2553,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       var classes = options.classes,
           i18n = options.i18n,
           perPage = options.perPage;
-      var max = hasFocus() ? length : ceil(length / perPage);
+      var max = hasFocus() ? Controller.getEnd() + 1 : ceil(length / perPage);
       list = placeholder || create("ul", classes.pagination, Elements.track.parentElement);
       addClass(list, paginationClasses = CLASS_PAGINATION + "--" + getDirection());
       setAttribute(list, ROLE, "tablist");

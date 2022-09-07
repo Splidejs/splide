@@ -183,6 +183,8 @@ export interface Options extends ResponsiveOptions {
    */
   live?: boolean;
 
+  compact?: boolean;
+
   /**
    * Determines whether to use the Transition component or not.
    */

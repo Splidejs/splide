@@ -424,6 +424,7 @@ interface Options extends ResponsiveOptions {
      * If `true`, screen readers will read a content of each slide whenever slide changes.
      */
     live?: boolean;
+    compact?: boolean;
     /**
      * Determines whether to use the Transition component or not.
      */
@@ -734,10 +735,6 @@ interface EventMap {
     'autoplay:playing': (rate: number) => void;
     'autoplay:pause': () => void;
     'lazyload:loaded': (img: HTMLImageElement, Slide: SlideComponent) => void;
-    /** @internal */
-    'shifted': () => void;
-    'slide:keydown': (Slide: SlideComponent, e: KeyboardEvent) => void;
-    'media': (query: MediaQueryList) => void;
 }
 
 /**
@@ -1559,13 +1556,11 @@ declare const EVENT_MOUNTED = "mounted";
 declare const EVENT_READY = "ready";
 declare const EVENT_MOVE = "move";
 declare const EVENT_MOVED = "moved";
-declare const EVENT_SHIFTED = "shifted";
 declare const EVENT_CLICK = "click";
 declare const EVENT_ACTIVE = "active";
 declare const EVENT_INACTIVE = "inactive";
 declare const EVENT_VISIBLE = "visible";
 declare const EVENT_HIDDEN = "hidden";
-declare const EVENT_SLIDE_KEYDOWN = "slide:keydown";
 declare const EVENT_REFRESH = "refresh";
 declare const EVENT_UPDATED = "updated";
 declare const EVENT_RESIZE = "resize";
@@ -1576,15 +1571,19 @@ declare const EVENT_DRAGGED = "dragged";
 declare const EVENT_SCROLL = "scroll";
 declare const EVENT_SCROLLED = "scrolled";
 declare const EVENT_DESTROY = "destroy";
-declare const EVENT_ARROWS_MOUNTED = "arrows:mounted";
-declare const EVENT_ARROWS_UPDATED = "arrows:updated";
-declare const EVENT_PAGINATION_MOUNTED = "pagination:mounted";
-declare const EVENT_PAGINATION_UPDATED = "pagination:updated";
+declare const EVENT_ARROWS_MOUNTED: string;
+declare const EVENT_ARROWS_UPDATED: string;
+declare const EVENT_PAGINATION_MOUNTED: string;
+declare const EVENT_PAGINATION_UPDATED: string;
 declare const EVENT_NAVIGATION_MOUNTED = "navigation:mounted";
-declare const EVENT_AUTOPLAY_PLAY = "autoplay:play";
-declare const EVENT_AUTOPLAY_PLAYING = "autoplay:playing";
-declare const EVENT_AUTOPLAY_PAUSE = "autoplay:pause";
+declare const EVENT_AUTOPLAY_PLAY: string;
+declare const EVENT_AUTOPLAY_PLAYING: string;
+declare const EVENT_AUTOPLAY_PAUSE: string;
 declare const EVENT_LAZYLOAD_LOADED = "lazyload:loaded";
+/** @internal */
+declare const EVENT_SLIDE_KEYDOWN = "sk";
+declare const EVENT_SHIFTED = "sh";
+declare const EVENT_END_INDEX_CHANGED = "ei";
 
 declare const CLASS_ROOT = "splide";
 declare const CLASS_TRACK: string;
@@ -1675,4 +1674,4 @@ declare const LOOP = "loop";
  */
 declare const FADE = "fade";
 
-export { AnyFunction, ArrowsComponent, AutoplayComponent, BaseComponent, CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_CLONE, CLASS_CONTAINER, CLASS_FOCUS_IN, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SPINNER, CLASS_SR, CLASS_TOGGLE, CLASS_TOGGLE_PAUSE, CLASS_TOGGLE_PLAY, CLASS_TRACK, CLASS_VISIBLE, Cast, ClonesComponent, ComponentConstructor, Components, ControllerComponent, CoverComponent, DEFAULTS, DirectionComponent, DragComponent, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, ElementsComponent, EventBinder, EventBinderObject, EventInterface, EventInterfaceObject, EventMap, FADE, Head, KeyboardComponent, LOOP, LTR, LayoutComponent, LazyLoadComponent, LiveComponent, MediaComponent, MoveComponent, Options, PaginationComponent, PaginationData, PaginationItem, Push, RTL, RequestInterval, RequestIntervalInterface, Resolve, ResponsiveOptions, SLIDE, STATUS_CLASSES, ScrollComponent, Shift, ShiftN, SlideComponent, SlidesComponent, Splide, SplideRenderer, State, StateObject, SyncComponent, SyncTarget, TTB, Throttle, ThrottleInstance, TransitionComponent, WheelComponent, Splide as default };
+export { AnyFunction, ArrowsComponent, AutoplayComponent, BaseComponent, CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_CLONE, CLASS_CONTAINER, CLASS_FOCUS_IN, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SPINNER, CLASS_SR, CLASS_TOGGLE, CLASS_TOGGLE_PAUSE, CLASS_TOGGLE_PLAY, CLASS_TRACK, CLASS_VISIBLE, Cast, ClonesComponent, ComponentConstructor, Components, ControllerComponent, CoverComponent, DEFAULTS, DirectionComponent, DragComponent, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_END_INDEX_CHANGED, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, ElementsComponent, EventBinder, EventBinderObject, EventInterface, EventInterfaceObject, EventMap, FADE, Head, KeyboardComponent, LOOP, LTR, LayoutComponent, LazyLoadComponent, LiveComponent, MediaComponent, MoveComponent, Options, PaginationComponent, PaginationData, PaginationItem, Push, RTL, RequestInterval, RequestIntervalInterface, Resolve, ResponsiveOptions, SLIDE, STATUS_CLASSES, ScrollComponent, Shift, ShiftN, SlideComponent, SlidesComponent, Splide, SplideRenderer, State, StateObject, SyncComponent, SyncTarget, TTB, Throttle, ThrottleInstance, TransitionComponent, WheelComponent, Splide as default };

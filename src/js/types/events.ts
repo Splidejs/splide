@@ -38,9 +38,4 @@ export interface EventMap {
   'autoplay:playing': ( rate: number ) => void;
   'autoplay:pause': () => void;
   'lazyload:loaded': ( img: HTMLImageElement, Slide: SlideComponent ) => void;
-
-  /** @internal */
-  'shifted': () => void;
-  'slide:keydown': ( Slide: SlideComponent, e: KeyboardEvent ) => void;
-  'media': ( query: MediaQueryList ) => void;
 }

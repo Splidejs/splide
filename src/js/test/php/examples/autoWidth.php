@@ -20,9 +20,10 @@ $settings = get_settings();
         // width     : 1000,
         autoWidth : true,
         gap       : '1rem',
-        trimSpace : false,
-        focus     : 'center',
+        // trimSpace : tr,
+        focus     : 0,
         drag      : 'free',
+        compact   : true,
       } );
 
       splide01.mount();
@@ -34,6 +35,8 @@ $settings = get_settings();
         gap       : '1rem',
         focus     : 'center',
         trimSpace : false,
+        drag      : 'free',
+
       } );
 
       splide02.mount();
