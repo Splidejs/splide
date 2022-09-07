@@ -298,7 +298,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
   function getEnd(): number {
     let end = slideCount - ( hasFocus() || ( isLoop && perMove ) ? 1 : perPage );
 
-    while ( compact && --end > 0 ) {
+    while ( compact && end-- > 0 ) {
       if ( toPosition( slideCount - 1, true ) !== toPosition( end, true ) ) {
         end++;
         break;
