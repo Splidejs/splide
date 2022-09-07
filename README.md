@@ -81,7 +81,7 @@ Please support the project if you like it!
 - No dependencies
 - Lightweight, 29kB (12kB gzipped)
 - Flexible and extensible
-- Protected by 300+ test cases
+- Protected by 400+ test cases
 - Multiple slides
 - Slide or fade transition by CSS
 - Supports breakpoints
