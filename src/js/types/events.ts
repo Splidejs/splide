@@ -28,6 +28,7 @@ export interface EventMap {
   'dragged': () => void;
   'scroll': () => void;
   'scrolled': () => void;
+  'overflow': ( overflow: boolean ) => void;
   'destroy': () => void;
   'arrows:mounted': ( prev: HTMLButtonElement, next: HTMLButtonElement ) => void;
   'arrows:updated': ( prev: HTMLButtonElement, next: HTMLButtonElement, prevIndex: number, nextIndex: number ) => void;

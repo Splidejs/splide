@@ -379,7 +379,7 @@ export class Splide {
    * @param options - An object with new options.
    */
   set options( options: Options ) {
-    this._C.Media.set( options, true );
+    this._C.Media.set( options, true, true );
   }
 
   /**

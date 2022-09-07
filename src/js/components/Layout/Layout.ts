@@ -1,9 +1,17 @@
 import { TTB } from '../../constants/directions';
-import { EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_UPDATED } from '../../constants/events';
+import {
+  EVENT_MOUNTED,
+  EVENT_OVERFLOW,
+  EVENT_REFRESH,
+  EVENT_RESIZE,
+  EVENT_RESIZED,
+  EVENT_UPDATED,
+} from '../../constants/events';
 import { EventInterface, Throttle } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { abs, apply, assert, isObject, rect, style, unit } from '../../utils';
+import { abs, apply, assert, isObject, nextTick, rect, style, unit } from '../../utils';
+import { FADE, SLIDE } from '../../constants/types';
 
 
 /**
@@ -20,7 +28,7 @@ export interface LayoutComponent extends BaseComponent {
 }
 
 /**
- * The component that layouts slider components and provides methods for dimensions.
+ * The component that adjusts slider styles and provides methods for dimensions.
  *
  * @since 3.0.0
  *
@@ -46,6 +54,11 @@ export function Layout( Splide: Splide, Components: Components, options: Options
    * Keeps the DOMRect object of the root element.
    */
   let rootRect: DOMRect;
+
+  /**
+   * Turns into `true` when the carousel is wider than the list.
+   */
+  let overflow: boolean;
 
   /**
    * Called when the component is mounted.
@@ -87,6 +100,10 @@ export function Layout( Splide: Splide, Components: Components, options: Options
 
       rootRect = newRect;
       emit( EVENT_RESIZED );
+
+      if ( overflow !== ( overflow = isOverflow() ) ) {
+        emit( EVENT_OVERFLOW, overflow );
+      }
     }
   }
 
@@ -210,7 +227,7 @@ export function Layout( Splide: Splide, Components: Components, options: Options
    * @return The width or height of the slider without clones.
    */
   function sliderSize(): number {
-    return totalSize( Splide.length - 1, true ) - totalSize( -1, true );
+    return totalSize( Splide.length - 1 ) - totalSize( 0 ) + slideSize( 0, true );
   }
 
   /**
@@ -233,6 +250,16 @@ export function Layout( Splide: Splide, Components: Components, options: Options
    */
   function getPadding( right: boolean ): number {
     return parseFloat( style( track, resolve( `padding${ right ? 'Right' : 'Left' }` ) ) ) || 0;
+  }
+
+  /**
+   * Checks if the carousel is wider than the list.
+   * This method always returns `true` for a fade carousel.
+   *
+   * @return `true` if the carousel is wider than the list, or otherwise `false`.
+   */
+  function isOverflow(): boolean {
+    return Splide.is( FADE ) || sliderSize() > listSize();
   }
 
   return {

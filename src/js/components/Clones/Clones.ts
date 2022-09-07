@@ -3,7 +3,7 @@ import { LOOP } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { addClass, append, before, ceil, empty, pad, push, rect, remove } from '../../utils';
+import { addClass, append, before, ceil, empty, isUndefined, pad, push, rect, remove } from '../../utils';
 
 
 /**
@@ -79,8 +79,12 @@ export function Clones( Splide: Splide, Components: Components, options: Options
    * Observes the required clone count and refreshes the slider if necessary.
    */
   function observe(): void {
-    if ( cloneCount < computeCloneCount() ) {
-      emit( EVENT_REFRESH );
+    const count = computeCloneCount();
+
+    if ( cloneCount !== count ) {
+      if ( cloneCount < count || ! count ) {
+        emit( EVENT_REFRESH );
+      }
     }
   }
 
@@ -134,7 +138,7 @@ export function Clones( Splide: Splide, Components: Components, options: Options
 
     if ( ! Splide.is( LOOP ) ) {
       clones = 0;
-    } else if ( ! clones ) {
+    } else if ( isUndefined( clones ) ) {
       const fixedSize  = options[ resolve( 'fixedWidth' ) ] && Components.Layout.slideSize( 0 );
       const fixedCount = fixedSize && ceil( rect( Elements.track )[ resolve( 'width' ) ] / fixedSize );
       clones = fixedCount || ( options[ resolve( 'autoWidth' ) ] && Splide.length ) || options.perPage * MULTIPLIER;

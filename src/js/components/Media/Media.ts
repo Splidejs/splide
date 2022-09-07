@@ -15,7 +15,7 @@ import { EVENT_UPDATED } from '../../constants/events';
 export interface MediaComponent extends BaseComponent {
   /** @internal */
   reduce( reduced: boolean ): void;
-  set( options: Options, userOptions?: boolean ): void;
+  set( options: Options, base?: boolean, notify?: boolean ): void;
 }
 
 /**
@@ -118,18 +118,20 @@ export function Media( Splide: Splide, Components: Components, options: Options 
   }
 
   /**
-   * Sets options.
+   * Sets current options or base options (prototype).
+   * If changing base options, always emits the `updated` event.
    *
    * @internal
    *
-   * @param opts - New options.
-   * @param user - Optional. Determines whether to also update user options or not.
+   * @param opts   - New options.
+   * @param base   - Optional. Determines whether to also update base options or not.
+   * @param notify - Optional. If `true`, always emits the `update` event.
    */
-  function set( opts: Options, user?: boolean ): void {
+  function set( opts: Options, base?: boolean, notify?: boolean ): void {
     merge( options, opts );
-    user && merge( Object.getPrototypeOf( options ), opts );
+    base && merge( Object.getPrototypeOf( options ), opts );
 
-    if ( ! state.is( CREATED ) ) {
+    if ( notify || ! state.is( CREATED ) ) {
       Splide.emit( EVENT_UPDATED, options );
     }
   }

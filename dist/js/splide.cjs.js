@@ -433,6 +433,7 @@ var EVENT_DRAGGING = "dragging";
 var EVENT_DRAGGED = "dragged";
 var EVENT_SCROLL = "scroll";
 var EVENT_SCROLLED = "scrolled";
+var EVENT_OVERFLOW = "overflow";
 var EVENT_DESTROY = "destroy";
 var EVENT_ARROWS_MOUNTED = ARROWS + "mounted";
 var EVENT_ARROWS_UPDATED = ARROWS + "updated";
@@ -632,11 +633,11 @@ function Media(Splide2, Components2, options) {
     }
   }
 
-  function set(opts, user) {
+  function set(opts, base, notify) {
     merge(options, opts);
-    user && merge(Object.getPrototypeOf(options), opts);
+    base && merge(Object.getPrototypeOf(options), opts);
 
-    if (!state.is(CREATED)) {
+    if (notify || !state.is(CREATED)) {
       Splide2.emit(EVENT_UPDATED, options);
     }
   }
@@ -1201,6 +1202,7 @@ function Layout(Splide2, Components2, options) {
       styleSlides = Slides.style;
   var vertical;
   var rootRect;
+  var overflow;
 
   function mount() {
     init();
@@ -1228,6 +1230,10 @@ function Layout(Splide2, Components2, options) {
       styleSlides("height", cssSlideHeight(), true);
       rootRect = newRect;
       emit(EVENT_RESIZED);
+
+      if (overflow !== (overflow = isOverflow())) {
+        emit(EVENT_OVERFLOW, overflow);
+      }
     }
   }
 
@@ -1288,7 +1294,7 @@ function Layout(Splide2, Components2, options) {
   }
 
   function sliderSize() {
-    return totalSize(Splide2.length - 1, true) - totalSize(-1, true);
+    return totalSize(Splide2.length - 1) - totalSize(0) + slideSize(0, true);
   }
 
   function getGap() {
@@ -1298,6 +1304,10 @@ function Layout(Splide2, Components2, options) {
 
   function getPadding(right) {
     return parseFloat(style(track, resolve("padding" + (right ? "Right" : "Left")))) || 0;
+  }
+
+  function isOverflow() {
+    return Splide2.is(FADE) || sliderSize() > listSize();
   }
 
   return {
@@ -1343,8 +1353,12 @@ function Clones(Splide2, Components2, options) {
   }
 
   function observe() {
-    if (cloneCount < computeCloneCount()) {
-      emit(EVENT_REFRESH);
+    var count = computeCloneCount();
+
+    if (cloneCount !== count) {
+      if (cloneCount < count || !count) {
+        emit(EVENT_REFRESH);
+      }
     }
   }
 
@@ -1379,7 +1393,7 @@ function Clones(Splide2, Components2, options) {
 
     if (!Splide2.is(LOOP)) {
       clones2 = 0;
-    } else if (!clones2) {
+    } else if (isUndefined(clones2)) {
       var fixedSize = options[resolve("fixedWidth")] && Components2.Layout.slideSize(0);
       var fixedCount = fixedSize && ceil(rect(Elements.track)[resolve("width")] / fixedSize);
       clones2 = fixedCount || options[resolve("autoWidth")] && Splide2.length || options.perPage * MULTIPLIER;
@@ -1711,7 +1725,7 @@ function Controller(Splide2, Components2, options) {
   function getEnd() {
     var end = slideCount - (hasFocus() || isLoop && perMove ? 1 : perPage);
 
-    while (compact && --end > 0) {
+    while (compact && end-- > 0) {
       if (toPosition(slideCount - 1, true) !== toPosition(end, true)) {
         end++;
         break;
@@ -2674,9 +2688,9 @@ function Sync(Splide2, Components2, options) {
   var events = [];
 
   function setup() {
-    Splide2.options = {
+    Components2.Media.set({
       slideFocus: isUndefined(slideFocus) ? isNavigation : slideFocus
-    };
+    }, true);
   }
 
   function mount() {
@@ -3141,7 +3155,7 @@ var _Splide = /*#__PURE__*/function () {
       return this._o;
     },
     set: function set(options) {
-      this._C.Media.set(options, true);
+      this._C.Media.set(options, true, true);
     }
   }, {
     key: "length",
@@ -3729,6 +3743,7 @@ exports.EVENT_MOUNTED = EVENT_MOUNTED;
 exports.EVENT_MOVE = EVENT_MOVE;
 exports.EVENT_MOVED = EVENT_MOVED;
 exports.EVENT_NAVIGATION_MOUNTED = EVENT_NAVIGATION_MOUNTED;
+exports.EVENT_OVERFLOW = EVENT_OVERFLOW;
 exports.EVENT_PAGINATION_MOUNTED = EVENT_PAGINATION_MOUNTED;
 exports.EVENT_PAGINATION_UPDATED = EVENT_PAGINATION_UPDATED;
 exports.EVENT_READY = EVENT_READY;

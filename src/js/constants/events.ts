@@ -20,6 +20,7 @@ export const EVENT_DRAGGING           = 'dragging';
 export const EVENT_DRAGGED            = 'dragged';
 export const EVENT_SCROLL             = 'scroll';
 export const EVENT_SCROLLED           = 'scrolled';
+export const EVENT_OVERFLOW           = 'overflow';
 export const EVENT_DESTROY            = 'destroy';
 export const EVENT_ARROWS_MOUNTED     = `${ ARROWS }mounted`;
 export const EVENT_ARROWS_UPDATED     = `${ ARROWS }updated`;

@@ -429,6 +429,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var EVENT_DRAGGED = "dragged";
   var EVENT_SCROLL = "scroll";
   var EVENT_SCROLLED = "scrolled";
+  var EVENT_OVERFLOW = "overflow";
   var EVENT_DESTROY = "destroy";
   var EVENT_ARROWS_MOUNTED = ARROWS + "mounted";
   var EVENT_ARROWS_UPDATED = ARROWS + "updated";
@@ -628,11 +629,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }
     }
 
-    function set(opts, user) {
+    function set(opts, base, notify) {
       merge(options, opts);
-      user && merge(Object.getPrototypeOf(options), opts);
+      base && merge(Object.getPrototypeOf(options), opts);
 
-      if (!state.is(CREATED)) {
+      if (notify || !state.is(CREATED)) {
         Splide2.emit(EVENT_UPDATED, options);
       }
     }
@@ -1194,6 +1195,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         styleSlides = Slides.style;
     var vertical;
     var rootRect;
+    var overflow;
 
     function mount() {
       init();
@@ -1221,6 +1223,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         styleSlides("height", cssSlideHeight(), true);
         rootRect = newRect;
         emit(EVENT_RESIZED);
+
+        if (overflow !== (overflow = isOverflow())) {
+          emit(EVENT_OVERFLOW, overflow);
+        }
       }
     }
 
@@ -1281,7 +1287,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function sliderSize() {
-      return totalSize(Splide2.length - 1, true) - totalSize(-1, true);
+      return totalSize(Splide2.length - 1) - totalSize(0) + slideSize(0, true);
     }
 
     function getGap() {
@@ -1291,6 +1297,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function getPadding(right) {
       return parseFloat(style(track, resolve("padding" + (right ? "Right" : "Left")))) || 0;
+    }
+
+    function isOverflow() {
+      return Splide2.is(FADE) || sliderSize() > listSize();
     }
 
     return {
@@ -1336,8 +1346,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function observe() {
-      if (cloneCount < computeCloneCount()) {
-        emit(EVENT_REFRESH);
+      var count = computeCloneCount();
+
+      if (cloneCount !== count) {
+        if (cloneCount < count || !count) {
+          emit(EVENT_REFRESH);
+        }
       }
     }
 
@@ -1372,7 +1386,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       if (!Splide2.is(LOOP)) {
         clones2 = 0;
-      } else if (!clones2) {
+      } else if (isUndefined(clones2)) {
         var fixedSize = options[resolve("fixedWidth")] && Components2.Layout.slideSize(0);
         var fixedCount = fixedSize && ceil(rect(Elements.track)[resolve("width")] / fixedSize);
         clones2 = fixedCount || options[resolve("autoWidth")] && Splide2.length || options.perPage * MULTIPLIER;
@@ -1704,7 +1718,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function getEnd() {
       var end = slideCount - (hasFocus() || isLoop && perMove ? 1 : perPage);
 
-      while (compact && --end > 0) {
+      while (compact && end-- > 0) {
         if (toPosition(slideCount - 1, true) !== toPosition(end, true)) {
           end++;
           break;
@@ -2667,9 +2681,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var events = [];
 
     function setup() {
-      Splide2.options = {
+      Components2.Media.set({
         slideFocus: isUndefined(slideFocus) ? isNavigation : slideFocus
-      };
+      }, true);
     }
 
     function mount() {
@@ -3134,7 +3148,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         return this._o;
       },
       set: function set(options) {
-        this._C.Media.set(options, true);
+        this._C.Media.set(options, true, true);
       }
     }, {
       key: "length",
