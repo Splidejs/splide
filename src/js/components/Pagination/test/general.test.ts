@@ -19,6 +19,22 @@ describe( 'Pagination', () => {
     expect( items.length ).toBe( Math.ceil( splide.length / 3 ) );
   } );
 
+  test( 'should not paginate if the `focus` option is available.', () => {
+    const splide = init( { perPage: 3, focus: 'center' } );
+    const items  = document.getElementsByClassName( CLASS_PAGINATION_PAGE );
+
+    expect( items.length ).toBe( splide.length );
+  } );
+
+  test( 'should omit unnecessary items when `focus` and `compact` options are enabled.', () => {
+    const splide = init( { perPage: 3, focus: 0, compact: true } );
+    const items  = document.getElementsByClassName( CLASS_PAGINATION_PAGE );
+
+    expect( items.length ).not.toBe( splide.length );
+    expect( items.length ).toBe( splide.Components.Controller.getEnd() + 1 );
+    expect( items.length ).toBe( 9 );
+  } );
+
   test( 'can move the slider when the item is clicked.', () => {
     const splide = init( { speed: 0 } );
     const items  = document.getElementsByClassName( CLASS_PAGINATION_PAGE );
