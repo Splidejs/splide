@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 4.0.17
+ * Version  : 4.0.18
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
@@ -1625,7 +1625,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function scroll(destination, duration, snap, callback) {
       Components2.Scroll.scroll(destination, duration, snap, function () {
-        setIndex(min(loop(Move.toIndex(getPosition())), endIndex));
+        var index = loop(Move.toIndex(getPosition()));
+        setIndex(compact ? min(index, endIndex) : index);
         callback && callback();
       });
     }

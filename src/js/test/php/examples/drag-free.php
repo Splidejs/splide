@@ -19,8 +19,8 @@ $settings = get_settings();
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
-        perPage: 2,
-        gap    : '0.5em',
+        perPage: 3,
+        gap    : '2em',
         drag   : 'free',
 	      snap   : true,
         // height : 400,

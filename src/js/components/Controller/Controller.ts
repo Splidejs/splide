@@ -151,7 +151,8 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    */
   function scroll( destination: number, duration?: number, snap?: boolean, callback?: AnyFunction ): void {
     Components.Scroll.scroll( destination, duration, snap, () => {
-      setIndex( min( loop( Move.toIndex( getPosition() ) ), endIndex ) );
+      const index = loop( Move.toIndex( getPosition() ) );
+      setIndex( compact ? min( index, endIndex ) : index );
       callback && callback();
     } );
   }
