@@ -2915,24 +2915,21 @@ var DEFAULTS = {
 };
 
 function Fade(Splide2, Components2, options) {
-  var _EventInterface15 = EventInterface(Splide2),
-      on = _EventInterface15.on;
+  var Slides = Components2.Slides;
 
   function mount() {
-    on([EVENT_MOUNTED, EVENT_REFRESH], function () {
-      nextTick(function () {
-        Components2.Slides.style("transition", "opacity " + options.speed + "ms " + options.easing);
-      });
+    EventInterface(Splide2).on([EVENT_MOUNTED, EVENT_REFRESH], init);
+  }
+
+  function init() {
+    Slides.forEach(function (Slide) {
+      Slide.style("transform", "translateX(-" + 100 * Slide.index + "%)");
     });
   }
 
   function start(index, done) {
-    var track = Components2.Elements.track;
-    style(track, "height", unit(rect(track).height));
-    nextTick(function () {
-      done();
-      style(track, "height", "");
-    });
+    Slides.style("transition", "opacity " + options.speed + "ms " + options.easing);
+    nextTick(done);
   }
 
   return {
@@ -2943,9 +2940,6 @@ function Fade(Splide2, Components2, options) {
 }
 
 function Slide(Splide2, Components2, options) {
-  var _EventInterface16 = EventInterface(Splide2),
-      bind = _EventInterface16.bind;
-
   var Move = Components2.Move,
       Controller = Components2.Controller,
       Scroll = Components2.Scroll;
@@ -2954,7 +2948,7 @@ function Slide(Splide2, Components2, options) {
   var endCallback;
 
   function mount() {
-    bind(list, "transitionend", function (e) {
+    EventInterface(Splide2).bind(list, "transitionend", function (e) {
       if (e.target === list && endCallback) {
         cancel();
         endCallback();
@@ -3255,8 +3249,8 @@ var SplideRenderer = /*#__PURE__*/function () {
   }
 
   SplideRenderer.clean = function clean(splide) {
-    var _EventInterface17 = EventInterface(splide),
-        on = _EventInterface17.on;
+    var _EventInterface15 = EventInterface(splide),
+        on = _EventInterface15.on;
 
     var root = splide.root;
     var clones = queryAll(root, "." + CLASS_CLONE);

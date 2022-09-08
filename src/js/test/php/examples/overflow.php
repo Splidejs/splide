@@ -21,6 +21,8 @@ $settings = get_settings();
       var splide01 = new Splide( '#splide01', {
         fixedWidth : '6rem',
         gap        : 10,
+        compact    : true,
+        focus      : 0,
       } );
 
       splide01.on( 'overflow', overflow => {

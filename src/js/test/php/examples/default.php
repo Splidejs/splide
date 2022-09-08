@@ -34,7 +34,7 @@ $settings = get_settings();
         // paginationDirection: 'ttb',
         rewindSpeed: 2000,
         // role: '',
-        label: '1',
+        label: 'Changed Label',
         focus: 0,
         compact: true,
 

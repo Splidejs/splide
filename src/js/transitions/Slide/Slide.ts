@@ -17,7 +17,6 @@ import { abs, apply, style } from '../../utils';
  * @return A Transition component object.
  */
 export function Slide( Splide: Splide, Components: Components, options: Options ): TransitionComponent {
-  const { bind } = EventInterface( Splide );
   const { Move, Controller, Scroll } = Components;
   const { list } = Components.Elements;
   const transition = apply( style, list, 'transition' );
@@ -31,7 +30,7 @@ export function Slide( Splide: Splide, Components: Components, options: Options 
    * Called when the component is mounted.
    */
   function mount(): void {
-    bind( list, 'transitionend', e => {
+    EventInterface( Splide ).bind( list, 'transitionend', e => {
       if ( e.target === list && endCallback ) {
         cancel();
         endCallback();

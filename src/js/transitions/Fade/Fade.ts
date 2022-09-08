@@ -2,7 +2,7 @@ import { EVENT_MOUNTED, EVENT_REFRESH } from '../../constants/events';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { Components, Options, TransitionComponent } from '../../types';
-import { nextTick, noop, rect, unit, style } from '../../utils';
+import { nextTick, noop } from '../../utils';
 
 
 /**
@@ -17,35 +17,35 @@ import { nextTick, noop, rect, unit, style } from '../../utils';
  * @return A Transition component object.
  */
 export function Fade( Splide: Splide, Components: Components, options: Options ): TransitionComponent {
-  const { on } = EventInterface( Splide );
+  const { Slides } = Components;
 
   /**
    * Called when the component is mounted.
-   * The nextTick disables the initial fade transition of the first slide.
    */
   function mount(): void {
-    on( [ EVENT_MOUNTED, EVENT_REFRESH ], () => {
-      nextTick( () => {
-        Components.Slides.style( 'transition', `opacity ${ options.speed }ms ${ options.easing }` );
-      } );
+    EventInterface( Splide ).on( [ EVENT_MOUNTED, EVENT_REFRESH ], init );
+  }
+
+  /**
+   * Initializes the component.
+   * Offsets all slides for stacking them onto the head of the list.
+   * The `nextTick` disables the initial fade transition of the first slide.
+   */
+  function init(): void {
+    Slides.forEach( Slide => {
+      Slide.style( 'transform', `translateX(-${ 100 * Slide.index }%)` );
     } );
   }
 
   /**
    * Starts the transition.
-   * Explicitly sets the track height to avoid it will collapse in Safari.
    *
-   * @param index - A destination index.
+   * @param index - A slide index to be active.
    * @param done  - The callback function that must be called after the transition ends.
    */
   function start( index: number, done: () => void ): void {
-    const { track } = Components.Elements;
-    style( track, 'height', unit( rect( track ).height ) );
-
-    nextTick( () => {
-      done();
-      style( track, 'height', '' );
-    } );
+    Slides.style( 'transition', `opacity ${ options.speed }ms ${ options.easing }` );
+    nextTick( done );
   }
 
   return {
