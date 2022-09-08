@@ -1,17 +1,10 @@
 import { TTB } from '../../constants/directions';
-import {
-  EVENT_MOUNTED,
-  EVENT_OVERFLOW,
-  EVENT_REFRESH,
-  EVENT_RESIZE,
-  EVENT_RESIZED,
-  EVENT_UPDATED,
-} from '../../constants/events';
+import { EVENT_OVERFLOW, EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_UPDATED } from '../../constants/events';
 import { EventInterface, Throttle } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { abs, apply, assert, isObject, nextTick, rect, style, unit } from '../../utils';
-import { FADE, SLIDE } from '../../constants/types';
+import { abs, apply, assert, isObject, rect, style, unit } from '../../utils';
+import { FADE } from '../../constants/types';
 
 
 /**
@@ -86,7 +79,8 @@ export function Layout( Splide: Splide, Components: Components, options: Options
   }
 
   /**
-   * Updates dimensions of some elements when the slider is resized.
+   * Updates dimensions of some elements when the carousel is resized.
+   * Also checks the carousel size and emits `overflow` events when it exceeds the list width.
    */
   function resize(): void {
     const newRect = rect( root );
@@ -223,6 +217,7 @@ export function Layout( Splide: Splide, Components: Components, options: Options
 
   /**
    * Returns the slider size without clones before the first slide.
+   * Do not use the clone's size because it's unstable while initializing and refreshing process.
    *
    * @return The width or height of the slider without clones.
    */
