@@ -222,7 +222,7 @@ export function Layout( Splide: Splide, Components: Components, options: Options
    * @return The width or height of the slider without clones.
    */
   function sliderSize(): number {
-    return totalSize( Splide.length - 1 ) - totalSize( 0 ) + slideSize( 0, true );
+    return totalSize( Splide.length - 1 ) - totalSize( 0 ) + slideSize( 0 );
   }
 
   /**
