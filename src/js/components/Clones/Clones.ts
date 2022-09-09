@@ -33,7 +33,8 @@ export const MULTIPLIER = 2;
  * @return A Clones component object.
  */
 export function Clones( Splide: Splide, Components: Components, options: Options ): ClonesComponent {
-  const { on, emit } = EventInterface( Splide );
+  const event = EventInterface( Splide );
+  const { on, emit } = event;
   const { Elements, Slides } = Components;
   const { resolve } = Components.Direction;
 
@@ -49,22 +50,24 @@ export function Clones( Splide: Splide, Components: Components, options: Options
 
   /**
    * Called when the component is mounted.
+   * Needs to remount the component on refresh, otherwise `refresh` event will be triggered again while refreshing.
    */
   function mount(): void {
-    init();
-    on( EVENT_REFRESH, destroy );
-    on( EVENT_REFRESH, init );
+    on( EVENT_REFRESH, remount );
     on( [ EVENT_UPDATED, EVENT_RESIZE ], observe );
-  }
 
-  /**
-   * Removes all clones if available, and generates new clones.
-   */
-  function init(): void {
     if ( ( cloneCount = computeCloneCount() ) ) {
       generate( cloneCount );
       emit( EVENT_RESIZE );
     }
+  }
+
+  /**
+   * Remounts the component.
+   */
+  function remount(): void {
+    destroy();
+    mount();
   }
 
   /**
@@ -73,6 +76,7 @@ export function Clones( Splide: Splide, Components: Components, options: Options
   function destroy(): void {
     remove( clones );
     empty( clones );
+    event.destroy();
   }
 
   /**
