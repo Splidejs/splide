@@ -83,6 +83,7 @@ export function Live( Splide: Splide, Components: Components, options: Options )
       interval.start();
     } else {
       remove( sr );
+      interval.cancel();
     }
   }
 
