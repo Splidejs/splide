@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 4.0.18
+ * Version  : 4.0.19
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
@@ -1287,7 +1287,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function sliderSize() {
-      return totalSize(Splide2.length - 1) - totalSize(0) + slideSize(0);
+      return totalSize(Splide2.length - 1, true) - totalSize(0, true) + slideSize(0, true);
     }
 
     function getGap() {
