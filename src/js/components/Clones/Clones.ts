@@ -34,7 +34,7 @@ export const MULTIPLIER = 2;
  */
 export function Clones( Splide: Splide, Components: Components, options: Options ): ClonesComponent {
   const event = EventInterface( Splide );
-  const { on, emit } = event;
+  const { on } = event;
   const { Elements, Slides } = Components;
   const { resolve } = Components.Direction;
 
@@ -58,7 +58,7 @@ export function Clones( Splide: Splide, Components: Components, options: Options
 
     if ( ( cloneCount = computeCloneCount() ) ) {
       generate( cloneCount );
-      emit( EVENT_RESIZE );
+      Components.Layout.resize();
     }
   }
 
@@ -87,7 +87,7 @@ export function Clones( Splide: Splide, Components: Components, options: Options
 
     if ( cloneCount !== count ) {
       if ( cloneCount < count || ! count ) {
-        emit( EVENT_REFRESH );
+        event.emit( EVENT_REFRESH );
       }
     }
   }

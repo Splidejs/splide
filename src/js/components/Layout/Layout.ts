@@ -18,6 +18,9 @@ export interface LayoutComponent extends BaseComponent {
   sliderSize(): number;
   totalSize( index?: number, withoutGap?: boolean ): number;
   getPadding( right: boolean ): number;
+
+  /** @internal */
+  resize(): void;
 }
 
 /**
@@ -259,6 +262,7 @@ export function Layout( Splide: Splide, Components: Components, options: Options
 
   return {
     mount,
+    resize,
     listSize,
     slideSize,
     sliderSize,

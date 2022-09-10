@@ -1305,6 +1305,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     return {
       mount: mount,
+      resize: resize,
       listSize: listSize,
       slideSize: slideSize,
       sliderSize: sliderSize,
@@ -1317,8 +1318,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
   function Clones(Splide2, Components2, options) {
     var event = EventInterface(Splide2);
-    var on = event.on,
-        emit = event.emit;
+    var on = event.on;
     var Elements = Components2.Elements,
         Slides = Components2.Slides;
     var resolve = Components2.Direction.resolve;
@@ -1331,7 +1331,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       if (cloneCount = computeCloneCount()) {
         generate(cloneCount);
-        emit(EVENT_RESIZE);
+        Components2.Layout.resize();
       }
     }
 
@@ -1351,7 +1351,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       if (cloneCount !== count) {
         if (cloneCount < count || !count) {
-          emit(EVENT_REFRESH);
+          event.emit(EVENT_REFRESH);
         }
       }
     }
@@ -2824,6 +2824,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         interval.start();
       } else {
         remove(sr);
+        interval.cancel();
       }
     }
 

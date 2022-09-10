@@ -1307,6 +1307,7 @@ function Layout(Splide2, Components2, options) {
 
   return {
     mount: mount,
+    resize: resize,
     listSize: listSize,
     slideSize: slideSize,
     sliderSize: sliderSize,
@@ -1319,8 +1320,7 @@ var MULTIPLIER = 2;
 
 function Clones(Splide2, Components2, options) {
   var event = EventInterface(Splide2);
-  var on = event.on,
-      emit = event.emit;
+  var on = event.on;
   var Elements = Components2.Elements,
       Slides = Components2.Slides;
   var resolve = Components2.Direction.resolve;
@@ -1333,7 +1333,7 @@ function Clones(Splide2, Components2, options) {
 
     if (cloneCount = computeCloneCount()) {
       generate(cloneCount);
-      emit(EVENT_RESIZE);
+      Components2.Layout.resize();
     }
   }
 
@@ -1353,7 +1353,7 @@ function Clones(Splide2, Components2, options) {
 
     if (cloneCount !== count) {
       if (cloneCount < count || !count) {
-        emit(EVENT_REFRESH);
+        event.emit(EVENT_REFRESH);
       }
     }
   }
@@ -2826,6 +2826,7 @@ function Live(Splide2, Components2, options) {
       interval.start();
     } else {
       remove(sr);
+      interval.cancel();
     }
   }
 
