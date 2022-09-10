@@ -65,29 +65,27 @@ export function Layout( Splide: Splide, Components: Components, options: Options
 
   /**
    * Initializes the component on `mount` or `updated`.
-   * - Uses `max-width` for the root to prevent the slider from exceeding the parent element.
-   * - Needs to always resize the carousel in case that `refresh` is requested in multiple times at the same time.
+   * Uses `max-width` for the root to prevent the slider from exceeding the parent element.
    */
   function init(): void {
+    rootRect = null;
     vertical = options.direction === TTB;
 
     style( root, 'maxWidth', unit( options.width ) );
     style( track, resolve( 'paddingLeft' ), cssPadding( false ) );
     style( track, resolve( 'paddingRight' ), cssPadding( true ) );
 
-    resize( true );
+    resize();
   }
 
   /**
    * Updates dimensions of some elements when the carousel is resized.
    * Also checks the carousel size and emits `overflow` events when it exceeds the list width.
-   *
-   * @param force - Skips checking the root dimension change and always performs the resizing process.
    */
-  function resize( force?: boolean ): void {
+  function resize(): void {
     const newRect = rect( root );
 
-    if ( force || rootRect.width !== newRect.width || rootRect.height !== newRect.height ) {
+    if ( ! rootRect || rootRect.width !== newRect.width || rootRect.height !== newRect.height ) {
       style( track, 'height', cssTrackHeight() );
 
       styleSlides( resolve( 'marginRight' ), unit( options.gap ) );

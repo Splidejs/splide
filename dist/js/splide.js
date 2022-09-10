@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 4.0.21
+ * Version  : 4.0.20
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
@@ -1205,17 +1205,18 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function init() {
+      rootRect = null;
       vertical = options.direction === TTB;
       style(root, "maxWidth", unit(options.width));
       style(track, resolve("paddingLeft"), cssPadding(false));
       style(track, resolve("paddingRight"), cssPadding(true));
-      resize(true);
+      resize();
     }
 
-    function resize(force) {
+    function resize() {
       var newRect = rect(root);
 
-      if (force || rootRect.width !== newRect.width || rootRect.height !== newRect.height) {
+      if (!rootRect || rootRect.width !== newRect.width || rootRect.height !== newRect.height) {
         style(track, "height", cssTrackHeight());
         styleSlides(resolve("marginRight"), unit(options.gap));
         styleSlides("width", cssSlideWidth());
@@ -2823,7 +2824,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         interval.start();
       } else {
         remove(sr);
-        interval.cancel();
       }
     }
 
