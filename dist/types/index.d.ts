@@ -72,7 +72,7 @@ interface LayoutComponent extends BaseComponent {
     totalSize(index?: number, withoutGap?: boolean): number;
     getPadding(right: boolean): number;
     /** @internal */
-    resize(): void;
+    resize(force?: boolean): void;
 }
 
 /**

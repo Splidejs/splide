@@ -58,7 +58,7 @@ export function Clones( Splide: Splide, Components: Components, options: Options
 
     if ( ( cloneCount = computeCloneCount() ) ) {
       generate( cloneCount );
-      Components.Layout.resize();
+      Components.Layout.resize( true );
     }
   }
 

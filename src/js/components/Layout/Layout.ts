@@ -20,7 +20,7 @@ export interface LayoutComponent extends BaseComponent {
   getPadding( right: boolean ): number;
 
   /** @internal */
-  resize(): void;
+  resize( force?: boolean ): void;
 }
 
 /**
@@ -71,24 +71,25 @@ export function Layout( Splide: Splide, Components: Components, options: Options
    * Uses `max-width` for the root to prevent the slider from exceeding the parent element.
    */
   function init(): void {
-    rootRect = null;
     vertical = options.direction === TTB;
 
     style( root, 'maxWidth', unit( options.width ) );
     style( track, resolve( 'paddingLeft' ), cssPadding( false ) );
     style( track, resolve( 'paddingRight' ), cssPadding( true ) );
 
-    resize();
+    resize( true );
   }
 
   /**
    * Updates dimensions of some elements when the carousel is resized.
    * Also checks the carousel size and emits `overflow` events when it exceeds the list width.
+   *
+   * @param force - Skips checking the root dimension change and always performs the resizing process.
    */
-  function resize(): void {
+  function resize( force?: boolean ): void {
     const newRect = rect( root );
 
-    if ( ! rootRect || rootRect.width !== newRect.width || rootRect.height !== newRect.height ) {
+    if ( force || rootRect.width !== newRect.width || rootRect.height !== newRect.height ) {
       style( track, 'height', cssTrackHeight() );
 
       styleSlides( resolve( 'marginRight' ), unit( options.gap ) );
