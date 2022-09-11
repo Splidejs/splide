@@ -68,7 +68,7 @@ interface SlideComponent extends BaseComponent {
 interface LayoutComponent extends BaseComponent {
     listSize(): number;
     slideSize(index: number, withoutGap?: boolean): number;
-    sliderSize(): number;
+    sliderSize(withoutGap?: boolean): number;
     totalSize(index?: number, withoutGap?: boolean): number;
     getPadding(right: boolean): number;
     /** @internal */

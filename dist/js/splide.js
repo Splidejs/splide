@@ -1285,8 +1285,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       return 0;
     }
 
-    function sliderSize() {
-      return totalSize(Splide2.length - 1, true) - totalSize(0, true) + slideSize();
+    function sliderSize(withoutGap) {
+      return totalSize(Splide2.length - 1, true) - totalSize(0, true) + slideSize(0, withoutGap);
     }
 
     function getGap() {
@@ -1299,7 +1299,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function isOverflow() {
-      return Splide2.is(FADE) || sliderSize() > listSize();
+      return Splide2.is(FADE) || sliderSize(true) > listSize();
     }
 
     return {

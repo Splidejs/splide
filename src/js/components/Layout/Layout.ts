@@ -15,7 +15,7 @@ import { FADE } from '../../constants/types';
 export interface LayoutComponent extends BaseComponent {
   listSize(): number;
   slideSize( index: number, withoutGap?: boolean ): number;
-  sliderSize(): number;
+  sliderSize( withoutGap?: boolean ): number;
   totalSize( index?: number, withoutGap?: boolean ): number;
   getPadding( right: boolean ): number;
 
@@ -223,10 +223,12 @@ export function Layout( Splide: Splide, Components: Components, options: Options
    * Returns the slider size without clones before the first slide.
    * Do not use the clone's size because it's unstable while initializing and refreshing process.
    *
+   * @param withoutGap - Optional. Determines whether to exclude the last gap or not.
+   *
    * @return The width or height of the slider without clones.
    */
-  function sliderSize(): number {
-    return totalSize( Splide.length - 1, true ) - totalSize( 0, true ) + slideSize();
+  function sliderSize( withoutGap?: boolean ): number {
+    return totalSize( Splide.length - 1, true ) - totalSize( 0, true ) + slideSize( 0, withoutGap );
   }
 
   /**
@@ -258,7 +260,7 @@ export function Layout( Splide: Splide, Components: Components, options: Options
    * @return `true` if the carousel is wider than the list, or otherwise `false`.
    */
   function isOverflow(): boolean {
-    return Splide.is( FADE ) || sliderSize() > listSize();
+    return Splide.is( FADE ) || sliderSize( true ) > listSize();
   }
 
   return {
