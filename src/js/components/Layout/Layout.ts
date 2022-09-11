@@ -221,12 +221,11 @@ export function Layout( Splide: Splide, Components: Components, options: Options
 
   /**
    * Returns the slider size without clones before the first slide.
-   * Do not use the clone's size because it's unstable while initializing and refreshing process.
    *
    * @return The width or height of the slider without clones.
    */
   function sliderSize(): number {
-    return totalSize( Splide.length - 1, true ) - totalSize( 0, true ) + slideSize( 0, true );
+    return totalSize( Splide.length - 1, true ) - totalSize( -1, true );
   }
 
   /**
