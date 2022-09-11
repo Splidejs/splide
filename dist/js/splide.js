@@ -1286,7 +1286,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function sliderSize() {
-      return totalSize(Splide2.length - 1, true) - totalSize(-1, true);
+      return totalSize(Splide2.length - 1, true) - totalSize(0, true) + slideSize(0, true);
     }
 
     function getGap() {

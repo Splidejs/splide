@@ -1293,7 +1293,7 @@ function Layout(Splide2, Components2, options) {
   }
 
   function sliderSize() {
-    return totalSize(Splide2.length - 1, true) - totalSize(-1, true);
+    return totalSize(Splide2.length - 1, true) - totalSize(0, true) + slideSize(0, true);
   }
 
   function getGap() {
