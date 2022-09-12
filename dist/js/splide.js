@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 4.0.20
+ * Version  : 4.0.19
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
@@ -1286,7 +1286,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function sliderSize(withoutGap) {
-      return totalSize(Splide2.length - 1, true) - totalSize(0, true) + slideSize(0, withoutGap);
+      return totalSize(Splide2.length - 1) - totalSize(0) + slideSize(0, withoutGap);
     }
 
     function getGap() {
@@ -1483,7 +1483,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function cancel() {
-      translate(getPosition());
+      translate(getPosition(), true);
       Transition.cancel();
     }
 

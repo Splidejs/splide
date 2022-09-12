@@ -166,7 +166,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * Cancels transition.
    */
   function cancel(): void {
-    translate( getPosition() );
+    translate( getPosition(), true );
     Transition.cancel();
   }
 

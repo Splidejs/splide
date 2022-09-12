@@ -1293,7 +1293,7 @@ function Layout(Splide2, Components2, options) {
   }
 
   function sliderSize(withoutGap) {
-    return totalSize(Splide2.length - 1, true) - totalSize(0, true) + slideSize(0, withoutGap);
+    return totalSize(Splide2.length - 1) - totalSize(0) + slideSize(0, withoutGap);
   }
 
   function getGap() {
@@ -1490,7 +1490,7 @@ function Move(Splide2, Components2, options) {
   }
 
   function cancel() {
-    translate(getPosition());
+    translate(getPosition(), true);
     Transition.cancel();
   }
 
