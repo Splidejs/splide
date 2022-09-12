@@ -152,9 +152,16 @@ export interface Options extends ResponsiveOptions {
   /**
    * Determines whether to trim spaces before/after the slider if the `focus` option is available.
    * - `true`: Trims spaces. The slider may stay on the same location even when requested to move.
-   * - `'move'`: Trims spaces and focuses to move the slider when requested.
+   * - `'move'`: Trims spaces and forces to move the slider when requested.
    */
   trimSpace?: boolean | 'move';
+
+  /**
+   * If `true` and the `focus` option is available:
+   * - Disables the next arrow when a carousel reaches the last page even if the active slide is not the last slide.
+   * - Omits redundant pagination dots which just change the active slide and do not move a carousel.
+   */
+  compact?: boolean;
 
   /**
    * Updates the `is-active` status of slides just before moving the slider.
@@ -182,13 +189,6 @@ export interface Options extends ResponsiveOptions {
    * If `true`, screen readers will read a content of each slide whenever slide changes.
    */
   live?: boolean;
-
-  /**
-   * If `true` and the `focus` option is available:
-   * - Disables the next arrow when a carousel reaches the last page even if the active slide is not the last slide.
-   * - Omits redundant pagination dots which just change the active slide and do not move a carousel.
-   */
-  compact?: boolean;
 
   /**
    * Determines whether to use the Transition component or not.

@@ -405,6 +405,12 @@ interface Options extends ResponsiveOptions {
      */
     trimSpace?: boolean | 'move';
     /**
+     * If `true` and the `focus` option is available:
+     * - Disables the next arrow when a carousel reaches the last page even if the active slide is not the last slide.
+     * - Omits redundant pagination dots which just change the active slide and do not move a carousel.
+     */
+    compact?: boolean;
+    /**
      * Updates the `is-active` status of slides just before moving the slider.
      */
     updateOnMove?: boolean;
@@ -426,7 +432,6 @@ interface Options extends ResponsiveOptions {
      * If `true`, screen readers will read a content of each slide whenever slide changes.
      */
     live?: boolean;
-    compact?: boolean;
     /**
      * Determines whether to use the Transition component or not.
      */
