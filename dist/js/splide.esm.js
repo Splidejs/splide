@@ -1521,7 +1521,7 @@ function Move(Splide2, Components2, options) {
 
   function trim(position) {
     if (options.trimSpace && Splide2.is(SLIDE)) {
-      position = clamp(position, 0, orient(sliderSize() - listSize()));
+      position = clamp(position, 0, orient(sliderSize(true) - listSize()));
     }
 
     return position;

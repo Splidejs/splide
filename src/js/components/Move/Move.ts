@@ -230,7 +230,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    */
   function trim( position: number ): number {
     if ( options.trimSpace && Splide.is( SLIDE ) ) {
-      position = clamp( position, 0, orient( sliderSize() - listSize() ) );
+      position = clamp( position, 0, orient( sliderSize( true ) - listSize() ) );
     }
 
     return position;

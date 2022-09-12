@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 4.0.19
+ * Version  : 4.0.20
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
@@ -1519,7 +1519,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function trim(position) {
       if (options.trimSpace && Splide2.is(SLIDE)) {
-        position = clamp(position, 0, orient(sliderSize() - listSize()));
+        position = clamp(position, 0, orient(sliderSize(true) - listSize()));
       }
 
       return position;
