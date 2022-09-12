@@ -183,6 +183,11 @@ export interface Options extends ResponsiveOptions {
    */
   live?: boolean;
 
+  /**
+   * If `true` and the `focus` option is available:
+   * - Disables the next arrow when a carousel reaches the last page even if the active slide is not the last slide.
+   * - Omits redundant pagination dots which just change the active slide and do not move a carousel.
+   */
   compact?: boolean;
 
   /**
