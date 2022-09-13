@@ -22,7 +22,7 @@ $settings = get_settings();
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
         width: 800,
-        type        : 'loop',
+        // type        : 'loop',
         perPage: 2,
         // perMove: 3,
         // rewind: true,
@@ -36,7 +36,7 @@ $settings = get_settings();
         // role: '',
         label: 'Changed Label',
         focus: 0,
-        compact: true,
+        omitEnd: true,
 
         // breakpoints: {
         //   1200: {

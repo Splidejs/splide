@@ -1574,7 +1574,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var _Components2$Slides = Components2.Slides,
         isEnough = _Components2$Slides.isEnough,
         getLength = _Components2$Slides.getLength;
-    var compact = options.compact;
+    var omitEnd = options.omitEnd;
     var isLoop = Splide2.is(LOOP);
     var isSlide = Splide2.is(SLIDE);
     var getNext = apply(getAdjacent, false);
@@ -1597,7 +1597,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       perMove = options.perMove;
       perPage = options.perPage;
       endIndex = getEnd();
-      var index = clamp(currIndex, 0, compact ? endIndex : slideCount - 1);
+      var index = clamp(currIndex, 0, omitEnd ? endIndex : slideCount - 1);
 
       if (index !== currIndex) {
         currIndex = index;
@@ -1626,7 +1626,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function scroll(destination, duration, snap, callback) {
       Components2.Scroll.scroll(destination, duration, snap, function () {
         var index = loop(Move.toIndex(getPosition()));
-        setIndex(compact ? min(index, endIndex) : index);
+        setIndex(omitEnd ? min(index, endIndex) : index);
         callback && callback();
       });
     }
@@ -1719,7 +1719,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     function getEnd() {
       var end = slideCount - (hasFocus() || isLoop && perMove ? 1 : perPage);
 
-      while (compact && end-- > 0) {
+      while (omitEnd && end-- > 0) {
         if (toPosition(slideCount - 1, true) !== toPosition(end, true)) {
           end++;
           break;

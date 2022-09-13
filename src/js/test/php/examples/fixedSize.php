@@ -22,7 +22,7 @@ $settings = get_settings();
         // type       : 'loop',
         fixedWidth : '6rem',
         gap        : 10,
-        compact    : true,
+        omitEnd    : true,
         focus      : 0,
       } );
 

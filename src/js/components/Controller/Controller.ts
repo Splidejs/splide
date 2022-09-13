@@ -46,7 +46,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
   const { Move } = Components;
   const { getPosition, getLimit, toPosition } = Move;
   const { isEnough, getLength } = Components.Slides;
-  const { compact } = options;
+  const { omitEnd } = options;
   const isLoop  = Splide.is( LOOP );
   const isSlide = Splide.is( SLIDE );
   const getNext = apply( getAdjacent, false );
@@ -102,7 +102,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
     perPage    = options.perPage;
     endIndex   = getEnd();
 
-    const index = clamp( currIndex, 0, compact ? endIndex : slideCount - 1 );
+    const index = clamp( currIndex, 0, omitEnd ? endIndex : slideCount - 1 );
 
     if ( index !== currIndex ) {
       currIndex = index;
@@ -152,7 +152,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
   function scroll( destination: number, duration?: number, snap?: boolean, callback?: AnyFunction ): void {
     Components.Scroll.scroll( destination, duration, snap, () => {
       const index = loop( Move.toIndex( getPosition() ) );
-      setIndex( compact ? min( index, endIndex ) : index );
+      setIndex( omitEnd ? min( index, endIndex ) : index );
       callback && callback();
     } );
   }
@@ -292,14 +292,14 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    * Returns the end index where the slider can go.
    * For example, if the slider has 10 slides and the `perPage` option is 3,
    * the slider can go to the slide 8 (the index is 7).
-   * If the `compact` option is available, computes the index from the slide position.
+   * If the `omitEnd` option is available, computes the index from the slide position.
    *
    * @return An end index.
    */
   function getEnd(): number {
     let end = slideCount - ( hasFocus() || ( isLoop && perMove ) ? 1 : perPage );
 
-    while ( compact && end-- > 0 ) {
+    while ( omitEnd && end-- > 0 ) {
       if ( toPosition( slideCount - 1, true ) !== toPosition( end, true ) ) {
         end++;
         break;

@@ -23,7 +23,7 @@ $settings = get_settings();
         // trimSpace : tr,
         focus     : 0,
         drag      : 'free',
-        compact   : true,
+        omitEnd   : true,
       } );
 
       splide01.mount();

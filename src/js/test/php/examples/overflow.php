@@ -21,7 +21,7 @@ $settings = get_settings();
       var splide01 = new Splide( '#splide01', {
         fixedWidth : '6rem',
         gap        : 10,
-        compact    : true,
+        omitEnd    : true,
         focus      : 0,
       } );
 
@@ -93,7 +93,7 @@ $settings = get_settings();
         gap       : '1rem',
         focus     : 0,
         drag      : 'free',
-        compact   : true,
+        omitEnd   : true,
       } );
 
       splide04.on( 'overflow', overflow => {

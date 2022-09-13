@@ -26,8 +26,8 @@ describe( 'Pagination', () => {
     expect( items.length ).toBe( splide.length );
   } );
 
-  test( 'should omit unnecessary items when `focus` and `compact` options are enabled.', () => {
-    const splide = init( { perPage: 3, focus: 0, compact: true } );
+  test( 'should omit unnecessary items when `focus` and `omitEnd` options are enabled.', () => {
+    const splide = init( { perPage: 3, focus: 0, omitEnd: true } );
     const items  = document.getElementsByClassName( CLASS_PAGINATION_PAGE );
 
     expect( items.length ).not.toBe( splide.length );
