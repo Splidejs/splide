@@ -1850,7 +1850,7 @@ function Arrows(Splide2, Components2, options) {
   }
 
   function listen() {
-    on([EVENT_MOVED, EVENT_REFRESH, EVENT_SCROLLED, EVENT_END_INDEX_CHANGED], update);
+    on([EVENT_MOUNTED, EVENT_MOVED, EVENT_REFRESH, EVENT_SCROLLED, EVENT_END_INDEX_CHANGED], update);
     bind(next, "click", apply(go, ">"));
     bind(prev, "click", apply(go, "<"));
   }

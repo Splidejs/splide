@@ -2,7 +2,9 @@ import { ALL_ATTRIBUTES, ARIA_CONTROLS, ARIA_LABEL } from '../../constants/attri
 import { CLASS_ARROWS } from '../../constants/classes';
 import {
   EVENT_ARROWS_MOUNTED,
-  EVENT_ARROWS_UPDATED, EVENT_END_INDEX_CHANGED,
+  EVENT_ARROWS_UPDATED,
+  EVENT_END_INDEX_CHANGED,
+  EVENT_MOUNTED,
   EVENT_MOVED,
   EVENT_REFRESH,
   EVENT_SCROLLED,
@@ -147,7 +149,7 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
    * Listens to some events.
    */
   function listen(): void {
-    on( [ EVENT_MOVED, EVENT_REFRESH, EVENT_SCROLLED, EVENT_END_INDEX_CHANGED ], update );
+    on( [ EVENT_MOUNTED, EVENT_MOVED, EVENT_REFRESH, EVENT_SCROLLED, EVENT_END_INDEX_CHANGED ], update );
     bind( next, 'click', apply( go, '>' ) );
     bind( prev, 'click', apply( go, '<' ) );
   }
