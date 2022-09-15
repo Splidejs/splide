@@ -27,7 +27,7 @@ export interface AutoplayComponent extends BaseComponent {
 }
 
 /**
- * The component for auto playing sliders.
+ * The component for autoplay, handling a progress bar and a toggle button.
  *
  * @since 3.0.0
  *
@@ -150,7 +150,7 @@ export function Autoplay( Splide: Splide, Components: Components, options: Optio
   /**
    * Called on every animation frame while autoplay is active.
    *
-   * @param rate - The progress rate between 0 to 1.
+   * @param rate - The progress rate between 0 and 1.
    */
   function onAnimationFrame( rate: number ): void {
     const { bar } = Elements;

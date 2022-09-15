@@ -71,7 +71,6 @@ export function Move( Splide: Splide, Components: Components, options: Options )
    * Repositions the slider.
    * - Do not call `cancel()` here because LazyLoad may emit resize while transitioning.
    * - iOS Safari emits window resize event while the user swipes the slider because of the bottom bar.
-   * - Slide components listening to the internal repositioned event to update their visibility.
    */
   function reposition(): void {
     if ( ! Components.Controller.isBusy() ) {
