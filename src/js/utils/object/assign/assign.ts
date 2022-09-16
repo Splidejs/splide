@@ -35,7 +35,6 @@ export function assign<T extends object, U extends object[]>(
 
 /**
  * Assigns all own enumerable properties of all source objects to the provided object.
- * `undefined` in source objects will be skipped.
  *
  * @param object - An object to assign properties to.
  *
