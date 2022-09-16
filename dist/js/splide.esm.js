@@ -131,18 +131,9 @@ var ownKeys = Object.keys;
 
 function forOwn(object, iteratee, right) {
   if (object) {
-    var keys = ownKeys(object);
-    keys = right ? keys.reverse() : keys;
-
-    for (var i = 0; i < keys.length; i++) {
-      var key = keys[i];
-
-      if (key !== "__proto__") {
-        if (iteratee(object[key], key) === false) {
-          break;
-        }
-      }
-    }
+    (right ? ownKeys(object).reverse() : ownKeys(object)).forEach(function (key) {
+      key !== "__proto__" && iteratee(object[key], key);
+    });
   }
 
   return object;
@@ -173,7 +164,7 @@ function merge(object) {
 }
 
 function omit(object, keys) {
-  toArray(keys || ownKeys(object)).forEach(function (key) {
+  forEach(keys || ownKeys(object), function (key) {
     delete object[key];
   });
 }
