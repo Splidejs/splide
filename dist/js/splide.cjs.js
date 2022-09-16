@@ -696,6 +696,7 @@ var ARIA_LIVE = ARIA_PREFIX + "live";
 var ARIA_BUSY = ARIA_PREFIX + "busy";
 var ARIA_ATOMIC = ARIA_PREFIX + "atomic";
 var ALL_ATTRIBUTES = [ROLE, TAB_INDEX, DISABLED, ARIA_CONTROLS, ARIA_CURRENT, ARIA_LABEL, ARIA_LABELLEDBY, ARIA_HIDDEN, ARIA_ORIENTATION, ARIA_ROLEDESCRIPTION];
+var STATUS_CLASS_PREFIX = "is-";
 var CLASS_ROOT = PROJECT_CODE;
 var CLASS_TRACK = PROJECT_CODE + "__track";
 var CLASS_LIST = PROJECT_CODE + "__list";
@@ -715,14 +716,15 @@ var CLASS_TOGGLE_PLAY = CLASS_TOGGLE + "__play";
 var CLASS_TOGGLE_PAUSE = CLASS_TOGGLE + "__pause";
 var CLASS_SPINNER = PROJECT_CODE + "__spinner";
 var CLASS_SR = PROJECT_CODE + "__sr";
-var CLASS_INITIALIZED = "is-initialized";
-var CLASS_ACTIVE = "is-active";
-var CLASS_PREV = "is-prev";
-var CLASS_NEXT = "is-next";
-var CLASS_VISIBLE = "is-visible";
-var CLASS_LOADING = "is-loading";
-var CLASS_FOCUS_IN = "is-focus-in";
-var STATUS_CLASSES = [CLASS_ACTIVE, CLASS_VISIBLE, CLASS_PREV, CLASS_NEXT, CLASS_LOADING, CLASS_FOCUS_IN];
+var CLASS_INITIALIZED = STATUS_CLASS_PREFIX + "initialized";
+var CLASS_ACTIVE = STATUS_CLASS_PREFIX + "active";
+var CLASS_PREV = STATUS_CLASS_PREFIX + "prev";
+var CLASS_NEXT = STATUS_CLASS_PREFIX + "next";
+var CLASS_VISIBLE = STATUS_CLASS_PREFIX + "visible";
+var CLASS_LOADING = STATUS_CLASS_PREFIX + "loading";
+var CLASS_FOCUS_IN = STATUS_CLASS_PREFIX + "focus-in";
+var CLASS_OVERFLOW = STATUS_CLASS_PREFIX + "overflow";
+var STATUS_CLASSES = [CLASS_ACTIVE, CLASS_VISIBLE, CLASS_PREV, CLASS_NEXT, CLASS_LOADING, CLASS_FOCUS_IN, CLASS_OVERFLOW];
 var CLASSES = {
   slide: CLASS_SLIDE,
   clone: CLASS_CLONE,
@@ -1222,6 +1224,7 @@ function Layout(Splide2, Components2, options) {
       emit(EVENT_RESIZED);
 
       if (overflow !== (overflow = isOverflow())) {
+        toggleClass(root, CLASS_OVERFLOW, overflow);
         emit(EVENT_OVERFLOW, overflow);
       }
     }
@@ -2536,7 +2539,7 @@ function Pagination(Splide2, Components2, options) {
   function mount() {
     destroy();
     on([EVENT_UPDATED, EVENT_REFRESH, EVENT_END_INDEX_CHANGED], mount);
-    var enabled = options.pagination && Slides.isEnough();
+    var enabled = options.pagination;
     placeholder && display(placeholder, enabled ? "" : "none");
 
     if (enabled) {
@@ -3696,6 +3699,7 @@ exports.CLASS_INITIALIZED = CLASS_INITIALIZED;
 exports.CLASS_LIST = CLASS_LIST;
 exports.CLASS_LOADING = CLASS_LOADING;
 exports.CLASS_NEXT = CLASS_NEXT;
+exports.CLASS_OVERFLOW = CLASS_OVERFLOW;
 exports.CLASS_PAGINATION = CLASS_PAGINATION;
 exports.CLASS_PAGINATION_PAGE = CLASS_PAGINATION_PAGE;
 exports.CLASS_PREV = CLASS_PREV;

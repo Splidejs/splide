@@ -84,13 +84,6 @@ describe( 'Pagination', () => {
     expect( items[ 3 ].getAttribute( 'aria-selected' ) ).toBe( 'true' );
   } );
 
-  test( 'should not create pagination if slides are not enough to the perPage option.', () => {
-    init( { perPage: 3 }, { length: 1 } );
-    const items  = document.getElementsByClassName( CLASS_PAGINATION_PAGE );
-
-    expect( items.length ).toBe( 0 );
-  } );
-
   test( 'should remove the pagination on destroy.', () => {
     const splide = init();
     splide.destroy();

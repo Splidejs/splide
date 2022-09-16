@@ -115,7 +115,7 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
     destroy();
     on( [ EVENT_UPDATED, EVENT_REFRESH, EVENT_END_INDEX_CHANGED ], mount );
 
-    const enabled = options.pagination && Slides.isEnough();
+    const enabled = options.pagination;
     placeholder && display( placeholder, enabled ? '' : 'none' );
 
     if ( enabled ) {

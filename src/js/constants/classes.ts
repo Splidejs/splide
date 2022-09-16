@@ -1,6 +1,15 @@
 import { PROJECT_CODE } from './project';
 
+/**
+ * The prefix for status classes.
+ *
+ * @since 4.1.0
+ */
+const STATUS_CLASS_PREFIX = 'is-';
 
+/**
+ * All classes as constants.
+ */
 export const CLASS_ROOT            = PROJECT_CODE;
 export const CLASS_TRACK           = `${ PROJECT_CODE }__track`;
 export const CLASS_LIST            = `${ PROJECT_CODE }__list`;
@@ -20,17 +29,17 @@ export const CLASS_TOGGLE_PLAY     = `${ CLASS_TOGGLE }__play`;
 export const CLASS_TOGGLE_PAUSE    = `${ CLASS_TOGGLE }__pause`;
 export const CLASS_SPINNER         = `${ PROJECT_CODE }__spinner`;
 export const CLASS_SR              = `${ PROJECT_CODE }__sr`;
-export const CLASS_INITIALIZED     = 'is-initialized';
-export const CLASS_ACTIVE          = 'is-active';
-export const CLASS_PREV            = 'is-prev';
-export const CLASS_NEXT            = 'is-next';
-export const CLASS_VISIBLE         = 'is-visible';
-export const CLASS_LOADING         = 'is-loading';
-export const CLASS_FOCUS_IN        = 'is-focus-in';
-
+export const CLASS_INITIALIZED     = `${ STATUS_CLASS_PREFIX }initialized`;
+export const CLASS_ACTIVE          = `${ STATUS_CLASS_PREFIX }active`;
+export const CLASS_PREV            = `${ STATUS_CLASS_PREFIX }prev`;
+export const CLASS_NEXT            = `${ STATUS_CLASS_PREFIX }next`;
+export const CLASS_VISIBLE         = `${ STATUS_CLASS_PREFIX }visible`;
+export const CLASS_LOADING         = `${ STATUS_CLASS_PREFIX }loading`;
+export const CLASS_FOCUS_IN        = `${ STATUS_CLASS_PREFIX }focus-in`;
+export const CLASS_OVERFLOW        = `${ STATUS_CLASS_PREFIX }overflow`;
 
 /**
- * The array with all status classes.
+ * The array with all status classes except for `is-initialized`.
  *
  * @since 3.0.0
  */
@@ -41,6 +50,7 @@ export const STATUS_CLASSES = [
   CLASS_NEXT,
   CLASS_LOADING,
   CLASS_FOCUS_IN,
+  CLASS_OVERFLOW,
 ];
 
 /**
