@@ -1,4 +1,6 @@
 .splide {
+  $root: &;
+
   &__pagination {
     align-items: center;
     display: flex;
@@ -13,6 +15,12 @@
       list-style-type: none;
       margin: 0;
       pointer-events: auto;
+    }
+  }
+
+  &:not( .is-overflow ) {
+    #{ $root }__pagination {
+      display: none;
     }
   }
 }
