@@ -119,7 +119,9 @@ export function Layout( Splide: Splide, Components: Components, options: Options
   function cssPadding( right: boolean ): string {
     const { padding } = options;
     const prop = resolve( right ? 'right' : 'left' );
-    return padding && unit( padding[ prop ] || ( isObject( padding ) ? 0 : padding ) ) || '0px';
+    return padding
+      && unit( padding[ prop ] || ( isObject( padding ) ? 0 : padding ) )
+      || '0px';
   }
 
   /**
@@ -154,7 +156,9 @@ export function Layout( Splide: Splide, Components: Components, options: Options
    * @return The width of the slide.
    */
   function cssSlideWidth(): string | null {
-    return options.autoWidth ? null : unit( options.fixedWidth ) || ( vertical ? '' : cssSlideSize() );
+    return options.autoWidth
+      ? null
+      : unit( options.fixedWidth ) || ( vertical ? '' : cssSlideSize() );
   }
 
   /**
@@ -235,7 +239,7 @@ export function Layout( Splide: Splide, Components: Components, options: Options
   }
 
   /**
-   * Returns the gap value.
+   * Returns the gap value in pixel by using the computed style of the first slide.
    *
    * @return The gap value in pixel.
    */
