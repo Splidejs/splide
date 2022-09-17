@@ -1303,7 +1303,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       slideSize: slideSize,
       sliderSize: sliderSize,
       totalSize: totalSize,
-      getPadding: getPadding
+      getPadding: getPadding,
+      isOverflow: isOverflow
     };
   }
 

@@ -1305,7 +1305,8 @@ function Layout(Splide2, Components2, options) {
     slideSize: slideSize,
     sliderSize: sliderSize,
     totalSize: totalSize,
-    getPadding: getPadding
+    getPadding: getPadding,
+    isOverflow: isOverflow
   };
 }
 

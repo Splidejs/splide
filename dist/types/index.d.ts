@@ -71,6 +71,7 @@ interface LayoutComponent extends BaseComponent {
     sliderSize(withoutGap?: boolean): number;
     totalSize(index?: number, withoutGap?: boolean): number;
     getPadding(right: boolean): number;
+    isOverflow(): boolean;
     /** @internal */
     resize(force?: boolean): void;
 }
