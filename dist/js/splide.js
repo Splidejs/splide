@@ -1867,16 +1867,18 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function update() {
-      var index = Splide2.index;
-      var prevIndex = Controller.getPrev();
-      var nextIndex = Controller.getNext();
-      var prevLabel = prevIndex > -1 && index < prevIndex ? i18n.last : i18n.prev;
-      var nextLabel = nextIndex > -1 && index > nextIndex ? i18n.first : i18n.next;
-      prev.disabled = prevIndex < 0;
-      next.disabled = nextIndex < 0;
-      setAttribute(prev, ARIA_LABEL, prevLabel);
-      setAttribute(next, ARIA_LABEL, nextLabel);
-      emit(EVENT_ARROWS_UPDATED, prev, next, prevIndex, nextIndex);
+      if (prev && next) {
+        var index = Splide2.index;
+        var prevIndex = Controller.getPrev();
+        var nextIndex = Controller.getNext();
+        var prevLabel = prevIndex > -1 && index < prevIndex ? i18n.last : i18n.prev;
+        var nextLabel = nextIndex > -1 && index > nextIndex ? i18n.first : i18n.next;
+        prev.disabled = prevIndex < 0;
+        next.disabled = nextIndex < 0;
+        setAttribute(prev, ARIA_LABEL, prevLabel);
+        setAttribute(next, ARIA_LABEL, nextLabel);
+        emit(EVENT_ARROWS_UPDATED, prev, next, prevIndex, nextIndex);
+      }
     }
 
     return {

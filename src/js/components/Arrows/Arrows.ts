@@ -196,19 +196,21 @@ export function Arrows( Splide: Splide, Components: Components, options: Options
    * Updates status of arrows, such as `disabled` and `aria-label`.
    */
   function update(): void {
-    const index     = Splide.index;
-    const prevIndex = Controller.getPrev();
-    const nextIndex = Controller.getNext();
-    const prevLabel = prevIndex > -1 && index < prevIndex ? i18n.last : i18n.prev;
-    const nextLabel = nextIndex > -1 && index > nextIndex ? i18n.first : i18n.next;
+    if ( prev && next ) {
+      const index     = Splide.index;
+      const prevIndex = Controller.getPrev();
+      const nextIndex = Controller.getNext();
+      const prevLabel = prevIndex > -1 && index < prevIndex ? i18n.last : i18n.prev;
+      const nextLabel = nextIndex > -1 && index > nextIndex ? i18n.first : i18n.next;
 
-    prev.disabled = prevIndex < 0;
-    next.disabled = nextIndex < 0;
+      prev.disabled = prevIndex < 0;
+      next.disabled = nextIndex < 0;
 
-    setAttribute( prev, ARIA_LABEL, prevLabel );
-    setAttribute( next, ARIA_LABEL, nextLabel );
+      setAttribute( prev, ARIA_LABEL, prevLabel );
+      setAttribute( next, ARIA_LABEL, nextLabel );
 
-    emit( EVENT_ARROWS_UPDATED, prev, next, prevIndex, nextIndex );
+      emit( EVENT_ARROWS_UPDATED, prev, next, prevIndex, nextIndex );
+    }
   }
 
   return {
