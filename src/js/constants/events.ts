@@ -1,7 +1,3 @@
-const ARROWS     = `arrows:`;
-const PAGINATION = `pagination:`;
-const AUTOPLAY   = `autoplay:`;
-
 export const EVENT_MOUNTED            = 'mounted';
 export const EVENT_READY              = 'ready';
 export const EVENT_MOVE               = 'move';
@@ -22,14 +18,14 @@ export const EVENT_SCROLL             = 'scroll';
 export const EVENT_SCROLLED           = 'scrolled';
 export const EVENT_OVERFLOW           = 'overflow';
 export const EVENT_DESTROY            = 'destroy';
-export const EVENT_ARROWS_MOUNTED     = `${ ARROWS }mounted`;
-export const EVENT_ARROWS_UPDATED     = `${ ARROWS }updated`;
-export const EVENT_PAGINATION_MOUNTED = `${ PAGINATION }mounted`;
-export const EVENT_PAGINATION_UPDATED = `${ PAGINATION }updated`;
+export const EVENT_ARROWS_MOUNTED     = 'arrows:mounted';
+export const EVENT_ARROWS_UPDATED     = 'arrows:updated';
+export const EVENT_PAGINATION_MOUNTED = 'pagination:mounted';
+export const EVENT_PAGINATION_UPDATED = 'pagination:updated';
 export const EVENT_NAVIGATION_MOUNTED = 'navigation:mounted';
-export const EVENT_AUTOPLAY_PLAY      = `${ AUTOPLAY }play`;
-export const EVENT_AUTOPLAY_PLAYING   = `${ AUTOPLAY }playing`;
-export const EVENT_AUTOPLAY_PAUSE     = `${ AUTOPLAY }pause`;
+export const EVENT_AUTOPLAY_PLAY      = 'autoplay:play';
+export const EVENT_AUTOPLAY_PLAYING   = 'autoplay:playing';
+export const EVENT_AUTOPLAY_PAUSE     = 'autoplay:pause';
 export const EVENT_LAZYLOAD_LOADED    = 'lazyload:loaded';
 
 /** @internal */

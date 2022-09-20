@@ -398,9 +398,6 @@ function EventBinder() {
   };
 }
 
-var ARROWS = "arrows:";
-var PAGINATION = "pagination:";
-var AUTOPLAY = "autoplay:";
 var EVENT_MOUNTED = "mounted";
 var EVENT_READY = "ready";
 var EVENT_MOVE = "move";
@@ -421,14 +418,14 @@ var EVENT_SCROLL = "scroll";
 var EVENT_SCROLLED = "scrolled";
 var EVENT_OVERFLOW = "overflow";
 var EVENT_DESTROY = "destroy";
-var EVENT_ARROWS_MOUNTED = ARROWS + "mounted";
-var EVENT_ARROWS_UPDATED = ARROWS + "updated";
-var EVENT_PAGINATION_MOUNTED = PAGINATION + "mounted";
-var EVENT_PAGINATION_UPDATED = PAGINATION + "updated";
+var EVENT_ARROWS_MOUNTED = "arrows:mounted";
+var EVENT_ARROWS_UPDATED = "arrows:updated";
+var EVENT_PAGINATION_MOUNTED = "pagination:mounted";
+var EVENT_PAGINATION_UPDATED = "pagination:updated";
 var EVENT_NAVIGATION_MOUNTED = "navigation:mounted";
-var EVENT_AUTOPLAY_PLAY = AUTOPLAY + "play";
-var EVENT_AUTOPLAY_PLAYING = AUTOPLAY + "playing";
-var EVENT_AUTOPLAY_PAUSE = AUTOPLAY + "pause";
+var EVENT_AUTOPLAY_PLAY = "autoplay:play";
+var EVENT_AUTOPLAY_PLAYING = "autoplay:playing";
+var EVENT_AUTOPLAY_PAUSE = "autoplay:pause";
 var EVENT_LAZYLOAD_LOADED = "lazyload:loaded";
 var EVENT_SLIDE_KEYDOWN = "sk";
 var EVENT_SHIFTED = "sh";
