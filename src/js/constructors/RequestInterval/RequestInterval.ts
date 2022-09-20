@@ -75,7 +75,7 @@ export function RequestInterval(
         }
       }
 
-      raf( update );
+      id = raf( update );
     }
   }
 
@@ -85,10 +85,10 @@ export function RequestInterval(
    * @param resume - Optional. Whether to resume the paused progress or not.
    */
   function start( resume?: boolean ): void {
-    ! resume && cancel();
+    resume || cancel();
     startTime = now() - ( resume ? rate * interval : 0 );
     paused    = false;
-    raf( update );
+    id        = raf( update );
   }
 
   /**
