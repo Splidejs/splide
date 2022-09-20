@@ -1,5 +1,5 @@
 import { AnyFunction } from '../../types';
-import { RequestInterval, RequestIntervalInterface } from '../RequestInterval/RequestInterval';
+import { RequestInterval } from '../RequestInterval/RequestInterval';
 
 
 /**
@@ -23,18 +23,9 @@ export function Throttle<F extends AnyFunction>(
   func: F,
   duration?: number
 ): ThrottleInstance<F> {
-  let interval: RequestIntervalInterface;
+  const interval = RequestInterval( duration || 0, func, null, 1 );
 
-  function throttled(): void {
-    if ( ! interval ) {
-      interval = RequestInterval( duration || 0, () => {
-        func();
-        interval = null;
-      }, null, 1 );
-
-      interval.start();
-    }
-  }
-
-  return throttled;
+  return () => {
+    interval.isPaused() && interval.start();
+  };
 }
