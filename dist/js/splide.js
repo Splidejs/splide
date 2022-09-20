@@ -297,9 +297,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     return abs(x - y) < epsilon;
   }
 
-  function between(number, minOrMax, maxOrMin, exclusive) {
-    var minimum = min(minOrMax, maxOrMin);
-    var maximum = max(minOrMax, maxOrMin);
+  function between(number, x, y, exclusive) {
+    var minimum = min(x, y);
+    var maximum = max(x, y);
     return exclusive ? minimum < number && number < maximum : minimum <= number && number <= maximum;
   }
 
@@ -483,15 +483,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           }
         }
 
-        raf(update);
+        id = raf(update);
       }
     }
 
     function start(resume) {
-      !resume && cancel();
+      resume || cancel();
       startTime = now() - (resume ? rate * interval : 0);
       paused = false;
-      raf(update);
+      id = raf(update);
     }
 
     function pause() {
@@ -550,19 +550,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   function Throttle(func, duration) {
-    var interval;
-
-    function throttled() {
-      if (!interval) {
-        interval = RequestInterval(duration || 0, function () {
-          func();
-          interval = null;
-        }, null, 1);
-        interval.start();
-      }
-    }
-
-    return throttled;
+    var interval = RequestInterval(duration || 0, func, null, 1);
+    return function () {
+      interval.isPaused() && interval.start();
+    };
   }
 
   function Media(Splide2, Components2, options) {
@@ -691,24 +682,25 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var ARIA_BUSY = ARIA_PREFIX + "busy";
   var ARIA_ATOMIC = ARIA_PREFIX + "atomic";
   var ALL_ATTRIBUTES = [ROLE, TAB_INDEX, DISABLED, ARIA_CONTROLS, ARIA_CURRENT, ARIA_LABEL, ARIA_LABELLEDBY, ARIA_HIDDEN, ARIA_ORIENTATION, ARIA_ROLEDESCRIPTION];
+  var CLASS_PREFIX = PROJECT_CODE + "__";
   var STATUS_CLASS_PREFIX = "is-";
   var CLASS_ROOT = PROJECT_CODE;
-  var CLASS_TRACK = PROJECT_CODE + "__track";
-  var CLASS_LIST = PROJECT_CODE + "__list";
-  var CLASS_SLIDE = PROJECT_CODE + "__slide";
+  var CLASS_TRACK = CLASS_PREFIX + "track";
+  var CLASS_LIST = CLASS_PREFIX + "list";
+  var CLASS_SLIDE = CLASS_PREFIX + "slide";
   var CLASS_CLONE = CLASS_SLIDE + "--clone";
   var CLASS_CONTAINER = CLASS_SLIDE + "__container";
-  var CLASS_ARROWS = PROJECT_CODE + "__arrows";
-  var CLASS_ARROW = PROJECT_CODE + "__arrow";
+  var CLASS_ARROWS = CLASS_PREFIX + "arrows";
+  var CLASS_ARROW = CLASS_PREFIX + "arrow";
   var CLASS_ARROW_PREV = CLASS_ARROW + "--prev";
   var CLASS_ARROW_NEXT = CLASS_ARROW + "--next";
-  var CLASS_PAGINATION = PROJECT_CODE + "__pagination";
+  var CLASS_PAGINATION = CLASS_PREFIX + "pagination";
   var CLASS_PAGINATION_PAGE = CLASS_PAGINATION + "__page";
-  var CLASS_PROGRESS = PROJECT_CODE + "__progress";
+  var CLASS_PROGRESS = CLASS_PREFIX + "progress";
   var CLASS_PROGRESS_BAR = CLASS_PROGRESS + "__bar";
-  var CLASS_TOGGLE = PROJECT_CODE + "__toggle";
-  var CLASS_SPINNER = PROJECT_CODE + "__spinner";
-  var CLASS_SR = PROJECT_CODE + "__sr";
+  var CLASS_TOGGLE = CLASS_PREFIX + "toggle";
+  var CLASS_SPINNER = CLASS_PREFIX + "spinner";
+  var CLASS_SR = CLASS_PREFIX + "sr";
   var CLASS_INITIALIZED = STATUS_CLASS_PREFIX + "initialized";
   var CLASS_ACTIVE = STATUS_CLASS_PREFIX + "active";
   var CLASS_PREV = STATUS_CLASS_PREFIX + "prev";
@@ -2678,12 +2670,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         slideFocus = options.slideFocus;
     var events = [];
 
-    function setup() {
-      Components2.Media.set({
-        slideFocus: isUndefined(slideFocus) ? isNavigation : slideFocus
-      }, true);
-    }
-
     function mount() {
       Splide2.splides.forEach(function (target) {
         if (!target.isParent) {
@@ -2743,7 +2729,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     return {
-      setup: setup,
+      setup: apply(Components2.Media.set, {
+        slideFocus: isUndefined(slideFocus) ? isNavigation : slideFocus
+      }, true),
       mount: mount,
       destroy: destroy,
       remount: remount

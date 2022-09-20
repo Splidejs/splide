@@ -297,9 +297,9 @@ function approximatelyEqual(x, y, epsilon) {
   return abs(x - y) < epsilon;
 }
 
-function between(number, minOrMax, maxOrMin, exclusive) {
-  var minimum = min(minOrMax, maxOrMin);
-  var maximum = max(minOrMax, maxOrMin);
+function between(number, x, y, exclusive) {
+  var minimum = min(x, y);
+  var maximum = max(x, y);
   return exclusive ? minimum < number && number < maximum : minimum <= number && number <= maximum;
 }
 
@@ -487,15 +487,15 @@ function RequestInterval(interval, onInterval, onUpdate, limit) {
         }
       }
 
-      raf(update);
+      id = raf(update);
     }
   }
 
   function start(resume) {
-    !resume && cancel();
+    resume || cancel();
     startTime = now() - (resume ? rate * interval : 0);
     paused = false;
-    raf(update);
+    id = raf(update);
   }
 
   function pause() {
@@ -554,19 +554,10 @@ function State(initialState) {
 }
 
 function Throttle(func, duration) {
-  var interval;
-
-  function throttled() {
-    if (!interval) {
-      interval = RequestInterval(duration || 0, function () {
-        func();
-        interval = null;
-      }, null, 1);
-      interval.start();
-    }
-  }
-
-  return throttled;
+  var interval = RequestInterval(duration || 0, func, null, 1);
+  return function () {
+    interval.isPaused() && interval.start();
+  };
 }
 
 function Media(Splide2, Components2, options) {
@@ -696,26 +687,27 @@ var ARIA_LIVE = ARIA_PREFIX + "live";
 var ARIA_BUSY = ARIA_PREFIX + "busy";
 var ARIA_ATOMIC = ARIA_PREFIX + "atomic";
 var ALL_ATTRIBUTES = [ROLE, TAB_INDEX, DISABLED, ARIA_CONTROLS, ARIA_CURRENT, ARIA_LABEL, ARIA_LABELLEDBY, ARIA_HIDDEN, ARIA_ORIENTATION, ARIA_ROLEDESCRIPTION];
+var CLASS_PREFIX = PROJECT_CODE + "__";
 var STATUS_CLASS_PREFIX = "is-";
 var CLASS_ROOT = PROJECT_CODE;
-var CLASS_TRACK = PROJECT_CODE + "__track";
-var CLASS_LIST = PROJECT_CODE + "__list";
-var CLASS_SLIDE = PROJECT_CODE + "__slide";
+var CLASS_TRACK = CLASS_PREFIX + "track";
+var CLASS_LIST = CLASS_PREFIX + "list";
+var CLASS_SLIDE = CLASS_PREFIX + "slide";
 var CLASS_CLONE = CLASS_SLIDE + "--clone";
 var CLASS_CONTAINER = CLASS_SLIDE + "__container";
-var CLASS_ARROWS = PROJECT_CODE + "__arrows";
-var CLASS_ARROW = PROJECT_CODE + "__arrow";
+var CLASS_ARROWS = CLASS_PREFIX + "arrows";
+var CLASS_ARROW = CLASS_PREFIX + "arrow";
 var CLASS_ARROW_PREV = CLASS_ARROW + "--prev";
 var CLASS_ARROW_NEXT = CLASS_ARROW + "--next";
-var CLASS_PAGINATION = PROJECT_CODE + "__pagination";
+var CLASS_PAGINATION = CLASS_PREFIX + "pagination";
 var CLASS_PAGINATION_PAGE = CLASS_PAGINATION + "__page";
-var CLASS_PROGRESS = PROJECT_CODE + "__progress";
+var CLASS_PROGRESS = CLASS_PREFIX + "progress";
 var CLASS_PROGRESS_BAR = CLASS_PROGRESS + "__bar";
-var CLASS_TOGGLE = PROJECT_CODE + "__toggle";
+var CLASS_TOGGLE = CLASS_PREFIX + "toggle";
 var CLASS_TOGGLE_PLAY = CLASS_TOGGLE + "__play";
 var CLASS_TOGGLE_PAUSE = CLASS_TOGGLE + "__pause";
-var CLASS_SPINNER = PROJECT_CODE + "__spinner";
-var CLASS_SR = PROJECT_CODE + "__sr";
+var CLASS_SPINNER = CLASS_PREFIX + "spinner";
+var CLASS_SR = CLASS_PREFIX + "sr";
 var CLASS_INITIALIZED = STATUS_CLASS_PREFIX + "initialized";
 var CLASS_ACTIVE = STATUS_CLASS_PREFIX + "active";
 var CLASS_PREV = STATUS_CLASS_PREFIX + "prev";
@@ -1874,16 +1866,18 @@ function Arrows(Splide2, Components2, options) {
   }
 
   function update() {
-    var index = Splide2.index;
-    var prevIndex = Controller.getPrev();
-    var nextIndex = Controller.getNext();
-    var prevLabel = prevIndex > -1 && index < prevIndex ? i18n.last : i18n.prev;
-    var nextLabel = nextIndex > -1 && index > nextIndex ? i18n.first : i18n.next;
-    prev.disabled = prevIndex < 0;
-    next.disabled = nextIndex < 0;
-    setAttribute(prev, ARIA_LABEL, prevLabel);
-    setAttribute(next, ARIA_LABEL, nextLabel);
-    emit(EVENT_ARROWS_UPDATED, prev, next, prevIndex, nextIndex);
+    if (prev && next) {
+      var index = Splide2.index;
+      var prevIndex = Controller.getPrev();
+      var nextIndex = Controller.getNext();
+      var prevLabel = prevIndex > -1 && index < prevIndex ? i18n.last : i18n.prev;
+      var nextLabel = nextIndex > -1 && index > nextIndex ? i18n.first : i18n.next;
+      prev.disabled = prevIndex < 0;
+      next.disabled = nextIndex < 0;
+      setAttribute(prev, ARIA_LABEL, prevLabel);
+      setAttribute(next, ARIA_LABEL, nextLabel);
+      emit(EVENT_ARROWS_UPDATED, prev, next, prevIndex, nextIndex);
+    }
   }
 
   return {
@@ -2683,12 +2677,6 @@ function Sync(Splide2, Components2, options) {
       slideFocus = options.slideFocus;
   var events = [];
 
-  function setup() {
-    Components2.Media.set({
-      slideFocus: isUndefined(slideFocus) ? isNavigation : slideFocus
-    }, true);
-  }
-
   function mount() {
     Splide2.splides.forEach(function (target) {
       if (!target.isParent) {
@@ -2748,7 +2736,9 @@ function Sync(Splide2, Components2, options) {
   }
 
   return {
-    setup: setup,
+    setup: apply(Components2.Media.set, {
+      slideFocus: isUndefined(slideFocus) ? isNavigation : slideFocus
+    }, true),
     mount: mount,
     destroy: destroy,
     remount: remount

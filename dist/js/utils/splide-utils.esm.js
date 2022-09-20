@@ -266,9 +266,9 @@ function approximatelyEqual(x, y, epsilon) {
   return abs(x - y) < epsilon;
 }
 
-function between(number, minOrMax, maxOrMin, exclusive) {
-  const minimum = min(minOrMax, maxOrMin);
-  const maximum = max(minOrMax, maxOrMin);
+function between(number, x, y, exclusive) {
+  const minimum = min(x, y);
+  const maximum = max(x, y);
   return exclusive ? minimum < number && number < maximum : minimum <= number && number <= maximum;
 }
 
