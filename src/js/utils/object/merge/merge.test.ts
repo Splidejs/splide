@@ -39,4 +39,14 @@ describe( 'merge', () => {
       i: Infinity,
     } );
   } );
+
+  test( 'should disconnect reference of arrays.', () => {
+    const array  = [ 1, 2, 3 ];
+    const object = {};
+    const source = { array };
+    const merged = merge( object, source );
+
+    expect( merged ).toStrictEqual( { array: [ 1, 2, 3 ] } );
+    expect( merged.array ).not.toBe( array );
+  } );
 } );
