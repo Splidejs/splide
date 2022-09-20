@@ -12,7 +12,7 @@ import { LOOP } from '../../constants/types';
 import { EventInterface, EventInterfaceObject } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { empty, includes, isUndefined, prevent, setAttribute } from '../../utils';
+import { apply, empty, includes, isUndefined, prevent, setAttribute } from '../../utils';
 import { normalizeKey } from '../../utils/dom/normalizeKey/normalizeKey';
 import { SlideComponent } from '../Slides/Slide';
 
@@ -51,13 +51,6 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
    * Stores event objects.
    */
   const events: EventInterfaceObject[] = [];
-
-  /**
-   * Called when the component is constructed.
-   */
-  function setup(): void {
-    Components.Media.set( { slideFocus: isUndefined( slideFocus ) ? isNavigation : slideFocus }, true );
-  }
 
   /**
    * Called when the component is mounted.
@@ -155,7 +148,11 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
   }
 
   return {
-    setup,
+    setup: apply(
+      Components.Media.set,
+      { slideFocus: isUndefined( slideFocus ) ? isNavigation : slideFocus },
+      true
+    ),
     mount,
     destroy,
     remount,
