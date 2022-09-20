@@ -1,6 +1,13 @@
 import { PROJECT_CODE } from './project';
 
 /**
+ * The prefix for classes.
+ *
+ * @since 4.1.0
+ */
+const CLASS_PREFIX = `${ PROJECT_CODE }__`;
+
+/**
  * The prefix for status classes.
  *
  * @since 4.1.0
@@ -11,24 +18,24 @@ const STATUS_CLASS_PREFIX = 'is-';
  * All classes as constants.
  */
 export const CLASS_ROOT            = PROJECT_CODE;
-export const CLASS_TRACK           = `${ PROJECT_CODE }__track`;
-export const CLASS_LIST            = `${ PROJECT_CODE }__list`;
-export const CLASS_SLIDE           = `${ PROJECT_CODE }__slide`;
+export const CLASS_TRACK           = `${ CLASS_PREFIX }track`;
+export const CLASS_LIST            = `${ CLASS_PREFIX }list`;
+export const CLASS_SLIDE           = `${ CLASS_PREFIX }slide`;
 export const CLASS_CLONE           = `${ CLASS_SLIDE }--clone`;
 export const CLASS_CONTAINER       = `${ CLASS_SLIDE }__container`;
-export const CLASS_ARROWS          = `${ PROJECT_CODE }__arrows`;
-export const CLASS_ARROW           = `${ PROJECT_CODE }__arrow`;
+export const CLASS_ARROWS          = `${ CLASS_PREFIX }arrows`;
+export const CLASS_ARROW           = `${ CLASS_PREFIX }arrow`;
 export const CLASS_ARROW_PREV      = `${ CLASS_ARROW }--prev`;
 export const CLASS_ARROW_NEXT      = `${ CLASS_ARROW }--next`;
-export const CLASS_PAGINATION      = `${ PROJECT_CODE }__pagination`;
+export const CLASS_PAGINATION      = `${ CLASS_PREFIX }pagination`;
 export const CLASS_PAGINATION_PAGE = `${ CLASS_PAGINATION }__page`;
-export const CLASS_PROGRESS        = `${ PROJECT_CODE }__progress`;
+export const CLASS_PROGRESS        = `${ CLASS_PREFIX }progress`;
 export const CLASS_PROGRESS_BAR    = `${ CLASS_PROGRESS }__bar`;
-export const CLASS_TOGGLE          = `${ PROJECT_CODE }__toggle`;
+export const CLASS_TOGGLE          = `${ CLASS_PREFIX }toggle`;
 export const CLASS_TOGGLE_PLAY     = `${ CLASS_TOGGLE }__play`;
 export const CLASS_TOGGLE_PAUSE    = `${ CLASS_TOGGLE }__pause`;
-export const CLASS_SPINNER         = `${ PROJECT_CODE }__spinner`;
-export const CLASS_SR              = `${ PROJECT_CODE }__sr`;
+export const CLASS_SPINNER         = `${ CLASS_PREFIX }spinner`;
+export const CLASS_SR              = `${ CLASS_PREFIX }sr`;
 export const CLASS_INITIALIZED     = `${ STATUS_CLASS_PREFIX }initialized`;
 export const CLASS_ACTIVE          = `${ STATUS_CLASS_PREFIX }active`;
 export const CLASS_PREV            = `${ STATUS_CLASS_PREFIX }prev`;
