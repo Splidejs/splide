@@ -22,7 +22,7 @@ async function emit() {
 }
 
 async function bundle() {
-  const file = path.join( dir, 'index.d.ts' )
+  const file = path.join( dir, 'index.d.ts' );
 
   const bundle = await rollup( {
     input  : file,
