@@ -8,7 +8,7 @@ import { BaseComponent, TransitionComponent } from './general';
  * @since 3.0.0
  */
 export interface Components {
-  [ key: string ]: BaseComponent;
+  [ key: string ]: BaseComponent | undefined;
   Media: Types.MediaComponent;
   Direction: Types.DirectionComponent;
   Elements: Types.ElementsComponent;

@@ -686,7 +686,7 @@ interface SyncTarget {
  * @since 3.0.0
  */
 interface Components {
-    [key: string]: BaseComponent;
+    [key: string]: BaseComponent | undefined;
     Media: MediaComponent;
     Direction: DirectionComponent;
     Elements: ElementsComponent;
