@@ -73,6 +73,31 @@ export function isNull( subject: unknown ): subject is null {
 }
 
 /**
+ * Tests to see if the given TypeName appears anywhere
+ * in the prototype chain of the given subject.
+ * This is a lose version of the instanceof operator
+ * (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/instanceof)
+ * required when checking the type of elements that cross window and iframe bouderies.
+ * 
+ * @param subject 
+ * @param typeName 
+ * @returns `true` if 
+ */
+function isInstanceOf(subject: any, typeName: string) {
+  if (subject === null) {
+    return false;
+  }
+  let p = subject.__proto__;
+  while (p !== null) {
+    if (p.constructor.name === typeName) {
+      return true;
+    }
+    p = p.__proto__;
+  }
+  return false;
+}
+
+/**
  * Checks if the given subject is an HTMLElement or not.
  *
  * @param subject - A subject to check.
@@ -80,7 +105,7 @@ export function isNull( subject: unknown ): subject is null {
  * @return `true` if the subject is an HTMLElement instance, or otherwise `false`.
  */
 export function isHTMLElement( subject: unknown ): subject is HTMLElement {
-  return subject instanceof HTMLElement;
+  return isInstanceOf( subject, 'HTMLElement' );
 }
 
 /**
@@ -91,5 +116,5 @@ export function isHTMLElement( subject: unknown ): subject is HTMLElement {
  * @return `true` if the subject is an HTMLButtonElement, or otherwise `false`.
  */
 export function isHTMLButtonElement( subject: unknown ): subject is HTMLButtonElement {
-  return subject instanceof HTMLButtonElement;
+  return isInstanceOf( subject, 'HTMLButtonElement' );
 }

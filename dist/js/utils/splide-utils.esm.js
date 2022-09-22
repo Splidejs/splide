@@ -36,11 +36,24 @@ const isUndefined = apply(typeOf, "undefined");
 function isNull(subject) {
   return subject === null;
 }
+function isInstanceOf(subject, typeName) {
+  if (subject === null) {
+    return false;
+  }
+  let p = subject.__proto__;
+  while (p !== null) {
+    if (p.constructor.name === typeName) {
+      return true;
+    }
+    p = p.__proto__;
+  }
+  return false;
+}
 function isHTMLElement(subject) {
-  return subject instanceof HTMLElement;
+  return isInstanceOf(subject, "HTMLElement");
 }
 function isHTMLButtonElement(subject) {
-  return subject instanceof HTMLButtonElement;
+  return isInstanceOf(subject, "HTMLButtonElement");
 }
 
 function toArray(value) {
