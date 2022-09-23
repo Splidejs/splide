@@ -1,7 +1,6 @@
 import {
   isArray,
   isFunction,
-  isHTMLButtonElement,
   isHTMLElement,
   isNull,
   isObject,
@@ -11,9 +10,6 @@ import {
 
 
 describe( 'Type methods', () => {
-  const div  = document.createElement( 'div' );
-  const text = document.createTextNode( 'test' );
-
   describe( 'isObject', () => {
     test( 'can return `true` if a subject is an object.', () => {
       [ {}, { a: 1 }, new Date() ].forEach( subject => {
@@ -93,29 +89,46 @@ describe( 'Type methods', () => {
       } );
     } );
   } );
+} );
 
-  describe( 'isHTMLElement', () => {
-    test( 'can return `true` if a subject is an HTMLElement.', () => {
-      expect( isHTMLElement( div ) ).toBe( true );
-    } );
+describe( 'isHTMLElement', () => {
+  const div  = document.createElement( 'div' );
+  const text = document.createTextNode( 'test' );
 
-    test( 'should return `false` for other subjects.', () => {
-      [ document, window, text, 1, true, undefined, '1', null, [ 1 ], { a: 1 }, NaN ].forEach( subject => {
-        expect( isHTMLElement( subject ) ).toBe( false );
-      } );
+  document.body.innerHTML = '<iframe></iframe>';
+
+  test( 'can return `true` if a subject is an HTMLElement.', () => {
+    expect( isHTMLElement( div ) ).toBe( true );
+  } );
+
+  test( 'should return `false` for other subjects.', () => {
+    [ document, window, text, 1, true, undefined, '1', null, [ 1 ], { a: 1 }, NaN ].forEach( subject => {
+      expect( isHTMLElement( subject ) ).toBe( false );
     } );
   } );
 
-  describe( 'isHTMLButtonElement', () => {
-    test( 'can return `true` if a subject is an HTMLElement.', () => {
-      const button = document.createElement( 'button' );
-      expect( isHTMLButtonElement( button ) ).toBe( true );
-    } );
+  test( 'should work for nodes coming from other realms.', () => {
+    const iframe = document.querySelector( 'iframe' );
 
-    test( 'should return `false` for other subjects.', () => {
-      [ document, window, div, text, 1, true, undefined, '1', null, [ 1 ], { a: 1 }, NaN ].forEach( subject => {
-        expect( isHTMLButtonElement( subject ) ).toBe( false );
-      } );
-    } );
+    expect( iframe ).toBeTruthy();
+
+    const { contentDocument, contentWindow } = iframe;
+    const iDiv = contentDocument.createElement( 'div' );
+
+    expect( contentWindow ).not.toBe( window );
+
+    // This should fail since `HTMLElement` is different with the iframe's.
+    expect( iDiv instanceof HTMLElement ).toBe( false );
+
+    // But this method will work since checking owners.
+    expect( isHTMLElement( iDiv ) ).toBe( true );
+  } );
+
+  test( 'should work for nodes that do not belong to a specific window.', () => {
+    const div = new DOMParser().parseFromString( '<div>', 'text/html' ).body.firstElementChild;
+
+    expect( div ).toBeTruthy();
+    expect( div.ownerDocument.defaultView ).toBeNull();
+    expect( isHTMLElement( div ) ).toBe( true );
   } );
 } );

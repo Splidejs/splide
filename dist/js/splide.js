@@ -69,7 +69,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   }
 
   function isHTMLElement(subject) {
-    return subject instanceof HTMLElement;
+    try {
+      return subject instanceof (subject.ownerDocument.defaultView || window).HTMLElement;
+    } catch (e) {
+      return false;
+    }
   }
 
   function toArray(value) {

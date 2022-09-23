@@ -73,23 +73,17 @@ export function isNull( subject: unknown ): subject is null {
 }
 
 /**
- * Checks if the given subject is an HTMLElement or not.
+ * Checks if the given subject is an HTMLElement instance or not.
+ * This method takes into account which `window` the node belongs to.
  *
  * @param subject - A subject to check.
  *
  * @return `true` if the subject is an HTMLElement instance, or otherwise `false`.
  */
 export function isHTMLElement( subject: unknown ): subject is HTMLElement {
-  return subject instanceof HTMLElement;
-}
-
-/**
- * Checks if the given subject is an HTMLButtonElement or not.
- *
- * @param subject - A subject to check.
- *
- * @return `true` if the subject is an HTMLButtonElement, or otherwise `false`.
- */
-export function isHTMLButtonElement( subject: unknown ): subject is HTMLButtonElement {
-  return subject instanceof HTMLButtonElement;
+  try {
+    return subject instanceof ( ( subject as Node ).ownerDocument.defaultView || window ).HTMLElement;
+  } catch ( e ) {
+    return false;
+  }
 }
