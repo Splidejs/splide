@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 4.1.2
+ * Version  : 4.1.3
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
@@ -64,7 +64,11 @@ function isNull(subject) {
 }
 
 function isHTMLElement(subject) {
-  return subject instanceof HTMLElement;
+  try {
+    return subject instanceof (subject.ownerDocument.defaultView || window).HTMLElement;
+  } catch (e) {
+    return false;
+  }
 }
 
 function toArray(value) {

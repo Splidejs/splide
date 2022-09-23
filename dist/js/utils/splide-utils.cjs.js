@@ -41,10 +41,11 @@ function isNull(subject) {
   return subject === null;
 }
 function isHTMLElement(subject) {
-  return subject instanceof HTMLElement;
-}
-function isHTMLButtonElement(subject) {
-  return subject instanceof HTMLButtonElement;
+  try {
+    return subject instanceof (subject.ownerDocument.defaultView || window).HTMLElement;
+  } catch (e) {
+    return false;
+  }
 }
 
 function toArray(value) {
@@ -335,7 +336,6 @@ exports.hasClass = hasClass;
 exports.includes = includes;
 exports.isArray = isArray;
 exports.isFunction = isFunction;
-exports.isHTMLButtonElement = isHTMLButtonElement;
 exports.isHTMLElement = isHTMLElement;
 exports.isNull = isNull;
 exports.isObject = isObject;

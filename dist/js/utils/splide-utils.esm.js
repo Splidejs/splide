@@ -37,10 +37,11 @@ function isNull(subject) {
   return subject === null;
 }
 function isHTMLElement(subject) {
-  return subject instanceof HTMLElement;
-}
-function isHTMLButtonElement(subject) {
-  return subject instanceof HTMLButtonElement;
+  try {
+    return subject instanceof (subject.ownerDocument.defaultView || window).HTMLElement;
+  } catch (e) {
+    return false;
+  }
 }
 
 function toArray(value) {
@@ -302,4 +303,4 @@ function uniqueId(prefix) {
   return `${prefix}${pad(ids[prefix] = (ids[prefix] || 0) + 1)}`;
 }
 
-export { abs, addClass, append, apply, approximatelyEqual, assert, assign, before, between, camelToKebab, ceil, child, children, clamp, create, display, empty, error, find, floor, focus, forEach, forOwn, format, getAttribute, hasClass, includes, isArray, isFunction, isHTMLButtonElement, isHTMLElement, isNull, isObject, isString, isUndefined, matches, max, measure, merge, min, nextTick, noop, omit, ownKeys, pad, parseHtml, prevent, push, query, queryAll, raf, rect, remove, removeAttribute, removeClass, setAttribute, sign, slice, style, timeOf, toArray, toggleClass, uniqueId, unit };
+export { abs, addClass, append, apply, approximatelyEqual, assert, assign, before, between, camelToKebab, ceil, child, children, clamp, create, display, empty, error, find, floor, focus, forEach, forOwn, format, getAttribute, hasClass, includes, isArray, isFunction, isHTMLElement, isNull, isObject, isString, isUndefined, matches, max, measure, merge, min, nextTick, noop, omit, ownKeys, pad, parseHtml, prevent, push, query, queryAll, raf, rect, remove, removeAttribute, removeClass, setAttribute, sign, slice, style, timeOf, toArray, toggleClass, uniqueId, unit };
