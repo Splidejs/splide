@@ -109,6 +109,13 @@ export interface Options extends ResponsiveOptions {
   wheel?: boolean;
 
   /**
+   * Enables navigation by the mouse wheel following up and down +
+   * Detects trackpad as well
+   * Set `waitForTransition` to `ture` or provide the `wheelSleep` duration.
+   */
+  freeScroll?: boolean;
+
+  /**
    * The threshold to cut off the small delta produced by inertia scroll.
    */
   wheelMinThreshold?: number;
