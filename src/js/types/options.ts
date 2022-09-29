@@ -109,6 +109,12 @@ export interface Options extends ResponsiveOptions {
   wheel?: boolean;
 
   /**
+   * Enables navigation by the mouse wheel/trackpad when gesture is horizontal (right to left or left to right).
+   * Set `waitForTransition` to `ture` or provide the `wheelSleep` duration.
+   */
+  wheelLtR?: boolean;
+
+  /**
    * The threshold to cut off the small delta produced by inertia scroll.
    */
   wheelMinThreshold?: number;

@@ -48,19 +48,28 @@ export function Wheel( Splide: Splide, Components: Components, options: Options 
    * @param e - A WheelEvent object.
    */
   function onWheel( e: WheelEvent ): void {
-    if ( e.cancelable ) {
-      const { deltaY } = e;
-      const backwards = deltaY < 0;
-      const timeStamp = timeOf( e );
+    if (e.cancelable) {
       const min       = options.wheelMinThreshold || 0;
       const sleep     = options.wheelSleep || 0;
-
-      if ( abs( deltaY ) > min && timeStamp - lastTime > sleep ) {
-        Splide.go( backwards ? '<' : '>' );
-        lastTime = timeStamp;
+      if (options.wheelLtR) {
+        var deltaX = e.deltaX;
+        var backwards = deltaX < 0;
+        const timeStamp = timeOf( e );
+        if ( abs( deltaX ) > min && timeStamp - lastTime > sleep ) {
+          Splide.go( backwards ? '<' : '>' );
+          lastTime = timeStamp;
+        }
+        shouldPrevent( backwards ) && prevent( e );
+      } else {
+        var deltaY = e.deltaY;
+        var backwards = deltaY < 0;
+        const timeStamp = timeOf( e );
+        if ( abs( deltaY ) > min && timeStamp - lastTime > sleep ) {
+          Splide.go( backwards ? '<' : '>' );
+          lastTime = timeStamp;
+        }
+        shouldPrevent( backwards ) && prevent( e );
       }
-
-      shouldPrevent( backwards ) && prevent( e );
     }
   }
 

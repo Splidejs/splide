@@ -2760,20 +2760,34 @@ function Wheel(Splide2, Components2, options) {
 
   function onWheel(e) {
     if (e.cancelable) {
-      var deltaY = e.deltaY;
-      var backwards = deltaY < 0;
-      var timeStamp = timeOf(e);
-
       var _min = options.wheelMinThreshold || 0;
 
       var sleep = options.wheelSleep || 0;
 
-      if (abs(deltaY) > _min && timeStamp - lastTime > sleep) {
-        Splide2.go(backwards ? "<" : ">");
-        lastTime = timeStamp;
-      }
+      if (options.wheelLtR) {
+        var deltaX = e.deltaX;
+        var backwards = deltaX < 0;
+        var timeStamp = timeOf(e);
 
-      shouldPrevent(backwards) && prevent(e);
+        if (abs(deltaX) > _min && timeStamp - lastTime > sleep) {
+          Splide2.go(backwards ? "<" : ">");
+          lastTime = timeStamp;
+        }
+
+        shouldPrevent(backwards) && prevent(e);
+      } else {
+        var deltaY = e.deltaY;
+        var backwards = deltaY < 0;
+
+        var _timeStamp = timeOf(e);
+
+        if (abs(deltaY) > _min && _timeStamp - lastTime > sleep) {
+          Splide2.go(backwards ? "<" : ">");
+          lastTime = _timeStamp;
+        }
+
+        shouldPrevent(backwards) && prevent(e);
+      }
     }
   }
 
