@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /*!
  * Splide.js
- * Version  : 4.1.3
+ * Version  : 4.1.2
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
@@ -2739,32 +2739,16 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     };
   }
 
-  function Wheel(Splide2, Components3, options) {
+  function Wheel(Splide2, Components2, options) {
     var _EventInterface12 = EventInterface(Splide2),
         bind = _EventInterface12.bind;
 
     var lastTime = 0;
 
     function mount() {
-      if (options.freeScroll) {
-        bind(Components2.Elements.track, "wheel", freeWheel, SCROLL_LISTENER_OPTIONS);
-      } else if (options.wheel) {
-        bind(Components3.Elements.track, "wheel", onWheel, SCROLL_LISTENER_OPTIONS);
+      if (options.wheel) {
+        bind(Components2.Elements.track, "wheel", onWheel, SCROLL_LISTENER_OPTIONS);
       }
-    }
-
-    function detectTrackPad(e) {
-      var isTrackpad = false;
-
-      if (e.wheelDeltaY) {
-        if (e.wheelDeltaY === e.deltaY * -3) {
-          isTrackpad = true;
-        }
-      } else if (e.deltaMode === 0) {
-        isTrackpad = true;
-      }
-
-      return isTrackpad;
     }
 
     function onWheel(e) {
@@ -2773,11 +2757,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         var backwards = deltaY < 0;
         var timeStamp = timeOf(e);
 
-        var _min2 = options.wheelMinThreshold || 0;
+        var _min = options.wheelMinThreshold || 0;
 
         var sleep = options.wheelSleep || 0;
 
-        if (abs(deltaY) > _min2 && timeStamp - lastTime > sleep) {
+        if (abs(deltaY) > _min && timeStamp - lastTime > sleep) {
           Splide2.go(backwards ? "<" : ">");
           lastTime = timeStamp;
         }
@@ -2786,41 +2770,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }
     }
 
-    function freeWheel(e) {
-      if (e.cancelable) {
-        var isTrackpad = detectTrackPad(e);
-        var timeStamp = timeOf(e);
-
-        var _min = options.wheelMinThreshold || 0;
-
-        var sleep = options.wheelSleep || 0;
-
-        if (isTrackpad) {
-          var deltaX = e.deltaX;
-          var backwards = deltaX < 0;
-
-          if (abs(deltaX) > _min && timeStamp - lastTime > sleep) {
-            Splide2.go(backwards ? "<" : ">");
-            lastTime = timeStamp;
-          }
-
-          shouldPrevent(backwards) && prevent(e);
-        } else {
-          var deltaY = e.deltaY;
-          var backwards = deltaY < 0;
-
-          if (abs(deltaY) > _min && timeStamp - lastTime > sleep) {
-            Splide2.go(backwards ? "<" : ">");
-            lastTime = timeStamp;
-          }
-
-          shouldPrevent(backwards) && prevent(e);
-        }
-      }
-    }
-
     function shouldPrevent(backwards) {
-      return !options.releaseWheel || Splide2.state.is(MOVING) || Components3.Controller.getAdjacent(backwards) !== -1;
+      return !options.releaseWheel || Splide2.state.is(MOVING) || Components2.Controller.getAdjacent(backwards) !== -1;
     }
 
     return {
