@@ -126,7 +126,7 @@ export function Controller( Splide: Splide, Components: Components, options: Opt
    * @see `Splide#go()`
    *
    * @param control        - A control pattern.
-   * @param allowSameIndex - Optional. Determines whether to allow to go to the current index or not.
+   * @param allowSameIndex - Optional. Determines whether to allow going to the current index or not.
    * @param callback       - Optional. A callback function invoked after transition ends.
    */
   function go( control: number | string, allowSameIndex?: boolean, callback?: AnyFunction ): void {
