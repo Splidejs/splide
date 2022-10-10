@@ -1,10 +1,7 @@
-const sass         = require( 'sass' );
-const fs           = require( 'fs' ).promises;
-const path         = require( 'path' );
-const postcss      = require( 'postcss' );
-const cssnano      = require( 'cssnano' );
-const autoprefixer = require( 'autoprefixer' );
-const name         = 'splide';
+const sass = require( 'sass' );
+const fs   = require( 'fs' ).promises;
+const path = require( 'path' );
+const name = 'splide';
 
 const files = [
   './src/css/core/index.scss',
@@ -13,28 +10,17 @@ const files = [
   './src/css/themes/skyblue/index.scss',
 ];
 
-function buildCss( file ) {
-  const result  = sass.renderSync( { file, outputStyle: 'compressed' } );
+async function buildCss( file ) {
+  const result  = await sass.compileAsync( file, { style: 'compressed' } );
   const outFile = rename( file );
 
-  return postcss( [
-    cssnano( { reduceIdents: false } ),
-    autoprefixer(),
-  ] )
-    .process( result.css, { from: undefined } )
-    .then( result => {
-      result.warnings().forEach( warn => {
-        console.warn( warn.toString() );
-      } );
+  await fs.mkdir( './dist/css/themes', { recursive: true } );
+  await fs.writeFile( outFile, result.css );
 
-      return fs.writeFile( outFile, result.css ).then( () => result );
-    } )
-    .then( result => {
-      if ( outFile.includes( 'splide-default' ) ) {
-        const dir = path.dirname( outFile ).split( '/' ).slice( 0, -1 ).join( '/' );
-        return fs.writeFile( `${ dir }/${ name }.min.css`, result.css ).then( () => result );
-      }
-    } );
+  if ( outFile.includes( 'splide-default' ) ) {
+    const dir = path.dirname( outFile ).split( '/' ).slice( 0, -1 ).join( '/' );
+    await fs.writeFile( `${ dir }/${ name }.min.css`, result.css );
+  }
 }
 
 function rename( file ) {

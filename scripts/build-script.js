@@ -1,7 +1,5 @@
 const rollup  = require( 'rollup' ).rollup;
 const esbuild = require( 'rollup-plugin-esbuild' ).default;
-const babel   = require( '@rollup/plugin-babel' );
-const resolve = require( '@rollup/plugin-node-resolve' ).nodeResolve;
 const path    = require( 'path' );
 const minify  = require( './plugins/minify' ).minify;
 const banner  = require( './constants/banner' );
@@ -16,12 +14,7 @@ async function buildScript( compress, type = 'default' ) {
   const bundle = await rollup( {
     input: `./src/js/build/${ type }.ts`,
     plugins: [
-      resolve(),
       esbuild( { minify: false } ),
-      babel.getBabelOutputPlugin( {
-        configFile: path.resolve( __dirname, '../.babelrc' ),
-        allowAllFormats: true,
-      } ),
       compress ? minify() : false,
     ],
   } );

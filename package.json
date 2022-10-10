@@ -29,24 +29,15 @@
     "url": "https://github.com/Splidejs/splide/issues"
   },
   "devDependencies": {
-    "@babel/core": "^7.18.13",
-    "@babel/preset-env": "^7.18.10",
-    "@rollup/plugin-babel": "^5.3.1",
-    "@rollup/plugin-node-resolve": "^13.3.0",
     "@types/jest": "^29.0.0",
     "@types/node": "^18.7.14",
     "@typescript-eslint/eslint-plugin": "^5.36.1",
     "@typescript-eslint/parser": "^5.36.1",
-    "autoprefixer": "^10.4.8",
-    "babel-jest": "^29.0.1",
-    "babel-loader": "^8.2.5",
     "chokidar": "^3.5.3",
-    "cssnano": "^5.1.13",
     "esbuild": "^0.15.6",
     "eslint": "^8.23.0",
-    "jest": "^29.0.1",
-    "jest-environment-jsdom": "^29.0.1",
-    "postcss": "^8.4.16",
+    "jest": "^29.1.1",
+    "jest-environment-jsdom": "^29.1.1",
     "rollup": "^2.79.0",
     "rollup-plugin-dts": "^4.2.2",
     "rollup-plugin-esbuild": "^4.10.1",
@@ -55,7 +46,7 @@
     "stylelint-config-sass-guidelines": "^9.0.1",
     "stylelint-order": "^5.0.0",
     "stylelint-scss": "^4.3.0",
-    "ts-jest": "next",
+    "ts-jest": "^29.0.2",
     "tslib": "^2.4.0",
     "typescript": "^4.8.2",
     "uglify-js": "^3.17.0"
@@ -66,7 +57,7 @@
     "build:module": "node scripts/build-module.js",
     "build:types": "node scripts/build-types.js",
     "build:css": "node scripts/build-css.js",
-    "build:all": "npm run build:js && npm run build:module && npm run build:css && npm run build:types && node scripts/build-utils.js",
+    "build:all": "npm run build:js && npm run build:module && npm run build:css && npm run build:types",
     "check:types": "tsc --noEmit",
     "jest": "jest --clearCache && jest",
     "eslint": "eslint src",
@@ -74,20 +65,11 @@
     "beforecommit": "npm run eslint && npm run stylelint && npm run jest && npm run build:all"
   },
   "browserslist": [
-    "> 5%",
-    "ie 10"
+    "> 5%"
   ],
   "files": [
     "dist",
-    "src/css/",
-    "src/js/components",
-    "src/js/constants",
-    "src/js/constructors",
-    "src/js/core",
-    "src/js/renderer",
-    "src/js/transitions",
-    "src/js/types",
-    "src/js/utils"
+    "src/css/"
   ],
   "exports": {
     ".": {
