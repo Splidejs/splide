@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
     "outDir": "dist",
-    "target": "es6",
+    "target": "ESNext",
+    "module": "ESNext",
+    "lib": [ "ESNext", "DOM" ],
     "sourceMap": true,
     "mapRoot": "./",
     "moduleResolution": "node",
@@ -11,11 +13,7 @@
     "strictNullChecks": false,
     "suppressImplicitAnyIndexErrors": true,
     "declarationDir": "./dist/types",
-    "declaration": true,
-    "lib": [
-      "dom",
-      "es6"
-    ],
+    "declaration": true
   },
   "include": [
     "src/js/**/*.ts",

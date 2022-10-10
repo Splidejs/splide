@@ -1,8 +1,9 @@
-const rollup  = require( 'rollup' ).rollup;
-const esbuild = require( 'rollup-plugin-esbuild' ).default;
-const banner  = require( './constants/banner' );
-const name    = 'splide';
+import { rollup } from 'rollup';
+import esbuild from 'rollup-plugin-esbuild';
+import { BANNER } from './constants/banner.js';
 
+
+const name = 'splide';
 
 function buildModule( type ) {
   return rollup( {
@@ -12,7 +13,7 @@ function buildModule( type ) {
     ],
   } ).then( bundle => {
     return bundle.write( {
-      banner,
+      banner   : BANNER,
       file     : `./dist/js/${ name }.${ type }.js`,
       format   : type,
       sourcemap: false,
@@ -22,6 +23,3 @@ function buildModule( type ) {
 }
 
 Promise.all( [ buildModule( 'cjs' ), buildModule( 'esm' ) ] ).catch( e => console.error( e ) );
-
-exports.buildCjs = () => buildModule( 'cjs' );
-exports.buildEsm = () => buildModule( 'esm' );

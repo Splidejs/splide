@@ -4,6 +4,7 @@
   "description": "Splide is a lightweight, flexible and accessible slider/carousel. No dependencies, no Lighthouse errors.",
   "author": "Naotoshi Fujita",
   "license": "MIT",
+  "type": "module",
   "main": "dist/js/splide.cjs.js",
   "module": "dist/js/splide.esm.js",
   "types": "dist/types/index.d.ts",

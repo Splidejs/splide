@@ -1,10 +1,13 @@
-const { default: dts } = require( 'rollup-plugin-dts' );
-const { rollup }       = require( 'rollup' );
-const { promises: fs } = require( 'fs' );
-const path             = require( 'path' );
-const util             = require( 'util' );
-const exec             = util.promisify( require( 'child_process' ).exec );
-const dir              = './dist/types';
+import dts from 'rollup-plugin-dts';
+import { rollup } from 'rollup';
+import fs from 'fs/promises';
+import path from 'path';
+import * as util from 'util';
+import { exec as _exec } from 'child_process';
+
+
+const exec = util.promisify( _exec );
+const dir  = './dist/types';
 
 
 async function clean() {

@@ -1,6 +1,7 @@
-const http   = require( 'http' );
-const path   = require( 'path' );
-const fs     = require( 'fs' ).promises;
+import * as http from 'http';
+import path from 'path';
+import fs from 'fs/promises';
+
 const server = http.createServer();
 
 const mime = {

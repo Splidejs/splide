@@ -1,4 +1,5 @@
-const uglify = require( 'uglify-js' );
+// const uglify = require( 'uglify-js' );
+import uglify from 'uglify-js';
 
 const DEFAULTS = {
   minify: {
@@ -15,7 +16,7 @@ const DEFAULTS = {
   },
 };
 
-function minify( pluginOptions = {} ) {
+export function minify( pluginOptions = {} ) {
   pluginOptions = { ...DEFAULTS, ...pluginOptions };
 
   return {
@@ -31,5 +32,3 @@ function minify( pluginOptions = {} ) {
     },
   };
 }
-
-exports.minify = minify;

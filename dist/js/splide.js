@@ -2493,21 +2493,26 @@
     };
   }
 
-  const _Splide = class {
+  class Splide {
+    static defaults = {};
+    static STATES = STATES;
+    root;
+    event = EventInterface();
+    Components = {};
+    state = State(CREATED);
+    splides = [];
+    _o = {};
+    _C;
+    _E = {};
+    _T;
     constructor(target, options) {
-      this.event = EventInterface();
-      this.Components = {};
-      this.state = State(CREATED);
-      this.splides = [];
-      this._o = {};
-      this._E = {};
       const root = isString(target) ? query(document, target) : target;
       assert(root, `${root} is invalid.`);
       this.root = root;
       options = merge({
         label: getAttribute(root, ARIA_LABEL) || "",
         labelledby: getAttribute(root, ARIA_LABELLEDBY) || ""
-      }, DEFAULTS, _Splide.defaults, options || {});
+      }, DEFAULTS, Splide.defaults, options || {});
       try {
         merge(options, JSON.parse(getAttribute(root, DATA_ATTRIBUTE)));
       } catch (e) {
@@ -2604,10 +2609,7 @@
     get index() {
       return this._C.Controller.getIndex();
     }
-  };
-  let Splide = _Splide;
-  Splide.defaults = {};
-  Splide.STATES = STATES;
+  }
 
   return Splide;
 

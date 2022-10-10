@@ -1,12 +1,12 @@
-const rollup  = require( 'rollup' ).rollup;
-const esbuild = require( 'rollup-plugin-esbuild' ).default;
-const path    = require( 'path' );
-const minify  = require( './plugins/minify' ).minify;
-const banner  = require( './constants/banner' );
-const fs      = require( 'fs' ).promises;
-const zlib    = require( 'zlib' );
-const name    = 'splide';
+import { rollup } from 'rollup';
+import esbuild from 'rollup-plugin-esbuild';
+import { minify } from './plugins/minify.js';
+import { BANNER } from './constants/banner.js';
+import fs from 'fs/promises';
+import * as zlib from 'zlib';
 
+
+const name = 'splide';
 
 async function buildScript( compress, type = 'default' ) {
   const file = `./dist/js/${ name }${ type !== 'default' ? `-${ type }` : '' }${ compress ? '.min' : '' }.js`;
@@ -20,8 +20,8 @@ async function buildScript( compress, type = 'default' ) {
   } );
 
   await bundle.write( {
-    banner,
     file,
+    banner   : BANNER,
     format   : 'umd',
     name     : type === 'default' ? 'Splide' : 'SplideRenderer',
     sourcemap: compress,
@@ -48,6 +48,6 @@ Promise.all( [
   buildScript( true, 'renderer' ),
 ] ).catch( console.error );
 
-exports.buildJs       = () => buildScript();
-exports.buildMin      = () => buildScript( true );
-exports.buildRenderer = () => buildScript( true, 'renderer' );
+export const buildJs       = () => buildScript();
+export const buildMin      = () => buildScript( true );
+export const buildRenderer = () => buildScript( 'renderer' );

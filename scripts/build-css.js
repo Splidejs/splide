@@ -1,6 +1,8 @@
-const sass = require( 'sass' );
-const fs   = require( 'fs' ).promises;
-const path = require( 'path' );
+import sass from 'sass';
+import fs from 'fs/promises';
+import path from 'path';
+
+
 const name = 'splide';
 
 const files = [
@@ -10,7 +12,7 @@ const files = [
   './src/css/themes/skyblue/index.scss',
 ];
 
-async function buildCss( file ) {
+async function buildScss( file ) {
   const result  = await sass.compileAsync( file, { style: 'compressed' } );
   const outFile = rename( file );
 
@@ -31,8 +33,9 @@ function rename( file ) {
   return `./dist/${ dirname }/${ name }-${ fragments[ fragments.length - 1 ] }.min.css`;
 }
 
-Promise.all( files.map( buildCss ) ).catch( e => console.error( e ) );
+Promise.all( files.map( buildScss ) ).catch( e => console.error( e ) );
 
-exports.buildCss = () => {
-  files.forEach( buildCss );
-};
+
+export const buildCss = () => {
+  files.forEach( buildScss );
+}

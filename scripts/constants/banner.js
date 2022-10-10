@@ -1,6 +1,7 @@
-const info = require( '../../package.json' );
+import info from '../../package.json' assert { type: "json" };
 
-module.exports = `/*!
+
+export const BANNER = `/*!
  * Splide.js
  * Version  : ${ info.version }
  * License  : ${ info.license }
