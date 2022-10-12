@@ -2,9 +2,7 @@ import { ARROW_LEFT, ARROW_RIGHT } from '../../constants/arrows';
 import { EVENT_MOVE, EVENT_UPDATED } from '../../constants/events';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { nextTick } from '../../utils';
-import { normalizeKey } from '../../utils/dom/normalizeKey/normalizeKey';
-import { EventInterface } from '@splidejs/utils';
+import { EventInterface, nextTick } from '@splidejs/utils';
 
 
 /**
@@ -103,11 +101,9 @@ export function Keyboard(
    */
   function onKeydown( e: KeyboardEvent ): void {
     if ( ! disabled ) {
-      const key = normalizeKey( e );
-
-      if ( key === resolve( ARROW_LEFT ) ) {
+      if ( e.key === resolve( ARROW_LEFT ) ) {
         Splide.go( '<' );
-      } else if ( key === resolve( ARROW_RIGHT ) ) {
+      } else if ( e.key === resolve( ARROW_RIGHT ) ) {
         Splide.go( '>' );
       }
     }

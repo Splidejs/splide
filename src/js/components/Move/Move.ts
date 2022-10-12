@@ -11,8 +11,7 @@ import { IDLE, MOVING } from '../../constants/states';
 import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, BaseComponent, Components, Options, TransitionComponent } from '../../types';
-import { abs, ceil, clamp, isUndefined, rect, style } from '../../utils';
-import { EventInterface } from '@splidejs/utils';
+import { abs, ceil, clamp, EventInterface, isUndefined, rect, style } from '@splidejs/utils';
 
 
 /**

@@ -8,9 +8,21 @@ import { CREATED, DESTROYED, IDLE, STATES } from '../../constants/states';
 import { FADE } from '../../constants/types';
 import { Fade, Slide } from '../../transitions';
 import { AnyFunction, ComponentConstructor, Components, EventMap, Options, SyncTarget } from '../../types';
-import { addClass, assert, assign, empty, forOwn, getAttribute, isString, merge, query, slice } from '../../utils';
+import {
+  addClass,
+  assign,
+  empty,
+  EventInterface,
+  forOwn,
+  getAttribute,
+  isString,
+  merge,
+  query,
+  slice,
+  State,
+} from '@splidejs/utils';
+import { assert } from '../../utils';
 import { ARIA_LABEL, ARIA_LABELLEDBY } from '../../constants/attributes';
-import { EventInterface, State } from '@splidejs/utils';
 
 
 /**

@@ -44,7 +44,7 @@ describe( 'Sync#navigate()', () => {
     expect( secondary.index ).toBe( 5 );
 
     Slides[ 3 ].slide.focus();
-    keydown( 'Spacebar', Slides[ 3 ].slide );
+    keydown( 'Enter', Slides[ 3 ].slide );
 
     expect( primary.index ).toBe( 3 );
     expect( secondary.index ).toBe( 3 );

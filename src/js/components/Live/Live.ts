@@ -3,8 +3,16 @@ import { CLASS_SR } from '../../constants/classes';
 import { EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_MOVED, EVENT_SCROLLED } from '../../constants/events';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { append, apply, create, remove, removeAttribute, setAttribute } from '../../utils';
-import { EventInterface, RequestInterval } from '@splidejs/utils';
+import {
+  append,
+  apply,
+  create,
+  EventInterface,
+  removeNode,
+  removeAttribute,
+  RequestInterval,
+  setAttribute,
+} from '@splidejs/utils';
 
 
 /**
@@ -88,7 +96,7 @@ export function Live(
       append( track, sr );
       interval.start();
     } else {
-      remove( sr );
+      removeNode( sr );
       interval.cancel();
     }
   }
@@ -98,7 +106,7 @@ export function Live(
    */
   function destroy(): void {
     removeAttribute( track, [ ARIA_LIVE, ARIA_ATOMIC, ARIA_BUSY ] );
-    remove( sr );
+    removeNode( sr );
   }
 
   /**

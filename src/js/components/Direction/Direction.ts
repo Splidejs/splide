@@ -10,7 +10,7 @@ import { BaseComponent, Components, Options } from '../../types';
  * @since 3.0.0
  */
 export interface DirectionComponent extends BaseComponent {
-  resolve( prop: string, axisOnly?: boolean, direction?: Options['direction'] ): string;
+  resolve<R extends string>( prop: string, axisOnly?: boolean, direction?: Options['direction'] ): R;
   orient( value: number ): number;
 }
 
@@ -49,7 +49,7 @@ export function Direction( Splide: Splide, Components: Components, options: Opti
    * @param axisOnly  - Optional. If `ture`, returns the same property for LTR and RTL.
    * @param direction - Optional. Specify the direction. The default value is the `direction` option.
    */
-  function resolve( prop: string, axisOnly?: boolean, direction?: Options['direction'] ): string {
+  function resolve<R extends string>( prop: string, axisOnly?: boolean, direction?: Options['direction'] ): R {
     direction = direction || options.direction;
     const index = direction === RTL && ! axisOnly ? 1 : direction === TTB ? 0 : -1;
 

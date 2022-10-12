@@ -2,8 +2,7 @@ import { SCROLL_LISTENER_OPTIONS } from '../../constants/listener-options';
 import { MOVING } from '../../constants/states';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { abs, prevent, timeOf } from '../../utils';
-import { EventInterface } from '@splidejs/utils';
+import { abs, EventInterface, prevent, timeOf } from '@splidejs/utils';
 
 
 /**

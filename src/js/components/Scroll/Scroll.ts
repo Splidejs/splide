@@ -3,9 +3,8 @@ import { IDLE, SCROLLING } from '../../constants/states';
 import { SLIDE } from '../../constants/types';
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, BaseComponent, Components, Options } from '../../types';
-import { abs, apply, approximatelyEqual, floor, max, sign } from '../../utils';
+import { abs, apply, approximatelyEqual, EventInterface, floor, max, RequestInterval, sign } from '@splidejs/utils';
 import { BASE_VELOCITY, BOUNCE_DIFF_THRESHOLD, BOUNCE_DURATION, FRICTION_FACTOR, MIN_DURATION } from './constants';
-import { EventInterface, RequestInterval } from '@splidejs/utils';
 
 
 /**

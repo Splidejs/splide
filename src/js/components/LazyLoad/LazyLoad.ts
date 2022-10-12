@@ -15,16 +15,16 @@ import {
   create,
   display,
   empty,
+  EventInterface,
   getAttribute,
   queryAll,
-  remove,
+  removeNode,
   removeAttribute,
   removeClass,
   setAttribute,
-} from '../../utils';
+} from '@splidejs/utils';
 import { SlideComponent } from '../Slides/Slide';
 import { IMAGE_SELECTOR, SRC_DATA_ATTRIBUTE, SRCSET_DATA_ATTRIBUTE } from './constants';
-import { EventInterface } from '@splidejs/utils';
 
 
 /**
@@ -163,7 +163,7 @@ export function LazyLoad(
     removeClass( Slide.slide, CLASS_LOADING );
 
     if ( e.type !== 'error' ) {
-      remove( data[ 2 ] );
+      removeNode( data[ 2 ] );
       display( img, '' );
       emit( EVENT_LAZYLOAD_LOADED, img, Slide );
       emit( EVENT_RESIZE );

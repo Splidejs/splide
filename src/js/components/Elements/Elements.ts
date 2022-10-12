@@ -20,12 +20,12 @@ import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import {
   addClass,
-  assert,
   assign,
   child,
   children,
+  closest,
   empty,
-  forOwn,
+  EventInterface,
   getAttribute,
   push,
   query,
@@ -34,10 +34,9 @@ import {
   setAttribute,
   toggleClass,
   uniqueId,
-} from '../../utils';
-import { closest } from '../../utils/dom/closest/closest';
+} from '@splidejs/utils';
+import { assert } from '../../utils';
 import { POINTER_DOWN_EVENTS } from '../Drag/constants';
-import { EventInterface } from '@splidejs/utils';
 
 
 /**
@@ -181,24 +180,24 @@ export function Elements(
    * Collects elements which the slider consists of.
    */
   function collect(): void {
-    track = find( `.${ CLASS_TRACK }` );
+    track = find( CLASS_TRACK );
     list  = child( track, `.${ CLASS_LIST }` );
 
     assert( track && list, 'A track/list element is missing.' );
     push( slides, children( list, `.${ CLASS_SLIDE }:not(.${ CLASS_CLONE })` ) );
 
-    forOwn( {
-      arrows    : CLASS_ARROWS,
-      pagination: CLASS_PAGINATION,
-      prev      : CLASS_ARROW_PREV,
-      next      : CLASS_ARROW_NEXT,
-      bar       : CLASS_PROGRESS_BAR,
-      toggle    : CLASS_TOGGLE,
-    }, ( className, key ) => {
-      elements[ key ] = find( `.${ className }` );
+    assign( elements, {
+      root,
+      track,
+      list,
+      slides,
+      arrows    : find( CLASS_ARROWS ),
+      pagination: find( CLASS_PAGINATION ),
+      prev      : find( CLASS_ARROW_PREV ),
+      next      : find( CLASS_ARROW_NEXT ),
+      bar       : find( CLASS_PROGRESS_BAR ),
+      toggle    : find( CLASS_TOGGLE ),
     } );
-
-    assign( elements, { root, track, list, slides } );
   }
 
   /**
@@ -225,10 +224,12 @@ export function Elements(
   /**
    * Finds an element only in this slider, ignoring elements in a nested slider.
    *
+   * @param className - A class name.
+   *
    * @return A found element or null.
    */
-  function find( selector: string ): HTMLElement | undefined {
-    const elm = query<HTMLElement>( root, selector );
+  function find( className: string ): HTMLElement | undefined {
+    const elm = query<HTMLElement>( root, `.${ className }` );
     return elm && closest( elm, `.${ CLASS_ROOT }` ) === root ? elm : undefined;
   }
 

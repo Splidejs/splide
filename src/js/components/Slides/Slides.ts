@@ -6,8 +6,9 @@ import {
   append,
   apply,
   before,
-  between,
+  between, CSSProperties,
   empty,
+  EventInterface,
   forEach as forEachItem,
   includes,
   isFunction,
@@ -16,11 +17,10 @@ import {
   matches,
   parseHtml,
   queryAll,
-  remove as removeNode,
+  removeNode,
   toArray,
-} from '../../utils';
+} from '@splidejs/utils';
 import { Slide, SlideComponent } from './Slide';
-import { EventInterface } from '@splidejs/utils';
 
 
 /**
@@ -240,7 +240,7 @@ export function Slides(
    * @param value        - A CSS value to add.
    * @param useContainer - Optional. Determines whether to apply the rule to the container or not.
    */
-  function style( prop: string, value: string | number, useContainer?: boolean ): void {
+  function style( prop: CSSProperties, value: string | number, useContainer?: boolean ): void {
     forEach( Slide => { Slide.style( prop, value, useContainer ) } );
   }
 

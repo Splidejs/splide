@@ -10,9 +10,8 @@ import {
 } from '../../constants/events';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { getAttribute, setAttribute, style, toggleClass } from '../../utils';
+import { EventInterface, getAttribute, RequestInterval, setAttribute, style, toggleClass } from '@splidejs/utils';
 import { INTERVAL_DATA_ATTRIBUTE } from './constants';
-import { EventInterface, RequestInterval } from '@splidejs/utils';
 
 
 /**

@@ -1,5 +1,5 @@
 import { Options } from '../../types';
-import { forOwn } from '../../utils';
+import { forOwn } from '@splidejs/utils';
 
 
 interface Styles {

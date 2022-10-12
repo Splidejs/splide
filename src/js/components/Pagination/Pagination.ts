@@ -28,17 +28,16 @@ import {
   create,
   display,
   empty,
+  EventInterface,
   focus,
   format,
   prevent,
-  remove,
+  removeNode,
   removeAttribute,
   removeClass,
   setAttribute,
   slice,
-} from '../../utils';
-import { normalizeKey } from '../../utils/dom/normalizeKey/normalizeKey';
-import { EventInterface } from '@splidejs/utils';
+} from '@splidejs/utils';
 
 
 /**
@@ -135,7 +134,7 @@ export function Pagination(
    */
   function destroy(): void {
     if ( list ) {
-      remove( placeholder ? slice( list.children ) : list );
+      removeNode( placeholder ? slice( list.children ) : list );
       removeClass( list, paginationClasses );
       empty( items );
       list = null;
@@ -203,7 +202,7 @@ export function Pagination(
    */
   function onKeydown( page: number, e: KeyboardEvent ): void {
     const { length } = items;
-    const key = normalizeKey( e );
+    const { key } = e;
     const dir = getDirection();
 
     let nextPage = -1;

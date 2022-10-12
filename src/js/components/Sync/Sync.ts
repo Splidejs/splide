@@ -11,10 +11,8 @@ import {
 import { LOOP } from '../../constants/types';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { apply, empty, includes, isUndefined, prevent, setAttribute } from '../../utils';
-import { normalizeKey } from '../../utils/dom/normalizeKey/normalizeKey';
+import { apply, empty, EventInterface, includes, isUndefined, prevent, setAttribute } from '@splidejs/utils';
 import { SlideComponent } from '../Slides/Slide';
-import { EventInterface } from '@splidejs/utils';
 
 
 /**
@@ -151,7 +149,7 @@ export function Sync(
    * @param e     - A KeyboardEvent object.
    */
   function onKeydown( Slide: SlideComponent, e: KeyboardEvent ): void {
-    if ( includes( TRIGGER_KEYS, normalizeKey( e ) ) ) {
+    if ( includes( TRIGGER_KEYS, e.key ) ) {
       onClick( Slide );
       prevent( e );
     }

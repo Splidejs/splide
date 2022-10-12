@@ -1,9 +1,8 @@
 import { EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_REFRESH, EVENT_UPDATED } from '../../constants/events';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { apply, child, display } from '../../utils';
+import { apply, child, display, EventInterface } from '@splidejs/utils';
 import { SlideComponent } from '../Slides/Slide';
-import { EventInterface } from '@splidejs/utils';
 
 
 /**

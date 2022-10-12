@@ -1,5 +1,4 @@
 import { fire, init, wait } from '../../../test';
-import { assign } from '../../../utils';
 
 
 describe( 'Drag', () => {
@@ -61,7 +60,7 @@ function fireCancelable( elm: Element | Window, event: string, data: any = {} ):
 function fireWithCoord( elm: Element | Window, event: string, data: any = {} ): void {
   const { x: pageX = 0, y: pageY = 0 } = data;
 
-  fireCancelable( elm, event, assign( data, {
+  fireCancelable( elm, event, Object.assign( data, {
     pageX,
     pageY,
     touches: [

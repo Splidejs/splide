@@ -4,6 +4,13 @@
 declare type AnyFunction$1 = (...args: any[]) => any;
 
 /**
+ * The union for CSS properties.
+ *
+ * @since 0.0.1
+ */
+declare type CSSProperties = Exclude<keyof CSSStyleDeclaration, number | 'length' | 'parentRule' | 'getPropertyPriority' | 'getPropertyValue' | 'item' | 'removeProperty' | 'setProperty'>;
+
+/**
  * The type for an array with remover functions.
  *
  * @since 0.0.1
@@ -125,7 +132,7 @@ interface MediaComponent extends BaseComponent {
  * @since 3.0.0
  */
 interface DirectionComponent extends BaseComponent {
-    resolve(prop: string, axisOnly?: boolean, direction?: Options['direction']): string;
+    resolve<R extends string>(prop: string, axisOnly?: boolean, direction?: Options['direction']): R;
     orient(value: number): number;
 }
 
@@ -166,7 +173,7 @@ interface SlideComponent extends BaseComponent {
     container: HTMLElement;
     isClone: boolean;
     update(): void;
-    style(prop: string, value: string | number, useContainer?: boolean): void;
+    style(prop: CSSProperties, value: string | number, useContainer?: boolean): void;
     isWithin(from: number, distance: number): boolean;
 }
 

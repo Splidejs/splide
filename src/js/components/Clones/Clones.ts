@@ -2,8 +2,19 @@ import { EVENT_REFRESH, EVENT_RESIZE, EVENT_UPDATED } from '../../constants/even
 import { LOOP } from '../../constants/types';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { addClass, append, before, ceil, empty, isUndefined, pad, push, rect, remove } from '../../utils';
-import { EventInterface } from '@splidejs/utils';
+import {
+  addClass,
+  append,
+  before,
+  ceil,
+  empty,
+  EventInterface,
+  isUndefined,
+  pad,
+  push,
+  rect,
+  removeNode,
+} from '@splidejs/utils';
 
 
 /**
@@ -79,7 +90,7 @@ export function Clones(
    * Destroys clones.
    */
   function destroy(): void {
-    remove( clones );
+    removeNode( clones );
     empty( clones );
     event.destroy();
   }

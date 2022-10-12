@@ -1,9 +1,8 @@
 import { MEDIA_PREFERS_REDUCED_MOTION } from '../../constants/media';
 import { CREATED, DESTROYED } from '../../constants/states';
-import { EventBinder } from '@splidejs/utils';
+import { EventBinder, merge, omit, ownKeys } from '@splidejs/utils';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { merge, omit, ownKeys } from '../../utils';
 import { EVENT_UPDATED } from '../../constants/events';
 
 

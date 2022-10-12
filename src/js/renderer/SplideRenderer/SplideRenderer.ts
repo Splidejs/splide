@@ -8,7 +8,6 @@ import { LOOP, SLIDE } from '../../constants/types';
 import { Splide } from '../../core/Splide/Splide';
 import { Options } from '../../types';
 import {
-  assert,
   assign,
   camelToKebab,
   child,
@@ -19,14 +18,15 @@ import {
   merge,
   push,
   queryAll,
-  remove,
+  removeNode,
   uniqueId,
   unit,
-} from '../../utils';
+} from '@splidejs/utils';
 import { CLASS_RENDERED } from '../constants/classes';
 import { RENDERER_DEFAULT_CONFIG } from '../constants/defaults';
 import { Style } from '../Style/Style';
 import { RendererConfig, SlideContent } from '../types/types';
+import { assert } from '../../utils';
 
 
 /**
@@ -46,10 +46,10 @@ export class SplideRenderer {
     const clones = queryAll( root, `.${ CLASS_CLONE }` );
 
     on( EVENT_MOUNTED, () => {
-      remove( child( root, 'style' ) );
+      removeNode( child( root, 'style' ) );
     } );
 
-    remove( clones );
+    removeNode( clones );
   }
 
   /**

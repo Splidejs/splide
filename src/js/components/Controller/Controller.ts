@@ -3,8 +3,17 @@ import { MOVING, SCROLLING } from '../../constants/states';
 import { LOOP, SLIDE } from '../../constants/types';
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, BaseComponent, Components, Options } from '../../types';
-import { apply, approximatelyEqual, between, clamp, floor, isString, isUndefined, min } from '../../utils';
-import { EventInterface } from '@splidejs/utils';
+import {
+  apply,
+  approximatelyEqual,
+  between,
+  clamp,
+  EventInterface,
+  floor,
+  isString,
+  isUndefined,
+  min,
+} from '@splidejs/utils';
 
 
 /**

@@ -38,6 +38,7 @@ import {
   apply,
   ceil,
   child,
+  CSSProperties,
   floor,
   focus,
   format,
@@ -52,7 +53,7 @@ import {
   setAttribute,
   style as _style,
   toggleClass,
-} from '../../utils';
+} from '@splidejs/utils';
 
 
 /**
@@ -67,7 +68,7 @@ export interface  SlideComponent extends BaseComponent {
   container: HTMLElement;
   isClone: boolean;
   update(): void;
-  style( prop: string, value: string | number, useContainer?: boolean ): void
+  style( prop: CSSProperties, value: string | number, useContainer?: boolean ): void
   isWithin( from: number, distance: number ): boolean;
 }
 
@@ -227,7 +228,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    * @param value        - A CSS value to add.
    * @param useContainer - Optional. Determines whether to apply the rule to the container or not.
    */
-  function style( prop: string, value: string | number, useContainer?: boolean ): void {
+  function style( prop: CSSProperties, value: string | number, useContainer?: boolean ): void {
     _style( ( useContainer && container ) || slide, prop, value );
   }
 

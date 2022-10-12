@@ -4,7 +4,8 @@ import {
   CLASS_ARROW_PREV,
   CLASS_LIST,
   CLASS_PROGRESS_BAR,
-  CLASS_ROOT, CLASS_TOGGLE,
+  CLASS_ROOT,
+  CLASS_TOGGLE,
   CLASS_TRACK,
 } from '../../../constants/classes';
 import { RTL } from '../../../constants/directions';

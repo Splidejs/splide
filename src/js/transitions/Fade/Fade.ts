@@ -1,8 +1,7 @@
 import { EVENT_MOUNTED, EVENT_REFRESH } from '../../constants/events';
 import { Splide } from '../../core/Splide/Splide';
 import { Components, Options, TransitionComponent } from '../../types';
-import { nextTick, noop } from '../../utils';
-import { EventInterface } from '@splidejs/utils';
+import { EventInterface, nextTick, noop } from '@splidejs/utils';
 
 
 /**

@@ -9,7 +9,7 @@ import {
 } from '../../../constants/events';
 import { Splide } from '../../../core/Splide/Splide';
 import { fire, init, keydown } from '../../../test';
-import { format } from '../../../utils';
+import { format } from '@splidejs/utils';
 import { SlideComponent } from '../Slide';
 
 

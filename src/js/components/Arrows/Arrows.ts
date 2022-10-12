@@ -20,14 +20,14 @@ import {
   before,
   create,
   display,
+  EventInterface,
   parseHtml,
-  remove,
+  removeNode,
   removeAttribute,
   removeClass,
   setAttribute,
-} from '../../utils';
+} from '@splidejs/utils';
 import { PATH, SIZE, XML_NAME_SPACE } from './path';
-import { EventInterface } from '@splidejs/utils';
 
 
 /**
@@ -143,7 +143,7 @@ export function Arrows(
     removeClass( wrapper, wrapperClasses );
 
     if ( created ) {
-      remove( placeholder ? [ prev, next ] : wrapper );
+      removeNode( placeholder ? [ prev, next ] : wrapper );
       prev = next = null;
     } else {
       removeAttribute( [ prev, next ], ALL_ATTRIBUTES );

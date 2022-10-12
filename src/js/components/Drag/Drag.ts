@@ -5,9 +5,8 @@ import { DRAGGING, IDLE, MOVING, SCROLLING } from '../../constants/states';
 import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { abs, isObject, matches, min, noop, prevent, sign, timeOf } from '../../utils';
+import { abs, EventInterface, isObject, matches, min, noop, prevent, sign, timeOf } from '@splidejs/utils';
 import { FRICTION, LOG_INTERVAL, POINTER_DOWN_EVENTS, POINTER_MOVE_EVENTS, POINTER_UP_EVENTS } from './constants';
-import { EventBinder, EventInterface } from '@splidejs/utils';
 
 
 /**
