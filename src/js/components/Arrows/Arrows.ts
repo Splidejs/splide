@@ -191,7 +191,7 @@ export function Arrows(
    */
   function createArrow( prev: boolean ): HTMLButtonElement {
     const arrow = `<button class="${ classes.arrow } ${ prev ? classes.prev : classes.next }" type="button">`
-      +	`<svg xmlns="${ XML_NAME_SPACE }" viewBox="0 0 ${ SIZE } ${ SIZE }" width="${ SIZE }" height="${ SIZE }" focusable="false">`
+      +	`<svg xmlns="${ XML_NAME_SPACE }" viewBox="0 0 ${ SIZE } ${ SIZE }" width="${ SIZE }" height="${ SIZE }">`
       + `<path d="${ options.arrowPath || PATH }" />`;
 
     return parseHtml<HTMLButtonElement>( arrow );
