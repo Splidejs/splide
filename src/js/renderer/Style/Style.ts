@@ -91,8 +91,7 @@ export class Style {
     let css = '';
 
     forOwn( selectors, ( styles, selector ) => {
-      selector = `#${ this.id } ${ selector }`.trim();
-      css += `${ selector } {`;
+      css += `${ `#${ this.id } ${ selector }`.trim() } {`;
 
       forOwn( styles, ( value, prop ) => {
         if ( value || value === 0 ) {

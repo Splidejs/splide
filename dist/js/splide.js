@@ -29,57 +29,57 @@
     DESTROYED
   };
 
-  function x(n) {
+  function N(n) {
     n.length = 0;
   }
-  const D = Array.prototype;
-  function m(n, t, e) {
-    return D.slice.call(n, t, e);
+  function a(n, ...t) {
+    return n.bind(null, ...t);
   }
-  function a(n) {
-    return n.bind(null, ...m(arguments, 1));
-  }
-  const an = setTimeout, ln = () => {
+  const dn = setTimeout, an = () => {
   };
   function P(n) {
     return requestAnimationFrame(n);
   }
-  function p(n, t) {
+  function m(n, t) {
     return typeof t === n;
   }
-  function g(n) {
-    return !q(n) && p("object", n);
+  function y(n) {
+    return !S(n) && m("object", n);
   }
-  const $ = Array.isArray, mn = a(p, "function"), h = a(p, "string"); a(p, "boolean"); const Z = a(p, "undefined");
-  function q(n) {
+  const g = Array.isArray, ln = a(m, "function"), p = a(m, "string"); a(m, "boolean"); const Z = a(m, "undefined");
+  function S(n) {
     return n === null;
   }
-  function F(n) {
+  function x(n) {
     try {
       return n instanceof (n.ownerDocument.defaultView || window).HTMLElement;
     } catch {
       return false;
     }
   }
-  function L(n) {
-    return $(n) ? n : [n];
+  function q(n) {
+    return g(n) ? n : [n];
   }
   function d(n, t) {
-    L(n).forEach(t);
+    q(n).forEach(t);
   }
   function G(n, t) {
     return n.includes(t);
   }
-  function hn(n, t) {
-    return n.push(...L(t)), n;
+  function pn(n, t) {
+    return n.push(...q(t)), n;
+  }
+  const D = Array.prototype;
+  function F(n, t, e) {
+    return D.slice.call(n, t, e);
   }
   function I(n, t, e) {
-    n && d(t, (i) => {
-      i && n.classList[e ? "add" : "remove"](i);
+    n && d(p(t) ? t.split(" ") : t, (i) => {
+      i && n.classList.toggle(i, e);
     });
   }
   function J(n, t) {
-    I(n, h(t) ? t.split(" ") : t, true);
+    I(n, t, true);
   }
   function Q(n, t) {
     d(t, n.appendChild.bind(n));
@@ -91,37 +91,37 @@
     });
   }
   function W(n, t) {
-    return F(n) && n.matches(t);
+    return x(n) && n.matches(t);
   }
   function X(n, t) {
-    const e = n ? m(n.children) : [];
+    const e = n ? F(n.children) : [];
     return t ? e.filter((i) => W(i, t)) : e;
   }
   function Y(n, t) {
     return t ? X(n, t)[0] : n.firstElementChild;
   }
-  function gn(n, t) {
+  function En(n, t) {
     return n.closest(t);
   }
-  const b = Object.assign, A = Object.keys;
-  function O(n, t, e) {
+  const v = Object.assign, A = Object.keys;
+  function L(n, t, e) {
     return n && (e ? A(n).reverse() : A(n)).forEach((i) => {
       i !== "__proto__" && t(n[i], i);
     }), n;
   }
-  function U(n) {
-    return m(arguments, 1).forEach((t) => {
-      O(t, (e, i) => {
-        $(e) ? n[i] = e.slice() : g(e) ? n[i] = U({}, g(n[i]) ? n[i] : {}, e) : n[i] = e;
+  function k(n, ...t) {
+    return t.forEach((e) => {
+      L(e, (i, r) => {
+        g(i) ? i = i.slice() : y(i) && (i = k({}, y(n[r]) ? n[r] : {}, i)), n[r] = i;
       });
     }), n;
   }
-  function En(n, t) {
+  function gn(n, t) {
     return d(t || A(n), (e) => {
       delete n[e];
     }), n;
   }
-  function k(n, t) {
+  function U(n, t) {
     d(n, (e) => {
       d(t, (i) => {
         e && e.removeAttribute(i);
@@ -129,26 +129,26 @@
     });
   }
   function M(n, t, e) {
-    g(t) ? O(t, (i, r) => {
+    y(t) ? L(t, (i, r) => {
       M(n, r, i);
     }) : d(n, (i) => {
-      q(e) || e === "" ? k(i, t) : i.setAttribute(t, String(e));
+      S(e) || e === "" ? U(i, t) : i.setAttribute(t, String(e));
     });
   }
   function j(n, t, e) {
     const i = document.createElement(n);
-    return t && (h(t) ? J(i, t) : M(i, t)), e && Q(e, i), i;
+    return t && (p(t) ? J(i, t) : M(i, t)), e && Q(e, i), i;
   }
   function nn(n, t, e) {
     if (Z(e))
       return getComputedStyle(n)[t];
-    q(e) || (n.style[t] = `${e}`);
+    S(e) || (n.style[t] = `${e}`);
   }
-  function $n(n, t) {
+  function An(n, t) {
     nn(n, "display", t);
   }
-  function An(n) {
-    F(n) && n.focus({ preventScroll: true });
+  function $n(n) {
+    x(n) && n.focus({ preventScroll: true });
   }
   function wn(n, t) {
     return n.getAttribute(t);
@@ -174,94 +174,94 @@
     return n && n.querySelector(t);
   }
   function Tn(n, t) {
-    return t && n ? m(n.querySelectorAll(t)) : [];
+    return t && n ? F(n.querySelectorAll(t)) : [];
   }
-  function Nn(n, t) {
+  function Pn(n, t) {
     I(n, t, false);
   }
-  function Pn(n) {
+  function Bn(n) {
     return n.timeStamp;
   }
-  function Bn(n) {
-    return h(n) ? n : n ? `${n}px` : "";
+  function Nn(n) {
+    return p(n) ? n : n ? `${n}px` : "";
   }
   function rn(n) {
     let t = "";
-    return O(n, (e, i) => {
+    return L(n, (e, i) => {
       t += e || e === 0 ? ` ${i}${e !== true ? `="${e}"` : ""}` : "";
     }), t.trim();
   }
-  function _() {
-    return m(arguments).reduce((n, t) => `${n} ${$(t) ? _(...t) : t || ""}`.trim(), "");
+  function _(...n) {
+    return n.reduce((t, e) => `${t} ${g(e) ? _(...e) : e || ""}`.trim(), "");
   }
   function on(n, t) {
-    return t = $(t) || !g(t) ? { class: _(t) } : t, `<${`${n} ${t ? rn(t) : ""}`.trim()}>`;
+    return t = g(t) || !y(t) ? { class: _(t) } : t, `<${`${n} ${t ? rn(t) : ""}`.trim()}>`;
   }
-  a(on, "div"); const { min: E, max: w, floor: Dn, ceil: Fn, abs: un, sign: In } = Math;
+  a(on, "div"); const { min: E, max: $, floor: Dn, ceil: Fn, abs: un, sign: In } = Math;
   function Mn(n, t, e) {
     return un(n - t) < e;
   }
   function _n(n, t, e, i) {
-    const r = E(t, e), o = w(t, e);
+    const r = E(t, e), o = $(t, e);
     return i ? r < n && n < o : r <= n && n <= o;
   }
-  function Hn(n, t, e) {
-    const i = E(t, e), r = w(t, e);
-    return E(w(i, n), r);
+  function bn(n, t, e) {
+    const i = E(t, e), r = $(t, e);
+    return E($(i, n), r);
   }
   function Kn(n, t) {
     return d(t, (e) => {
       n = n.replace("%s", `${e}`);
     }), n;
   }
-  function cn(n) {
-    return n < 10 ? `0${n}` : `${n}`;
+  function cn(n, t = 2) {
+    return `${n}`.padStart(t, "0");
   }
   const B = {};
   function zn(n) {
     return `${n}${cn(B[n] = (B[n] || 0) + 1)}`;
   }
-  function C(n, t) {
+  function w(n, t) {
     d(n, (e) => {
-      h(e) && e.split(" ").forEach(t);
+      p(e) && e.split(" ").forEach(t);
     });
   }
-  function S(n, t) {
+  function C(n, t) {
     const e = [];
     for (let i = n.length - 1; i >= 0; i--)
       t(n[i]) && e.push(...n.splice(i, 1));
     return e;
   }
-  function H(n) {
+  function b(n) {
     const t = n || [], e = n ? {} : void 0;
     function i(o, f, u, c) {
-      C(f, (s) => {
+      w(f, (s) => {
         o.addEventListener(s, u, c), t.push([o.removeEventListener.bind(o, s, u, c), e]);
       });
     }
     function r() {
-      e ? S(t, (o) => o[1] === e).forEach((o) => {
+      e ? C(t, (o) => o[1] === e).forEach((o) => {
         o[0]();
       }) : (t.forEach((o) => {
         o[0]();
-      }), x(t));
+      }), N(t));
     }
     return {
       bind: i,
-      create: a(H, t),
+      create: a(b, t),
       destroy: r
     };
   }
-  function v(n) {
+  function H(n) {
     const t = n || [], e = n ? {} : void 0;
     function i(u, c) {
-      C(u, (s) => {
+      w(u, (s) => {
         t.push([s, c, e]);
       });
     }
     function r(u, c) {
-      C(u, (s) => {
-        S(t, (l) => l[0] === s && (!c || l[1] === c) && l[2] === e);
+      w(u, (s) => {
+        C(t, (l) => l[0] === s && (!c || l[1] === c) && l[2] === e);
       });
     }
     function o(u, ...c) {
@@ -270,24 +270,24 @@
       });
     }
     function f() {
-      e ? S(t, (u) => u[2] === e) : x(t);
+      e ? C(t, (u) => u[2] === e) : N(t);
     }
     return {
       on: i,
       off: r,
       emit: o,
-      create: a(v, t),
+      create: a(H, t),
       destroy: f
     };
   }
-  function fn(n = H(), t = v()) {
+  function fn(n = b(), t = H()) {
     function e() {
       return fn(n.create(), t.create());
     }
     function i() {
       n.destroy(), t.destroy();
     }
-    return b({}, n, t, { create: e, destroy: i });
+    return v({}, n, t, { create: e, destroy: i });
   }
   function sn(n, t, e, i) {
     const { now: r } = Date;
@@ -295,24 +295,24 @@
     function l() {
       if (!c) {
         if (f = n ? E((r() - o) / n, 1) : 1, e && e(f), f >= 1 && (t(), o = r(), i && ++s >= i))
-          return T();
+          return O();
         u = P(l);
       }
     }
-    function K(y) {
-      y || N(), o = r() - (y ? f * n : 0), c = false, u = P(l);
+    function K(h) {
+      h || T(), o = r() - (h ? f * n : 0), c = false, u = P(l);
     }
-    function T() {
+    function O() {
       c = true;
     }
     function z() {
       o = r(), f = 0, e && e(f);
     }
-    function N() {
+    function T() {
       u && cancelAnimationFrame(u), f = 0, u = 0, c = true;
     }
-    function R(y) {
-      n = y;
+    function R(h) {
+      n = h;
     }
     function V() {
       return c;
@@ -320,8 +320,8 @@
     return {
       start: K,
       rewind: z,
-      pause: T,
-      cancel: N,
+      pause: O,
+      cancel: T,
       set: R,
       isPaused: V
     };
@@ -332,7 +332,7 @@
       t = r;
     }
     function i(r) {
-      return G(L(r), t);
+      return G(q(r), t);
     }
     return { set: e, is: i };
   }
@@ -380,7 +380,7 @@
     const { state } = Splide2;
     const breakpoints = options.breakpoints || {};
     const reducedMotion = options.reducedMotion || {};
-    const binder = H();
+    const binder = b();
     const queries = [];
     function setup() {
       const isMin = options.mediaQuery === "min";
@@ -404,9 +404,9 @@
       const destroyed = state.is(DESTROYED);
       const direction = options.direction;
       const merged = queries.reduce((merged2, entry) => {
-        return U(merged2, entry[1].matches ? entry[0] : {});
+        return k(merged2, entry[1].matches ? entry[0] : {});
       }, {});
-      En(options);
+      gn(options);
       set(merged);
       if (options.destroy) {
         Splide2.destroy(options.destroy === "completely");
@@ -419,12 +419,12 @@
     }
     function reduce(enable) {
       if (matchMedia(MEDIA_PREFERS_REDUCED_MOTION).matches) {
-        enable ? U(options, reducedMotion) : En(options, A(reducedMotion));
+        enable ? k(options, reducedMotion) : gn(options, A(reducedMotion));
       }
     }
     function set(opts, base, notify) {
-      U(options, opts);
-      base && U(Object.getPrototypeOf(options), opts);
+      k(options, opts);
+      base && k(Object.getPrototypeOf(options), opts);
       if (notify || !state.is(CREATED)) {
         Splide2.emit(EVENT_UPDATED, options);
       }
@@ -594,15 +594,15 @@
     }
     function destroy(completely) {
       const attrs = ALL_ATTRIBUTES.concat("style");
-      x(slides);
-      Nn(root, rootClasses);
-      Nn(track, trackClasses);
-      k([track, list], attrs);
-      k(root, completely ? attrs : ["style", ARIA_ROLEDESCRIPTION]);
+      N(slides);
+      Pn(root, rootClasses);
+      Pn(track, trackClasses);
+      U([track, list], attrs);
+      U(root, completely ? attrs : ["style", ARIA_ROLEDESCRIPTION]);
     }
     function update() {
-      Nn(root, rootClasses);
-      Nn(track, trackClasses);
+      Pn(root, rootClasses);
+      Pn(track, trackClasses);
       rootClasses = getClasses(CLASS_ROOT);
       trackClasses = getClasses(CLASS_TRACK);
       J(root, rootClasses);
@@ -614,8 +614,8 @@
       track = find(CLASS_TRACK);
       list = Y(track, `.${CLASS_LIST}`);
       assert(track && list, "A track/list element is missing.");
-      hn(slides, X(list, `.${CLASS_SLIDE}:not(.${CLASS_CLONE})`));
-      b(elements, {
+      pn(slides, X(list, `.${CLASS_SLIDE}:not(.${CLASS_CLONE})`));
+      v(elements, {
         root,
         track,
         list,
@@ -642,7 +642,7 @@
     }
     function find(className) {
       const elm = On(root, `.${className}`);
-      return elm && gn(elm, `.${CLASS_ROOT}`) === root ? elm : void 0;
+      return elm && En(elm, `.${CLASS_ROOT}`) === root ? elm : void 0;
     }
     function getClasses(base) {
       return [
@@ -653,7 +653,7 @@
         base === CLASS_ROOT && CLASS_ACTIVE
       ];
     }
-    return b(elements, {
+    return v(elements, {
       setup,
       mount,
       destroy
@@ -696,8 +696,8 @@
     function destroy() {
       destroyed = true;
       event.destroy();
-      Nn(slide, STATUS_CLASSES);
-      k(slide, ALL_ATTRIBUTES);
+      Pn(slide, STATUS_CLASSES);
+      U(slide, ALL_ATTRIBUTES);
       M(slide, "style", styles);
       M(slide, ARIA_LABEL, label || "");
     }
@@ -709,7 +709,7 @@
       M(slide, ARIA_LABEL, Kn(i18n.slideX, (isClone ? slideIndex : index) + 1));
       M(slide, ARIA_CONTROLS, controls);
       M(slide, ROLE, slideFocus ? "button" : "");
-      slideFocus && k(slide, ARIA_ROLEDESCRIPTION);
+      slideFocus && U(slide, ARIA_ROLEDESCRIPTION);
     }
     function onMove() {
       if (!destroyed) {
@@ -749,7 +749,7 @@
       }
       if (!visible && document.activeElement === slide) {
         const Slide2 = Components.Slides.getAt(Splide2.index);
-        Slide2 && An(Slide2.slide);
+        Slide2 && $n(Slide2.slide);
       }
     }
     function style(prop, value, useContainer) {
@@ -809,7 +809,7 @@
       forEach((Slide2) => {
         Slide2.destroy();
       });
-      x(Slides2);
+      N(Slides2);
     }
     function update() {
       forEach((Slide2) => {
@@ -836,10 +836,10 @@
     }
     function add(items, index) {
       d(items, (slide) => {
-        if (h(slide)) {
+        if (p(slide)) {
           slide = qn(slide);
         }
-        if (F(slide)) {
+        if (x(slide)) {
           const ref = slides[index];
           ref ? yn(slide, ref) : Q(list, slide);
           J(slide, options.classes.slide);
@@ -857,7 +857,7 @@
     }
     function filter(matcher) {
       return Slides2.filter(
-        mn(matcher) ? matcher : (Slide2) => h(matcher) ? W(Slide2.slide, matcher) : G(L(matcher), Slide2.index)
+        ln(matcher) ? matcher : (Slide2) => p(matcher) ? W(Slide2.slide, matcher) : G(q(matcher), Slide2.index)
       );
     }
     function style(prop, value, useContainer) {
@@ -921,7 +921,7 @@
     }
     function init() {
       vertical = options.direction === TTB;
-      nn(root, "maxWidth", Bn(options.width));
+      nn(root, "maxWidth", Nn(options.width));
       nn(track, resolve("paddingLeft"), cssPadding(false));
       nn(track, resolve("paddingRight"), cssPadding(true));
       resize(true);
@@ -930,7 +930,7 @@
       const newRect = tn(root);
       if (force || rootRect.width !== newRect.width || rootRect.height !== newRect.height) {
         nn(track, "height", cssTrackHeight());
-        styleSlides(resolve("marginRight"), Bn(options.gap));
+        styleSlides(resolve("marginRight"), Nn(options.gap));
         styleSlides("width", cssSlideWidth());
         styleSlides("height", cssSlideHeight(), true);
         rootRect = newRect;
@@ -944,7 +944,7 @@
     function cssPadding(right) {
       const { padding } = options;
       const prop = resolve(right ? "right" : "left");
-      return padding && Bn(padding[prop] || (g(padding) ? 0 : padding)) || "0px";
+      return padding && Nn(padding[prop] || (y(padding) ? 0 : padding)) || "0px";
     }
     function cssTrackHeight() {
       let height = "";
@@ -956,16 +956,16 @@
       return height;
     }
     function cssHeight() {
-      return Bn(options.height || tn(list).width * options.heightRatio);
+      return Nn(options.height || tn(list).width * options.heightRatio);
     }
     function cssSlideWidth() {
-      return options.autoWidth ? null : Bn(options.fixedWidth) || (vertical ? "" : cssSlideSize());
+      return options.autoWidth ? null : Nn(options.fixedWidth) || (vertical ? "" : cssSlideSize());
     }
     function cssSlideHeight() {
-      return Bn(options.fixedHeight) || (vertical ? options.autoHeight ? null : cssSlideSize() : cssHeight());
+      return Nn(options.fixedHeight) || (vertical ? options.autoHeight ? null : cssSlideSize() : cssHeight());
     }
     function cssSlideSize() {
-      const gap = Bn(options.gap);
+      const gap = Nn(options.gap);
       return `calc((100%${gap && ` + ${gap}`})/${options.perPage || 1}${gap && ` - ${gap}`})`;
     }
     function listSize() {
@@ -1033,7 +1033,7 @@
     }
     function destroy() {
       en(clones);
-      x(clones);
+      N(clones);
       event.destroy();
     }
     function observe() {
@@ -1049,13 +1049,13 @@
       const { length } = slides;
       if (length) {
         while (slides.length < count) {
-          hn(slides, slides);
+          pn(slides, slides);
         }
-        hn(slides.slice(-count), slides.slice(0, count)).forEach((Slide, index) => {
+        pn(slides.slice(-count), slides.slice(0, count)).forEach((Slide, index) => {
           const isHead = index < count;
           const clone = cloneDeep(Slide.slide, index);
           isHead ? yn(clone, slides[0].slide) : Q(Elements.list, clone);
-          hn(clones, clone);
+          pn(clones, clone);
           Slides.register(clone, index - count + (isHead ? 0 : length), Slide.index);
         });
       }
@@ -1171,7 +1171,7 @@
     }
     function trim(position) {
       if (options.trimSpace && Splide2.is(SLIDE)) {
-        position = Hn(position, 0, orient(sliderSize(true) - listSize()));
+        position = bn(position, 0, orient(sliderSize(true) - listSize()));
       }
       return position;
     }
@@ -1234,7 +1234,7 @@
       perMove = options.perMove;
       perPage = options.perPage;
       endIndex = getEnd();
-      const index = Hn(currIndex, 0, omitEnd ? endIndex : slideCount - 1);
+      const index = bn(currIndex, 0, omitEnd ? endIndex : slideCount - 1);
       if (index !== currIndex) {
         currIndex = index;
         Move.reposition();
@@ -1264,7 +1264,7 @@
     }
     function parse(control) {
       let index = currIndex;
-      if (h(control)) {
+      if (p(control)) {
         const [, indicator, number] = control.match(/([+\-<>])(\d+)?/) || [];
         if (indicator === "+" || indicator === "-") {
           index = computeDestIndex(currIndex + +`${indicator}${+number || 1}`, currIndex);
@@ -1274,7 +1274,7 @@
           index = getPrev(true);
         }
       } else {
-        index = isLoop ? control : Hn(control, 0, endIndex);
+        index = isLoop ? control : bn(control, 0, endIndex);
       }
       return index;
     }
@@ -1338,17 +1338,17 @@
           break;
         }
       }
-      return Hn(end, 0, slideCount - 1);
+      return bn(end, 0, slideCount - 1);
     }
     function toIndex(page) {
-      return Hn(hasFocus() ? page : perPage * page, 0, endIndex);
+      return bn(hasFocus() ? page : perPage * page, 0, endIndex);
     }
     function toPage(index) {
       return hasFocus() ? E(index, endIndex) : Dn((index >= endIndex ? slideCount - 1 : index) / perPage);
     }
     function toDest(destination) {
       const closest = Move.toIndex(destination);
-      return isSlide ? Hn(closest, 0, endIndex) : closest;
+      return isSlide ? bn(closest, 0, endIndex) : closest;
     }
     function setIndex(index) {
       if (index !== currIndex) {
@@ -1412,8 +1412,8 @@
         createArrows();
       }
       if (prev && next) {
-        b(arrows, { prev, next });
-        $n(wrapper, enabled ? "" : "none");
+        v(arrows, { prev, next });
+        An(wrapper, enabled ? "" : "none");
         J(wrapper, wrapperClasses = `${CLASS_ARROWS}--${options.direction}`);
         if (enabled) {
           listen();
@@ -1425,12 +1425,12 @@
     }
     function destroy() {
       event.destroy();
-      Nn(wrapper, wrapperClasses);
+      Pn(wrapper, wrapperClasses);
       if (created) {
         en(placeholder ? [prev, next] : wrapper);
         prev = next = null;
       } else {
-        k([prev, next], ALL_ATTRIBUTES);
+        U([prev, next], ALL_ATTRIBUTES);
       }
     }
     function listen() {
@@ -1578,7 +1578,7 @@
     }
     function toggle(cover2, img, Slide) {
       Slide.style("background", cover2 ? `center/cover no-repeat url("${img.src}")` : "", true);
-      $n(img, cover2 ? "none" : "");
+      An(img, cover2 ? "none" : "");
     }
     return {
       mount,
@@ -1615,7 +1615,7 @@
       }
       const noDistance = Mn(from, destination, 1);
       friction = 1;
-      duration = noDistance ? 0 : duration || w(un(destination - from) / BASE_VELOCITY, MIN_DURATION);
+      duration = noDistance ? 0 : duration || $(un(destination - from) / BASE_VELOCITY, MIN_DURATION);
       callback = onScrolled;
       interval = sn(duration, onEnd, a(update, from, destination, noConstrain), 1);
       set(SCROLLING);
@@ -1681,8 +1681,8 @@
     let disabled;
     let target;
     function mount() {
-      bind(track, POINTER_MOVE_EVENTS, ln, SCROLL_LISTENER_OPTIONS);
-      bind(track, POINTER_UP_EVENTS, ln, SCROLL_LISTENER_OPTIONS);
+      bind(track, POINTER_MOVE_EVENTS, an, SCROLL_LISTENER_OPTIONS);
+      bind(track, POINTER_UP_EVENTS, an, SCROLL_LISTENER_OPTIONS);
       bind(track, POINTER_DOWN_EVENTS, onPointerDown, SCROLL_LISTENER_OPTIONS);
       bind(track, "click", onClick, { capture: true });
       bind(track, "dragstart", Ln);
@@ -1775,7 +1775,7 @@
     }
     function shouldStart(e) {
       const { dragMinThreshold: thresholds } = options;
-      const isObj = g(thresholds);
+      const isObj = y(thresholds);
       const mouse = isObj && thresholds.mouse || 0;
       const touch = (isObj ? thresholds.touch : +thresholds) || 10;
       return un(diffCoord(e)) > (isTouchEvent(e) ? touch : mouse);
@@ -1802,7 +1802,7 @@
       return coordOf(e, orthogonal) - coordOf(getBaseEvent(e), orthogonal);
     }
     function diffTime(e) {
-      return Pn(e) - Pn(getBaseEvent(e));
+      return Bn(e) - Bn(getBaseEvent(e));
     }
     function getBaseEvent(e) {
       return baseEvent === e && prevBaseEvent || baseEvent;
@@ -1859,7 +1859,7 @@
     function onMove() {
       const _disabled = disabled;
       disabled = true;
-      an(() => {
+      dn(() => {
         disabled = _disabled;
       });
     }
@@ -1895,7 +1895,7 @@
       }
     }
     function init() {
-      x(entries);
+      N(entries);
       register();
       if (isSequential) {
         loadNext();
@@ -1915,7 +1915,7 @@
             const parent = img.parentElement;
             const spinner = Y(parent, `.${className}`) || j("span", className, parent);
             entries.push([img, Slide, spinner]);
-            img.src || $n(img, "none");
+            img.src || An(img, "none");
           }
         });
       });
@@ -1933,15 +1933,15 @@
       bind(img, "load error", a(onLoad, data));
       M(img, "src", wn(img, SRC_DATA_ATTRIBUTE));
       M(img, "srcset", wn(img, SRCSET_DATA_ATTRIBUTE));
-      k(img, SRC_DATA_ATTRIBUTE);
-      k(img, SRCSET_DATA_ATTRIBUTE);
+      U(img, SRC_DATA_ATTRIBUTE);
+      U(img, SRCSET_DATA_ATTRIBUTE);
     }
     function onLoad(data, e) {
       const [img, Slide] = data;
-      Nn(Slide.slide, CLASS_LOADING);
+      Pn(Slide.slide, CLASS_LOADING);
       if (e.type !== "error") {
         en(data[2]);
-        $n(img, "");
+        An(img, "");
         emit(EVENT_LAZYLOAD_LOADED, img, Slide);
         emit(EVENT_RESIZE);
       }
@@ -1952,7 +1952,7 @@
     }
     return {
       mount,
-      destroy: a(x, entries),
+      destroy: a(N, entries),
       check
     };
   }
@@ -1970,7 +1970,7 @@
       destroy();
       on([EVENT_UPDATED, EVENT_REFRESH, EVENT_END_INDEX_CHANGED], mount);
       const enabled = options.pagination;
-      placeholder && $n(placeholder, enabled ? "" : "none");
+      placeholder && An(placeholder, enabled ? "" : "none");
       if (enabled) {
         on([EVENT_MOVE, EVENT_SCROLL, EVENT_SCROLLED], update);
         createPagination();
@@ -1980,9 +1980,9 @@
     }
     function destroy() {
       if (list) {
-        en(placeholder ? m(list.children) : list);
-        Nn(list, paginationClasses);
-        x(items);
+        en(placeholder ? F(list.children) : list);
+        Pn(list, paginationClasses);
+        N(items);
         list = null;
       }
       event.destroy();
@@ -2032,7 +2032,7 @@
       }
       const item = items[nextPage];
       if (item) {
-        An(item.button);
+        $n(item.button);
         go(`>${nextPage}`);
         Ln(e, true);
       }
@@ -2048,8 +2048,8 @@
       const curr = getAt(getIndex());
       if (prev) {
         const { button } = prev;
-        Nn(button, CLASS_ACTIVE);
-        k(button, ARIA_SELECTED);
+        Pn(button, CLASS_ACTIVE);
+        U(button, ARIA_SELECTED);
         M(button, TAB_INDEX, -1);
       }
       if (curr) {
@@ -2088,7 +2088,7 @@
       events.forEach((event2) => {
         event2.destroy();
       });
-      x(events);
+      N(events);
     }
     function remount() {
       destroy();
@@ -2149,7 +2149,7 @@
       if (e.cancelable) {
         const { deltaY } = e;
         const backwards = deltaY < 0;
-        const timeStamp = Pn(e);
+        const timeStamp = Bn(e);
         const min = options.wheelMinThreshold || 0;
         const sleep = options.wheelSleep || 0;
         if (un(deltaY) > min && timeStamp - lastTime > sleep) {
@@ -2195,7 +2195,7 @@
       }
     }
     function destroy() {
-      k(track, [ARIA_LIVE, ARIA_ATOMIC, ARIA_BUSY]);
+      U(track, [ARIA_LIVE, ARIA_ATOMIC, ARIA_BUSY]);
       en(sr);
     }
     function disable(disabled) {
@@ -2288,12 +2288,12 @@
     }
     function start(index, done) {
       Slides.style("transition", `opacity ${options.speed}ms ${options.easing}`);
-      an(done);
+      dn(done);
     }
     return {
       mount,
       start,
-      cancel: ln
+      cancel: an
     };
   }
 
@@ -2362,19 +2362,19 @@
     _E = {};
     _T;
     constructor(target, options) {
-      const root = h(target) ? On(document, target) : target;
+      const root = p(target) ? On(document, target) : target;
       assert(root, `${root} is invalid.`);
       this.root = root;
-      options = U({
+      options = k({
         label: wn(root, ARIA_LABEL) || "",
         labelledby: wn(root, ARIA_LABELLEDBY) || ""
       }, DEFAULTS, Splide.defaults, options || {});
       try {
-        U(options, JSON.parse(wn(root, DATA_ATTRIBUTE)));
+        k(options, JSON.parse(wn(root, DATA_ATTRIBUTE)));
       } catch (e) {
         assert(false, "Invalid JSON");
       }
-      this._o = Object.create(U({}, options));
+      this._o = Object.create(k({}, options));
     }
     mount(Extensions, Transition) {
       const { state, Components: Components2 } = this;
@@ -2383,13 +2383,13 @@
       this._C = Components2;
       this._T = Transition || this._T || (this.is(FADE) ? Fade : Slide);
       this._E = Extensions || this._E;
-      const Constructors = b({}, ComponentConstructors, this._E, { Transition: this._T });
-      O(Constructors, (Component, key) => {
+      const Constructors = v({}, ComponentConstructors, this._E, { Transition: this._T });
+      L(Constructors, (Component, key) => {
         const component = Component(this, Components2, this._o, this.event.create());
         Components2[key] = component;
         component.setup && component.setup();
       });
-      O(Components2, (component) => {
+      L(Components2, (component) => {
         component.mount && component.mount();
       });
       this.emit(EVENT_MOUNTED);
@@ -2420,7 +2420,7 @@
       return this;
     }
     emit(event) {
-      this.event.emit(event, ...m(arguments, 1));
+      this.event.emit(event, ...F(arguments, 1));
       return this;
     }
     add(slides, index) {
@@ -2443,12 +2443,12 @@
       if (state.is(CREATED)) {
         this.on(EVENT_READY, this.destroy.bind(this, completely));
       } else {
-        O(this._C, (component) => {
+        L(this._C, (component) => {
           component.destroy && component.destroy(completely);
         }, true);
         event.emit(EVENT_DESTROY);
         event.destroy();
-        completely && x(this.splides);
+        completely && N(this.splides);
         state.set(DESTROYED);
       }
       return this;
