@@ -1,12 +1,11 @@
 import { TTB } from '../../constants/directions';
 import { EVENT_OVERFLOW, EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_UPDATED } from '../../constants/events';
-import { Throttle } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import { abs, apply, assert, isObject, rect, style, toggleClass, unit } from '../../utils';
 import { FADE } from '../../constants/types';
 import { CLASS_OVERFLOW } from '../../constants/classes';
-import { EventInterface } from '@splidejs/utils';
+import { EventInterface, Throttle } from '@splidejs/utils';
 
 
 /**

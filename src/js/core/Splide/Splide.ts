@@ -6,12 +6,11 @@ import { EVENT_DESTROY, EVENT_MOUNTED, EVENT_READY, EVENT_REFRESH } from '../../
 import { DATA_ATTRIBUTE } from '../../constants/project';
 import { CREATED, DESTROYED, IDLE, STATES } from '../../constants/states';
 import { FADE } from '../../constants/types';
-import { State, StateObject } from '../../constructors';
 import { Fade, Slide } from '../../transitions';
 import { AnyFunction, ComponentConstructor, Components, EventMap, Options, SyncTarget } from '../../types';
 import { addClass, assert, assign, empty, forOwn, getAttribute, isString, merge, query, slice } from '../../utils';
 import { ARIA_LABEL, ARIA_LABELLEDBY } from '../../constants/attributes';
-import { EventInterface } from '@splidejs/utils';
+import { EventInterface, State } from '@splidejs/utils';
 
 
 /**
@@ -48,7 +47,7 @@ export class Splide {
   /**
    * The StateObject object.
    */
-  readonly state: StateObject = State( CREATED );
+  readonly state = State( CREATED );
 
   /**
    * An array with SyncTarget objects for splide instances to sync with.

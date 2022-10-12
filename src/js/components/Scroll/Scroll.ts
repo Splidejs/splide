@@ -1,12 +1,11 @@
 import { EVENT_MOVE, EVENT_REFRESH, EVENT_SCROLL, EVENT_SCROLLED, EVENT_UPDATED } from '../../constants/events';
 import { IDLE, SCROLLING } from '../../constants/states';
 import { SLIDE } from '../../constants/types';
-import { RequestInterval, RequestIntervalInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, BaseComponent, Components, Options } from '../../types';
 import { abs, apply, approximatelyEqual, floor, max, sign } from '../../utils';
 import { BASE_VELOCITY, BOUNCE_DIFF_THRESHOLD, BOUNCE_DURATION, FRICTION_FACTOR, MIN_DURATION } from './constants';
-import { EventInterface } from '@splidejs/utils';
+import { EventInterface, RequestInterval } from '@splidejs/utils';
 
 
 /**
@@ -46,7 +45,7 @@ export function Scroll(
   /**
    * Retains the active RequestInterval object.
    */
-  let interval: RequestIntervalInterface;
+  let interval: RequestInterval;
 
   /**
    * Holds the callback function.

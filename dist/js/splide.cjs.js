@@ -37,6 +37,9 @@ function m(n, t, e) {
 function a(n) {
   return n.bind(null, ...m(arguments, 1));
 }
+function P(n) {
+  return requestAnimationFrame(n);
+}
 function p(n, t) {
   return typeof t === n;
 }
@@ -52,6 +55,9 @@ function L(n) {
 }
 function d(n, t) {
   L(n).forEach(t);
+}
+function G(n, t) {
+  return n.includes(t);
 }
 const b = Object.assign, A = Object.keys;
 function O(n, t, e) {
@@ -71,7 +77,7 @@ function _() {
 function on(n, t) {
   return t = $(t) || !g(t) ? { class: _(t) } : t, `<${`${n} ${t ? rn(t) : ""}`.trim()}>`;
 }
-a(on, "div");
+a(on, "div"); const { min: E, max: w, floor: xn, ceil: Dn, abs: un, sign: Fn } = Math;
 function C(n, t) {
   d(n, (e) => {
     h(e) && e.split(" ").forEach(t);
@@ -140,6 +146,59 @@ function fn(n = H(), t = v()) {
   }
   return b({}, n, t, { create: e, destroy: i });
 }
+function sn(n, t, e, i) {
+  const { now: r } = Date;
+  let o, f = 0, u, c = true, s = 0;
+  function l() {
+    if (!c) {
+      if (f = n ? E((r() - o) / n, 1) : 1, e && e(f), f >= 1 && (t(), o = r(), i && ++s >= i))
+        return T();
+      u = P(l);
+    }
+  }
+  function K(y) {
+    y || N(), o = r() - (y ? f * n : 0), c = false, u = P(l);
+  }
+  function T() {
+    c = true;
+  }
+  function z() {
+    o = r(), f = 0, e && e(f);
+  }
+  function N() {
+    u && cancelAnimationFrame(u), f = 0, u = 0, c = true;
+  }
+  function R(y) {
+    n = y;
+  }
+  function V() {
+    return c;
+  }
+  return {
+    start: K,
+    rewind: z,
+    pause: T,
+    cancel: N,
+    set: R,
+    isPaused: V
+  };
+}
+function zn(n) {
+  let t = n;
+  function e(r) {
+    t = r;
+  }
+  function i(r) {
+    return G(L(r), t);
+  }
+  return { set: e, is: i };
+}
+function Rn(n, t) {
+  const e = sn(t || 0, n, void 0, 1);
+  return () => {
+    e.isPaused() && e.start();
+  };
+}
 
 function empty(array) {
   array.length = 0;
@@ -157,10 +216,6 @@ const nextTick = setTimeout;
 
 const noop = () => {
 };
-
-function raf(func) {
-  return requestAnimationFrame(func);
-}
 
 function typeOf(type, subject) {
   return typeof subject === type;
@@ -998,83 +1053,6 @@ function Slides(Splide2, Components2, options, event) {
   };
 }
 
-function RequestInterval(interval, onInterval, onUpdate, limit) {
-  const { now } = Date;
-  let startTime;
-  let rate = 0;
-  let id;
-  let paused = true;
-  let count = 0;
-  function update() {
-    if (!paused) {
-      rate = interval ? min((now() - startTime) / interval, 1) : 1;
-      onUpdate && onUpdate(rate);
-      if (rate >= 1) {
-        onInterval();
-        startTime = now();
-        if (limit && ++count >= limit) {
-          return pause();
-        }
-      }
-      id = raf(update);
-    }
-  }
-  function start(resume) {
-    resume || cancel();
-    startTime = now() - (resume ? rate * interval : 0);
-    paused = false;
-    id = raf(update);
-  }
-  function pause() {
-    paused = true;
-  }
-  function rewind() {
-    startTime = now();
-    rate = 0;
-    if (onUpdate) {
-      onUpdate(rate);
-    }
-  }
-  function cancel() {
-    id && cancelAnimationFrame(id);
-    rate = 0;
-    id = 0;
-    paused = true;
-  }
-  function set(time) {
-    interval = time;
-  }
-  function isPaused() {
-    return paused;
-  }
-  return {
-    start,
-    rewind,
-    pause,
-    cancel,
-    set,
-    isPaused
-  };
-}
-
-function State(initialState) {
-  let state = initialState;
-  function set(value) {
-    state = value;
-  }
-  function is(states) {
-    return includes(toArray(states), state);
-  }
-  return { set, is };
-}
-
-function Throttle(func, duration) {
-  const interval = RequestInterval(duration || 0, func, null, 1);
-  return () => {
-    interval.isPaused() && interval.start();
-  };
-}
-
 function Layout(Splide2, Components2, options, event) {
   const { on, bind, emit } = event;
   const { Slides } = Components2;
@@ -1086,7 +1064,7 @@ function Layout(Splide2, Components2, options, event) {
   let overflow;
   function mount() {
     init();
-    bind(window, "resize load", Throttle(apply(emit, EVENT_RESIZE)));
+    bind(window, "resize load", Rn(apply(emit, EVENT_RESIZE)));
     on([EVENT_UPDATED, EVENT_REFRESH], init);
     on(EVENT_RESIZE, resize);
   }
@@ -1647,7 +1625,7 @@ const INTERVAL_DATA_ATTRIBUTE = `${DATA_ATTRIBUTE}-interval`;
 
 function Autoplay(Splide2, Components2, options, event) {
   const { on, bind, emit } = event;
-  const interval = RequestInterval(options.interval, Splide2.go.bind(Splide2, ">"), onAnimationFrame);
+  const interval = sn(options.interval, Splide2.go.bind(Splide2, ">"), onAnimationFrame);
   const { isPaused } = interval;
   const { Elements, Elements: { root, toggle } } = Components2;
   const { autoplay } = options;
@@ -1785,7 +1763,7 @@ function Scroll(Splide2, Components2, options, event) {
     friction = 1;
     duration = noDistance ? 0 : duration || max(abs(destination - from) / BASE_VELOCITY, MIN_DURATION);
     callback = onScrolled;
-    interval = RequestInterval(duration, onEnd, apply(update, from, destination, noConstrain), 1);
+    interval = sn(duration, onEnd, apply(update, from, destination, noConstrain), 1);
     set(SCROLLING);
     emit(EVENT_SCROLL);
     interval.start();
@@ -2354,7 +2332,7 @@ function Live(Splide2, Components2, options, event) {
   const { track } = Components2.Elements;
   const enabled = options.live && !options.isNavigation;
   const sr = create("span", CLASS_SR);
-  const interval = RequestInterval(SR_REMOVAL_DELAY, apply(toggle, false));
+  const interval = sn(SR_REMOVAL_DELAY, apply(toggle, false));
   function mount() {
     if (enabled) {
       disable(!Components2.Autoplay.isPaused());
@@ -2536,7 +2514,7 @@ class Splide {
   root;
   event = fn();
   Components = {};
-  state = State(CREATED);
+  state = zn(CREATED);
   splides = [];
   _o = {};
   _C;
@@ -3087,12 +3065,9 @@ exports.FADE = FADE;
 exports.LOOP = LOOP;
 exports.LTR = LTR;
 exports.RTL = RTL;
-exports.RequestInterval = RequestInterval;
 exports.SLIDE = SLIDE;
 exports.STATUS_CLASSES = STATUS_CLASSES;
 exports.Splide = Splide;
 exports.SplideRenderer = SplideRenderer;
-exports.State = State;
 exports.TTB = TTB;
-exports.Throttle = Throttle;
 exports["default"] = Splide;

@@ -93,6 +93,22 @@ interface EventInterface<M extends Record<string, AnyFunction$1> = Record<string
 declare function EventInterface<M extends Record<string, AnyFunction$1> = Record<string, AnyFunction$1>>(binder?: EventBinder, bus?: EventBus<Record<string, AnyFunction$1>>): EventInterface<M>;
 
 /**
+ * The interface for the State object.
+ *
+ * @since 0.0.1
+ */
+interface State {
+    set(state: number): void;
+    is(states: number | number[]): boolean;
+}
+/**
+ * The function providing a super simple state system.
+ *
+ * @param initialState - Specifies the initial state.
+ */
+declare function State(initialState: number): State;
+
+/**
  * The interface for the Media component.
  *
  * @since 4.0.0
@@ -919,65 +935,6 @@ declare type SlidesPredicate = (Slide: SlideComponent, index: number, Slides: Sl
 declare type SlideMatcher = number | number[] | string | SlidesPredicate;
 
 /**
- * The interface for the returning value of the RequestInterval.
- *
- * @since 3.0.0
- */
-interface RequestIntervalInterface {
-    start(resume?: boolean): void;
-    pause(): void;
-    rewind(): void;
-    cancel(): void;
-    set(interval: number): void;
-    isPaused(): boolean;
-}
-/**
- * Requests interval like the native `setInterval()` with using `requestAnimationFrame`.
- *
- * @since 3.0.0
- *
- * @param interval   - The interval duration in milliseconds.
- * @param onInterval - The callback fired on every interval.
- * @param onUpdate   - Optional. Called on every animation frame, taking the progress rate.
- * @param limit      - Optional. Limits the number of interval.
- */
-declare function RequestInterval(interval: number, onInterval: () => void, onUpdate?: (rate: number) => void, limit?: number): RequestIntervalInterface;
-
-/**
- * The interface for the State object.
- *
- * @since 3.0.0
- */
-interface StateObject {
-    set(state: number): void;
-    is(states: number | number[]): boolean;
-}
-/**
- * The function providing a super simple state system.
- *
- * @param initialState - Specifies the initial state.
- */
-declare function State(initialState: number): StateObject;
-
-/**
- * The interface for the returning value of the RequestInterval.
- *
- * @since 3.0.0
- */
-interface ThrottleInstance<F extends AnyFunction> extends Function {
-    (...args: Parameters<F>): void;
-}
-/**
- * Returns the throttled function.
- *
- * @param func     - A function to throttle.
- * @param duration - Optional. Throttle duration in milliseconds.
- *
- * @return A throttled function.
- */
-declare function Throttle<F extends AnyFunction>(func: F, duration?: number): ThrottleInstance<F>;
-
-/**
  * The frontend class for the Splide slider.
  *
  * @since 3.0.0
@@ -1014,7 +971,7 @@ declare class Splide {
     /**
      * The StateObject object.
      */
-    readonly state: StateObject;
+    readonly state: State;
     /**
      * An array with SyncTarget objects for splide instances to sync with.
      */
@@ -1730,4 +1687,4 @@ declare const LOOP = "loop";
  */
 declare const FADE = "fade";
 
-export { AnyFunction, ArrowsComponent, AutoplayComponent, BaseComponent, CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_CLONE, CLASS_CONTAINER, CLASS_FOCUS_IN, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_OVERFLOW, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SPINNER, CLASS_SR, CLASS_TOGGLE, CLASS_TOGGLE_PAUSE, CLASS_TOGGLE_PLAY, CLASS_TRACK, CLASS_VISIBLE, Cast, ClonesComponent, ComponentConstructor, Components, ControllerComponent, CoverComponent, DEFAULTS, DirectionComponent, DragComponent, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_END_INDEX_CHANGED, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_OVERFLOW, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, ElementsComponent, EventMap, FADE, Head, KeyboardComponent, LOOP, LTR, LayoutComponent, LazyLoadComponent, LiveComponent, MediaComponent, MoveComponent, Options, PaginationComponent, PaginationData, PaginationItem, Push, RTL, RequestInterval, RequestIntervalInterface, Resolve, ResponsiveOptions, SLIDE, STATUS_CLASSES, ScrollComponent, Shift, ShiftN, SlideComponent, SlidesComponent, Splide, SplideRenderer, State, StateObject, SyncComponent, SyncTarget, TTB, Throttle, ThrottleInstance, TransitionComponent, WheelComponent, Splide as default };
+export { AnyFunction, ArrowsComponent, AutoplayComponent, BaseComponent, CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_CLONE, CLASS_CONTAINER, CLASS_FOCUS_IN, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_OVERFLOW, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SPINNER, CLASS_SR, CLASS_TOGGLE, CLASS_TOGGLE_PAUSE, CLASS_TOGGLE_PLAY, CLASS_TRACK, CLASS_VISIBLE, Cast, ClonesComponent, ComponentConstructor, Components, ControllerComponent, CoverComponent, DEFAULTS, DirectionComponent, DragComponent, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_END_INDEX_CHANGED, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_OVERFLOW, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, ElementsComponent, EventMap, FADE, Head, KeyboardComponent, LOOP, LTR, LayoutComponent, LazyLoadComponent, LiveComponent, MediaComponent, MoveComponent, Options, PaginationComponent, PaginationData, PaginationItem, Push, RTL, Resolve, ResponsiveOptions, SLIDE, STATUS_CLASSES, ScrollComponent, Shift, ShiftN, SlideComponent, SlidesComponent, Splide, SplideRenderer, SyncComponent, SyncTarget, TTB, TransitionComponent, WheelComponent, Splide as default };
