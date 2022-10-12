@@ -6,11 +6,12 @@ import { EVENT_DESTROY, EVENT_MOUNTED, EVENT_READY, EVENT_REFRESH } from '../../
 import { DATA_ATTRIBUTE } from '../../constants/project';
 import { CREATED, DESTROYED, IDLE, STATES } from '../../constants/states';
 import { FADE } from '../../constants/types';
-import { EventInterface, EventInterfaceObject, State, StateObject } from '../../constructors';
+import { State, StateObject } from '../../constructors';
 import { Fade, Slide } from '../../transitions';
 import { AnyFunction, ComponentConstructor, Components, EventMap, Options, SyncTarget } from '../../types';
 import { addClass, assert, assign, empty, forOwn, getAttribute, isString, merge, query, slice } from '../../utils';
 import { ARIA_LABEL, ARIA_LABELLEDBY } from '../../constants/attributes';
+import { EventInterface } from '@splidejs/utils';
 
 
 /**
@@ -37,7 +38,7 @@ export class Splide {
   /**
    * The EventBusObject object.
    */
-  readonly event: EventInterfaceObject = EventInterface();
+  readonly event = EventInterface();
 
   /**
    * The collection of all component objects.
@@ -121,7 +122,7 @@ export class Splide {
     const Constructors = assign( {}, ComponentConstructors, this._E, { Transition: this._T } );
 
     forOwn( Constructors, ( Component, key ) => {
-      const component = Component( this, Components, this._o );
+      const component = Component( this, Components, this._o, this.event.create() );
       Components[ key ] = component;
       component.setup && component.setup();
     } );
@@ -146,8 +147,8 @@ export class Splide {
    *
    * @example
    * ```ts
-   * var primary   = new Splide();
-   * var secondary = new Splide();
+   * const primary   = new Splide();
+   * const secondary = new Splide();
    *
    * primary.sync( secondary );
    * primary.mount();
@@ -187,7 +188,7 @@ export class Splide {
    *
    * @example
    * ```ts
-   * var splide = new Splide();
+   * const splide = new Splide();
    *
    * // Goes to the slide 1:
    * splide.go( 1 );
@@ -216,7 +217,7 @@ export class Splide {
    *
    * @example
    * ```ts
-   * var splide = new Splide();
+   * const splide = new Splide();
    *
    * // Listens to a single event:
    * splide.on( 'move', function() {} );
@@ -246,7 +247,7 @@ export class Splide {
    *
    * @example
    * ```ts
-   * var splide = new Splide();
+   * const splide = new Splide();
    *
    * // Removes all handlers assigned to "move":
    * splide.off( 'move' );
@@ -255,12 +256,13 @@ export class Splide {
    * splide.off( 'move.myNamespace' );
    * ```
    *
-   * @param events - An event name or names separated by spaces. Use a dot(.) to append a namespace.
+   * @param events   - An event name or names separated by spaces. Use a dot(.) to append a namespace.
+   * @param callback - A callback function to remove.
    *
    * @return `this`
    */
-  off<K extends keyof EventMap>( events: K | K[] | string | string[] ): this {
-    this.event.off( events );
+  off<K extends keyof EventMap>( events: K | K[] | string | string[], callback: AnyFunction ): this {
+    this.event.off( events, callback );
     return this;
   }
 
@@ -285,7 +287,7 @@ export class Splide {
    *
    * @example
    * ```ts
-   * var splide = new Splide();
+   * const splide = new Splide();
    * splide.mount();
    *
    * // Adds the slide by the HTML:
@@ -349,7 +351,7 @@ export class Splide {
 
     if ( state.is( CREATED ) ) {
       // Postpones destruction requested before the slider becomes ready.
-      EventInterface( this ).on( EVENT_READY, this.destroy.bind( this, completely ) );
+      this.on( EVENT_READY, this.destroy.bind( this, completely ) );
     } else {
       forOwn( this._C, component => {
         component.destroy && component.destroy( completely );

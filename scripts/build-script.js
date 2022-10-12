@@ -1,5 +1,6 @@
 import { rollup } from 'rollup';
 import esbuild from 'rollup-plugin-esbuild';
+import resolve from '@rollup/plugin-node-resolve';
 import { minify } from './plugins/minify.js';
 import { BANNER } from './constants/banner.js';
 import fs from 'fs/promises';
@@ -14,6 +15,7 @@ async function buildScript( compress, type = 'default' ) {
   const bundle = await rollup( {
     input: `./src/js/build/${ type }.ts`,
     plugins: [
+      resolve(),
       esbuild( { minify: false } ),
       compress ? minify() : false,
     ],

@@ -10,7 +10,6 @@ import {
   EVENT_SCROLLED,
   EVENT_UPDATED,
 } from '../../constants/events';
-import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import {
@@ -28,6 +27,7 @@ import {
   setAttribute,
 } from '../../utils';
 import { PATH, SIZE, XML_NAME_SPACE } from './path';
+import { EventInterface } from '@splidejs/utils';
 
 
 /**
@@ -50,11 +50,16 @@ export interface ArrowsComponent extends BaseComponent {
  * @param Splide     - A Splide instance.
  * @param Components - A collection of components.
  * @param options    - Options.
+ * @param event      - An EventInterface instance.
  *
  * @return An Arrows component object.
  */
-export function Arrows( Splide: Splide, Components: Components, options: Options ): ArrowsComponent {
-  const event = EventInterface( Splide );
+export function Arrows(
+  Splide: Splide,
+  Components: Components,
+  options: Options,
+  event: EventInterface
+): ArrowsComponent {
   const { on, bind, emit } = event;
   const { classes, i18n } = options;
   const { Elements, Controller } = Components;

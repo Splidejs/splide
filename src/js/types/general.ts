@@ -1,6 +1,7 @@
 import { Splide } from '../core/Splide/Splide';
 import { Components } from './components';
 import { Options } from './options';
+import { EventInterface } from '@splidejs/utils';
 
 
 /**
@@ -15,7 +16,8 @@ export type AnyFunction = ( ...args: any[] ) => any;
  *
  * @since 3.0.0
  */
-export type ComponentConstructor = ( Splide: Splide, Components: Components, options: Options ) => BaseComponent;
+export type ComponentConstructor = ( Splide: Splide, Components: Components, options: Options, event: EventInterface )
+  => BaseComponent;
 
 /**
  * The interface for any component.

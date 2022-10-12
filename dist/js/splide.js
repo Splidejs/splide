@@ -29,6 +29,120 @@
     DESTROYED
   };
 
+  function x(n) {
+    n.length = 0;
+  }
+  const D = Array.prototype;
+  function m(n, t, e) {
+    return D.slice.call(n, t, e);
+  }
+  function a(n) {
+    return n.bind(null, ...m(arguments, 1));
+  }
+  function p(n, t) {
+    return typeof t === n;
+  }
+  function g(n) {
+    return !q(n) && p("object", n);
+  }
+  const $ = Array.isArray; a(p, "function"); const h = a(p, "string"); a(p, "boolean"); a(p, "undefined");
+  function q(n) {
+    return n === null;
+  }
+  function L(n) {
+    return $(n) ? n : [n];
+  }
+  function d(n, t) {
+    L(n).forEach(t);
+  }
+  const b = Object.assign, A = Object.keys;
+  function O(n, t, e) {
+    return n && (e ? A(n).reverse() : A(n)).forEach((i) => {
+      i !== "__proto__" && t(n[i], i);
+    }), n;
+  }
+  function rn(n) {
+    let t = "";
+    return O(n, (e, i) => {
+      t += e || e === 0 ? ` ${i}${e !== true ? `="${e}"` : ""}` : "";
+    }), t.trim();
+  }
+  function _() {
+    return m(arguments).reduce((n, t) => `${n} ${$(t) ? _(...t) : t || ""}`.trim(), "");
+  }
+  function on(n, t) {
+    return t = $(t) || !g(t) ? { class: _(t) } : t, `<${`${n} ${t ? rn(t) : ""}`.trim()}>`;
+  }
+  a(on, "div");
+  function C(n, t) {
+    d(n, (e) => {
+      h(e) && e.split(" ").forEach(t);
+    });
+  }
+  function S(n, t) {
+    const e = [];
+    for (let i = n.length - 1; i >= 0; i--)
+      t(n[i]) && e.push(...n.splice(i, 1));
+    return e;
+  }
+  function H(n) {
+    const t = n || [], e = n ? {} : void 0;
+    function i(o, f, u, c) {
+      C(f, (s) => {
+        o.addEventListener(s, u, c), t.push([o.removeEventListener.bind(o, s, u, c), e]);
+      });
+    }
+    function r() {
+      e ? S(t, (o) => o[1] === e).forEach((o) => {
+        o[0]();
+      }) : (t.forEach((o) => {
+        o[0]();
+      }), x(t));
+    }
+    return {
+      bind: i,
+      create: a(H, t),
+      destroy: r
+    };
+  }
+  function v(n) {
+    const t = n || [], e = n ? {} : void 0;
+    function i(u, c) {
+      C(u, (s) => {
+        t.push([s, c, e]);
+      });
+    }
+    function r(u, c) {
+      C(u, (s) => {
+        S(t, (l) => l[0] === s && (!c || l[1] === c) && l[2] === e);
+      });
+    }
+    function o(u, ...c) {
+      t.slice().forEach((s) => {
+        s[0] === u && s[1](...c);
+      });
+    }
+    function f() {
+      e ? S(t, (u) => u[2] === e) : x(t);
+    }
+    return {
+      on: i,
+      off: r,
+      emit: o,
+      create: a(v, t),
+      destroy: f
+    };
+  }
+  function fn(n = H(), t = v()) {
+    function e() {
+      return fn(n.create(), t.create());
+    }
+    function i() {
+      n.destroy(), t.destroy();
+    }
+    return b({}, n, t, { create: e, destroy: i });
+  }
+
   function empty(array) {
     array.length = 0;
   }
@@ -314,63 +428,6 @@
     return `${prefix}${pad(ids[prefix] = (ids[prefix] || 0) + 1)}`;
   }
 
-  function EventBinder() {
-    let listeners = [];
-    function bind(targets, events, callback, options) {
-      forEachEvent(targets, events, (target, event, namespace) => {
-        const isEventTarget = "addEventListener" in target;
-        const remover = isEventTarget ? target.removeEventListener.bind(target, event, callback, options) : target["removeListener"].bind(target, callback);
-        isEventTarget ? target.addEventListener(event, callback, options) : target["addListener"](callback);
-        listeners.push([target, event, namespace, callback, remover]);
-      });
-    }
-    function unbind(targets, events, callback) {
-      forEachEvent(targets, events, (target, event, namespace) => {
-        listeners = listeners.filter((listener) => {
-          if (listener[0] === target && listener[1] === event && listener[2] === namespace && (!callback || listener[3] === callback)) {
-            listener[4]();
-            return false;
-          }
-          return true;
-        });
-      });
-    }
-    function dispatch(target, type, detail) {
-      let e;
-      const bubbles = true;
-      if (typeof CustomEvent === "function") {
-        e = new CustomEvent(type, { bubbles, detail });
-      } else {
-        e = document.createEvent("CustomEvent");
-        e.initCustomEvent(type, bubbles, false, detail);
-      }
-      target.dispatchEvent(e);
-      return e;
-    }
-    function forEachEvent(targets, events, iteratee) {
-      forEach(targets, (target) => {
-        target && forEach(events, (events2) => {
-          events2.split(" ").forEach((eventNS) => {
-            const fragment = eventNS.split(".");
-            iteratee(target, fragment[0], fragment[1]);
-          });
-        });
-      });
-    }
-    function destroy() {
-      listeners.forEach((data) => {
-        data[4]();
-      });
-      empty(listeners);
-    }
-    return {
-      bind,
-      unbind,
-      dispatch,
-      destroy
-    };
-  }
-
   const EVENT_MOUNTED = "mounted";
   const EVENT_READY = "ready";
   const EVENT_MOVE = "move";
@@ -404,110 +461,11 @@
   const EVENT_SHIFTED = "sh";
   const EVENT_END_INDEX_CHANGED = "ei";
 
-  function EventInterface(Splide2) {
-    const bus = Splide2 ? Splide2.event.bus : document.createDocumentFragment();
-    const binder = EventBinder();
-    function on(events, callback) {
-      binder.bind(bus, toArray(events).join(" "), (e) => {
-        callback.apply(callback, isArray(e.detail) ? e.detail : []);
-      });
-    }
-    function emit(event) {
-      binder.dispatch(bus, event, slice(arguments, 1));
-    }
-    if (Splide2) {
-      Splide2.event.on(EVENT_DESTROY, binder.destroy);
-    }
-    return assign(binder, {
-      bus,
-      on,
-      off: apply(binder.unbind, bus),
-      emit
-    });
-  }
-
-  function RequestInterval(interval, onInterval, onUpdate, limit) {
-    const { now } = Date;
-    let startTime;
-    let rate = 0;
-    let id;
-    let paused = true;
-    let count = 0;
-    function update() {
-      if (!paused) {
-        rate = interval ? min((now() - startTime) / interval, 1) : 1;
-        onUpdate && onUpdate(rate);
-        if (rate >= 1) {
-          onInterval();
-          startTime = now();
-          if (limit && ++count >= limit) {
-            return pause();
-          }
-        }
-        id = raf(update);
-      }
-    }
-    function start(resume) {
-      resume || cancel();
-      startTime = now() - (resume ? rate * interval : 0);
-      paused = false;
-      id = raf(update);
-    }
-    function pause() {
-      paused = true;
-    }
-    function rewind() {
-      startTime = now();
-      rate = 0;
-      if (onUpdate) {
-        onUpdate(rate);
-      }
-    }
-    function cancel() {
-      id && cancelAnimationFrame(id);
-      rate = 0;
-      id = 0;
-      paused = true;
-    }
-    function set(time) {
-      interval = time;
-    }
-    function isPaused() {
-      return paused;
-    }
-    return {
-      start,
-      rewind,
-      pause,
-      cancel,
-      set,
-      isPaused
-    };
-  }
-
-  function State(initialState) {
-    let state = initialState;
-    function set(value) {
-      state = value;
-    }
-    function is(states) {
-      return includes(toArray(states), state);
-    }
-    return { set, is };
-  }
-
-  function Throttle(func, duration) {
-    const interval = RequestInterval(duration || 0, func, null, 1);
-    return () => {
-      interval.isPaused() && interval.start();
-    };
-  }
-
   function Media(Splide2, Components2, options) {
     const { state } = Splide2;
     const breakpoints = options.breakpoints || {};
     const reducedMotion = options.reducedMotion || {};
-    const binder = EventBinder();
+    const binder = H();
     const queries = [];
     function setup() {
       const isMin = options.mediaQuery === "min";
@@ -697,8 +655,8 @@
   const POINTER_MOVE_EVENTS = "touchmove mousemove";
   const POINTER_UP_EVENTS = "touchend touchcancel mouseup click";
 
-  function Elements(Splide2, Components2, options) {
-    const { on, bind } = EventInterface(Splide2);
+  function Elements(Splide2, Components2, options, event) {
+    const { on, bind } = event;
     const { root } = Splide2;
     const { i18n } = options;
     const elements = {};
@@ -796,7 +754,7 @@
   const FADE = "fade";
 
   function Slide$1(Splide2, index, slideIndex, slide) {
-    const event = EventInterface(Splide2);
+    const event = Splide2.event.create();
     const { on, emit, bind } = event;
     const { Components, root, options } = Splide2;
     const { isNavigation, updateOnMove, i18n, pagination, slideFocus } = options;
@@ -922,8 +880,8 @@
     return self;
   }
 
-  function Slides(Splide2, Components2, options) {
-    const { on, emit, bind } = EventInterface(Splide2);
+  function Slides(Splide2, Components2, options, event) {
+    const { on, emit, bind } = event;
     const { slides, list } = Components2.Elements;
     const Slides2 = [];
     function mount() {
@@ -1035,8 +993,85 @@
     };
   }
 
-  function Layout(Splide2, Components2, options) {
-    const { on, bind, emit } = EventInterface(Splide2);
+  function RequestInterval(interval, onInterval, onUpdate, limit) {
+    const { now } = Date;
+    let startTime;
+    let rate = 0;
+    let id;
+    let paused = true;
+    let count = 0;
+    function update() {
+      if (!paused) {
+        rate = interval ? min((now() - startTime) / interval, 1) : 1;
+        onUpdate && onUpdate(rate);
+        if (rate >= 1) {
+          onInterval();
+          startTime = now();
+          if (limit && ++count >= limit) {
+            return pause();
+          }
+        }
+        id = raf(update);
+      }
+    }
+    function start(resume) {
+      resume || cancel();
+      startTime = now() - (resume ? rate * interval : 0);
+      paused = false;
+      id = raf(update);
+    }
+    function pause() {
+      paused = true;
+    }
+    function rewind() {
+      startTime = now();
+      rate = 0;
+      if (onUpdate) {
+        onUpdate(rate);
+      }
+    }
+    function cancel() {
+      id && cancelAnimationFrame(id);
+      rate = 0;
+      id = 0;
+      paused = true;
+    }
+    function set(time) {
+      interval = time;
+    }
+    function isPaused() {
+      return paused;
+    }
+    return {
+      start,
+      rewind,
+      pause,
+      cancel,
+      set,
+      isPaused
+    };
+  }
+
+  function State(initialState) {
+    let state = initialState;
+    function set(value) {
+      state = value;
+    }
+    function is(states) {
+      return includes(toArray(states), state);
+    }
+    return { set, is };
+  }
+
+  function Throttle(func, duration) {
+    const interval = RequestInterval(duration || 0, func, null, 1);
+    return () => {
+      interval.isPaused() && interval.start();
+    };
+  }
+
+  function Layout(Splide2, Components2, options, event) {
+    const { on, bind, emit } = event;
     const { Slides } = Components2;
     const { resolve } = Components2.Direction;
     const { root, track, list } = Components2.Elements;
@@ -1141,8 +1176,7 @@
   }
 
   const MULTIPLIER = 2;
-  function Clones(Splide2, Components2, options) {
-    const event = EventInterface(Splide2);
+  function Clones(Splide2, Components2, options, event) {
     const { on } = event;
     const { Elements, Slides } = Components2;
     const { resolve } = Components2.Direction;
@@ -1212,8 +1246,8 @@
     };
   }
 
-  function Move(Splide2, Components2, options) {
-    const { on, emit } = EventInterface(Splide2);
+  function Move(Splide2, Components2, options, event) {
+    const { on, emit } = event;
     const { set } = Splide2.state;
     const { slideSize, getPadding, totalSize, listSize, sliderSize } = Components2.Layout;
     const { resolve, orient } = Components2.Direction;
@@ -1337,8 +1371,8 @@
     };
   }
 
-  function Controller(Splide2, Components2, options) {
-    const { on, emit } = EventInterface(Splide2);
+  function Controller(Splide2, Components2, options, event) {
+    const { on, emit } = event;
     const { Move } = Components2;
     const { getPosition, getLimit, toPosition } = Move;
     const { isEnough, getLength } = Components2.Slides;
@@ -1516,8 +1550,7 @@
   const PATH = "m15.5 0.932-4.3 4.38 14.5 14.6-14.5 14.5 4.3 4.4 14.6-14.6 4.4-4.3-4.4-4.4-14.6-14.6z";
   const SIZE = 40;
 
-  function Arrows(Splide2, Components2, options) {
-    const event = EventInterface(Splide2);
+  function Arrows(Splide2, Components2, options, event) {
     const { on, bind, emit } = event;
     const { classes, i18n } = options;
     const { Elements, Controller } = Components2;
@@ -1607,8 +1640,8 @@
 
   const INTERVAL_DATA_ATTRIBUTE = `${DATA_ATTRIBUTE}-interval`;
 
-  function Autoplay(Splide2, Components2, options) {
-    const { on, bind, emit } = EventInterface(Splide2);
+  function Autoplay(Splide2, Components2, options, event) {
+    const { on, bind, emit } = event;
     const interval = RequestInterval(options.interval, Splide2.go.bind(Splide2, ">"), onAnimationFrame);
     const { isPaused } = interval;
     const { Elements, Elements: { root, toggle } } = Components2;
@@ -1690,8 +1723,8 @@
     };
   }
 
-  function Cover(Splide2, Components2, options) {
-    const { on } = EventInterface(Splide2);
+  function Cover(Splide2, Components2, options, event) {
+    const { on } = event;
     function mount() {
       if (options.cover) {
         on(EVENT_LAZYLOAD_LOADED, apply(toggle, true));
@@ -1722,8 +1755,8 @@
   const BASE_VELOCITY = 1.5;
   const MIN_DURATION = 800;
 
-  function Scroll(Splide2, Components2, options) {
-    const { on, emit } = EventInterface(Splide2);
+  function Scroll(Splide2, Components2, options, event) {
+    const { on, emit } = event;
     const { state: { set } } = Splide2;
     const { Move } = Components2;
     const { getPosition, getLimit, exceededLimit, translate } = Move;
@@ -1794,8 +1827,9 @@
 
   const SCROLL_LISTENER_OPTIONS = { passive: false, capture: true };
 
-  function Drag(Splide2, Components2, options) {
-    const { on, emit, bind, unbind } = EventInterface(Splide2);
+  function Drag(Splide2, Components2, options, event) {
+    const { on, emit, bind } = event;
+    const binder = event.create();
     const { state } = Splide2;
     const { Move, Scroll, Controller, Elements: { track }, Media: { reduce } } = Components2;
     const { resolve, orient } = Components2.Direction;
@@ -1831,8 +1865,8 @@
             target = isTouch ? track : window;
             dragging = state.is([MOVING, SCROLLING]);
             prevBaseEvent = null;
-            bind(target, POINTER_MOVE_EVENTS, onPointerMove, SCROLL_LISTENER_OPTIONS);
-            bind(target, POINTER_UP_EVENTS, onPointerUp, SCROLL_LISTENER_OPTIONS);
+            binder.bind(target, POINTER_MOVE_EVENTS, onPointerMove, SCROLL_LISTENER_OPTIONS);
+            binder.bind(target, POINTER_UP_EVENTS, onPointerUp, SCROLL_LISTENER_OPTIONS);
             Move.cancel();
             Scroll.cancel();
             save(e);
@@ -1873,8 +1907,7 @@
         move(e);
         prevent(e);
       }
-      unbind(target, POINTER_MOVE_EVENTS, onPointerMove);
-      unbind(target, POINTER_UP_EVENTS, onPointerUp);
+      binder.destroy();
       dragging = false;
     }
     function onClick(e) {
@@ -1976,8 +2009,8 @@
   }
 
   const KEYBOARD_EVENT = "keydown";
-  function Keyboard(Splide2, Components2, options) {
-    const { on, bind, unbind } = EventInterface(Splide2);
+  function Keyboard(Splide2, Components2, options, event) {
+    const { on, bind, destroy } = event;
     const { root } = Splide2;
     const { resolve } = Components2.Direction;
     let target;
@@ -1994,9 +2027,6 @@
         target = keyboard === "global" ? window : root;
         bind(target, KEYBOARD_EVENT, onKeydown);
       }
-    }
-    function destroy() {
-      unbind(target, KEYBOARD_EVENT);
     }
     function disable(value) {
       disabled = value;
@@ -2029,8 +2059,8 @@
   const SRCSET_DATA_ATTRIBUTE = `${SRC_DATA_ATTRIBUTE}-srcset`;
   const IMAGE_SELECTOR = `[${SRC_DATA_ATTRIBUTE}], [${SRCSET_DATA_ATTRIBUTE}]`;
 
-  function LazyLoad(Splide2, Components2, options) {
-    const { on, off, bind, emit } = EventInterface(Splide2);
+  function LazyLoad(Splide2, Components2, options, event) {
+    const { on, off, bind, emit } = event;
     const isSequential = options.lazyLoad === "sequential";
     const events = [EVENT_MOVED, EVENT_SCROLLED];
     let entries = [];
@@ -2103,8 +2133,7 @@
     };
   }
 
-  function Pagination(Splide2, Components2, options) {
-    const event = EventInterface(Splide2);
+  function Pagination(Splide2, Components2, options, event) {
     const { on, emit, bind } = event;
     const { Slides, Elements, Controller } = Components2;
     const { hasFocus, getIndex, go } = Controller;
@@ -2217,7 +2246,7 @@
   }
 
   const TRIGGER_KEYS = [" ", "Enter"];
-  function Sync(Splide2, Components2, options) {
+  function Sync(Splide2, Components2, options, event) {
     const { isNavigation, slideFocus } = options;
     const events = [];
     function mount() {
@@ -2232,8 +2261,8 @@
       }
     }
     function destroy() {
-      events.forEach((event) => {
-        event.destroy();
+      events.forEach((event2) => {
+        event2.destroy();
       });
       empty(events);
     }
@@ -2242,23 +2271,27 @@
       mount();
     }
     function sync(splide, target) {
-      const event = EventInterface(splide);
-      event.on(EVENT_MOVE, (index, prev, dest) => {
+      const event2 = splide.event.create();
+      event2.on(EVENT_MOVE, (index, prev, dest) => {
         target.go(target.is(LOOP) ? dest : index);
       });
-      events.push(event);
+      events.push(event2);
     }
     function navigate() {
-      const event = EventInterface(Splide2);
-      const { on } = event;
+      const ev = event.create();
+      const { on } = ev;
       on(EVENT_CLICK, onClick);
       on(EVENT_SLIDE_KEYDOWN, onKeydown);
       on([EVENT_MOUNTED, EVENT_UPDATED], update);
-      events.push(event);
-      event.emit(EVENT_NAVIGATION_MOUNTED, Splide2.splides);
+      events.push(ev);
+      ev.emit(EVENT_NAVIGATION_MOUNTED, Splide2.splides);
     }
     function update() {
-      setAttribute(Components2.Elements.list, ARIA_ORIENTATION, options.direction === TTB ? "vertical" : "");
+      setAttribute(
+        Components2.Elements.list,
+        ARIA_ORIENTATION,
+        options.direction === TTB ? "vertical" : ""
+      );
     }
     function onClick(Slide) {
       Splide2.go(Slide.index);
@@ -2281,12 +2314,11 @@
     };
   }
 
-  function Wheel(Splide2, Components2, options) {
-    const { bind } = EventInterface(Splide2);
+  function Wheel(Splide2, Components2, options, event) {
     let lastTime = 0;
     function mount() {
       if (options.wheel) {
-        bind(Components2.Elements.track, "wheel", onWheel, SCROLL_LISTENER_OPTIONS);
+        event.bind(Components2.Elements.track, "wheel", onWheel, SCROLL_LISTENER_OPTIONS);
       }
     }
     function onWheel(e) {
@@ -2312,8 +2344,8 @@
   }
 
   const SR_REMOVAL_DELAY = 90;
-  function Live(Splide2, Components2, options) {
-    const { on } = EventInterface(Splide2);
+  function Live(Splide2, Components2, options, event) {
+    const { on } = event;
     const { track } = Components2.Elements;
     const enabled = options.live && !options.isNavigation;
     const sr = create("span", CLASS_SR);
@@ -2420,10 +2452,10 @@
     }
   };
 
-  function Fade(Splide2, Components2, options) {
+  function Fade(Splide2, Components2, options, event) {
     const { Slides } = Components2;
     function mount() {
-      EventInterface(Splide2).on([EVENT_MOUNTED, EVENT_REFRESH], init);
+      event.on([EVENT_MOUNTED, EVENT_REFRESH], init);
     }
     function init() {
       Slides.forEach((Slide) => {
@@ -2441,13 +2473,13 @@
     };
   }
 
-  function Slide(Splide2, Components2, options) {
+  function Slide(Splide2, Components2, options, event) {
     const { Move, Controller, Scroll } = Components2;
     const { list } = Components2.Elements;
     const transition = apply(style, list, "transition");
     let endCallback;
     function mount() {
-      EventInterface(Splide2).bind(list, "transitionend", (e) => {
+      event.bind(list, "transitionend", (e) => {
         if (e.target === list && endCallback) {
           cancel();
           endCallback();
@@ -2497,7 +2529,7 @@
     static defaults = {};
     static STATES = STATES;
     root;
-    event = EventInterface();
+    event = fn();
     Components = {};
     state = State(CREATED);
     splides = [];
@@ -2529,7 +2561,7 @@
       this._E = Extensions || this._E;
       const Constructors = assign({}, ComponentConstructors, this._E, { Transition: this._T });
       forOwn(Constructors, (Component, key) => {
-        const component = Component(this, Components2, this._o);
+        const component = Component(this, Components2, this._o, this.event.create());
         Components2[key] = component;
         component.setup && component.setup();
       });
@@ -2559,8 +2591,8 @@
       this.event.on(events, callback);
       return this;
     }
-    off(events) {
-      this.event.off(events);
+    off(events, callback) {
+      this.event.off(events, callback);
       return this;
     }
     emit(event) {
@@ -2585,7 +2617,7 @@
     destroy(completely = true) {
       const { event, state } = this;
       if (state.is(CREATED)) {
-        EventInterface(this).on(EVENT_READY, this.destroy.bind(this, completely));
+        this.on(EVENT_READY, this.destroy.bind(this, completely));
       } else {
         forOwn(this._C, (component) => {
           component.destroy && component.destroy(completely);

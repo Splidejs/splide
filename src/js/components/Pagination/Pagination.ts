@@ -19,7 +19,6 @@ import {
   EVENT_SCROLLED,
   EVENT_UPDATED,
 } from '../../constants/events';
-import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import {
@@ -39,6 +38,7 @@ import {
   slice,
 } from '../../utils';
 import { normalizeKey } from '../../utils/dom/normalizeKey/normalizeKey';
+import { EventInterface } from '@splidejs/utils';
 
 
 /**
@@ -76,17 +76,21 @@ export interface PaginationItem {
 /**
  * The component for the pagination UI (a slide picker).
  *
- * @link https://www.w3.org/TR/2021/NOTE-wai-aria-practices-1.2-20211129/#grouped-carousel-elements
  * @since 3.0.0
  *
  * @param Splide     - A Splide instance.
  * @param Components - A collection of components.
  * @param options    - Options.
+ * @param event      - An EventInterface instance.
  *
  * @return A Pagination component object.
  */
-export function Pagination( Splide: Splide, Components: Components, options: Options ): PaginationComponent {
-  const event = EventInterface( Splide );
+export function Pagination(
+  Splide: Splide,
+  Components: Components,
+  options: Options,
+  event: EventInterface
+): PaginationComponent {
   const { on, emit, bind } = event;
   const { Slides, Elements, Controller } = Components;
   const { hasFocus, getIndex, go } = Controller;

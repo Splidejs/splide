@@ -9,10 +9,10 @@ import {
 } from '../../constants/events';
 import { IDLE, MOVING } from '../../constants/states';
 import { FADE, LOOP, SLIDE } from '../../constants/types';
-import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, BaseComponent, Components, Options, TransitionComponent } from '../../types';
 import { abs, ceil, clamp, isUndefined, rect, style } from '../../utils';
+import { EventInterface } from '@splidejs/utils';
 
 
 /**
@@ -44,11 +44,17 @@ export interface MoveComponent extends BaseComponent {
  * @param Splide     - A Splide instance.
  * @param Components - A collection of components.
  * @param options    - Options.
+ * @param event      - An EventInterface instance.
  *
  * @return A Move component object.
  */
-export function Move( Splide: Splide, Components: Components, options: Options ): MoveComponent {
-  const { on, emit } = EventInterface( Splide );
+export function Move(
+  Splide: Splide,
+  Components: Components,
+  options: Options,
+  event: EventInterface
+): MoveComponent {
+  const { on, emit } = event;
   const { set } = Splide.state;
   const { slideSize, getPadding, totalSize, listSize, sliderSize } = Components.Layout;
   const { resolve, orient } = Components.Direction;

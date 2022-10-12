@@ -1,5 +1,4 @@
 import { EVENT_REFRESH, EVENT_RESIZE } from '../../constants/events';
-import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, BaseComponent, Components, Options } from '../../types';
 import {
@@ -21,6 +20,7 @@ import {
   toArray,
 } from '../../utils';
 import { Slide, SlideComponent } from './Slide';
+import { EventInterface } from '@splidejs/utils';
 
 
 /**
@@ -72,11 +72,17 @@ export type SlideMatcher = number | number[] | string | SlidesPredicate;
  * @param Splide     - A Splide instance.
  * @param Components - A collection of components.
  * @param options    - Options.
+ * @param event      - An EventInterface instance.
  *
  * @return An Slides component object.
  */
-export function Slides( Splide: Splide, Components: Components, options: Options ): SlidesComponent {
-  const { on, emit, bind } = EventInterface( Splide );
+export function Slides(
+  Splide: Splide,
+  Components: Components,
+  options: Options,
+  event: EventInterface
+): SlidesComponent {
+  const { on, emit, bind } = event;
   const { slides, list } = Components.Elements;
 
   /**

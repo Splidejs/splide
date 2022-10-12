@@ -1,11 +1,12 @@
 import { TTB } from '../../constants/directions';
 import { EVENT_OVERFLOW, EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_UPDATED } from '../../constants/events';
-import { EventInterface, Throttle } from '../../constructors';
+import { Throttle } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import { abs, apply, assert, isObject, rect, style, toggleClass, unit } from '../../utils';
 import { FADE } from '../../constants/types';
 import { CLASS_OVERFLOW } from '../../constants/classes';
+import { EventInterface } from '@splidejs/utils';
 
 
 /**
@@ -33,11 +34,17 @@ export interface LayoutComponent extends BaseComponent {
  * @param Splide     - A Splide instance.
  * @param Components - A collection of components.
  * @param options    - Options.
+ * @param event      - An EventInterface instance.
  *
  * @return An Layout component object.
  */
-export function Layout( Splide: Splide, Components: Components, options: Options ): LayoutComponent {
-  const { on, bind, emit } = EventInterface( Splide );
+export function Layout(
+  Splide: Splide,
+  Components: Components,
+  options: Options,
+  event: EventInterface
+): LayoutComponent {
+  const { on, bind, emit } = event;
   const { Slides } = Components;
   const { resolve } = Components.Direction;
   const { root, track, list } = Components.Elements;

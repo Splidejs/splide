@@ -1,8 +1,8 @@
 import { SLIDE } from '../../constants/types';
-import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { Components, Options, TransitionComponent } from '../../types';
 import { abs, apply, style } from '../../utils';
+import { EventInterface } from '@splidejs/utils';
 
 
 /**
@@ -13,10 +13,16 @@ import { abs, apply, style } from '../../utils';
  * @param Splide     - A Splide instance.
  * @param Components - A collection of components.
  * @param options    - Options.
+ * @param event      - An EventInterface instance.
  *
  * @return A Transition component object.
  */
-export function Slide( Splide: Splide, Components: Components, options: Options ): TransitionComponent {
+export function Slide(
+  Splide: Splide,
+  Components: Components,
+  options: Options,
+  event: EventInterface
+): TransitionComponent {
   const { Move, Controller, Scroll } = Components;
   const { list } = Components.Elements;
   const transition = apply( style, list, 'transition' );
@@ -30,7 +36,7 @@ export function Slide( Splide: Splide, Components: Components, options: Options 
    * Called when the component is mounted.
    */
   function mount(): void {
-    EventInterface( Splide ).bind( list, 'transitionend', e => {
+    event.bind( list, 'transitionend', e => {
       if ( e.target === list && endCallback ) {
         cancel();
         endCallback();

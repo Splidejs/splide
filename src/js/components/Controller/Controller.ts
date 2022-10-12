@@ -1,10 +1,10 @@
 import { EVENT_END_INDEX_CHANGED, EVENT_REFRESH, EVENT_RESIZED, EVENT_UPDATED } from '../../constants/events';
 import { MOVING, SCROLLING } from '../../constants/states';
 import { LOOP, SLIDE } from '../../constants/types';
-import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, BaseComponent, Components, Options } from '../../types';
 import { apply, approximatelyEqual, between, clamp, floor, isString, isUndefined, min } from '../../utils';
+import { EventInterface } from '@splidejs/utils';
 
 
 /**
@@ -38,11 +38,17 @@ export interface ControllerComponent extends BaseComponent {
  * @param Splide     - A Splide instance.
  * @param Components - A collection of components.
  * @param options    - Options.
+ * @param event      - An EventInterface instance.
  *
  * @return A Controller component object.
  */
-export function Controller( Splide: Splide, Components: Components, options: Options ): ControllerComponent {
-  const { on, emit } = EventInterface( Splide );
+export function Controller(
+  Splide: Splide,
+  Components: Components,
+  options: Options,
+  event: EventInterface
+): ControllerComponent {
+  const { on, emit } = event;
   const { Move } = Components;
   const { getPosition, getLimit, toPosition } = Move;
   const { isEnough, getLength } = Components.Slides;

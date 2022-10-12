@@ -1,11 +1,12 @@
 import { EVENT_MOVE, EVENT_REFRESH, EVENT_SCROLL, EVENT_SCROLLED, EVENT_UPDATED } from '../../constants/events';
 import { IDLE, SCROLLING } from '../../constants/states';
 import { SLIDE } from '../../constants/types';
-import { EventInterface, RequestInterval, RequestIntervalInterface } from '../../constructors';
+import { RequestInterval, RequestIntervalInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, BaseComponent, Components, Options } from '../../types';
 import { abs, apply, approximatelyEqual, floor, max, sign } from '../../utils';
 import { BASE_VELOCITY, BOUNCE_DIFF_THRESHOLD, BOUNCE_DURATION, FRICTION_FACTOR, MIN_DURATION } from './constants';
+import { EventInterface } from '@splidejs/utils';
 
 
 /**
@@ -26,11 +27,17 @@ export interface ScrollComponent extends BaseComponent {
  * @param Splide     - A Splide instance.
  * @param Components - A collection of components.
  * @param options    - Options.
+ * @param event      - An EventInterface instance.
  *
  * @return A Scroll component object.
  */
-export function Scroll( Splide: Splide, Components: Components, options: Options ): ScrollComponent {
-  const { on, emit } = EventInterface( Splide );
+export function Scroll(
+  Splide: Splide,
+  Components: Components,
+  options: Options,
+  event: EventInterface
+): ScrollComponent {
+  const { on, emit } = event;
   const { state: { set } } = Splide;
   const { Move } = Components;
   const { getPosition, getLimit, exceededLimit, translate } = Move;

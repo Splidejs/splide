@@ -1,10 +1,11 @@
 import { ARIA_ATOMIC, ARIA_BUSY, ARIA_LIVE } from '../../constants/attributes';
 import { CLASS_SR } from '../../constants/classes';
 import { EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_MOVED, EVENT_SCROLLED } from '../../constants/events';
-import { EventInterface, RequestInterval } from '../../constructors';
+import { RequestInterval } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import { append, apply, create, remove, removeAttribute, setAttribute } from '../../utils';
+import { EventInterface } from '@splidejs/utils';
 
 
 /**
@@ -31,11 +32,17 @@ const SR_REMOVAL_DELAY = 90;
  * @param Splide     - A Splide instance.
  * @param Components - A collection of components.
  * @param options    - Options.
+ * @param event      - An EventInterface instance.
  *
  * @return A Live component object.
  */
-export function Live( Splide: Splide, Components: Components, options: Options ): LiveComponent {
-  const { on } = EventInterface( Splide );
+export function Live(
+  Splide: Splide,
+  Components: Components,
+  options: Options,
+  event: EventInterface
+): LiveComponent {
+  const { on } = event;
   const { track } = Components.Elements;
 
   /**

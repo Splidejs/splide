@@ -1,8 +1,8 @@
 import { EVENT_MOUNTED, EVENT_REFRESH } from '../../constants/events';
-import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { Components, Options, TransitionComponent } from '../../types';
 import { nextTick, noop } from '../../utils';
+import { EventInterface } from '@splidejs/utils';
 
 
 /**
@@ -13,17 +13,23 @@ import { nextTick, noop } from '../../utils';
  * @param Splide     - A Splide instance.
  * @param Components - A collection of components.
  * @param options    - Options.
+ * @param event      - An EventInterface instance.
  *
  * @return A Transition component object.
  */
-export function Fade( Splide: Splide, Components: Components, options: Options ): TransitionComponent {
+export function Fade(
+  Splide: Splide,
+  Components: Components,
+  options: Options,
+  event: EventInterface
+): TransitionComponent {
   const { Slides } = Components;
 
   /**
    * Called when the component is mounted.
    */
   function mount(): void {
-    EventInterface( Splide ).on( [ EVENT_MOUNTED, EVENT_REFRESH ], init );
+    event.on( [ EVENT_MOUNTED, EVENT_REFRESH ], init );
   }
 
   /**

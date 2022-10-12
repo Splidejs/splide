@@ -31,7 +31,6 @@ import {
 } from '../../constants/events';
 import { MOVING, SCROLLING } from '../../constants/states';
 import { FADE, LOOP } from '../../constants/types';
-import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent } from '../../types';
 import {
@@ -85,7 +84,7 @@ export interface  SlideComponent extends BaseComponent {
  * @return A Slide subcomponent.
  */
 export function Slide( Splide: Splide, index: number, slideIndex: number, slide: HTMLElement ): SlideComponent {
-  const event = EventInterface( Splide );
+  const event = Splide.event.create();
   const { on, emit, bind } = event;
   const { Components, root, options } = Splide;
   const { isNavigation, updateOnMove, i18n, pagination, slideFocus } = options;

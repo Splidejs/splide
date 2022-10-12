@@ -6,7 +6,6 @@ import {
   EVENT_RESIZE,
   EVENT_SCROLLED,
 } from '../../constants/events';
-import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import {
@@ -25,6 +24,7 @@ import {
 } from '../../utils';
 import { SlideComponent } from '../Slides/Slide';
 import { IMAGE_SELECTOR, SRC_DATA_ATTRIBUTE, SRCSET_DATA_ATTRIBUTE } from './constants';
+import { EventInterface } from '@splidejs/utils';
 
 
 /**
@@ -53,11 +53,17 @@ type LazyLoadEntry = [ HTMLImageElement, SlideComponent, HTMLSpanElement ];
  * @param Splide     - A Splide instance.
  * @param Components - A collection of components.
  * @param options    - Options.
+ * @param event      - An EventInterface instance.
  *
  * @return An LazyLoad component object.
  */
-export function LazyLoad( Splide: Splide, Components: Components, options: Options ): LazyLoadComponent {
-  const { on, off, bind, emit } = EventInterface( Splide );
+export function LazyLoad(
+  Splide: Splide,
+  Components: Components,
+  options: Options,
+  event: EventInterface
+): LazyLoadComponent {
+  const { on, off, bind, emit } = event;
   const isSequential = options.lazyLoad === 'sequential';
   const events       = [ EVENT_MOVED, EVENT_SCROLLED ];
 

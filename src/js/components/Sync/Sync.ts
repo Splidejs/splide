@@ -9,12 +9,12 @@ import {
   EVENT_UPDATED,
 } from '../../constants/events';
 import { LOOP } from '../../constants/types';
-import { EventInterface, EventInterfaceObject } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import { apply, empty, includes, isUndefined, prevent, setAttribute } from '../../utils';
 import { normalizeKey } from '../../utils/dom/normalizeKey/normalizeKey';
 import { SlideComponent } from '../Slides/Slide';
+import { EventInterface } from '@splidejs/utils';
 
 
 /**
@@ -41,16 +41,22 @@ const TRIGGER_KEYS = [ ' ', 'Enter' ];
  * @param Splide     - A Splide instance.
  * @param Components - A collection of components.
  * @param options    - Options.
+ * @param event      - An EventInterface object.
  *
  * @return A Sync component object.
  */
-export function Sync( Splide: Splide, Components: Components, options: Options ): SyncComponent {
+export function Sync(
+  Splide: Splide,
+  Components: Components,
+  options: Options,
+  event: EventInterface
+): SyncComponent {
   const { isNavigation, slideFocus } = options;
 
   /**
    * Stores event objects.
    */
-  const events: EventInterfaceObject[] = [];
+  const events: EventInterface[] = []; // todo
 
   /**
    * Called when the component is mounted.
@@ -93,7 +99,7 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
    * @param target - A target splide instance.
    */
   function sync( splide: Splide, target: Splide ): void {
-    const event = EventInterface( splide );
+    const event = splide.event.create();
 
     event.on( EVENT_MOVE, ( index, prev, dest ) => {
       target.go( target.is( LOOP ) ? dest : index );
@@ -107,22 +113,26 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
    * Note that the direction of `menu` is implicitly `vertical` as default.
    */
   function navigate(): void {
-    const event = EventInterface( Splide );
-    const { on } = event;
+    const ev = event.create();
+    const { on } = ev;
 
     on( EVENT_CLICK, onClick );
     on( EVENT_SLIDE_KEYDOWN, onKeydown );
     on( [ EVENT_MOUNTED, EVENT_UPDATED ], update );
 
-    events.push( event );
-    event.emit( EVENT_NAVIGATION_MOUNTED, Splide.splides );
+    events.push( ev );
+    ev.emit( EVENT_NAVIGATION_MOUNTED, Splide.splides );
   }
 
   /**
    * Update attributes.
    */
   function update(): void {
-    setAttribute( Components.Elements.list, ARIA_ORIENTATION, options.direction === TTB ? 'vertical' : '' );
+    setAttribute(
+      Components.Elements.list,
+      ARIA_ORIENTATION,
+      options.direction === TTB ? 'vertical' : ''
+    );
   }
 
   /**

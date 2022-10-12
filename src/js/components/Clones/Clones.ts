@@ -1,9 +1,9 @@
 import { EVENT_REFRESH, EVENT_RESIZE, EVENT_UPDATED } from '../../constants/events';
 import { LOOP } from '../../constants/types';
-import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import { addClass, append, before, ceil, empty, isUndefined, pad, push, rect, remove } from '../../utils';
+import { EventInterface } from '@splidejs/utils';
 
 
 /**
@@ -29,11 +29,16 @@ export const MULTIPLIER = 2;
  * @param Splide     - A Splide instance.
  * @param Components - A collection of components.
  * @param options    - Options.
+ * @param event      - An EventInterface instance.
  *
  * @return A Clones component object.
  */
-export function Clones( Splide: Splide, Components: Components, options: Options ): ClonesComponent {
-  const event = EventInterface( Splide );
+export function Clones(
+  Splide: Splide,
+  Components: Components,
+  options: Options,
+  event: EventInterface
+): ClonesComponent {
   const { on } = event;
   const { Elements, Slides } = Components;
   const { resolve } = Components.Direction;

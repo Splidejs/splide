@@ -5,7 +5,6 @@ import { DEFAULTS } from '../../constants/defaults';
 import { TTB } from '../../constants/directions';
 import { EVENT_MOUNTED } from '../../constants/events';
 import { LOOP, SLIDE } from '../../constants/types';
-import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { Options } from '../../types';
 import {
@@ -42,7 +41,7 @@ export class SplideRenderer {
    * @param splide - A Splide instance.
    */
   static clean( splide: Splide ): void {
-    const { on } = EventInterface( splide );
+    const { on } = splide.event;
     const { root } = splide;
     const clones = queryAll( root, `.${ CLASS_CLONE }` );
 

@@ -16,7 +16,6 @@ import {
 } from '../../constants/classes';
 import { EVENT_REFRESH, EVENT_UPDATED } from '../../constants/events';
 import { PROJECT_CODE } from '../../constants/project';
-import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import {
@@ -38,6 +37,7 @@ import {
 } from '../../utils';
 import { closest } from '../../utils/dom/closest/closest';
 import { POINTER_DOWN_EVENTS } from '../Drag/constants';
+import { EventInterface } from '@splidejs/utils';
 
 
 /**
@@ -74,11 +74,17 @@ export interface ElementsComponent extends BaseComponent, ElementCollection {
  * @param Splide     - A Splide instance.
  * @param Components - A collection of components.
  * @param options    - Options.
+ * @param event      - An EventInterface instance.
  *
  * @return An Elements component object.
  */
-export function Elements( Splide: Splide, Components: Components, options: Options ): ElementsComponent {
-  const { on, bind } = EventInterface( Splide );
+export function Elements(
+  Splide: Splide,
+  Components: Components,
+  options: Options,
+  event: EventInterface
+): ElementsComponent {
+  const { on, bind } = event;
   const { root } = Splide;
   const { i18n } = options;
   const elements: ElementCollection = {} as ElementCollection;

@@ -1,5 +1,6 @@
 import { rollup } from 'rollup';
 import esbuild from 'rollup-plugin-esbuild';
+import resolve from '@rollup/plugin-node-resolve';
 import { BANNER } from './constants/banner.js';
 
 
@@ -9,6 +10,7 @@ function buildModule( type ) {
   return rollup( {
     input: './src/js/index.ts',
     plugins: [
+      resolve(),
       esbuild(),
     ],
   } ).then( bundle => {

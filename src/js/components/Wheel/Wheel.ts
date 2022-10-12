@@ -1,9 +1,9 @@
 import { SCROLL_LISTENER_OPTIONS } from '../../constants/listener-options';
 import { MOVING } from '../../constants/states';
-import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import { abs, prevent, timeOf } from '../../utils';
+import { EventInterface } from '@splidejs/utils';
 
 
 /**
@@ -22,12 +22,16 @@ export interface WheelComponent extends BaseComponent {
  * @param Splide     - A Splide instance.
  * @param Components - A collection of components.
  * @param options    - Options.
+ * @param event      - An EventInterface instance.
  *
  * @return A Wheel component object.
  */
-export function Wheel( Splide: Splide, Components: Components, options: Options ): WheelComponent {
-  const { bind } = EventInterface( Splide );
-
+export function Wheel(
+  Splide: Splide,
+  Components: Components,
+  options: Options,
+  event: EventInterface
+): WheelComponent {
   /**
    * Holds the last time when the wheel moves the slider.
    */
@@ -38,7 +42,7 @@ export function Wheel( Splide: Splide, Components: Components, options: Options 
    */
   function mount(): void {
     if ( options.wheel ) {
-      bind( Components.Elements.track, 'wheel', onWheel, SCROLL_LISTENER_OPTIONS );
+      event.bind( Components.Elements.track, 'wheel', onWheel, SCROLL_LISTENER_OPTIONS );
     }
   }
 

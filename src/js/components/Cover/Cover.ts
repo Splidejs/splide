@@ -1,9 +1,9 @@
 import { EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_REFRESH, EVENT_UPDATED } from '../../constants/events';
-import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import { apply, child, display } from '../../utils';
 import { SlideComponent } from '../Slides/Slide';
+import { EventInterface } from '@splidejs/utils';
 
 
 /**
@@ -22,11 +22,17 @@ export interface CoverComponent extends BaseComponent {
  * @param Splide     - A Splide instance.
  * @param Components - A collection of components.
  * @param options    - Options.
+ * @param event      - An EventInterface instance.
  *
  * @return A Cover component object.
  */
-export function Cover( Splide: Splide, Components: Components, options: Options ): CoverComponent {
-  const { on } = EventInterface( Splide );
+export function Cover(
+  Splide: Splide,
+  Components: Components,
+  options: Options,
+  event: EventInterface
+): CoverComponent {
+  const { on } = event;
 
   /**
    * Called when the component is mounted.

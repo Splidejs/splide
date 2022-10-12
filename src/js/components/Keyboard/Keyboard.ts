@@ -1,10 +1,10 @@
 import { ARROW_LEFT, ARROW_RIGHT } from '../../constants/arrows';
 import { EVENT_MOVE, EVENT_UPDATED } from '../../constants/events';
-import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import { nextTick } from '../../utils';
 import { normalizeKey } from '../../utils/dom/normalizeKey/normalizeKey';
+import { EventInterface } from '@splidejs/utils';
 
 
 /**
@@ -31,11 +31,17 @@ const KEYBOARD_EVENT = 'keydown';
  * @param Splide     - A Splide instance.
  * @param Components - A collection of components.
  * @param options    - Options.
+ * @param event      - An EventInterface instance.
  *
  * @return A Keyboard component object.
  */
-export function Keyboard( Splide: Splide, Components: Components, options: Options ): KeyboardComponent {
-  const { on, bind, unbind } = EventInterface( Splide );
+export function Keyboard(
+  Splide: Splide,
+  Components: Components,
+  options: Options,
+  event: EventInterface
+): KeyboardComponent {
+  const { on, bind, destroy } = event;
   const { root } = Splide;
   const { resolve } = Components.Direction;
 
@@ -69,13 +75,6 @@ export function Keyboard( Splide: Splide, Components: Components, options: Optio
       target = keyboard === 'global' ? window : root;
       bind( target, KEYBOARD_EVENT, onKeydown );
     }
-  }
-
-  /**
-   * Destroys the component.
-   */
-  function destroy(): void {
-    unbind( target, KEYBOARD_EVENT );
   }
 
   /**

@@ -3,11 +3,11 @@ import { EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_MOUNTED, EVENT_UPDATED
 import { SCROLL_LISTENER_OPTIONS } from '../../constants/listener-options';
 import { DRAGGING, IDLE, MOVING, SCROLLING } from '../../constants/states';
 import { FADE, LOOP, SLIDE } from '../../constants/types';
-import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
 import { abs, isObject, matches, min, noop, prevent, sign, timeOf } from '../../utils';
 import { FRICTION, LOG_INTERVAL, POINTER_DOWN_EVENTS, POINTER_MOVE_EVENTS, POINTER_UP_EVENTS } from './constants';
+import { EventBinder, EventInterface } from '@splidejs/utils';
 
 
 /**
@@ -28,11 +28,18 @@ export interface DragComponent extends BaseComponent {
  * @param Splide     - A Splide instance.
  * @param Components - A collection of components.
  * @param options    - Options.
+ * @param event      - An EventInterface instance.
  *
  * @return A Drag component object.
  */
-export function Drag( Splide: Splide, Components: Components, options: Options ): DragComponent {
-  const { on, emit, bind, unbind } = EventInterface( Splide );
+export function Drag(
+  Splide: Splide,
+  Components: Components,
+  options: Options,
+  event: EventInterface
+): DragComponent {
+  const { on, emit, bind } = event;
+  const binder = event.create();
   const { state } = Splide;
   const { Move, Scroll, Controller, Elements: { track }, Media: { reduce } } = Components;
   const { resolve, orient } = Components.Direction;
@@ -125,8 +132,8 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
           dragging      = state.is( [ MOVING, SCROLLING ] );
           prevBaseEvent = null;
 
-          bind( target, POINTER_MOVE_EVENTS, onPointerMove, SCROLL_LISTENER_OPTIONS );
-          bind( target, POINTER_UP_EVENTS, onPointerUp, SCROLL_LISTENER_OPTIONS );
+          binder.bind( target, POINTER_MOVE_EVENTS, onPointerMove, SCROLL_LISTENER_OPTIONS );
+          binder.bind( target, POINTER_UP_EVENTS, onPointerUp, SCROLL_LISTENER_OPTIONS );
           Move.cancel();
           Scroll.cancel();
           save( e );
@@ -188,8 +195,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
       prevent( e );
     }
 
-    unbind( target, POINTER_MOVE_EVENTS, onPointerMove );
-    unbind( target, POINTER_UP_EVENTS, onPointerUp );
+    binder.destroy();
     dragging = false;
   }
 
