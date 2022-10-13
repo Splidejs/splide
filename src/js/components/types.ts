@@ -9,7 +9,6 @@ export type { MoveComponent }       from './Move/Move';
 export type { ControllerComponent } from './Controller/Controller';
 export type { ArrowsComponent }     from './Arrows/Arrows';
 export type { AutoplayComponent }   from './Autoplay/Autoplay';
-export type { CoverComponent }      from './Cover/Cover';
 export type { ScrollComponent }     from './Scroll/Scroll';
 export type { DragComponent }       from './Drag/Drag';
 export type { KeyboardComponent }   from './Keyboard/Keyboard';

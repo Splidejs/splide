@@ -1195,8 +1195,7 @@
       const shifted = orient(shift(getPosition(), backwards));
       return backwards ? shifted >= padding : shifted <= list[resolve("scrollWidth")] - tn(track)[resolve("width")] + padding;
     }
-    function exceededLimit(max, position) {
-      position = Z(position) ? getPosition() : position;
+    function exceededLimit(max, position = getPosition()) {
       const exceededMin = max !== true && orient(position) < orient(getLimit(false));
       const exceededMax = max !== false && orient(position) > orient(getLimit(true));
       return exceededMin || exceededMax;
@@ -1568,32 +1567,6 @@
       play,
       pause,
       isPaused
-    };
-  }
-
-  function Cover(Splide2, Components2, options, event) {
-    const { on } = event;
-    function mount() {
-      if (options.cover) {
-        on(EVENT_LAZYLOAD_LOADED, a(toggle, true));
-        on([EVENT_MOUNTED, EVENT_UPDATED, EVENT_REFRESH], a(cover, true));
-      }
-    }
-    function cover(cover2) {
-      Components2.Slides.forEach((Slide) => {
-        const img = Y(Slide.container || Slide.slide, "img");
-        if (img && img.src) {
-          toggle(cover2, img, Slide);
-        }
-      });
-    }
-    function toggle(cover2, img, Slide) {
-      Slide.style("background", cover2 ? `center/cover no-repeat url("${img.src}")` : "", true);
-      An(img, cover2 ? "none" : "");
-    }
-    return {
-      mount,
-      destroy: a(cover, false)
     };
   }
 
@@ -2233,7 +2206,6 @@
     Controller: Controller,
     Arrows: Arrows,
     Autoplay: Autoplay,
-    Cover: Cover,
     Scroll: Scroll,
     Drag: Drag,
     Keyboard: Keyboard,
@@ -2372,14 +2344,14 @@
     _C;
     _E = {};
     _T;
-    constructor(target, options) {
+    constructor(target, options = {}) {
       const root = p(target) ? On(document, target) : target;
       assert(root, `${root} is invalid.`);
       this.root = root;
       options = k({
         label: wn(root, ARIA_LABEL) || "",
         labelledby: wn(root, ARIA_LABELLEDBY) || ""
-      }, DEFAULTS, Splide.defaults, options || {});
+      }, DEFAULTS, Splide.defaults, options);
       try {
         k(options, JSON.parse(wn(root, DATA_ATTRIBUTE)));
       } catch (e) {
@@ -2387,13 +2359,13 @@
       }
       this._o = Object.create(k({}, options));
     }
-    mount(Extensions, Transition) {
+    mount(Extensions = this._E, Transition = this._T) {
       const { state, Components: Components2 } = this;
       assert(state.is([CREATED, DESTROYED]), "Already mounted!");
       state.set(CREATED);
       this._C = Components2;
-      this._T = Transition || this._T || (this.is(FADE) ? Fade : Slide);
-      this._E = Extensions || this._E;
+      this._T = Transition || (this.is(FADE) ? Fade : Slide);
+      this._E = Extensions;
       const Constructors = v({}, ComponentConstructors, this._E, { Transition: this._T });
       L(Constructors, (Component, key) => {
         const component = Component(this, Components2, this._o, this.event.create());
@@ -2430,8 +2402,8 @@
       this.event.off(events, callback);
       return this;
     }
-    emit(event) {
-      this.event.emit(event, ...F(arguments, 1));
+    emit(event, ...args) {
+      this.event.emit(event, ...args);
       return this;
     }
     add(slides, index) {

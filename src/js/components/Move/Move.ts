@@ -11,7 +11,7 @@ import { IDLE, MOVING } from '../../constants/states';
 import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { Splide } from '../../core/Splide/Splide';
 import { AnyFunction, BaseComponent, Components, Options, TransitionComponent } from '../../types';
-import { abs, ceil, clamp, EventInterface, isUndefined, rect, style } from '@splidejs/utils';
+import { abs, ceil, clamp, EventInterface, rect, style } from '@splidejs/utils';
 
 
 /**
@@ -289,8 +289,7 @@ export function Move(
    *
    * @return `true` if the position exceeds the limit, or otherwise `false`.
    */
-  function exceededLimit( max?: boolean | undefined, position?: number ): boolean {
-    position = isUndefined( position ) ? getPosition() : position;
+  function exceededLimit( max?: boolean | undefined, position = getPosition() ): boolean {
     const exceededMin = max !== true && orient( position ) < orient( getLimit( false ) );
     const exceededMax = max !== false && orient( position ) > orient( getLimit( true ) );
     return exceededMin || exceededMax;

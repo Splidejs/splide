@@ -92,7 +92,7 @@ export class Splide {
    * @param target  - The selector for the target element, or the element itself.
    * @param options - Optional. An object with options.
    */
-  constructor( target: string | HTMLElement, options?: Options ) {
+  constructor( target: string | HTMLElement, options: Options = {} ) {
     const root = isString( target ) ? query<HTMLElement>( document, target ) : target;
     assert( root, `${ root } is invalid.` );
 
@@ -101,7 +101,7 @@ export class Splide {
     options = merge( {
       label     : getAttribute( root, ARIA_LABEL ) || '',
       labelledby: getAttribute( root, ARIA_LABELLEDBY ) || '',
-    }, DEFAULTS, Splide.defaults, options || {} );
+    }, DEFAULTS, Splide.defaults, options );
 
     try {
       merge( options, JSON.parse( getAttribute( root, DATA_ATTRIBUTE ) ) );
@@ -120,15 +120,15 @@ export class Splide {
    *
    * @return `this`
    */
-  mount( Extensions?: Record<string, ComponentConstructor>, Transition?: ComponentConstructor ): this {
+  mount( Extensions: Record<string, ComponentConstructor> = this._E, Transition: ComponentConstructor = this._T ): this {
     const { state, Components } = this;
     assert( state.is( [ CREATED, DESTROYED ] ), 'Already mounted!' );
 
     state.set( CREATED );
 
     this._C = Components;
-    this._T = Transition || this._T || ( this.is( FADE ) ? Fade : Slide );
-    this._E = Extensions || this._E;
+    this._T = Transition || ( this.is( FADE ) ? Fade : Slide );
+    this._E = Extensions;
 
     const Constructors = assign( {}, ComponentConstructors, this._E, { Transition: this._T } );
 
@@ -287,9 +287,8 @@ export class Splide {
    */
   emit<K extends keyof EventMap>( event: K, ...args: Parameters<EventMap[ K ]> ): this;
   emit( event: string, ...args: any[] ): this;
-  emit( event: string ): this {
-    // eslint-disable-next-line prefer-rest-params, prefer-spread
-    this.event.emit( event, ...slice( arguments, 1 ) );
+  emit( event: string, ...args: any[] ): this {
+    this.event.emit( event, ...args );
     return this;
   }
 

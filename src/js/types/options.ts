@@ -133,12 +133,6 @@ export interface Options extends ResponsiveOptions {
   direction?: 'ltr' | 'rtl' | 'ttb';
 
   /**
-   * Converts the image `src` to the css `background-image` URL of the parent element.
-   * This requires `fixedHeight` or `heightRatio` option.
-   */
-  cover?: boolean;
-
-  /**
    * Determines whether to add `tabindex="0"` to visible slides or not.
    */
   slideFocus?: boolean;

@@ -8,7 +8,6 @@ export { Move }       from './Move/Move';
 export { Controller } from './Controller/Controller';
 export { Arrows }     from './Arrows/Arrows';
 export { Autoplay }   from './Autoplay/Autoplay';
-export { Cover }      from './Cover/Cover';
 export { Scroll }     from './Scroll/Scroll';
 export { Drag }       from './Drag/Drag';
 export { Keyboard }   from './Keyboard/Keyboard';
