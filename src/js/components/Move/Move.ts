@@ -215,7 +215,7 @@ export function Move(
    */
   function toPosition( index: number, trimming?: boolean ): number {
     const Slide    = Slides.getAt( index );
-    const position = Slide ? orient( Slide.pos - offset( index ) ) : 0;
+    const position = Slide ? orient( Slide.pos() - offset( index ) ) : 0;
     return trimming ? trim( position ) : position;
   }
 

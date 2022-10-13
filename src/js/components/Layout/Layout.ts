@@ -206,7 +206,7 @@ export function Layout(
    */
   function slideSize( index = 0, withoutGap?: boolean ): number {
     const Slide = getAt( index );
-    return ( Slide ? Slide.size : 0 ) + ( withoutGap ? 0 : getGap() );
+    return ( Slide ? Slide.size() : 0 ) + ( withoutGap ? 0 : getGap() );
   }
 
   /**
@@ -220,7 +220,7 @@ export function Layout(
    */
   function totalSize( index: number, withoutGap?: boolean ): number {
     const Slide = getAt( index );
-    return Slide ? Slide.pos + Slide.size + ( withoutGap ? 0 : getGap() ) : 0;
+    return Slide ? Slide.pos() + Slide.size() + ( withoutGap ? 0 : getGap() ) : 0;
   }
 
   /**
@@ -244,7 +244,7 @@ export function Layout(
   function getGap(): number {
     const first  = getAt( 0 );
     const second = getAt( 1 );
-    return first && second ? second.pos - first.pos - first.size : 0;
+    return first && second ? second.pos() - first.pos() - first.size() : 0;
   }
 
   /**

@@ -68,10 +68,10 @@ export interface  SlideComponent extends BaseComponent {
   readonly slide: HTMLElement;
   readonly container: HTMLElement;
   readonly isClone: boolean;
-  readonly pos: number;
-  readonly size: number;
 
   update(): void;
+  pos(): number;
+  size(): number;
   style( prop: CSSProperties, value: string | number, useContainer?: boolean ): void
   isWithin( from: number, distance: number ): boolean;
 }
@@ -93,6 +93,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   const { on, emit, bind } = event;
   const { Components, root, options } = Splide;
   const { isNavigation, updateOnMove, i18n, pagination, slideFocus } = options;
+  const { Elements } = Components;
   const { resolve } = Components.Direction;
   const styles    = getAttribute( slide, 'style' );
   const label     = getAttribute( slide, ARIA_LABEL );
@@ -254,7 +255,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
       return isActive();
     }
 
-    const trackRect = rect( Components.Elements.track );
+    const trackRect = rect( Elements.track );
     const slideRect = rect( slide );
     const left      = resolve( 'left', true );
     const right     = resolve( 'right', true );
@@ -288,7 +289,8 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    * @return The slide position.
    */
   function pos(): number {
-    return abs( rect( slide )[ resolve( 'left' ) ] - rect( Components.Elements.list )[ resolve( 'left' ) ] );
+    const left = resolve( 'left' );
+    return abs( rect( slide )[ left ] - rect( Elements.list )[ left ] );
   }
 
   /**
@@ -300,7 +302,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
     return rect( slide )[ resolve( 'width' ) ];
   }
 
-  const self = define( {
+  const self = {
     index,
     slideIndex,
     slide,
@@ -309,9 +311,11 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
     mount,
     destroy,
     update,
+    pos,
+    size,
     style,
     isWithin,
-  }, { pos, size } );
+  };
 
   return self;
 }

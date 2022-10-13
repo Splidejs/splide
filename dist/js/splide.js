@@ -664,18 +664,12 @@
   const LOOP = "loop";
   const FADE = "fade";
 
-  function define(object, getters) {
-    L(getters, (get, key) => {
-      Object.defineProperty(object, key, { get, enumerable: true });
-    });
-    return object;
-  }
-
   function Slide$1(Splide2, index, slideIndex, slide) {
     const event = Splide2.event.create();
     const { on, emit, bind } = event;
     const { Components, root, options } = Splide2;
     const { isNavigation, updateOnMove, i18n, pagination, slideFocus } = options;
+    const { Elements } = Components;
     const { resolve } = Components.Direction;
     const styles = wn(slide, "style");
     const label = wn(slide, ARIA_LABEL);
@@ -770,7 +764,7 @@
       if (Splide2.is(FADE)) {
         return isActive();
       }
-      const trackRect = tn(Components.Elements.track);
+      const trackRect = tn(Elements.track);
       const slideRect = tn(slide);
       const left = resolve("left", true);
       const right = resolve("right", true);
@@ -784,12 +778,13 @@
       return diff <= distance;
     }
     function pos() {
-      return un(tn(slide)[resolve("left")] - tn(Components.Elements.list)[resolve("left")]);
+      const left = resolve("left");
+      return un(tn(slide)[left] - tn(Elements.list)[left]);
     }
     function size() {
       return tn(slide)[resolve("width")];
     }
-    const self = define({
+    const self = {
       index,
       slideIndex,
       slide,
@@ -798,9 +793,11 @@
       mount,
       destroy,
       update,
+      pos,
+      size,
       style,
       isWithin
-    }, { pos, size });
+    };
     return self;
   }
 
@@ -986,11 +983,11 @@
     }
     function slideSize(index = 0, withoutGap) {
       const Slide = getAt(index);
-      return (Slide ? Slide.size : 0) + (withoutGap ? 0 : getGap());
+      return (Slide ? Slide.size() : 0) + (withoutGap ? 0 : getGap());
     }
     function totalSize(index, withoutGap) {
       const Slide = getAt(index);
-      return Slide ? Slide.pos + Slide.size + (withoutGap ? 0 : getGap()) : 0;
+      return Slide ? Slide.pos() + Slide.size() + (withoutGap ? 0 : getGap()) : 0;
     }
     function sliderSize(withoutGap) {
       return totalSize(Splide2.length - 1) - totalSize(0) + slideSize(0, withoutGap);
@@ -998,7 +995,7 @@
     function getGap() {
       const first = getAt(0);
       const second = getAt(1);
-      return first && second ? second.pos - first.pos - first.size : 0;
+      return first && second ? second.pos() - first.pos() - first.size() : 0;
     }
     function getPadding(right) {
       return parseFloat(nn(
@@ -1173,7 +1170,7 @@
     }
     function toPosition(index, trimming) {
       const Slide = Slides.getAt(index);
-      const position = Slide ? orient(Slide.pos - offset(index)) : 0;
+      const position = Slide ? orient(Slide.pos() - offset(index)) : 0;
       return trimming ? trim(position) : position;
     }
     function getPosition() {
