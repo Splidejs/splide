@@ -173,6 +173,8 @@ interface SlideComponent extends BaseComponent {
     container: HTMLElement;
     isClone: boolean;
     update(): void;
+    position(): number;
+    size(): number;
     style(prop: CSSProperties, value: string | number, useContainer?: boolean): void;
     isWithin(from: number, distance: number): boolean;
 }

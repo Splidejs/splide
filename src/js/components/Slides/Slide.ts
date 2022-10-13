@@ -54,6 +54,7 @@ import {
   style as _style,
   toggleClass,
 } from '@splidejs/utils';
+import { define } from '../../utils/define/define';
 
 
 /**
@@ -62,11 +63,14 @@ import {
  * @since 3.0.0
  */
 export interface  SlideComponent extends BaseComponent {
-  index: number;
-  slideIndex: number;
-  slide: HTMLElement;
-  container: HTMLElement;
-  isClone: boolean;
+  readonly index: number;
+  readonly slideIndex: number;
+  readonly slide: HTMLElement;
+  readonly container: HTMLElement;
+  readonly isClone: boolean;
+  readonly pos: number;
+  readonly size: number;
+
   update(): void;
   style( prop: CSSProperties, value: string | number, useContainer?: boolean ): void
   isWithin( from: number, distance: number ): boolean;
@@ -278,7 +282,25 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
     return diff <= distance;
   }
 
-  const self = {
+  /**
+   * Returns the slide offset position that is relative to the list element.
+   *
+   * @return The slide position.
+   */
+  function pos(): number {
+    return abs( rect( slide )[ resolve( 'left' ) ] - rect( Components.Elements.list )[ resolve( 'left' ) ] );
+  }
+
+  /**
+   * Returns width of the slide in a horizontal carousel, or height in a vertical one.
+   *
+   * @return Width of height of the slide.
+   */
+  function size(): number {
+    return rect( slide )[ resolve( 'width' ) ];
+  }
+
+  const self = define( {
     index,
     slideIndex,
     slide,
@@ -289,7 +311,7 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
     update,
     style,
     isWithin,
-  };
+  }, { pos, size } );
 
   return self;
 }

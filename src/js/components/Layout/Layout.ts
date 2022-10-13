@@ -2,7 +2,7 @@ import { TTB } from '../../constants/directions';
 import { EVENT_OVERFLOW, EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_UPDATED } from '../../constants/events';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { abs, apply, EventInterface, isObject, rect, style, Throttle, toggleClass, unit } from '@splidejs/utils';
+import { apply, EventInterface, isObject, rect, style, Throttle, toggleClass, unit } from '@splidejs/utils';
 import { assert } from '../../utils';
 import { FADE } from '../../constants/types';
 import { CLASS_OVERFLOW } from '../../constants/classes';
@@ -204,11 +204,9 @@ export function Layout(
    *
    * @return The size of the specified slide element in pixel.
    */
-  function slideSize( index?: number, withoutGap?: boolean ): number {
-    const Slide = getAt( index || 0 );
-    return Slide
-      ? rect( Slide.slide )[ resolve( 'width' ) ] + ( withoutGap ? 0 : getGap() )
-      : 0;
+  function slideSize( index = 0, withoutGap?: boolean ): number {
+    const Slide = getAt( index );
+    return ( Slide ? Slide.size : 0 ) + ( withoutGap ? 0 : getGap() );
   }
 
   /**
@@ -222,14 +220,7 @@ export function Layout(
    */
   function totalSize( index: number, withoutGap?: boolean ): number {
     const Slide = getAt( index );
-
-    if ( Slide ) {
-      const right = rect( Slide.slide )[ resolve( 'right' ) ];
-      const left  = rect( list )[ resolve( 'left' ) ];
-      return abs( right - left ) + ( withoutGap ? 0 : getGap() );
-    }
-
-    return 0;
+    return Slide ? Slide.pos + Slide.size + ( withoutGap ? 0 : getGap() ) : 0;
   }
 
   /**
@@ -245,18 +236,22 @@ export function Layout(
   }
 
   /**
-   * Returns the gap value in pixel by using the computed style of the first slide.
+   * Compute the gap by the first and second slides.
+   * This always returns 0 if the number of slides is less than 2.
    *
    * @return The gap value in pixel.
    */
   function getGap(): number {
-    const Slide = getAt( 0 );
-    return Slide && parseFloat( style( Slide.slide, resolve( 'marginRight' ) ) ) || 0;
+    const first  = getAt( 0 );
+    const second = getAt( 1 );
+    return first && second ? second.pos - first.pos - first.size : 0;
   }
 
   /**
    * Returns the padding value.
    * This method resolves the difference of the direction.
+   *
+   * @todo
    *
    * @param right - Determines whether to get `paddingRight/Bottom` or `paddingLeft/Top`.
    *

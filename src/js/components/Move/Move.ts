@@ -55,7 +55,8 @@ export function Move(
 ): MoveComponent {
   const { on, emit } = event;
   const { set } = Splide.state;
-  const { slideSize, getPadding, totalSize, listSize, sliderSize } = Components.Layout;
+  const { Slides } = Components;
+  const { slideSize, getPadding, listSize, sliderSize } = Components.Layout;
   const { resolve, orient } = Components.Direction;
   const { list, track } = Components.Elements;
 
@@ -177,18 +178,20 @@ export function Move(
   /**
    * Returns the closest index to the position.
    *
+   * @todo
+   *
    * @param position - A position to convert.
    *
    * @return The closest index to the position.
    */
   function toIndex( position: number ): number {
-    const Slides = Components.Slides.get();
+    const slides = Slides.get();
 
     let index       = 0;
     let minDistance = Infinity;
 
-    for ( let i = 0; i < Slides.length; i++ ) {
-      const slideIndex = Slides[ i ].index;
+    for ( let i = 0; i < slides.length; i++ ) {
+      const slideIndex = slides[ i ].index;
       const distance   = abs( toPosition( slideIndex, true ) - position );
 
       if ( distance <= minDistance ) {
@@ -211,7 +214,8 @@ export function Move(
    * @return The position corresponding with the index.
    */
   function toPosition( index: number, trimming?: boolean ): number {
-    const position = orient( totalSize( index - 1 ) - offset( index ) );
+    const Slide    = Slides.getAt( index );
+    const position = Slide ? orient( Slide.pos - offset( index ) ) : 0;
     return trimming ? trim( position ) : position;
   }
 
@@ -269,10 +273,12 @@ export function Move(
    * @return `true` if the slider can be shifted for the specified direction, or otherwise `false`.
    */
   function canShift( backwards: boolean ): boolean {
+    const padding = getPadding( false );
     const shifted = orient( shift( getPosition(), backwards ) );
+
     return backwards
-      ? shifted >= 0
-      : shifted <= list[ resolve( 'scrollWidth' ) ] - rect( track )[ resolve( 'width' ) ];
+      ? shifted >= padding
+      : shifted <= list[ resolve( 'scrollWidth' ) ] - rect( track )[ resolve( 'width' ) ] + padding;
   }
 
   /**

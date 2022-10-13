@@ -117,7 +117,10 @@ export function Controller(
     perPage    = options.perPage;
     endIndex   = getEnd();
 
-    const index = clamp( currIndex, 0, omitEnd ? endIndex : slideCount - 1 );
+    const end   = omitEnd ? endIndex : slideCount - 1;
+    const index = clamp( currIndex, 0, end );
+
+    prevIndex = clamp( currIndex, 0, end );
 
     if ( index !== currIndex ) {
       currIndex = index;

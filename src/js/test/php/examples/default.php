@@ -23,16 +23,17 @@ $settings = get_settings();
       var splide = new Splide( '#splide01', {
         width: 800,
         // type        : 'loop',
-        perPage: 2,
+        perPage: 3,
         // perMove: 3,
         // rewind: true,
         // rewindByDrag: true,
-        padding: '3rem',
-        updateOnMove: true,
-        direction: 'ltr',
-        height: undefined,
+        // padding: '3rem',
+        // updateOnMove: true,
+        // direction: 'ltr',
+        // height: undefined,
+        // gap: '30%',
         // paginationDirection: 'ttb',
-        rewindSpeed: 2000,
+        // rewindSpeed: 2000,
         // role: '',
         label: 'Changed Label',
         focus: 0,
@@ -110,7 +111,11 @@ $settings = get_settings();
 </head>
 <body>
 
-<?php render( 'splide01', 5 ); ?>
+<?php render( 'splide01', 10 ); ?>
+
+<div>
+  <div style="margin-right: 1rem">a</div>
+</div>
 
 <pre></pre>
 

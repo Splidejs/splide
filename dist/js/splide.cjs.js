@@ -780,6 +780,12 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     }
     return diff <= distance;
   }
+  function position() {
+    return slide[resolve("offsetLeft")];
+  }
+  function size() {
+    return tn(slide)[resolve("width")];
+  }
   const self = {
     index,
     slideIndex,
@@ -789,6 +795,8 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     mount,
     destroy,
     update,
+    position,
+    size,
     style,
     isWithin
   };
@@ -975,18 +983,13 @@ function Layout(Splide2, Components2, options, event) {
   function listSize() {
     return tn(list)[resolve("width")];
   }
-  function slideSize(index, withoutGap) {
-    const Slide = getAt(index || 0);
-    return Slide ? tn(Slide.slide)[resolve("width")] + (withoutGap ? 0 : getGap()) : 0;
+  function slideSize(index = 0, withoutGap) {
+    const Slide = getAt(index);
+    return (Slide ? Slide.size() : 0) + (withoutGap ? 0 : getGap());
   }
   function totalSize(index, withoutGap) {
     const Slide = getAt(index);
-    if (Slide) {
-      const right = tn(Slide.slide)[resolve("right")];
-      const left = tn(list)[resolve("left")];
-      return un(right - left) + (withoutGap ? 0 : getGap());
-    }
-    return 0;
+    return Slide ? Slide.position() + Slide.size() + (withoutGap ? 0 : getGap()) : 0;
   }
   function sliderSize(withoutGap) {
     return totalSize(Splide2.length - 1) - totalSize(0) + slideSize(0, withoutGap);
@@ -996,10 +999,7 @@ function Layout(Splide2, Components2, options, event) {
     return Slide && parseFloat(nn(Slide.slide, resolve("marginRight"))) || 0;
   }
   function getPadding(right) {
-    return parseFloat(nn(
-      track,
-      resolve(`padding${right ? "Right" : "Left"}`)
-    )) || 0;
+    return list[`offset${right ? "Right" : "Left"}`];
   }
   function isOverflow() {
     return Splide2.is(FADE) || sliderSize(true) > listSize();
@@ -1090,13 +1090,13 @@ function Clones(Splide2, Components2, options, event) {
 function Move(Splide2, Components2, options, event) {
   const { on, emit } = event;
   const { set } = Splide2.state;
-  const { slideSize, getPadding, totalSize, listSize, sliderSize } = Components2.Layout;
+  const { slideSize, getPadding, listSize, sliderSize } = Components2.Layout;
   const { resolve, orient } = Components2.Direction;
   const { list, track } = Components2.Elements;
   let Transition;
   function mount() {
     Transition = Components2.Transition;
-    on([EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition);
+    on([EVENT_RESIZED], reposition);
   }
   function reposition() {
     if (!Components2.Controller.isBusy()) {
@@ -1166,7 +1166,8 @@ function Move(Splide2, Components2, options, event) {
     return index;
   }
   function toPosition(index, trimming) {
-    const position = orient(totalSize(index - 1) - offset(index));
+    const Slide = Components2.Slides.getAt(index);
+    const position = Slide ? orient(Slide.position() - offset(index)) : 0;
     return trimming ? trim(position) : position;
   }
   function getPosition() {
@@ -1454,7 +1455,7 @@ function Arrows(Splide2, Components2, options, event) {
     !placeholder && yn(wrapper, track);
   }
   function createArrow(prev2) {
-    const arrow = `<button class="${classes.arrow} ${prev2 ? classes.prev : classes.next}" type="button"><svg xmlns="${XML_NAME_SPACE}" viewBox="0 0 ${SIZE} ${SIZE}" width="${SIZE}" height="${SIZE}" focusable="false"><path d="${options.arrowPath || PATH}" />`;
+    const arrow = `<button class="${classes.arrow} ${prev2 ? classes.prev : classes.next}" type="button"><svg xmlns="${XML_NAME_SPACE}" viewBox="0 0 ${SIZE} ${SIZE}" width="${SIZE}" height="${SIZE}"><path d="${options.arrowPath || PATH}" />`;
     return qn(arrow);
   }
   function update() {

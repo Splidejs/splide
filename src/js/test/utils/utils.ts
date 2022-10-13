@@ -115,6 +115,8 @@ export function setSlidesRect( slides: HTMLElement[], list: HTMLElement, width: 
         height: height,
         left  : width * index + offsets.left,
         right : width * index + width + offsets.left,
+        top   : height * index + offsets.top,
+        bottom: height * index + width + offsets.top,
       } );
     };
   } );

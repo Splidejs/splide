@@ -664,6 +664,13 @@
   const LOOP = "loop";
   const FADE = "fade";
 
+  function define(object, getters) {
+    L(getters, (get, key) => {
+      Object.defineProperty(object, key, { get, enumerable: true });
+    });
+    return object;
+  }
+
   function Slide$1(Splide2, index, slideIndex, slide) {
     const event = Splide2.event.create();
     const { on, emit, bind } = event;
@@ -776,7 +783,13 @@
       }
       return diff <= distance;
     }
-    const self = {
+    function pos() {
+      return un(tn(slide)[resolve("left")] - tn(Components.Elements.list)[resolve("left")]);
+    }
+    function size() {
+      return tn(slide)[resolve("width")];
+    }
+    const self = define({
       index,
       slideIndex,
       slide,
@@ -787,7 +800,7 @@
       update,
       style,
       isWithin
-    };
+    }, { pos, size });
     return self;
   }
 
@@ -971,25 +984,21 @@
     function listSize() {
       return tn(list)[resolve("width")];
     }
-    function slideSize(index, withoutGap) {
-      const Slide = getAt(index || 0);
-      return Slide ? tn(Slide.slide)[resolve("width")] + (withoutGap ? 0 : getGap()) : 0;
+    function slideSize(index = 0, withoutGap) {
+      const Slide = getAt(index);
+      return (Slide ? Slide.size : 0) + (withoutGap ? 0 : getGap());
     }
     function totalSize(index, withoutGap) {
       const Slide = getAt(index);
-      if (Slide) {
-        const right = tn(Slide.slide)[resolve("right")];
-        const left = tn(list)[resolve("left")];
-        return un(right - left) + (withoutGap ? 0 : getGap());
-      }
-      return 0;
+      return Slide ? Slide.pos + Slide.size + (withoutGap ? 0 : getGap()) : 0;
     }
     function sliderSize(withoutGap) {
       return totalSize(Splide2.length - 1) - totalSize(0) + slideSize(0, withoutGap);
     }
     function getGap() {
-      const Slide = getAt(0);
-      return Slide && parseFloat(nn(Slide.slide, resolve("marginRight"))) || 0;
+      const first = getAt(0);
+      const second = getAt(1);
+      return first && second ? second.pos - first.pos - first.size : 0;
     }
     function getPadding(right) {
       return parseFloat(nn(
@@ -1086,7 +1095,8 @@
   function Move(Splide2, Components2, options, event) {
     const { on, emit } = event;
     const { set } = Splide2.state;
-    const { slideSize, getPadding, totalSize, listSize, sliderSize } = Components2.Layout;
+    const { Slides } = Components2;
+    const { slideSize, getPadding, listSize, sliderSize } = Components2.Layout;
     const { resolve, orient } = Components2.Direction;
     const { list, track } = Components2.Elements;
     let Transition;
@@ -1146,11 +1156,11 @@
       Transition.cancel();
     }
     function toIndex(position) {
-      const Slides = Components2.Slides.get();
+      const slides = Slides.get();
       let index = 0;
       let minDistance = Infinity;
-      for (let i = 0; i < Slides.length; i++) {
-        const slideIndex = Slides[i].index;
+      for (let i = 0; i < slides.length; i++) {
+        const slideIndex = slides[i].index;
         const distance = un(toPosition(slideIndex, true) - position);
         if (distance <= minDistance) {
           minDistance = distance;
@@ -1162,7 +1172,8 @@
       return index;
     }
     function toPosition(index, trimming) {
-      const position = orient(totalSize(index - 1) - offset(index));
+      const Slide = Slides.getAt(index);
+      const position = Slide ? orient(Slide.pos - offset(index)) : 0;
       return trimming ? trim(position) : position;
     }
     function getPosition() {
@@ -1183,8 +1194,9 @@
       return toPosition(max ? Components2.Controller.getEnd() : 0, !!options.trimSpace);
     }
     function canShift(backwards) {
+      const padding = getPadding(false);
       const shifted = orient(shift(getPosition(), backwards));
-      return backwards ? shifted >= 0 : shifted <= list[resolve("scrollWidth")] - tn(track)[resolve("width")];
+      return backwards ? shifted >= padding : shifted <= list[resolve("scrollWidth")] - tn(track)[resolve("width")] + padding;
     }
     function exceededLimit(max, position) {
       position = Z(position) ? getPosition() : position;
@@ -1234,7 +1246,9 @@
       perMove = options.perMove;
       perPage = options.perPage;
       endIndex = getEnd();
-      const index = bn(currIndex, 0, omitEnd ? endIndex : slideCount - 1);
+      const end = omitEnd ? endIndex : slideCount - 1;
+      const index = bn(currIndex, 0, end);
+      prevIndex = bn(currIndex, 0, end);
       if (index !== currIndex) {
         currIndex = index;
         Move.reposition();
@@ -1450,7 +1464,7 @@
       !placeholder && yn(wrapper, track);
     }
     function createArrow(prev2) {
-      const arrow = `<button class="${classes.arrow} ${prev2 ? classes.prev : classes.next}" type="button"><svg xmlns="${XML_NAME_SPACE}" viewBox="0 0 ${SIZE} ${SIZE}" width="${SIZE}" height="${SIZE}" focusable="false"><path d="${options.arrowPath || PATH}" />`;
+      const arrow = `<button class="${classes.arrow} ${prev2 ? classes.prev : classes.next}" type="button"><svg xmlns="${XML_NAME_SPACE}" viewBox="0 0 ${SIZE} ${SIZE}" width="${SIZE}" height="${SIZE}"><path d="${options.arrowPath || PATH}" />`;
       return qn(arrow);
     }
     function update() {
