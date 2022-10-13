@@ -1,4 +1,4 @@
-import * as ComponentConstructors from '../../components';
+import { COMPONENTS } from '../../components';
 import { SlideMatcher } from '../../components/Slides/Slides';
 import { CLASS_INITIALIZED } from '../../constants/classes';
 import { DEFAULTS } from '../../constants/defaults';
@@ -18,7 +18,6 @@ import {
   isString,
   merge,
   query,
-  slice,
   State,
 } from '@splidejs/utils';
 import { assert } from '../../utils';
@@ -130,7 +129,7 @@ export class Splide {
     this._T = Transition || ( this.is( FADE ) ? Fade : Slide );
     this._E = Extensions;
 
-    const Constructors = assign( {}, ComponentConstructors, this._E, { Transition: this._T } );
+    const Constructors = assign( {}, COMPONENTS, this._E, { Transition: this._T } );
 
     forOwn( Constructors, ( Component, key ) => {
       const component = Component( this, Components, this._o, this.event.create() );

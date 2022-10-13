@@ -2151,6 +2151,8 @@
     };
   }
 
+  const VISUALLY_HIDDEN = `border:0;clip:rect(0,0,0,0);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px`;
+
   const SR_REMOVAL_DELAY = 90;
   function Live(Splide2, Components2, options, event) {
     const { on } = event;
@@ -2163,6 +2165,7 @@
         disable(!Components2.Autoplay.isPaused());
         M(track, ARIA_ATOMIC, true);
         sr.textContent = "\u2026";
+        sr.style.cssText = VISUALLY_HIDDEN;
         on(EVENT_AUTOPLAY_PLAY, a(disable, true));
         on(EVENT_AUTOPLAY_PAUSE, a(disable, false));
         on([EVENT_MOVED, EVENT_SCROLLED], a(toggle, true));
@@ -2194,27 +2197,26 @@
     };
   }
 
-  var ComponentConstructors = /*#__PURE__*/Object.freeze({
-    __proto__: null,
-    Media: Media,
-    Direction: Direction,
-    Elements: Elements,
-    Slides: Slides,
-    Layout: Layout,
-    Clones: Clones,
-    Move: Move,
-    Controller: Controller,
-    Arrows: Arrows,
-    Autoplay: Autoplay,
-    Scroll: Scroll,
-    Drag: Drag,
-    Keyboard: Keyboard,
-    LazyLoad: LazyLoad,
-    Pagination: Pagination,
-    Sync: Sync,
-    Wheel: Wheel,
-    Live: Live
-  });
+  const COMPONENTS = {
+    Media,
+    Direction,
+    Elements,
+    Slides,
+    Layout,
+    Clones,
+    Move,
+    Controller,
+    Arrows,
+    Autoplay,
+    Scroll,
+    Drag,
+    Keyboard,
+    LazyLoad,
+    Pagination,
+    Sync,
+    Wheel,
+    Live
+  };
 
   const I18N = {
     prev: "Previous slide",
@@ -2366,7 +2368,7 @@
       this._C = Components2;
       this._T = Transition || (this.is(FADE) ? Fade : Slide);
       this._E = Extensions;
-      const Constructors = v({}, ComponentConstructors, this._E, { Transition: this._T });
+      const Constructors = v({}, COMPONENTS, this._E, { Transition: this._T });
       L(Constructors, (Component, key) => {
         const component = Component(this, Components2, this._o, this.event.create());
         Components2[key] = component;

@@ -251,8 +251,6 @@ export function Layout(
    * Returns the padding value.
    * This method resolves the difference of the direction.
    *
-   * @todo
-   *
    * @param right - Determines whether to get `paddingRight/Bottom` or `paddingLeft/Top`.
    *
    * @return The padding value in pixel.

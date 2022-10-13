@@ -13,6 +13,7 @@ import {
   RequestInterval,
   setAttribute,
 } from '@splidejs/utils';
+import { VISUALLY_HIDDEN } from './constants';
 
 
 /**
@@ -76,7 +77,8 @@ export function Live(
     if ( enabled ) {
       disable( ! Components.Autoplay.isPaused() );
       setAttribute( track, ARIA_ATOMIC, true );
-      sr.textContent = '…';
+      sr.textContent   = '…';
+      sr.style.cssText = VISUALLY_HIDDEN;
 
       on( EVENT_AUTOPLAY_PLAY, apply( disable, true ) );
       on( EVENT_AUTOPLAY_PAUSE, apply( disable, false ) );

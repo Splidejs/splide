@@ -673,6 +673,7 @@ function Slide$1(Splide2, index, slideIndex, slide) {
   const { on, emit, bind } = event;
   const { Components, root, options } = Splide2;
   const { isNavigation, updateOnMove, i18n, pagination, slideFocus } = options;
+  const { Elements } = Components;
   const { resolve } = Components.Direction;
   const styles = wn(slide, "style");
   const label = wn(slide, ARIA_LABEL);
@@ -767,7 +768,7 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     if (Splide2.is(FADE)) {
       return isActive();
     }
-    const trackRect = tn(Components.Elements.track);
+    const trackRect = tn(Elements.track);
     const slideRect = tn(slide);
     const left = resolve("left", true);
     const right = resolve("right", true);
@@ -780,8 +781,9 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     }
     return diff <= distance;
   }
-  function position() {
-    return slide[resolve("offsetLeft")];
+  function pos() {
+    const left = resolve("left");
+    return un(tn(slide)[left] - tn(Elements.list)[left]);
   }
   function size() {
     return tn(slide)[resolve("width")];
@@ -795,7 +797,7 @@ function Slide$1(Splide2, index, slideIndex, slide) {
     mount,
     destroy,
     update,
-    position,
+    pos,
     size,
     style,
     isWithin
@@ -989,17 +991,21 @@ function Layout(Splide2, Components2, options, event) {
   }
   function totalSize(index, withoutGap) {
     const Slide = getAt(index);
-    return Slide ? Slide.position() + Slide.size() + (withoutGap ? 0 : getGap()) : 0;
+    return Slide ? Slide.pos() + Slide.size() + (withoutGap ? 0 : getGap()) : 0;
   }
   function sliderSize(withoutGap) {
     return totalSize(Splide2.length - 1) - totalSize(0) + slideSize(0, withoutGap);
   }
   function getGap() {
-    const Slide = getAt(0);
-    return Slide && parseFloat(nn(Slide.slide, resolve("marginRight"))) || 0;
+    const first = getAt(0);
+    const second = getAt(1);
+    return first && second ? second.pos() - first.pos() - first.size() : 0;
   }
   function getPadding(right) {
-    return list[`offset${right ? "Right" : "Left"}`];
+    return parseFloat(nn(
+      track,
+      resolve(`padding${right ? "Right" : "Left"}`)
+    )) || 0;
   }
   function isOverflow() {
     return Splide2.is(FADE) || sliderSize(true) > listSize();
@@ -1090,13 +1096,14 @@ function Clones(Splide2, Components2, options, event) {
 function Move(Splide2, Components2, options, event) {
   const { on, emit } = event;
   const { set } = Splide2.state;
+  const { Slides } = Components2;
   const { slideSize, getPadding, listSize, sliderSize } = Components2.Layout;
   const { resolve, orient } = Components2.Direction;
   const { list, track } = Components2.Elements;
   let Transition;
   function mount() {
     Transition = Components2.Transition;
-    on([EVENT_RESIZED], reposition);
+    on([EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition);
   }
   function reposition() {
     if (!Components2.Controller.isBusy()) {
@@ -1150,11 +1157,11 @@ function Move(Splide2, Components2, options, event) {
     Transition.cancel();
   }
   function toIndex(position) {
-    const Slides = Components2.Slides.get();
+    const slides = Slides.get();
     let index = 0;
     let minDistance = Infinity;
-    for (let i = 0; i < Slides.length; i++) {
-      const slideIndex = Slides[i].index;
+    for (let i = 0; i < slides.length; i++) {
+      const slideIndex = slides[i].index;
       const distance = un(toPosition(slideIndex, true) - position);
       if (distance <= minDistance) {
         minDistance = distance;
@@ -1166,8 +1173,8 @@ function Move(Splide2, Components2, options, event) {
     return index;
   }
   function toPosition(index, trimming) {
-    const Slide = Components2.Slides.getAt(index);
-    const position = Slide ? orient(Slide.position() - offset(index)) : 0;
+    const Slide = Slides.getAt(index);
+    const position = Slide ? orient(Slide.pos() - offset(index)) : 0;
     return trimming ? trim(position) : position;
   }
   function getPosition() {
@@ -1188,11 +1195,11 @@ function Move(Splide2, Components2, options, event) {
     return toPosition(max ? Components2.Controller.getEnd() : 0, !!options.trimSpace);
   }
   function canShift(backwards) {
+    const padding = getPadding(false);
     const shifted = orient(shift(getPosition(), backwards));
-    return backwards ? shifted >= 0 : shifted <= list[resolve("scrollWidth")] - tn(track)[resolve("width")];
+    return backwards ? shifted >= padding : shifted <= list[resolve("scrollWidth")] - tn(track)[resolve("width")] + padding;
   }
-  function exceededLimit(max, position) {
-    position = Z(position) ? getPosition() : position;
+  function exceededLimit(max, position = getPosition()) {
     const exceededMin = max !== true && orient(position) < orient(getLimit(false));
     const exceededMax = max !== false && orient(position) > orient(getLimit(true));
     return exceededMin || exceededMax;
@@ -1239,7 +1246,9 @@ function Controller(Splide2, Components2, options, event) {
     perMove = options.perMove;
     perPage = options.perPage;
     endIndex = getEnd();
-    const index = bn(currIndex, 0, omitEnd ? endIndex : slideCount - 1);
+    const end = omitEnd ? endIndex : slideCount - 1;
+    const index = bn(currIndex, 0, end);
+    prevIndex = bn(currIndex, 0, end);
     if (index !== currIndex) {
       currIndex = index;
       Move.reposition();
@@ -1562,32 +1571,6 @@ function Autoplay(Splide2, Components2, options, event) {
     play,
     pause,
     isPaused
-  };
-}
-
-function Cover(Splide2, Components2, options, event) {
-  const { on } = event;
-  function mount() {
-    if (options.cover) {
-      on(EVENT_LAZYLOAD_LOADED, a(toggle, true));
-      on([EVENT_MOUNTED, EVENT_UPDATED, EVENT_REFRESH], a(cover, true));
-    }
-  }
-  function cover(cover2) {
-    Components2.Slides.forEach((Slide) => {
-      const img = Y(Slide.container || Slide.slide, "img");
-      if (img && img.src) {
-        toggle(cover2, img, Slide);
-      }
-    });
-  }
-  function toggle(cover2, img, Slide) {
-    Slide.style("background", cover2 ? `center/cover no-repeat url("${img.src}")` : "", true);
-    An(img, cover2 ? "none" : "");
-  }
-  return {
-    mount,
-    destroy: a(cover, false)
   };
 }
 
@@ -2184,6 +2167,7 @@ function Live(Splide2, Components2, options, event) {
       disable(!Components2.Autoplay.isPaused());
       M(track, ARIA_ATOMIC, true);
       sr.textContent = "\u2026";
+      sr.style.cssText = "border: 0; clip: rect(0,0,0,0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px";
       on(EVENT_AUTOPLAY_PLAY, a(disable, true));
       on(EVENT_AUTOPLAY_PAUSE, a(disable, false));
       on([EVENT_MOVED, EVENT_SCROLLED], a(toggle, true));
@@ -2195,7 +2179,6 @@ function Live(Splide2, Components2, options, event) {
       Q(track, sr);
       interval.start();
     } else {
-      en(sr);
       interval.cancel();
     }
   }
@@ -2227,7 +2210,6 @@ var ComponentConstructors = /*#__PURE__*/Object.freeze({
   Controller: Controller,
   Arrows: Arrows,
   Autoplay: Autoplay,
-  Cover: Cover,
   Scroll: Scroll,
   Drag: Drag,
   Keyboard: Keyboard,
@@ -2366,14 +2348,14 @@ class Splide {
   _C;
   _E = {};
   _T;
-  constructor(target, options) {
+  constructor(target, options = {}) {
     const root = p(target) ? On(document, target) : target;
     assert(root, `${root} is invalid.`);
     this.root = root;
     options = k({
       label: wn(root, ARIA_LABEL) || "",
       labelledby: wn(root, ARIA_LABELLEDBY) || ""
-    }, DEFAULTS, Splide.defaults, options || {});
+    }, DEFAULTS, Splide.defaults, options);
     try {
       k(options, JSON.parse(wn(root, DATA_ATTRIBUTE)));
     } catch (e) {
@@ -2381,13 +2363,13 @@ class Splide {
     }
     this._o = Object.create(k({}, options));
   }
-  mount(Extensions, Transition) {
+  mount(Extensions = this._E, Transition = this._T) {
     const { state, Components: Components2 } = this;
     assert(state.is([CREATED, DESTROYED]), "Already mounted!");
     state.set(CREATED);
     this._C = Components2;
-    this._T = Transition || this._T || (this.is(FADE) ? Fade : Slide);
-    this._E = Extensions || this._E;
+    this._T = Transition || (this.is(FADE) ? Fade : Slide);
+    this._E = Extensions;
     const Constructors = v({}, ComponentConstructors, this._E, { Transition: this._T });
     L(Constructors, (Component, key) => {
       const component = Component(this, Components2, this._o, this.event.create());
@@ -2424,8 +2406,8 @@ class Splide {
     this.event.off(events, callback);
     return this;
   }
-  emit(event) {
-    this.event.emit(event, ...F(arguments, 1));
+  emit(event, ...args) {
+    this.event.emit(event, ...args);
     return this;
   }
   add(slides, index) {
