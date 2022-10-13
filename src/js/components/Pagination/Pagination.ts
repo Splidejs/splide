@@ -184,8 +184,6 @@ export function Pagination(
    * Called when the user clicks each pagination dot.
    * Moves the focus to the active slide for accessibility.
    *
-   * @link https://www.w3.org/WAI/tutorials/carousels/functionality/
-   *
    * @param page - A clicked page index.
    */
   function onClick( page: number ): void {
@@ -195,7 +193,7 @@ export function Pagination(
   /**
    * Called when any key is pressed on the pagination.
    *
-   * @link https://www.w3.org/TR/2021/NOTE-wai-aria-practices-1.2-20211129/#keyboard-interaction-21
+   * @link https://www.w3.org/WAI/ARIA/apg/patterns/tabpanel/#keyboard-interaction-21
    *
    * @param page - A page index.
    * @param e    - A KeyboardEvent object.
