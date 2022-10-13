@@ -251,7 +251,9 @@ export function Move(
    */
   function offset( index: number ): number {
     const { focus } = options;
-    return focus === 'center' ? ( listSize() - slideSize( index, true ) ) / 2 : +focus * slideSize( index ) || 0;
+    return focus === 'center'
+      ? ( listSize() - slideSize( index, true ) ) / 2
+      : +focus * slideSize( index ) || 0;
   }
 
   /**
