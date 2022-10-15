@@ -111,7 +111,7 @@ export function Move(
   }
 
   /**
-   * Jumps to the slide at the specified index.
+   * Jumps to the slide at the specified index (silently).
    *
    * @param index - An index to jump to.
    */
@@ -177,8 +177,6 @@ export function Move(
 
   /**
    * Returns the closest index to the position.
-   *
-   * @todo
    *
    * @param position - A position to convert.
    *
