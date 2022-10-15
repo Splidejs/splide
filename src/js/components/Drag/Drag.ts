@@ -40,7 +40,7 @@ export function Drag(
   const { on, emit, bind } = event;
   const binder = event.create();
   const { state } = Splide;
-  const { Move, Scroll, Controller, Elements: { track }, Media: { reduce } } = Components;
+  const { Move, Scroll, Controller, Elements: { track }, Breakpoints: { reduce } } = Components;
   const { resolve, orient } = Components.Direction;
   const { getPosition, exceededLimit } = Move;
 

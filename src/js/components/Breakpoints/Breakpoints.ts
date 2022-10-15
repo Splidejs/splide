@@ -11,7 +11,7 @@ import { EVENT_OVERFLOW, EVENT_UPDATED } from '../../constants/events';
  *
  * @since 4.0.0
  */
-export interface MediaComponent extends BaseComponent {
+export interface BreakpointsComponent extends BaseComponent {
   /** @internal */
   reduce( reduced: boolean ): void;
   set( options: Options, base?: boolean, notify?: boolean ): void;
@@ -33,10 +33,16 @@ const NOT_OVERFLOW_KEY = '!overflow';
  * @param Splide     - A Splide instance.
  * @param Components - A collection of components.
  * @param options    - Options.
+ * @param event      - An EventInterface instance.
  *
  * @return A Media component object.
  */
-export function Media( Splide: Splide, Components: Components, options: Options, event: EventInterface ): MediaComponent {
+export function Breakpoints(
+  Splide: Splide,
+  Components: Components,
+  options: Options,
+  event: EventInterface
+): BreakpointsComponent {
   const { state } = Splide;
   const breakpoints   = options.breakpoints || {};
   const reducedMotion = options.reducedMotion || {};
@@ -151,7 +157,6 @@ export function Media( Splide: Splide, Components: Components, options: Options,
 
   return {
     setup,
-    // mount,
     destroy,
     reduce,
     set,

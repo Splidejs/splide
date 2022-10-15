@@ -90,10 +90,10 @@ export function Scroll(
       destination = Move.toPosition( Components.Controller.toDest( destination % size ) ) + offset;
     }
 
-    const noDistance = approximatelyEqual( from, destination, 1 );
+    const immediately = approximatelyEqual( from, destination, 1 ) || duration === 0;
 
     friction = 1;
-    duration = noDistance ? 0 : duration || max( abs( destination - from ) / BASE_VELOCITY, MIN_DURATION );
+    duration = immediately ? 0 : duration || max( abs( destination - from ) / BASE_VELOCITY, MIN_DURATION );
     callback = onScrolled;
     interval = RequestInterval( duration, onEnd, apply( update, from, destination, noConstrain ), 1 );
 

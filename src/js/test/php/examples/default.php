@@ -22,7 +22,6 @@ $settings = get_settings();
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
         width: 800,
-        start: 1,
         // type        : 'loop',
         perPage: 3,
         // perMove: 3,
@@ -93,6 +92,11 @@ $settings = get_settings();
 
 	    const pre = document.querySelector( 'pre' );
 
+
+      document.querySelector( '#jump' ).addEventListener( 'click', () => {
+        splide.Components.Controller.jump( 5 )
+      } );
+
 	    // Array.from( document.getElementsByTagName( 'button' ) ).forEach( button => {
 			// 	button.addEventListener( 'click', function () {
 			// 		alert( 'click' );
@@ -114,6 +118,10 @@ $settings = get_settings();
 <body>
 
 <?php render( 'splide01', 10 ); ?>
+
+<button id="jump">
+  jump
+</button>
 
 <div>
   <div style="margin-right: 1rem">a</div>

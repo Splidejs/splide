@@ -377,7 +377,7 @@
   const EVENT_END_INDEX_CHANGED = "ei";
 
   const NOT_OVERFLOW_KEY = "!overflow";
-  function Media(Splide2, Components2, options, event) {
+  function Breakpoints(Splide2, Components2, options, event) {
     const { state } = Splide2;
     const breakpoints = options.breakpoints || {};
     const reducedMotion = options.reducedMotion || {};
@@ -1253,7 +1253,7 @@
       endIndex = getEnd();
       const end = omitEnd ? endIndex : slideCount - 1;
       const index = bn(currIndex, 0, end);
-      prevIndex = bn(currIndex, 0, end);
+      prevIndex = index;
       if (index !== currIndex) {
         currIndex = index;
         Move.reposition();
@@ -1273,6 +1273,10 @@
           Move.move(dest, index, prevIndex, callback);
         }
       }
+    }
+    function jump(index) {
+      Move.cancel();
+      scroll(toPosition(index), 0);
     }
     function scroll(destination, duration, snap, callback) {
       Components2.Scroll.scroll(destination, duration, snap, () => {
@@ -1387,6 +1391,7 @@
     return {
       mount,
       go,
+      jump,
       scroll,
       getNext,
       getPrev,
@@ -1606,9 +1611,9 @@
         const offset = In(destination) * size * Dn(un(destination) / size) || 0;
         destination = Move.toPosition(Components2.Controller.toDest(destination % size)) + offset;
       }
-      const noDistance = Mn(from, destination, 1);
+      const immediately = Mn(from, destination, 1) || duration === 0;
       friction = 1;
-      duration = noDistance ? 0 : duration || $(un(destination - from) / BASE_VELOCITY, MIN_DURATION);
+      duration = immediately ? 0 : duration || $(un(destination - from) / BASE_VELOCITY, MIN_DURATION);
       callback = onScrolled;
       interval = sn(duration, onEnd, a(update, from, destination, noConstrain), 1);
       set(SCROLLING);
@@ -1661,7 +1666,7 @@
     const { on, emit, bind } = event;
     const binder = event.create();
     const { state } = Splide2;
-    const { Move, Scroll, Controller, Elements: { track }, Media: { reduce } } = Components2;
+    const { Move, Scroll, Controller, Elements: { track }, Breakpoints: { reduce } } = Components2;
     const { resolve, orient } = Components2.Direction;
     const { getPosition, exceededLimit } = Move;
     let basePosition;
@@ -2121,7 +2126,7 @@
     }
     return {
       setup: a(
-        Components2.Media.set,
+        Components2.Breakpoints.set,
         { slideFocus: Z(slideFocus) ? isNavigation : slideFocus },
         true
       ),
@@ -2207,7 +2212,7 @@
   }
 
   const COMPONENTS = {
-    Media,
+    Breakpoints,
     Direction,
     Elements,
     Slides,
@@ -2451,7 +2456,7 @@
       return this._o;
     }
     set options(options) {
-      this._C.Media.set(options, true, true);
+      this._C.Breakpoints.set(options, true, true);
     }
     get length() {
       return this._C.Slides.getLength(true);

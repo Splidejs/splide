@@ -2,7 +2,7 @@ import { DESTROYED } from '../../../constants/states';
 import { init } from '../../../test';
 
 
-describe( 'Media', () => {
+describe( 'Breakpoints', () => {
   beforeAll( () => {
     window.matchMedia = () => ( {
       matches            : true, // All queries match the media string.
@@ -35,7 +35,7 @@ describe( 'Media', () => {
 
   test( 'can enable or disable `reducedMotion` option by `reduce()`.', () => {
     const splide = init( { speed: 1000, rewindSpeed: 2000, autoplay: true } );
-    const { reduce } = splide.Components.Media;
+    const { reduce } = splide.Components.Breakpoints;
 
     expect( splide.options.speed ).toBe( 0 );
     expect( splide.options.rewindSpeed ).toBe( 0 );

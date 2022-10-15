@@ -54,7 +54,7 @@ export function Sync(
   /**
    * Stores event objects.
    */
-  const events: EventInterface[] = []; // todo
+  const events: EventInterface[] = [];
 
   /**
    * Called when the component is mounted.
@@ -157,7 +157,7 @@ export function Sync(
 
   return {
     setup: apply(
-      Components.Media.set,
+      Components.Breakpoints.set,
       { slideFocus: isUndefined( slideFocus ) ? isNavigation : slideFocus },
       true
     ),

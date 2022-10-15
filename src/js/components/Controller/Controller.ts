@@ -23,6 +23,7 @@ import {
  */
 export interface ControllerComponent extends BaseComponent {
   go( control: number | string, allowSameIndex?: boolean, callback?: AnyFunction ): void;
+  jump( index: number ): void;
   scroll( destination: number, duration?: number, snap?: boolean, callback?: AnyFunction ): void;
   getNext( destination?: boolean ): number;
   getPrev( destination?: boolean ): number;
@@ -120,7 +121,7 @@ export function Controller(
     const end   = omitEnd ? endIndex : slideCount - 1;
     const index = clamp( currIndex, 0, end );
 
-    prevIndex = clamp( currIndex, 0, end );
+    prevIndex = index;
 
     if ( index !== currIndex ) {
       currIndex = index;
@@ -157,6 +158,16 @@ export function Controller(
         Move.move( dest, index, prevIndex, callback );
       }
     }
+  }
+
+  /**
+   * Immediately jumps to the specified index.
+   *
+   * @param index - An index where to jump.
+   */
+  function jump( index: number ): void {
+    Move.cancel();
+    scroll( toPosition( index ), 0 );
   }
 
   /**
@@ -405,6 +416,7 @@ export function Controller(
   return {
     mount,
     go,
+    jump,
     scroll,
     getNext,
     getPrev,

@@ -9,7 +9,7 @@ import { BaseComponent, TransitionComponent } from './general';
  */
 export interface Components {
   [ key: string ]: BaseComponent | undefined;
-  Media: Types.MediaComponent;
+  Breakpoints: Types.BreakpointsComponent;
   Direction: Types.DirectionComponent;
   Elements: Types.ElementsComponent;
   Slides: Types.SlidesComponent;
@@ -19,7 +19,6 @@ export interface Components {
   Controller: Types.ControllerComponent;
   Arrows: Types.ArrowsComponent;
   Autoplay: Types.AutoplayComponent;
-  Cover: Types.CoverComponent;
   Scroll: Types.ScrollComponent;
   Drag: Types.DragComponent;
   Keyboard: Types.KeyboardComponent;
