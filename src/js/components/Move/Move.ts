@@ -56,7 +56,7 @@ export function Move(
   const { on, emit } = event;
   const { set } = Splide.state;
   const { Slides } = Components;
-  const { slideSize, getPadding, listSize, sliderSize } = Components.Layout;
+  const { slideSize, getPadding, listSize, sliderSize, totalSize } = Components.Layout;
   const { resolve, orient } = Components.Direction;
   const { list, track } = Components.Elements;
 
@@ -214,8 +214,7 @@ export function Move(
    * @return The position corresponding with the index.
    */
   function toPosition( index: number, trimming?: boolean ): number {
-    const Slide    = Slides.getAt( index );
-    const position = Slide ? orient( Slide.pos() - offset( index ) ) : 0;
+    const position = orient( totalSize( index - 1 ) - offset( index ) );
     return trimming ? trim( position ) : position;
   }
 

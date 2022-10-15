@@ -20,99 +20,116 @@ $settings = get_settings();
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide01 = new Splide( '#splide01', {
         fixedWidth : '6rem',
+        type       : 'loop',
         gap        : 10,
         omitEnd    : true,
         focus      : 0,
+        breakpoints: {
+          1200: {
+            arrows: true,
+          },
+
+          '!overflow': {
+            arrows    : false,
+            drag      : false,
+            pagination: false,
+            clones    : 0,
+          }
+        }
       } );
 
-      splide01.on( 'overflow', overflow => {
-        console.log( 'splide01:', overflow );
-        splide01.root.classList.toggle( 'is-inactive', ! overflow );
-        splide01.options = { arrows: overflow, pagination: overflow, drag: overflow };
-      } );
+      // splide01.on( 'overflow', overflow => {
+      //   console.log( 'splide01:', overflow );
+      //   // splide01.root.classList.toggle( 'is-inactive', ! overflow );
+      //   splide01.options = { clones: overflow ? undefined : 0, arrows: overflow, pagination: overflow, drag: overflow };
+      // } );
 
       splide01.mount();
 
-      var splide02 = new Splide( '#splide02', {
-        type      : 'loop',
-        gap       : '1rem',
-        fixedWidth: 100,
-      } );
-
-      splide02.on( 'overflow', overflow => {
-        console.log( 'splide02:', overflow );
-        splide02.root.classList.toggle( 'is-inactive', ! overflow );
-
-        if ( overflow ) {
-          splide02.options = { clones: undefined, arrows: true, pagination: true, drag: true };
-        } else {
-          splide02.go( 0 );
-          splide02.options = { clones: 0, arrows: false, pagination: false, drag: false };
-        }
-      } );
-
-      splide02.mount();
-
-      var splide03 = new Splide( '#splide03', {
-        // height : 400,
-        type   : 'loop',
-        gap    : '1rem',
-        perPage: 3,
-      } );
-
-      splide03.on( 'overflow', overflow => {
-        console.log( 'splide03:', overflow );
-        splide03.go( 0 );
-
-        if ( overflow ) {
-          splide03.options = { clones: undefined, arrows: true, pagination: true, drag: true };
-        } else {
-          splide03.options = { clones: 0, arrows: false, pagination: false, drag: false };
-        }
-      } );
-
-      splide03.mount();
-
-      var add    = document.getElementById( 'add' );
-      var remove = document.getElementById( 'remove' );
-
-      var index = 1;
-
-      add.addEventListener( 'click', function() {
-        splide03.add( [
-          `<li class="splide__slide"><img src="../../assets/images/pics/slide${ String( ++index ).padStart( 2, '0' ) }.jpg"></li>`,
-        ] );
-      } );
-
-      remove.addEventListener( 'click', function() {
-        splide03.remove( splide03.length - 1 );
-      } );
-
-      var splide04 = new Splide( '#splide04', {
-        autoWidth : true,
-        gap       : '1rem',
-        focus     : 0,
-        drag      : 'free',
-        omitEnd   : true,
-      } );
-
-      splide04.on( 'overflow', overflow => {
-        console.log( 'splide04:', overflow );
-
-        if ( overflow ) {
-          splide04.options = { arrows: true, pagination: true, drag: true };
-        } else {
-          splide04.options = { arrows: false, pagination: false, drag: false };
-        }
-      } );
-
-      splide04.mount();
+      // var splide02 = new Splide( '#splide02', {
+      //   type      : 'loop',
+      //   gap       : '1rem',
+      //   fixedWidth: 100,
+      // } );
+      //
+      // splide02.on( 'overflow', overflow => {
+      //   console.log( 'splide02:', overflow );
+      //   splide02.root.classList.toggle( 'is-inactive', ! overflow );
+      //
+      //   if ( overflow ) {
+      //     splide02.options = { clones: undefined, arrows: true, pagination: true, drag: true };
+      //   } else {
+      //     splide02.go( 0 );
+      //     splide02.options = { clones: 0, arrows: false, pagination: false, drag: false };
+      //   }
+      // } );
+      //
+      // splide02.mount();
+      //
+      // var splide03 = new Splide( '#splide03', {
+      //   // height : 400,
+      //   type   : 'loop',
+      //   gap    : '1rem',
+      //   perPage: 3,
+      // } );
+      //
+      // splide03.on( 'overflow', overflow => {
+      //   console.log( 'splide03:', overflow );
+      //   splide03.go( 0 );
+      //
+      //   if ( overflow ) {
+      //     splide03.options = { clones: undefined, arrows: true, pagination: true, drag: true };
+      //   } else {
+      //     splide03.options = { clones: 0, arrows: false, pagination: false, drag: false };
+      //   }
+      // } );
+      //
+      // splide03.mount();
+      //
+      // var add    = document.getElementById( 'add' );
+      // var remove = document.getElementById( 'remove' );
+      //
+      // var index = 1;
+      //
+      // add.addEventListener( 'click', function() {
+      //   splide03.add( [
+      //     `<li class="splide__slide"><img src="../../assets/images/pics/slide${ String( ++index ).padStart( 2, '0' ) }.jpg"></li>`,
+      //   ] );
+      // } );
+      //
+      // remove.addEventListener( 'click', function() {
+      //   splide03.remove( splide03.length - 1 );
+      // } );
+      //
+      // var splide04 = new Splide( '#splide04', {
+      //   autoWidth : true,
+      //   gap       : '1rem',
+      //   focus     : 0,
+      //   drag      : 'free',
+      //   omitEnd   : true,
+      // } );
+      //
+      // splide04.on( 'overflow', overflow => {
+      //   console.log( 'splide04:', overflow );
+      //
+      //   if ( overflow ) {
+      //     splide04.options = { arrows: true, pagination: true, drag: true };
+      //   } else {
+      //     splide04.options = { arrows: false, pagination: false, drag: false };
+      //   }
+      // } );
+      //
+      // splide04.mount();
     } );
   </script>
 
   <style>
-    .splide.is-inactive .splide__list {
+    .splide:not( .is-overflow ) .splide__list {
       justify-content: center;
+    }
+
+    .splide:not( .is-overflow ) .splide__slide:last-child {
+      margin: 0 !important;
     }
   </style>
 </head>

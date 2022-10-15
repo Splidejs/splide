@@ -54,7 +54,6 @@ import {
   style as _style,
   toggleClass,
 } from '@splidejs/utils';
-import { define } from '../../utils/define/define';
 
 
 /**
@@ -289,8 +288,9 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
    * @return The slide position.
    */
   function pos(): number {
-    const left = resolve( 'left' );
-    return abs( rect( slide )[ left ] - rect( Elements.list )[ left ] );
+    const first = Components.Slides.get()[ 0 ];
+    const left  = resolve( 'left' );
+    return first ? abs( rect( slide )[ left ] - rect( first.slide )[ left ] ) : 0;
   }
 
   /**

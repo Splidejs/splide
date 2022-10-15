@@ -51,7 +51,7 @@ export function Clones(
   event: EventInterface
 ): ClonesComponent {
   const { on } = event;
-  const { Elements, Slides } = Components;
+  const { Elements, Slides, Layout: { resize } } = Components;
   const { resolve } = Components.Direction;
 
   /**
@@ -74,7 +74,7 @@ export function Clones(
 
     if ( ( cloneCount = computeCloneCount() ) ) {
       generate( cloneCount );
-      Components.Layout.resize( true );
+      resize( true );
     }
   }
 
@@ -84,6 +84,7 @@ export function Clones(
   function remount(): void {
     destroy();
     mount();
+    resize( true );
   }
 
   /**
@@ -97,12 +98,14 @@ export function Clones(
 
   /**
    * Observes the required clone count and refreshes the slider if necessary.
+   * If clones are disabled by `0`, moves the carousel to the first slide.
    */
   function observe(): void {
     const count = computeCloneCount();
 
     if ( cloneCount !== count ) {
       if ( cloneCount < count || ! count ) {
+        ! count && Splide.go( 0 );
         event.emit( EVENT_REFRESH );
       }
     }

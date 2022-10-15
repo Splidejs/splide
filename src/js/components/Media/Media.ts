@@ -1,9 +1,9 @@
 import { MEDIA_PREFERS_REDUCED_MOTION } from '../../constants/media';
 import { CREATED, DESTROYED } from '../../constants/states';
-import { EventBinder, merge, omit, ownKeys } from '@splidejs/utils';
+import { EventBinder, EventInterface, merge, omit, ownKeys } from '@splidejs/utils';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { EVENT_UPDATED } from '../../constants/events';
+import { EVENT_OVERFLOW, EVENT_UPDATED } from '../../constants/events';
 
 
 /**
@@ -18,6 +18,13 @@ export interface MediaComponent extends BaseComponent {
 }
 
 /**
+ * The special breakpoints key when the number of slides are not enough for the list.
+ *
+ * @since 5.0.0
+ */
+const NOT_OVERFLOW_KEY = '!overflow';
+
+/**
  * The component for observing media queries and updating options if necessary.
  * This used to be the Options component.
  *
@@ -29,16 +36,16 @@ export interface MediaComponent extends BaseComponent {
  *
  * @return A Media component object.
  */
-export function Media( Splide: Splide, Components: Components, options: Options ): MediaComponent {
+export function Media( Splide: Splide, Components: Components, options: Options, event: EventInterface ): MediaComponent {
   const { state } = Splide;
   const breakpoints   = options.breakpoints || {};
   const reducedMotion = options.reducedMotion || {};
   const binder        = EventBinder();
 
   /**
-   * Stores options and MediaQueryList object.
+   * Stores options and a predicate function.
    */
-  const queries: Array<[ Options, MediaQueryList ]> = [];
+  const entries: Array<[ Options, () => boolean ]> = [];
 
   /**
    * Called when the component is constructed.
@@ -49,8 +56,15 @@ export function Media( Splide: Splide, Components: Components, options: Options 
     ownKeys( breakpoints )
       .sort( ( n, m ) => isMin ? +n - +m : +m - +n )
       .forEach( key => {
-        register( breakpoints[ key ], `(${ isMin ? 'min' : 'max' }-width:${ key }px)` );
+        if ( key !== NOT_OVERFLOW_KEY ) {
+          register( breakpoints[ key ], `(${ isMin ? 'min' : 'max' }-width:${ key }px)` );
+        }
       } );
+
+    if ( breakpoints[ NOT_OVERFLOW_KEY ] ) {
+      entries.push( [ breakpoints[ NOT_OVERFLOW_KEY ], () => Components.Layout && ! Components.Layout.isOverflow() ] );
+      event.on( EVENT_OVERFLOW, update );
+    }
 
     register( reducedMotion, MEDIA_PREFERS_REDUCED_MOTION );
     update();
@@ -68,7 +82,7 @@ export function Media( Splide: Splide, Components: Components, options: Options 
   }
 
   /**
-   * Registers entries as [ Options, media query string ].
+   * Registers entries as `[ Options, media query string ]`.
    *
    * @param options - Options merged to current options when the document matches the query.
    * @param query   - A query string.
@@ -76,7 +90,7 @@ export function Media( Splide: Splide, Components: Components, options: Options 
   function register( options: Options, query: string ): void {
     const queryList = matchMedia( query );
     binder.bind( queryList, 'change', update );
-    queries.push( [ options, queryList ] );
+    entries.push( [ options,  () => queryList.matches ] );
   }
 
   /**
@@ -85,8 +99,8 @@ export function Media( Splide: Splide, Components: Components, options: Options 
   function update(): void {
     const destroyed = state.is( DESTROYED );
     const direction = options.direction;
-    const merged = queries.reduce<Options>( ( merged, entry ) => {
-      return merge( merged, entry[ 1 ].matches ? entry[ 0 ] : {} );
+    const merged = entries.reduce<Options>( ( merged, entry ) => {
+      return merge( merged, entry[ 1 ]() ? entry[ 0 ] : {} );
     }, {} );
 
     omit( options );
@@ -137,6 +151,7 @@ export function Media( Splide: Splide, Components: Components, options: Options 
 
   return {
     setup,
+    // mount,
     destroy,
     reduce,
     set,

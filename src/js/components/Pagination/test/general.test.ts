@@ -32,7 +32,6 @@ describe( 'Pagination', () => {
 
     expect( items.length ).not.toBe( splide.length );
     expect( items.length ).toBe( splide.Components.Controller.getEnd() + 1 );
-    expect( items.length ).toBe( 8 );
   } );
 
   test( 'can move the slider when the item is clicked.', () => {

@@ -376,17 +376,24 @@
   const EVENT_SHIFTED = "sh";
   const EVENT_END_INDEX_CHANGED = "ei";
 
-  function Media(Splide2, Components2, options) {
+  const NOT_OVERFLOW_KEY = "!overflow";
+  function Media(Splide2, Components2, options, event) {
     const { state } = Splide2;
     const breakpoints = options.breakpoints || {};
     const reducedMotion = options.reducedMotion || {};
     const binder = b();
-    const queries = [];
+    const entries = [];
     function setup() {
       const isMin = options.mediaQuery === "min";
       A(breakpoints).sort((n, m) => isMin ? +n - +m : +m - +n).forEach((key) => {
-        register(breakpoints[key], `(${isMin ? "min" : "max"}-width:${key}px)`);
+        if (key !== NOT_OVERFLOW_KEY) {
+          register(breakpoints[key], `(${isMin ? "min" : "max"}-width:${key}px)`);
+        }
       });
+      if (breakpoints[NOT_OVERFLOW_KEY]) {
+        entries.push([breakpoints[NOT_OVERFLOW_KEY], () => Components2.Layout && !Components2.Layout.isOverflow()]);
+        event.on(EVENT_OVERFLOW, update);
+      }
       register(reducedMotion, MEDIA_PREFERS_REDUCED_MOTION);
       update();
     }
@@ -398,13 +405,13 @@
     function register(options2, query) {
       const queryList = matchMedia(query);
       binder.bind(queryList, "change", update);
-      queries.push([options2, queryList]);
+      entries.push([options2, () => queryList.matches]);
     }
     function update() {
       const destroyed = state.is(DESTROYED);
       const direction = options.direction;
-      const merged = queries.reduce((merged2, entry) => {
-        return k(merged2, entry[1].matches ? entry[0] : {});
+      const merged = entries.reduce((merged2, entry) => {
+        return k(merged2, entry[1]() ? entry[0] : {});
       }, {});
       gn(options);
       set(merged);
@@ -778,8 +785,9 @@
       return diff <= distance;
     }
     function pos() {
+      const first = Components.Slides.get()[0];
       const left = resolve("left");
-      return un(tn(slide)[left] - tn(Elements.list)[left]);
+      return first ? un(tn(slide)[left] - tn(first.slide)[left]) : 0;
     }
     function size() {
       return tn(slide)[resolve("width")];
@@ -1021,7 +1029,7 @@
   const MULTIPLIER = 2;
   function Clones(Splide2, Components2, options, event) {
     const { on } = event;
-    const { Elements, Slides } = Components2;
+    const { Elements, Slides, Layout: { resize } } = Components2;
     const { resolve } = Components2.Direction;
     const clones = [];
     let cloneCount;
@@ -1030,12 +1038,13 @@
       on([EVENT_UPDATED, EVENT_RESIZE], observe);
       if (cloneCount = computeCloneCount()) {
         generate(cloneCount);
-        Components2.Layout.resize(true);
+        resize(true);
       }
     }
     function remount() {
       destroy();
       mount();
+      resize(true);
     }
     function destroy() {
       en(clones);
@@ -1046,6 +1055,7 @@
       const count = computeCloneCount();
       if (cloneCount !== count) {
         if (cloneCount < count || !count) {
+          !count && Splide2.go(0);
           event.emit(EVENT_REFRESH);
         }
       }
@@ -1093,7 +1103,7 @@
     const { on, emit } = event;
     const { set } = Splide2.state;
     const { Slides } = Components2;
-    const { slideSize, getPadding, listSize, sliderSize } = Components2.Layout;
+    const { slideSize, getPadding, listSize, sliderSize, totalSize } = Components2.Layout;
     const { resolve, orient } = Components2.Direction;
     const { list, track } = Components2.Elements;
     let Transition;
@@ -1169,8 +1179,7 @@
       return index;
     }
     function toPosition(index, trimming) {
-      const Slide = Slides.getAt(index);
-      const position = Slide ? orient(Slide.pos() - offset(index)) : 0;
+      const position = orient(totalSize(index - 1) - offset(index));
       return trimming ? trim(position) : position;
     }
     function getPosition() {

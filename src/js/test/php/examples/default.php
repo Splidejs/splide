@@ -22,6 +22,7 @@ $settings = get_settings();
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
         width: 800,
+        start: 1,
         // type        : 'loop',
         perPage: 3,
         // perMove: 3,
@@ -39,15 +40,16 @@ $settings = get_settings();
         focus: 0,
         omitEnd: true,
 
-        // breakpoints: {
-        //   1200: {
-        //     // padding: 5,
-        //   },
-        //   1000: {
-        //     label: 'The destroyed carousel',
-        //     destroy: true,
-        //   },
-        // },
+        breakpoints: {
+          1200: {
+            start: 4,
+            // padding: 5,
+          },
+          1000: {
+            label: 'The destroyed carousel',
+            destroy: true,
+          },
+        },
 
         classes: {
           arrows: 'splide__arrows custom-arrows',
