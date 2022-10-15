@@ -34,7 +34,7 @@ import { PATH, SIZE, XML_NAME_SPACE } from './path';
  * @since 3.0.0
  */
 export interface ArrowsComponent extends BaseComponent {
-  arrows: { prev?: HTMLButtonElement, next?: HTMLButtonElement };
+  readonly arrows: { readonly prev?: HTMLButtonElement, readonly next?: HTMLButtonElement };
 
   /** @internal */
   update(): void;

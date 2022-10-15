@@ -44,7 +44,7 @@ import {
  * @since 3.0.0
  */
 export interface PaginationComponent extends BaseComponent {
-  items: PaginationItem[];
+  readonly items: PaginationItem[];
   getAt( index: number ): PaginationItem;
   update(): void;
 }
@@ -55,8 +55,8 @@ export interface PaginationComponent extends BaseComponent {
  * @since 3.0.0
  */
 export interface PaginationData {
-  list: HTMLUListElement;
-  items: PaginationItem[];
+  readonly list: HTMLUListElement;
+  readonly items: PaginationItem[];
 }
 
 /**
@@ -65,9 +65,9 @@ export interface PaginationData {
  * @since 3.0.0
  */
 export interface PaginationItem {
-  li: HTMLLIElement;
-  button: HTMLButtonElement;
-  page: number;
+  readonly li: HTMLLIElement;
+  readonly button: HTMLButtonElement;
+  readonly page: number;
 }
 
 /**

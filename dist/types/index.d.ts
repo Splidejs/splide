@@ -252,9 +252,9 @@ interface ControllerComponent extends BaseComponent {
  * @since 3.0.0
  */
 interface ArrowsComponent extends BaseComponent {
-    arrows: {
-        prev?: HTMLButtonElement;
-        next?: HTMLButtonElement;
+    readonly arrows: {
+        readonly prev?: HTMLButtonElement;
+        readonly next?: HTMLButtonElement;
     };
     /** @internal */
     update(): void;

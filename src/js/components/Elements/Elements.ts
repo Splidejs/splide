@@ -60,7 +60,7 @@ export interface ElementCollection {
  *
  * @since 3.0.0
  */
-export interface ElementsComponent extends BaseComponent, ElementCollection {
+export interface ElementsComponent extends BaseComponent, Readonly<ElementCollection> {
 }
 
 /**
