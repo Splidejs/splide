@@ -94,7 +94,7 @@ $settings = get_settings();
 
 
       document.querySelector( '#jump' ).addEventListener( 'click', () => {
-        splide.Components.Controller.jump( 5 )
+        splide.Components.Controller.jump( '+2' )
       } );
 
 	    // Array.from( document.getElementsByTagName( 'button' ) ).forEach( button => {

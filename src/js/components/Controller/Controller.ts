@@ -23,7 +23,7 @@ import {
  */
 export interface ControllerComponent extends BaseComponent {
   go( control: number | string, allowSameIndex?: boolean, callback?: AnyFunction ): void;
-  jump( index: number ): void;
+  jump( control: number | string ): void;
   scroll( destination: number, duration?: number, snap?: boolean, callback?: AnyFunction ): void;
   getNext( destination?: boolean ): number;
   getPrev( destination?: boolean ): number;
@@ -163,11 +163,11 @@ export function Controller(
   /**
    * Immediately jumps to the specified index.
    *
-   * @param index - An index where to jump.
+   * @param control - An index where to jump.
    */
-  function jump( index: number ): void {
+  function jump( control: number | string ): void {
     Move.cancel();
-    scroll( toPosition( index ), 0 );
+    scroll( toPosition( loop( parse( control ) ) ), 0 );
   }
 
   /**
