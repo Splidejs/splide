@@ -182,7 +182,7 @@ export class Splide {
   }
 
   /**
-   * Moves the slider with the following control pattern.
+   * Moves the carousel with the following control pattern.
    *
    * | Pattern | Description |
    * |---|---|
@@ -219,6 +219,18 @@ export class Splide {
    */
   go( control: number | string ): this {
     this._C.Controller.go( control );
+    return this;
+  }
+
+  /**
+   * Moves the carousel without transition.
+   *
+   * @param control - A control pattern. See `move()` for more details.
+   *
+   * @return `this`
+   */
+  jump( control: number | string ): this {
+    this._C.Controller.jump( control );
     return this;
   }
 

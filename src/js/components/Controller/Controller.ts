@@ -166,8 +166,12 @@ export function Controller(
    * @param control - An index where to jump.
    */
   function jump( control: number | string ): void {
-    Move.cancel();
-    scroll( toPosition( loop( parse( control ) ) ), 0 );
+    const { set } = Components.Breakpoints;
+    const { speed } = options;
+
+    set( { speed: 0 } );
+    go( control );
+    set( { speed } );
   }
 
   /**

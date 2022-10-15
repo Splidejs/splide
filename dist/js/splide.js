@@ -482,7 +482,7 @@
         return merge(merged2, entry[1]() ? entry[0] : {});
       }, {});
       omit(options);
-      set(merged);
+      set(merged, false, !state.is(CREATED));
       if (options.destroy) {
         Splide2.destroy(options.destroy === "completely");
       } else if (destroyed) {
@@ -500,7 +500,7 @@
     function set(opts, base, notify) {
       merge(options, opts);
       base && merge(Object.getPrototypeOf(options), opts);
-      if (notify || !state.is(CREATED)) {
+      if (notify) {
         Splide2.emit(EVENT_UPDATED, options);
       }
     }
@@ -1343,8 +1343,11 @@
       }
     }
     function jump(control) {
-      Move.cancel();
-      scroll(toPosition(loop(parse(control))), 0);
+      const { set } = Components2.Breakpoints;
+      const { speed } = options;
+      set({ speed: 0 });
+      go(control);
+      set({ speed });
     }
     function scroll(destination, duration, snap, callback) {
       Components2.Scroll.scroll(destination, duration, snap, () => {
@@ -2476,6 +2479,10 @@
     }
     go(control) {
       this._C.Controller.go(control);
+      return this;
+    }
+    jump(control) {
+      this._C.Controller.jump(control);
       return this;
     }
     on(events, callback) {

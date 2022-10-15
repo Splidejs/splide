@@ -230,7 +230,7 @@ interface MoveComponent extends BaseComponent {
  */
 interface ControllerComponent extends BaseComponent {
     go(control: number | string, allowSameIndex?: boolean, callback?: AnyFunction): void;
-    jump(index: number): void;
+    jump(control: number | string): void;
     scroll(destination: number, duration?: number, snap?: boolean, callback?: AnyFunction): void;
     getNext(destination?: boolean): number;
     getPrev(destination?: boolean): number;
@@ -1024,7 +1024,7 @@ declare class Splide {
      */
     sync(splide: Splide): this;
     /**
-     * Moves the slider with the following control pattern.
+     * Moves the carousel with the following control pattern.
      *
      * | Pattern | Description |
      * |---|---|
@@ -1060,6 +1060,14 @@ declare class Splide {
      * @return `this`
      */
     go(control: number | string): this;
+    /**
+     * Moves the carousel without transition.
+     *
+     * @param control - A control pattern. See `move()` for more details.
+     *
+     * @return `this`
+     */
+    jump(control: number | string): this;
     /**
      * Registers an event handler.
      *

@@ -22,8 +22,8 @@ $settings = get_settings();
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
         width: 800,
-        // type        : 'loop',
-        perPage: 3,
+        // type        : 'fade',
+        perPage: 2,
         // perMove: 3,
         // rewind: true,
         // rewindByDrag: true,
@@ -36,8 +36,8 @@ $settings = get_settings();
         // rewindSpeed: 2000,
         // role: '',
         label: 'Changed Label',
-        focus: 0,
-        omitEnd: true,
+        // focus: 0,
+        // omitEnd: true,
 
         breakpoints: {
           1200: {
@@ -94,7 +94,7 @@ $settings = get_settings();
 
 
       document.querySelector( '#jump' ).addEventListener( 'click', () => {
-        splide.Components.Controller.jump( '+2' )
+        splide.Components.Controller.jump( '>' )
       } );
 
 	    // Array.from( document.getElementsByTagName( 'button' ) ).forEach( button => {

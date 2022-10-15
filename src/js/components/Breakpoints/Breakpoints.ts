@@ -110,7 +110,7 @@ export function Breakpoints(
     }, {} );
 
     omit( options );
-    set( merged );
+    set( merged, false, ! state.is( CREATED ) );
 
     if ( options.destroy ) {
       Splide.destroy( options.destroy === 'completely' );
@@ -144,13 +144,13 @@ export function Breakpoints(
    *
    * @param opts   - New options.
    * @param base   - Optional. Determines whether to also update base options or not.
-   * @param notify - Optional. If `true`, always emits the `update` event.
+   * @param notify - Optional. If `true`, emits the `update` event.
    */
   function set( opts: Options, base?: boolean, notify?: boolean ): void {
     merge( options, opts );
     base && merge( Object.getPrototypeOf( options ), opts );
 
-    if ( notify || ! state.is( CREATED ) ) {
+    if ( notify ) {
       Splide.emit( EVENT_UPDATED, options );
     }
   }
