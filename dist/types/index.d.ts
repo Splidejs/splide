@@ -158,7 +158,7 @@ interface ElementCollection {
  *
  * @since 3.0.0
  */
-interface ElementsComponent extends BaseComponent, ElementCollection {
+interface ElementsComponent extends BaseComponent, Readonly<ElementCollection> {
 }
 
 /**
@@ -316,7 +316,7 @@ interface LazyLoadComponent extends BaseComponent {
  * @since 3.0.0
  */
 interface PaginationComponent extends BaseComponent {
-    items: PaginationItem[];
+    readonly items: PaginationItem[];
     getAt(index: number): PaginationItem;
     update(): void;
 }
@@ -326,8 +326,8 @@ interface PaginationComponent extends BaseComponent {
  * @since 3.0.0
  */
 interface PaginationData {
-    list: HTMLUListElement;
-    items: PaginationItem[];
+    readonly list: HTMLUListElement;
+    readonly items: PaginationItem[];
 }
 /**
  * The interface for each pagination item.
@@ -335,9 +335,9 @@ interface PaginationData {
  * @since 3.0.0
  */
 interface PaginationItem {
-    li: HTMLLIElement;
-    button: HTMLButtonElement;
-    page: number;
+    readonly li: HTMLLIElement;
+    readonly button: HTMLButtonElement;
+    readonly page: number;
 }
 
 /**
@@ -487,9 +487,15 @@ interface Options extends ResponsiveOptions {
      */
     wheelSleep?: number;
     /**
-     * Determines whether to release the wheel event when the slider reaches the first or last slide.
+     * Determines whether to release the wheel event when the carousel reaches the first or last slide.
      */
     releaseWheel?: boolean;
+    /**
+     * Determines whether to release the touch event when the carousel reaches the first or last slide.
+     * If `true`, the bounce effect will not play.
+     * Note that this does not affect mouse drag events.
+     */
+    releaseTouch?: boolean;
     /**
      * The direction of the slider.
      * - 'ltr': Left to right

@@ -1788,14 +1788,15 @@ const Drag = (Splide, Components, options, event) => {
       state.set(DRAGGING);
       emit(EVENT_DRAG);
     }
+    if (shouldRelease(e)) {
+      return onPointerUp(e);
+    }
     if (e.cancelable) {
       if (dragging) {
         Move.translate(basePosition + constrain(diffCoord(e)));
         const expired = diffTime(e) > LOG_INTERVAL;
         const hasExceeded = exceeded !== (exceeded = exceededLimit());
-        if (expired || hasExceeded) {
-          save(e);
-        }
+        expired || hasExceeded && save(e);
         clickPrevented = true;
         emit(EVENT_DRAGGING);
         prevent(e);
@@ -1816,6 +1817,7 @@ const Drag = (Splide, Components, options, event) => {
     }
     binder.destroy();
     dragging = false;
+    exceeded = false;
   }
   function onClick(e) {
     if (!disabled && clickPrevented) {
@@ -1842,6 +1844,16 @@ const Drag = (Splide, Components, options, event) => {
       Controller.go(Controller.toDest(destination), true);
     }
     reduce(true);
+  }
+  function shouldRelease(e) {
+    if (options.releaseTouch && Splide.is(SLIDE) && isTouchEvent(e)) {
+      const { index } = Splide;
+      const diff = diffCoord(e);
+      if (exceededLimit() || index === 0 && diff > 0 || index === Splide.length - 1 && diff < 0) {
+        return true;
+      }
+    }
+    return false;
   }
   function shouldStart(e) {
     const { dragMinThreshold: thresholds } = options;

@@ -148,6 +148,10 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
       emit( EVENT_DRAG );
     }
 
+    if ( shouldRelease( e ) ) {
+      return onPointerUp( e );
+    }
+
     if ( e.cancelable ) {
       if ( dragging ) {
         Move.translate( basePosition + constrain( diffCoord( e ) ) );
@@ -155,10 +159,7 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
         const expired     = diffTime( e ) > LOG_INTERVAL;
         const hasExceeded = exceeded !== ( exceeded = exceededLimit() );
 
-        if ( expired || hasExceeded ) {
-          save( e );
-        }
-
+        expired || hasExceeded && save( e );
         clickPrevented = true;
         emit( EVENT_DRAGGING );
         prevent( e );
@@ -190,6 +191,7 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
 
     binder.destroy();
     dragging = false;
+    exceeded = false;
   }
 
   /**
@@ -230,7 +232,7 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
     reduce( false );
 
     if ( isFree ) {
-      Controller.scroll( destination, 0, options.snap );
+      Controller.scroll( destination, undefined, options.snap );
     } else if ( Splide.is( FADE ) ) {
       Controller.go( orient( sign( velocity ) ) < 0 ? ( rewind ? '<' : '-' ) : ( rewind ? '>' : '+' ) );
     } else if ( Splide.is( SLIDE ) && exceeded && rewind ) {
@@ -240,6 +242,24 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
     }
 
     reduce( true );
+  }
+
+  /**
+   * Checks if the provided touch event should be released or not.
+   *
+   * @param e - A TouchEvent or MouseEvent object.
+   */
+  function shouldRelease( e: TouchEvent | MouseEvent ): boolean {
+    if ( options.releaseTouch && Splide.is( SLIDE ) && isTouchEvent( e ) ) {
+      const { index } = Splide;
+      const diff = diffCoord( e );
+
+      if ( exceededLimit() || index === 0 && diff > 0 || index === Splide.length - 1 && diff < 0 ) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**

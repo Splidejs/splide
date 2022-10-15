@@ -120,9 +120,16 @@ export interface Options extends ResponsiveOptions {
   wheelSleep?: number;
 
   /**
-   * Determines whether to release the wheel event when the slider reaches the first or last slide.
+   * Determines whether to release the wheel event when the carousel reaches the first or last slide.
    */
   releaseWheel?: boolean;
+
+  /**
+   * Determines whether to release the touch event when the carousel reaches the first or last slide.
+   * If `true`, the bounce effect will not play.
+   * Note that this does not affect mouse drag events.
+   */
+  releaseTouch?: boolean;
 
   /**
    * The direction of the slider.
