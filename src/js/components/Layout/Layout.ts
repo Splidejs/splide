@@ -219,23 +219,6 @@ export function Layout(
    * @return The total width of slides in the horizontal slider, or the height in the vertical one.
    */
   function totalSize( index: number, withoutGap?: boolean ): number {
-    // const first = getAt( index );
-    // const last  = getAt( Splide.length - 1 );
-    //
-    // if ( last ) {
-    //   console.log( last.pos() );
-    // }
-    //
-    // const Slide = getAt( index );
-    // if ( Slide ) {
-    //   const right = rect( Slide.slide )[ resolve( 'right' ) ];
-    //   const left  = rect( list )[ resolve( 'left' ) ];
-    //
-    //   return  abs( right - left ) + ( withoutGap ? 0 : getGap() );
-    // }
-    //
-    // return 0;
-
     const Slide = getAt( index );
     return Slide ? Slide.pos() + Slide.size() + ( withoutGap ? 0 : getGap() ) : 0;
   }
