@@ -8,9 +8,8 @@ import {
   EVENT_REFRESH,
   EVENT_SCROLL,
 } from '../../constants/events';
-import { Splide } from '../../core/Splide/Splide';
-import { BaseComponent, Components, Options } from '../../types';
-import { EventInterface, getAttribute, RequestInterval, setAttribute, style, toggleClass } from '@splidejs/utils';
+import { BaseComponent, ComponentConstructor } from '../../types';
+import { getAttribute, RequestInterval, setAttribute, style, toggleClass } from '@splidejs/utils';
 import { INTERVAL_DATA_ATTRIBUTE } from './constants';
 
 
@@ -37,12 +36,7 @@ export interface AutoplayComponent extends BaseComponent {
  *
  * @return An Autoplay component object.
  */
-export function Autoplay(
-  Splide: Splide,
-  Components: Components,
-  options: Options,
-  event: EventInterface
-): AutoplayComponent {
+export const Autoplay: ComponentConstructor<AutoplayComponent> = ( Splide, Components, options, event ) => {
   const { on, bind, emit } = event;
   const interval = RequestInterval( options.interval, Splide.go.bind( Splide, '>' ), onAnimationFrame );
   const { isPaused } = interval;
@@ -180,4 +174,4 @@ export function Autoplay(
     pause,
     isPaused,
   };
-}
+};

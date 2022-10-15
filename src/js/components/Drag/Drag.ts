@@ -3,9 +3,8 @@ import { EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_MOUNTED, EVENT_UPDATED
 import { SCROLL_LISTENER_OPTIONS } from '../../constants/listener-options';
 import { DRAGGING, IDLE, MOVING, SCROLLING } from '../../constants/states';
 import { FADE, LOOP, SLIDE } from '../../constants/types';
-import { Splide } from '../../core/Splide/Splide';
-import { BaseComponent, Components, Options } from '../../types';
-import { abs, EventInterface, isObject, matches, min, noop, prevent, sign, timeOf } from '@splidejs/utils';
+import { BaseComponent, ComponentConstructor } from '../../types';
+import { abs, isObject, matches, min, noop, prevent, sign, timeOf } from '@splidejs/utils';
 import { FRICTION, LOG_INTERVAL, POINTER_DOWN_EVENTS, POINTER_MOVE_EVENTS, POINTER_UP_EVENTS } from './constants';
 
 
@@ -31,12 +30,7 @@ export interface DragComponent extends BaseComponent {
  *
  * @return A Drag component object.
  */
-export function Drag(
-  Splide: Splide,
-  Components: Components,
-  options: Options,
-  event: EventInterface
-): DragComponent {
+export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, options, event ) => {
   const { on, emit, bind } = event;
   const binder = event.create();
   const { state } = Splide;
@@ -415,4 +409,4 @@ export function Drag(
     disable,
     isDragging,
   };
-}
+};

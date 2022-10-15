@@ -1,8 +1,7 @@
 import { TTB } from '../../constants/directions';
 import { EVENT_OVERFLOW, EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_UPDATED } from '../../constants/events';
-import { Splide } from '../../core/Splide/Splide';
-import { BaseComponent, Components, Options } from '../../types';
-import { apply, EventInterface, isObject, rect, style, Throttle, toggleClass, unit } from '@splidejs/utils';
+import { BaseComponent, ComponentConstructor } from '../../types';
+import { apply, isObject, rect, style, Throttle, toggleClass, unit } from '@splidejs/utils';
 import { assert } from '../../utils';
 import { FADE } from '../../constants/types';
 import { CLASS_OVERFLOW } from '../../constants/classes';
@@ -37,12 +36,7 @@ export interface LayoutComponent extends BaseComponent {
  *
  * @return An Layout component object.
  */
-export function Layout(
-  Splide: Splide,
-  Components: Components,
-  options: Options,
-  event: EventInterface
-): LayoutComponent {
+export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Components, options, event ) => {
   const { on, bind, emit } = event;
   const { Slides } = Components;
   const { resolve } = Components.Direction;
@@ -283,4 +277,4 @@ export function Layout(
     getPadding,
     isOverflow,
   };
-}
+};

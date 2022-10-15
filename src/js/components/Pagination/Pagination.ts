@@ -19,8 +19,7 @@ import {
   EVENT_SCROLLED,
   EVENT_UPDATED,
 } from '../../constants/events';
-import { Splide } from '../../core/Splide/Splide';
-import { BaseComponent, Components, Options } from '../../types';
+import { BaseComponent, ComponentConstructor, Options } from '../../types';
 import {
   addClass,
   apply,
@@ -28,13 +27,12 @@ import {
   create,
   display,
   empty,
-  EventInterface,
   focus,
   format,
   prevent,
-  removeNode,
   removeAttribute,
   removeClass,
+  removeNode,
   setAttribute,
   slice,
 } from '@splidejs/utils';
@@ -84,12 +82,7 @@ export interface PaginationItem {
  *
  * @return A Pagination component object.
  */
-export function Pagination(
-  Splide: Splide,
-  Components: Components,
-  options: Options,
-  event: EventInterface
-): PaginationComponent {
+export const Pagination: ComponentConstructor<PaginationComponent> = ( Splide, Components, options, event ) => {
   const { on, emit, bind } = event;
   const { Slides, Elements, Controller } = Components;
   const { hasFocus, getIndex, go } = Controller;
@@ -273,4 +266,4 @@ export function Pagination(
     getAt,
     update,
   };
-}
+};

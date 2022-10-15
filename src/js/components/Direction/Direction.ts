@@ -1,7 +1,7 @@
 import { ARROW_DOWN, ARROW_LEFT, ARROW_RIGHT, ARROW_UP } from '../../constants/arrows';
 import { RTL, TTB } from '../../constants/directions';
 import { Splide } from '../../core/Splide/Splide';
-import { BaseComponent, Components, Options } from '../../types';
+import { BaseComponent, ComponentConstructor, Components, Options } from '../../types';
 
 
 /**
@@ -41,7 +41,7 @@ export const ORIENTATION_MAP = {
  *
  * @return A Direction component object.
  */
-export function Direction( Splide: Splide, Components: Components, options: Options ): DirectionComponent {
+export const Direction: ComponentConstructor<DirectionComponent> = ( Splide: Splide, Components: Components, options: Options ) => {
   /**
    * Resolves the provided property name.
    *
@@ -75,4 +75,4 @@ export function Direction( Splide: Splide, Components: Components, options: Opti
     resolve,
     orient,
   };
-}
+};

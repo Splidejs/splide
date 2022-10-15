@@ -1,8 +1,7 @@
 import { SCROLL_LISTENER_OPTIONS } from '../../constants/listener-options';
 import { MOVING } from '../../constants/states';
-import { Splide } from '../../core/Splide/Splide';
-import { BaseComponent, Components, Options } from '../../types';
-import { abs, EventInterface, prevent, timeOf } from '@splidejs/utils';
+import { BaseComponent, ComponentConstructor } from '../../types';
+import { abs, prevent, timeOf } from '@splidejs/utils';
 
 
 /**
@@ -25,12 +24,7 @@ export interface WheelComponent extends BaseComponent {
  *
  * @return A Wheel component object.
  */
-export function Wheel(
-  Splide: Splide,
-  Components: Components,
-  options: Options,
-  event: EventInterface
-): WheelComponent {
+export const Wheel: ComponentConstructor<WheelComponent> = ( Splide, Components, options, event ) => {
   /**
    * Holds the last time when the wheel moves the slider.
    */
@@ -83,4 +77,4 @@ export function Wheel(
   return {
     mount,
   };
-}
+};

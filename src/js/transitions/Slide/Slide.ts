@@ -1,7 +1,6 @@
 import { SLIDE } from '../../constants/types';
-import { Splide } from '../../core/Splide/Splide';
-import { Components, Options, TransitionComponent } from '../../types';
-import { abs, apply, EventInterface, style } from '@splidejs/utils';
+import { ComponentConstructor, TransitionComponent } from '../../types';
+import { abs, apply, style } from '@splidejs/utils';
 
 
 /**
@@ -16,12 +15,7 @@ import { abs, apply, EventInterface, style } from '@splidejs/utils';
  *
  * @return A Transition component object.
  */
-export function Slide(
-  Splide: Splide,
-  Components: Components,
-  options: Options,
-  event: EventInterface
-): TransitionComponent {
+export const Slide: ComponentConstructor<TransitionComponent> = ( Splide, Components, options, event ) => {
   const { Move, Controller, Scroll } = Components;
   const { list } = Components.Elements;
   const transition = apply( style, list, 'transition' );
@@ -102,4 +96,4 @@ export function Slide(
     start,
     cancel,
   };
-}
+};

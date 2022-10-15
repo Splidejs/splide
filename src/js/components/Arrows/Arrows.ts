@@ -10,8 +10,7 @@ import {
   EVENT_SCROLLED,
   EVENT_UPDATED,
 } from '../../constants/events';
-import { Splide } from '../../core/Splide/Splide';
-import { BaseComponent, Components, Options } from '../../types';
+import { BaseComponent, ComponentConstructor } from '../../types';
 import {
   addClass,
   append,
@@ -20,11 +19,10 @@ import {
   before,
   create,
   display,
-  EventInterface,
   parseHtml,
-  removeNode,
   removeAttribute,
   removeClass,
+  removeNode,
   setAttribute,
 } from '@splidejs/utils';
 import { PATH, SIZE, XML_NAME_SPACE } from './path';
@@ -54,12 +52,7 @@ export interface ArrowsComponent extends BaseComponent {
  *
  * @return An Arrows component object.
  */
-export function Arrows(
-  Splide: Splide,
-  Components: Components,
-  options: Options,
-  event: EventInterface
-): ArrowsComponent {
+export const Arrows: ComponentConstructor<ArrowsComponent> = ( Splide, Components, options, event ) => {
   const { on, bind, emit } = event;
   const { classes, i18n } = options;
   const { Elements, Controller } = Components;
@@ -224,4 +217,4 @@ export function Arrows(
     destroy,
     update,
   };
-}
+};

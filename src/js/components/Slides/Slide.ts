@@ -87,7 +87,7 @@ export interface  SlideComponent extends BaseComponent {
  *
  * @return A Slide subcomponent.
  */
-export function Slide( Splide: Splide, index: number, slideIndex: number, slide: HTMLElement ): SlideComponent {
+export const Slide = ( Splide: Splide, index: number, slideIndex: number, slide: HTMLElement ): SlideComponent => {
   const event = Splide.event.create();
   const { on, emit, bind } = event;
   const { Components, root, options } = Splide;
@@ -318,4 +318,4 @@ export function Slide( Splide: Splide, index: number, slideIndex: number, slide:
   };
 
   return self;
-}
+};

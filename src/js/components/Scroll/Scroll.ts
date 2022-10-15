@@ -1,9 +1,8 @@
 import { EVENT_MOVE, EVENT_REFRESH, EVENT_SCROLL, EVENT_SCROLLED, EVENT_UPDATED } from '../../constants/events';
 import { IDLE, SCROLLING } from '../../constants/states';
 import { SLIDE } from '../../constants/types';
-import { Splide } from '../../core/Splide/Splide';
-import { AnyFunction, BaseComponent, Components, Options } from '../../types';
-import { abs, apply, approximatelyEqual, EventInterface, floor, max, RequestInterval, sign } from '@splidejs/utils';
+import { AnyFunction, BaseComponent, ComponentConstructor } from '../../types';
+import { abs, apply, approximatelyEqual, floor, max, RequestInterval, sign } from '@splidejs/utils';
 import { BASE_VELOCITY, BOUNCE_DIFF_THRESHOLD, BOUNCE_DURATION, FRICTION_FACTOR, MIN_DURATION } from './constants';
 
 
@@ -29,12 +28,7 @@ export interface ScrollComponent extends BaseComponent {
  *
  * @return A Scroll component object.
  */
-export function Scroll(
-  Splide: Splide,
-  Components: Components,
-  options: Options,
-  event: EventInterface
-): ScrollComponent {
+export const Scroll: ComponentConstructor<ScrollComponent> = ( Splide, Components, options, event ) => {
   const { on, emit } = event;
   const { state: { set } } = Splide;
   const { Move } = Components;
@@ -172,4 +166,4 @@ export function Scroll(
     scroll,
     cancel,
   };
-}
+};

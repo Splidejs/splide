@@ -81,8 +81,8 @@ declare function EventBus<M extends Record<string, AnyFunction$1>, K extends key
  *
  * @since 0.0.1
  */
-interface EventInterface<M extends Record<string, AnyFunction$1> = Record<string, AnyFunction$1>> extends Omit<EventBinder, 'create'>, Omit<EventBus<M>, 'create'> {
-    create(): EventInterface<M>;
+interface EventInterface$1<M extends Record<string, AnyFunction$1> = Record<string, AnyFunction$1>> extends Omit<EventBinder, 'create'>, Omit<EventBus<M>, 'create'> {
+    create(): EventInterface$1<M>;
     destroy(): void;
 }
 /**
@@ -97,7 +97,7 @@ interface EventInterface<M extends Record<string, AnyFunction$1> = Record<string
  *
  * @return A collection of interface functions.
  */
-declare function EventInterface<M extends Record<string, AnyFunction$1> = Record<string, AnyFunction$1>>(binder?: EventBinder, bus?: EventBus<Record<string, AnyFunction$1>>): EventInterface<M>;
+declare function EventInterface$1<M extends Record<string, AnyFunction$1> = Record<string, AnyFunction$1>>(binder?: EventBinder, bus?: EventBus<Record<string, AnyFunction$1>>): EventInterface$1<M>;
 
 /**
  * The interface for the State object.
@@ -746,6 +746,89 @@ interface ResponsiveOptions {
     destroy?: boolean | 'completely';
 }
 
+declare const EVENT_MOUNTED = "mounted";
+declare const EVENT_READY = "ready";
+declare const EVENT_MOVE = "move";
+declare const EVENT_MOVED = "moved";
+declare const EVENT_CLICK = "click";
+declare const EVENT_ACTIVE = "active";
+declare const EVENT_INACTIVE = "inactive";
+declare const EVENT_VISIBLE = "visible";
+declare const EVENT_HIDDEN = "hidden";
+declare const EVENT_REFRESH = "refresh";
+declare const EVENT_UPDATED = "updated";
+declare const EVENT_RESIZE = "resize";
+declare const EVENT_RESIZED = "resized";
+declare const EVENT_DRAG = "drag";
+declare const EVENT_DRAGGING = "dragging";
+declare const EVENT_DRAGGED = "dragged";
+declare const EVENT_SCROLL = "scroll";
+declare const EVENT_SCROLLED = "scrolled";
+declare const EVENT_OVERFLOW = "overflow";
+declare const EVENT_DESTROY = "destroy";
+declare const EVENT_ARROWS_MOUNTED = "arrows:mounted";
+declare const EVENT_ARROWS_UPDATED = "arrows:updated";
+declare const EVENT_PAGINATION_MOUNTED = "pagination:mounted";
+declare const EVENT_PAGINATION_UPDATED = "pagination:updated";
+declare const EVENT_NAVIGATION_MOUNTED = "navigation:mounted";
+declare const EVENT_AUTOPLAY_PLAY = "autoplay:play";
+declare const EVENT_AUTOPLAY_PLAYING = "autoplay:playing";
+declare const EVENT_AUTOPLAY_PAUSE = "autoplay:pause";
+declare const EVENT_LAZYLOAD_LOADED = "lazyload:loaded";
+declare const EVENT_LAZYLOAD_ERROR = "lazyload:error";
+/** @internal */
+declare const EVENT_SLIDE_KEYDOWN = "_sk";
+declare const EVENT_SHIFTED = "_sh";
+declare const EVENT_END_INDEX_CHANGED = "_ei";
+
+/**
+ * The interface for all internal E.
+ *
+ * @since 3.0.0
+ */
+interface EventMap {
+    [EVENT_MOUNTED]: () => void;
+    [EVENT_READY]: () => void;
+    [EVENT_CLICK]: (Slide: SlideComponent, e: MouseEvent) => void;
+    [EVENT_MOVE]: (index: number, prev: number, dest: number) => void;
+    [EVENT_MOVED]: (index: number, prev: number, dest: number) => void;
+    [EVENT_ACTIVE]: (Slide: SlideComponent) => void;
+    [EVENT_INACTIVE]: (Slide: SlideComponent) => void;
+    [EVENT_VISIBLE]: (Slide: SlideComponent) => void;
+    [EVENT_HIDDEN]: (Slide: SlideComponent) => void;
+    [EVENT_REFRESH]: () => void;
+    [EVENT_UPDATED]: (options: Options) => void;
+    [EVENT_RESIZE]: () => void;
+    [EVENT_RESIZED]: () => void;
+    [EVENT_DRAG]: () => void;
+    [EVENT_DRAGGING]: () => void;
+    [EVENT_DRAGGED]: () => void;
+    [EVENT_SCROLL]: () => void;
+    [EVENT_SCROLLED]: () => void;
+    [EVENT_OVERFLOW]: (overflow: boolean) => void;
+    [EVENT_DESTROY]: () => void;
+    [EVENT_ARROWS_MOUNTED]: (prev: HTMLButtonElement, next: HTMLButtonElement) => void;
+    [EVENT_ARROWS_UPDATED]: (prev: HTMLButtonElement, next: HTMLButtonElement, prevIndex: number, nextIndex: number) => void;
+    [EVENT_PAGINATION_MOUNTED]: (data: PaginationData, item: PaginationItem) => void;
+    [EVENT_PAGINATION_UPDATED]: (data: PaginationData, prev: PaginationItem, curr: PaginationItem) => void;
+    [EVENT_NAVIGATION_MOUNTED]: (splides: Splide[]) => void;
+    [EVENT_AUTOPLAY_PLAY]: () => void;
+    [EVENT_AUTOPLAY_PLAYING]: (rate: number) => void;
+    [EVENT_AUTOPLAY_PAUSE]: () => void;
+    [EVENT_LAZYLOAD_LOADED]: (img: HTMLImageElement, Slide: SlideComponent) => void;
+    [EVENT_LAZYLOAD_ERROR]: (img: HTMLImageElement, Slide: SlideComponent) => void;
+    /** @internal */
+    [EVENT_SLIDE_KEYDOWN]: (Slide: SlideComponent, e: KeyboardEvent) => void;
+    [EVENT_SHIFTED]: () => void;
+    [EVENT_END_INDEX_CHANGED]: () => void;
+}
+/**
+ * The EventInterface type with Splide `EventMap`.
+ *
+ * @since 5.0.0
+ */
+declare type EventInterface = EventInterface$1<EventMap & Record<string, AnyFunction>>;
+
 /**
  * The type for any function.
  *
@@ -757,7 +840,7 @@ declare type AnyFunction = (...args: any[]) => any;
  *
  * @since 3.0.0
  */
-declare type ComponentConstructor = (Splide: Splide, Components: Components, options: Options, event: EventInterface) => BaseComponent;
+declare type ComponentConstructor<R extends BaseComponent = BaseComponent> = (Splide: Splide, Components: Components, options: Options, event: EventInterface) => R;
 /**
  * The interface for any component.
  *
@@ -813,43 +896,6 @@ interface Components {
     Wheel: WheelComponent;
     Live: LiveComponent;
     Transition: TransitionComponent;
-}
-
-/**
- * The interface for all internal events.
- *
- * @since 3.0.0
- */
-interface EventMap {
-    'mounted': () => void;
-    'ready': () => void;
-    'click': (Slide: SlideComponent, e: MouseEvent) => void;
-    'move': (index: number, prev: number, dest: number) => void;
-    'moved': (index: number, prev: number, dest: number) => void;
-    'active': (Slide: SlideComponent) => void;
-    'inactive': (Slide: SlideComponent) => void;
-    'visible': (Slide: SlideComponent) => void;
-    'hidden': (Slide: SlideComponent) => void;
-    'refresh': () => void;
-    'updated': (options: Options) => void;
-    'resize': () => void;
-    'resized': () => void;
-    'drag': () => void;
-    'dragging': () => void;
-    'dragged': () => void;
-    'scroll': () => void;
-    'scrolled': () => void;
-    'overflow': (overflow: boolean) => void;
-    'destroy': () => void;
-    'arrows:mounted': (prev: HTMLButtonElement, next: HTMLButtonElement) => void;
-    'arrows:updated': (prev: HTMLButtonElement, next: HTMLButtonElement, prevIndex: number, nextIndex: number) => void;
-    'pagination:mounted': (data: PaginationData, item: PaginationItem) => void;
-    'pagination:updated': (data: PaginationData, prev: PaginationItem, curr: PaginationItem) => void;
-    'navigation:mounted': (splides: Splide[]) => void;
-    'autoplay:play': () => void;
-    'autoplay:playing': (rate: number) => void;
-    'autoplay:pause': () => void;
-    'lazyload:loaded': (img: HTMLImageElement, Slide: SlideComponent) => void;
 }
 
 /**
@@ -959,7 +1005,7 @@ declare class Splide {
     /**
      * The EventBusObject object.
      */
-    readonly event: EventInterface<Record<string, AnyFunction$1>>;
+    readonly event: EventInterface$1<Record<string, AnyFunction$1>>;
     /**
      * The collection of all component objects.
      */
@@ -1564,40 +1610,6 @@ declare class SplideRenderer {
     html(): string;
 }
 
-declare const EVENT_MOUNTED = "mounted";
-declare const EVENT_READY = "ready";
-declare const EVENT_MOVE = "move";
-declare const EVENT_MOVED = "moved";
-declare const EVENT_CLICK = "click";
-declare const EVENT_ACTIVE = "active";
-declare const EVENT_INACTIVE = "inactive";
-declare const EVENT_VISIBLE = "visible";
-declare const EVENT_HIDDEN = "hidden";
-declare const EVENT_REFRESH = "refresh";
-declare const EVENT_UPDATED = "updated";
-declare const EVENT_RESIZE = "resize";
-declare const EVENT_RESIZED = "resized";
-declare const EVENT_DRAG = "drag";
-declare const EVENT_DRAGGING = "dragging";
-declare const EVENT_DRAGGED = "dragged";
-declare const EVENT_SCROLL = "scroll";
-declare const EVENT_SCROLLED = "scrolled";
-declare const EVENT_OVERFLOW = "overflow";
-declare const EVENT_DESTROY = "destroy";
-declare const EVENT_ARROWS_MOUNTED = "arrows:mounted";
-declare const EVENT_ARROWS_UPDATED = "arrows:updated";
-declare const EVENT_PAGINATION_MOUNTED = "pagination:mounted";
-declare const EVENT_PAGINATION_UPDATED = "pagination:updated";
-declare const EVENT_NAVIGATION_MOUNTED = "navigation:mounted";
-declare const EVENT_AUTOPLAY_PLAY = "autoplay:play";
-declare const EVENT_AUTOPLAY_PLAYING = "autoplay:playing";
-declare const EVENT_AUTOPLAY_PAUSE = "autoplay:pause";
-declare const EVENT_LAZYLOAD_LOADED = "lazyload:loaded";
-/** @internal */
-declare const EVENT_SLIDE_KEYDOWN = "sk";
-declare const EVENT_SHIFTED = "sh";
-declare const EVENT_END_INDEX_CHANGED = "ei";
-
 /**
  * All classes as constants.
  */
@@ -1691,4 +1703,4 @@ declare const LOOP = "loop";
  */
 declare const FADE = "fade";
 
-export { AnyFunction, ArrowsComponent, AutoplayComponent, BaseComponent, BreakpointsComponent, CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_CLONE, CLASS_CONTAINER, CLASS_FOCUS_IN, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_OVERFLOW, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SPINNER, CLASS_SR, CLASS_TOGGLE, CLASS_TOGGLE_PAUSE, CLASS_TOGGLE_PLAY, CLASS_TRACK, CLASS_VISIBLE, Cast, ClonesComponent, ComponentConstructor, Components, ControllerComponent, DEFAULTS, DirectionComponent, DragComponent, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_END_INDEX_CHANGED, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_OVERFLOW, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, ElementsComponent, EventMap, FADE, Head, KeyboardComponent, LOOP, LTR, LayoutComponent, LazyLoadComponent, LiveComponent, MoveComponent, Options, PaginationComponent, PaginationData, PaginationItem, Push, RTL, Resolve, ResponsiveOptions, SLIDE, STATUS_CLASSES, ScrollComponent, Shift, ShiftN, SlideComponent, SlidesComponent, Splide, SplideRenderer, SyncComponent, SyncTarget, TTB, TransitionComponent, WheelComponent, Splide as default };
+export { AnyFunction, ArrowsComponent, AutoplayComponent, BaseComponent, BreakpointsComponent, CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_CLONE, CLASS_CONTAINER, CLASS_FOCUS_IN, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_OVERFLOW, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SPINNER, CLASS_SR, CLASS_TOGGLE, CLASS_TOGGLE_PAUSE, CLASS_TOGGLE_PLAY, CLASS_TRACK, CLASS_VISIBLE, Cast, ClonesComponent, ComponentConstructor, Components, ControllerComponent, DEFAULTS, DirectionComponent, DragComponent, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_END_INDEX_CHANGED, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_ERROR, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_OVERFLOW, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, ElementsComponent, EventInterface, EventMap, FADE, Head, KeyboardComponent, LOOP, LTR, LayoutComponent, LazyLoadComponent, LiveComponent, MoveComponent, Options, PaginationComponent, PaginationData, PaginationItem, Push, RTL, Resolve, ResponsiveOptions, SLIDE, STATUS_CLASSES, ScrollComponent, Shift, ShiftN, SlideComponent, SlidesComponent, Splide, SplideRenderer, SyncComponent, SyncTarget, TTB, TransitionComponent, WheelComponent, Splide as default };

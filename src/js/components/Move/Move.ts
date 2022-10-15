@@ -9,9 +9,8 @@ import {
 } from '../../constants/events';
 import { IDLE, MOVING } from '../../constants/states';
 import { FADE, LOOP, SLIDE } from '../../constants/types';
-import { Splide } from '../../core/Splide/Splide';
-import { AnyFunction, BaseComponent, Components, Options, TransitionComponent } from '../../types';
-import { abs, ceil, clamp, EventInterface, rect, style } from '@splidejs/utils';
+import { AnyFunction, BaseComponent, ComponentConstructor, TransitionComponent } from '../../types';
+import { abs, ceil, clamp, rect, style } from '@splidejs/utils';
 
 
 /**
@@ -47,12 +46,7 @@ export interface MoveComponent extends BaseComponent {
  *
  * @return A Move component object.
  */
-export function Move(
-  Splide: Splide,
-  Components: Components,
-  options: Options,
-  event: EventInterface
-): MoveComponent {
+export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, options, event ) => {
   const { on, emit } = event;
   const { set } = Splide.state;
   const { Slides } = Components;
@@ -308,4 +302,4 @@ export function Move(
     exceededLimit,
     reposition,
   };
-}
+};

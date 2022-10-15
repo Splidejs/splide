@@ -1,14 +1,13 @@
 import { EVENT_REFRESH, EVENT_RESIZE } from '../../constants/events';
-import { Splide } from '../../core/Splide/Splide';
-import { AnyFunction, BaseComponent, Components, Options } from '../../types';
+import { AnyFunction, BaseComponent, ComponentConstructor } from '../../types';
 import {
   addClass,
   append,
   apply,
   before,
-  between, CSSProperties,
+  between,
+  CSSProperties,
   empty,
-  EventInterface,
   forEach as forEachItem,
   includes,
   isFunction,
@@ -76,12 +75,7 @@ export type SlideMatcher = number | number[] | string | SlidesPredicate;
  *
  * @return An Slides component object.
  */
-export function Slides(
-  Splide: Splide,
-  Components: Components,
-  options: Options,
-  event: EventInterface
-): SlidesComponent {
+export const Slides: ComponentConstructor<SlidesComponent> = ( Splide, Components, options, event ) => {
   const { on, emit, bind } = event;
   const { slides, list } = Components.Elements;
 
@@ -303,4 +297,4 @@ export function Slides(
     getLength,
     isEnough,
   };
-}
+};

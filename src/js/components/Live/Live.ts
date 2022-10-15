@@ -1,18 +1,8 @@
 import { ARIA_ATOMIC, ARIA_BUSY, ARIA_LIVE } from '../../constants/attributes';
 import { CLASS_SR } from '../../constants/classes';
 import { EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_MOVED, EVENT_SCROLLED } from '../../constants/events';
-import { Splide } from '../../core/Splide/Splide';
-import { BaseComponent, Components, Options } from '../../types';
-import {
-  append,
-  apply,
-  create,
-  EventInterface,
-  removeNode,
-  removeAttribute,
-  RequestInterval,
-  setAttribute,
-} from '@splidejs/utils';
+import { BaseComponent, ComponentConstructor } from '../../types';
+import { append, apply, create, removeAttribute, removeNode, RequestInterval, setAttribute } from '@splidejs/utils';
 import { VISUALLY_HIDDEN } from './constants';
 
 
@@ -44,12 +34,7 @@ const SR_REMOVAL_DELAY = 90;
  *
  * @return A Live component object.
  */
-export function Live(
-  Splide: Splide,
-  Components: Components,
-  options: Options,
-  event: EventInterface
-): LiveComponent {
+export const Live: ComponentConstructor<LiveComponent> = ( Splide, Components, options, event ) => {
   const { on } = event;
   const { track } = Components.Elements;
 
@@ -128,4 +113,4 @@ export function Live(
     disable,
     destroy,
   };
-}
+};

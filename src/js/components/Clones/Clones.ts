@@ -1,20 +1,7 @@
 import { EVENT_REFRESH, EVENT_RESIZE, EVENT_UPDATED } from '../../constants/events';
 import { LOOP } from '../../constants/types';
-import { Splide } from '../../core/Splide/Splide';
-import { BaseComponent, Components, Options } from '../../types';
-import {
-  addClass,
-  append,
-  before,
-  ceil,
-  empty,
-  EventInterface,
-  isUndefined,
-  pad,
-  push,
-  rect,
-  removeNode,
-} from '@splidejs/utils';
+import { BaseComponent, ComponentConstructor } from '../../types';
+import { addClass, append, before, ceil, empty, isUndefined, pad, push, rect, removeNode } from '@splidejs/utils';
 
 
 /**
@@ -44,12 +31,7 @@ export const MULTIPLIER = 2;
  *
  * @return A Clones component object.
  */
-export function Clones(
-  Splide: Splide,
-  Components: Components,
-  options: Options,
-  event: EventInterface
-): ClonesComponent {
+export const Clones: ComponentConstructor<ClonesComponent> = ( Splide, Components, options, event ) => {
   const { on } = event;
   const { Elements, Slides, Layout: { resize } } = Components;
   const { resolve } = Components.Direction;
@@ -174,4 +156,4 @@ export function Clones(
     mount,
     destroy,
   };
-}
+};

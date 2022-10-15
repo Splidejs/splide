@@ -1,8 +1,7 @@
 import { MEDIA_PREFERS_REDUCED_MOTION } from '../../constants/media';
 import { CREATED, DESTROYED } from '../../constants/states';
-import { EventBinder, EventInterface, merge, omit, ownKeys } from '@splidejs/utils';
-import { Splide } from '../../core/Splide/Splide';
-import { BaseComponent, Components, Options } from '../../types';
+import { EventBinder, merge, omit, ownKeys } from '@splidejs/utils';
+import { BaseComponent, ComponentConstructor, Options } from '../../types';
 import { EVENT_OVERFLOW, EVENT_UPDATED } from '../../constants/events';
 
 
@@ -37,12 +36,7 @@ const NOT_OVERFLOW_KEY = '!overflow';
  *
  * @return A Media component object.
  */
-export function Breakpoints(
-  Splide: Splide,
-  Components: Components,
-  options: Options,
-  event: EventInterface
-): BreakpointsComponent {
+export const Breakpoints: ComponentConstructor<BreakpointsComponent> = ( Splide, Components, options, event ) => {
   const { state } = Splide;
   const breakpoints   = options.breakpoints || {};
   const reducedMotion = options.reducedMotion || {};
@@ -161,4 +155,4 @@ export function Breakpoints(
     reduce,
     set,
   };
-}
+};

@@ -1,8 +1,7 @@
 import { ARROW_LEFT, ARROW_RIGHT } from '../../constants/arrows';
 import { EVENT_MOVE, EVENT_UPDATED } from '../../constants/events';
-import { Splide } from '../../core/Splide/Splide';
-import { BaseComponent, Components, Options } from '../../types';
-import { EventInterface, nextTick } from '@splidejs/utils';
+import { BaseComponent, ComponentConstructor } from '../../types';
+import { nextTick } from '@splidejs/utils';
 
 
 /**
@@ -33,12 +32,7 @@ const KEYBOARD_EVENT = 'keydown';
  *
  * @return A Keyboard component object.
  */
-export function Keyboard(
-  Splide: Splide,
-  Components: Components,
-  options: Options,
-  event: EventInterface
-): KeyboardComponent {
+export const Keyboard: ComponentConstructor<KeyboardComponent> = ( Splide, Components, options, event ) => {
   const { on, bind, destroy } = event;
   const { root } = Splide;
   const { resolve } = Components.Direction;
@@ -114,4 +108,4 @@ export function Keyboard(
     destroy,
     disable,
   };
-}
+};

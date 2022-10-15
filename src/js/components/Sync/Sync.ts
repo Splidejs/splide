@@ -10,8 +10,8 @@ import {
 } from '../../constants/events';
 import { LOOP } from '../../constants/types';
 import { Splide } from '../../core/Splide/Splide';
-import { BaseComponent, Components, Options } from '../../types';
-import { apply, empty, EventInterface, includes, isUndefined, prevent, setAttribute } from '@splidejs/utils';
+import { BaseComponent, ComponentConstructor, EventInterface } from '../../types';
+import { apply, empty, includes, isUndefined, prevent, setAttribute } from '@splidejs/utils';
 import { SlideComponent } from '../Slides/Slide';
 
 
@@ -43,12 +43,7 @@ const TRIGGER_KEYS = [ ' ', 'Enter' ];
  *
  * @return A Sync component object.
  */
-export function Sync(
-  Splide: Splide,
-  Components: Components,
-  options: Options,
-  event: EventInterface
-): SyncComponent {
+export const Sync: ComponentConstructor<SyncComponent> = ( Splide, Components, options, event ) => {
   const { isNavigation, slideFocus } = options;
 
   /**
@@ -165,4 +160,4 @@ export function Sync(
     destroy,
     remount,
   };
-}
+};

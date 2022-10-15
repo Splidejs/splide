@@ -1,19 +1,8 @@
 import { EVENT_END_INDEX_CHANGED, EVENT_REFRESH, EVENT_RESIZED, EVENT_UPDATED } from '../../constants/events';
 import { MOVING, SCROLLING } from '../../constants/states';
 import { LOOP, SLIDE } from '../../constants/types';
-import { Splide } from '../../core/Splide/Splide';
-import { AnyFunction, BaseComponent, Components, Options } from '../../types';
-import {
-  apply,
-  approximatelyEqual,
-  between,
-  clamp,
-  EventInterface,
-  floor,
-  isString,
-  isUndefined,
-  min,
-} from '@splidejs/utils';
+import { AnyFunction, BaseComponent, ComponentConstructor } from '../../types';
+import { apply, approximatelyEqual, between, clamp, floor, isString, isUndefined, min } from '@splidejs/utils';
 
 
 /**
@@ -52,12 +41,7 @@ export interface ControllerComponent extends BaseComponent {
  *
  * @return A Controller component object.
  */
-export function Controller(
-  Splide: Splide,
-  Components: Components,
-  options: Options,
-  event: EventInterface
-): ControllerComponent {
+export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, Components, options, event ) => {
   const { on, emit } = event;
   const { Move } = Components;
   const { getPosition, getLimit, toPosition } = Move;
@@ -434,4 +418,4 @@ export function Controller(
     hasFocus,
     isBusy,
   };
-}
+};

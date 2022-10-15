@@ -16,8 +16,7 @@ import {
 } from '../../constants/classes';
 import { EVENT_REFRESH, EVENT_UPDATED } from '../../constants/events';
 import { PROJECT_CODE } from '../../constants/project';
-import { Splide } from '../../core/Splide/Splide';
-import { BaseComponent, Components, Options } from '../../types';
+import { BaseComponent, ComponentConstructor } from '../../types';
 import {
   addClass,
   assign,
@@ -25,7 +24,6 @@ import {
   children,
   closest,
   empty,
-  EventInterface,
   getAttribute,
   push,
   query,
@@ -77,12 +75,7 @@ export interface ElementsComponent extends BaseComponent, ElementCollection {
  *
  * @return An Elements component object.
  */
-export function Elements(
-  Splide: Splide,
-  Components: Components,
-  options: Options,
-  event: EventInterface
-): ElementsComponent {
+export const Elements: ComponentConstructor<ElementsComponent> = ( Splide, Components, options, event ) => {
   const { on, bind } = event;
   const { root } = Splide;
   const { i18n } = options;
@@ -255,4 +248,4 @@ export function Elements(
     mount,
     destroy,
   } );
-}
+};

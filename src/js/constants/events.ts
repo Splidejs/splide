@@ -27,8 +27,9 @@ export const EVENT_AUTOPLAY_PLAY      = 'autoplay:play';
 export const EVENT_AUTOPLAY_PLAYING   = 'autoplay:playing';
 export const EVENT_AUTOPLAY_PAUSE     = 'autoplay:pause';
 export const EVENT_LAZYLOAD_LOADED    = 'lazyload:loaded';
+export const EVENT_LAZYLOAD_ERROR     = 'lazyload:error';
 
 /** @internal */
-export const EVENT_SLIDE_KEYDOWN     = 'sk';
-export const EVENT_SHIFTED           = 'sh';
-export const EVENT_END_INDEX_CHANGED = 'ei';
+export const EVENT_SLIDE_KEYDOWN     = '_sk';
+export const EVENT_SHIFTED           = '_sh';
+export const EVENT_END_INDEX_CHANGED = '_ei';

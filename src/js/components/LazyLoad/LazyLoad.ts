@@ -1,13 +1,13 @@
 import { CLASS_LOADING } from '../../constants/classes';
 import {
+  EVENT_LAZYLOAD_ERROR,
   EVENT_LAZYLOAD_LOADED,
   EVENT_MOVED,
   EVENT_REFRESH,
   EVENT_RESIZE,
   EVENT_SCROLLED,
 } from '../../constants/events';
-import { Splide } from '../../core/Splide/Splide';
-import { BaseComponent, Components, Options } from '../../types';
+import { BaseComponent, ComponentConstructor } from '../../types';
 import {
   addClass,
   apply,
@@ -15,12 +15,11 @@ import {
   create,
   display,
   empty,
-  EventInterface,
   getAttribute,
   queryAll,
-  removeNode,
   removeAttribute,
   removeClass,
+  removeNode,
   setAttribute,
 } from '@splidejs/utils';
 import { SlideComponent } from '../Slides/Slide';
@@ -57,12 +56,7 @@ type LazyLoadEntry = [ HTMLImageElement, SlideComponent, HTMLSpanElement ];
  *
  * @return An LazyLoad component object.
  */
-export function LazyLoad(
-  Splide: Splide,
-  Components: Components,
-  options: Options,
-  event: EventInterface
-): LazyLoadComponent {
+export const LazyLoad: ComponentConstructor<LazyLoadComponent> = ( Splide, Components, options, event ) => {
   const { on, off, bind, emit } = event;
   const isSequential = options.lazyLoad === 'sequential';
   const events       = [ EVENT_MOVED, EVENT_SCROLLED ];
@@ -167,6 +161,8 @@ export function LazyLoad(
       display( img, '' );
       emit( EVENT_LAZYLOAD_LOADED, img, Slide );
       emit( EVENT_RESIZE );
+    } else {
+      emit( EVENT_LAZYLOAD_ERROR, img, Slide );
     }
 
     isSequential && loadNext();
@@ -184,4 +180,4 @@ export function LazyLoad(
     destroy: apply( empty, entries ),
     check,
   };
-}
+};

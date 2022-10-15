@@ -1,7 +1,6 @@
 import { EVENT_MOUNTED, EVENT_REFRESH } from '../../constants/events';
-import { Splide } from '../../core/Splide/Splide';
-import { Components, Options, TransitionComponent } from '../../types';
-import { EventInterface, nextTick, noop } from '@splidejs/utils';
+import { ComponentConstructor, TransitionComponent } from '../../types';
+import { nextTick, noop } from '@splidejs/utils';
 
 
 /**
@@ -16,12 +15,7 @@ import { EventInterface, nextTick, noop } from '@splidejs/utils';
  *
  * @return A Transition component object.
  */
-export function Fade(
-  Splide: Splide,
-  Components: Components,
-  options: Options,
-  event: EventInterface
-): TransitionComponent {
+export const Fade: ComponentConstructor<TransitionComponent> = ( Splide, Components, options, event ) => {
   const { Slides } = Components;
 
   /**
@@ -58,4 +52,4 @@ export function Fade(
     start,
     cancel: noop,
   };
-}
+};

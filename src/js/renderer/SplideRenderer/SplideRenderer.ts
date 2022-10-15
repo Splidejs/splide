@@ -108,7 +108,7 @@ export class SplideRenderer {
     this.config    = assign( {}, RENDERER_DEFAULT_CONFIG, config || {} );
     this.id        = this.config.id || uniqueId( 'splide' );
     this.Style     = new Style( this.id, this.options );
-    this.Direction = Direction( null, null, this.options );
+    this.Direction = Direction( null, null, this.options, undefined );
 
     assert( this.contents.length, 'Provide at least 1 content.' );
 
