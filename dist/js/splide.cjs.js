@@ -66,9 +66,6 @@ function toArray(value) {
 function forEach(values, iteratee) {
   toArray(values).forEach(iteratee);
 }
-function includes(array, value) {
-  return array.includes(value);
-}
 function push(array, items) {
   array.push(...toArray(items));
   return array;
@@ -76,6 +73,9 @@ function push(array, items) {
 const arrayProto = Array.prototype;
 function slice(arrayLike, start, end) {
   return arrayProto.slice.call(arrayLike, start, end);
+}
+function includes(arrayLike, value) {
+  return arrayProto.includes.call(arrayLike, value);
 }
 function toggleClass(elm, classes, force) {
   if (elm) {
@@ -1216,9 +1216,8 @@ const Move = (Splide, Components, options, event) => {
   }
   function loop(position) {
     if (Splide.is(LOOP)) {
-      const index = toIndex(position);
-      const exceededMax = index > Components.Controller.getEnd();
-      const exceededMin = index < 0;
+      const exceededMax = exceededLimit(true, position);
+      const exceededMin = exceededLimit(false, position);
       if (exceededMin || exceededMax) {
         position = shift(position, exceededMax);
       }
@@ -1294,7 +1293,8 @@ const Move = (Splide, Components, options, event) => {
     getPosition,
     getLimit,
     exceededLimit,
-    reposition
+    reposition,
+    canShift
   };
 };
 
@@ -1341,7 +1341,9 @@ const Controller = (Splide, Components, options, event) => {
     if (!isBusy()) {
       const dest = parse(control);
       const index = loop(dest);
-      if (index > -1 && (allowSameIndex || index !== currIndex)) {
+      const validIndex = index > -1 && (allowSameIndex || index !== currIndex);
+      const canMove = dest === index || Move.canShift(dest > prevIndex);
+      if (validIndex && canMove) {
         setIndex(index);
         Move.move(dest, index, prevIndex, callback);
       }
@@ -1839,7 +1841,7 @@ const Drag = (Splide, Components, options, event) => {
     const rewind = options.rewind && options.rewindByDrag;
     reduce(false);
     if (isFree) {
-      Controller.scroll(destination, 0, options.snap);
+      Controller.scroll(destination, void 0, options.snap);
     } else if (Splide.is(FADE)) {
       Controller.go(orient(sign(velocity)) < 0 ? rewind ? "<" : "-" : rewind ? ">" : "+");
     } else if (Splide.is(SLIDE) && exceeded && rewind) {
@@ -2229,23 +2231,32 @@ const Sync = (Splide2, Components, options, event) => {
 const Wheel = (Splide, Components, options, event) => {
   let lastTime = 0;
   function mount() {
+    event.destroy();
     if (options.wheel) {
       event.bind(Components.Elements.track, "wheel", onWheel, SCROLL_LISTENER_OPTIONS);
     }
+    event.on(EVENT_UPDATED, mount);
   }
   function onWheel(e) {
     if (e.cancelable) {
-      const { deltaY } = e;
-      const backwards = deltaY < 0;
+      const delta = parse(e);
+      const backwards = delta < 0;
       const timeStamp = timeOf(e);
       const min = options.wheelMinThreshold || 0;
       const sleep = options.wheelSleep || 0;
-      if (abs(deltaY) > min && timeStamp - lastTime > sleep) {
-        Splide.go(backwards ? "<" : ">");
+      if (abs(delta) > min && timeStamp - lastTime > sleep) {
+        Splide.go(delta < 0 ? "<" : ">");
         lastTime = timeStamp;
       }
       shouldPrevent(backwards) && prevent(e);
     }
+  }
+  function parse(e) {
+    const { wheelAxis = "y" } = options;
+    const { deltaX, deltaY } = e;
+    const x = includes(wheelAxis, "x") ? Components.Direction.orient(-deltaX) : 0;
+    const y = includes(wheelAxis, "y") ? deltaY : 0;
+    return x || y;
   }
   function shouldPrevent(backwards) {
     return !options.releaseWheel || Splide.state.is(MOVING) || Components.Controller.getAdjacent(backwards) !== -1;

@@ -134,10 +134,12 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    */
   function go( control: number | string, allowSameIndex?: boolean, callback?: AnyFunction ): void {
     if ( ! isBusy() ) {
-      const dest  = parse( control );
-      const index = loop( dest );
+      const dest       = parse( control );
+      const index      = loop( dest );
+      const validIndex = index > -1 && ( allowSameIndex || index !== currIndex );
+      const canMove    = dest === index || Move.canShift( dest > prevIndex );
 
-      if ( index > -1 && ( allowSameIndex || index !== currIndex ) ) {
+      if ( validIndex && canMove ) {
         setIndex( index );
         Move.move( dest, index, prevIndex, callback );
       }

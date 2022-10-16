@@ -32,6 +32,7 @@ export interface MoveComponent extends BaseComponent {
 
   /** @internal */
   reposition(): void;
+  canShift( backwards: boolean ): boolean;
 }
 
 /**
@@ -131,12 +132,13 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    * Loops the provided position if it exceeds bounds (limit indices).
    *
    * @param position - A position to loop.
+   *
+   * @return A looped position.
    */
   function loop( position: number ): number {
     if ( Splide.is( LOOP ) ) {
-      const index       = toIndex( position );
-      const exceededMax = index > Components.Controller.getEnd();
-      const exceededMin = index < 0;
+      const exceededMax = exceededLimit( true, position );
+      const exceededMin = exceededLimit( false, position );
 
       if ( exceededMin || exceededMax ) {
         position = shift( position, exceededMax );
@@ -301,5 +303,6 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
     getLimit,
     exceededLimit,
     reposition,
+    canShift,
   };
 };

@@ -92,6 +92,9 @@ export function init( options: Options = {}, args: InitArgs = {} ): Splide {
 
   if ( mount ) {
     splide.mount();
+
+    // Can not simulate this method.
+    splide.Components.Move.canShift = () => true;
   }
 
   return splide;

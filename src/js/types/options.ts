@@ -104,9 +104,14 @@ export interface Options extends ResponsiveOptions {
 
   /**
    * Enables navigation by the mouse wheel.
-   * Set `waitForTransition` to `ture` or provide the `wheelSleep` duration.
+   * You'll need to set `waitForTransition` to `ture` or provide the `wheelSleep` duration to avoid quick change.
    */
   wheel?: boolean;
+
+  /**
+   * Determines the wheel axis. The default value is 'y'.
+   */
+  wheelAxis?: 'x' | 'y' | 'xy';
 
   /**
    * The threshold to cut off the small delta produced by inertia scroll.
