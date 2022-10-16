@@ -180,7 +180,7 @@ export const Slides: ComponentConstructor<SlidesComponent> = ( Splide, Component
 
       if ( isHTMLElement( slide ) ) {
         const ref = slides[ index ];
-        ref ? before( slide, ref ) : append( list, slide );
+        ref ? before( ref, slide ) : append( list, slide );
         addClass( slide, options.classes.slide );
         observeImages( slide, apply( emit, EVENT_RESIZE ) );
       }

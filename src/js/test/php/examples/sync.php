@@ -22,17 +22,17 @@ $settings = get_settings();
 		    heightRatio: 0.3,
 		    perPage    : 1,
 		    pagination : false,
-		    keyboard   : false,
-		    cover: true,
+		    keyboard   : true,
 		    breakpoints: {
 			    1000: {
-				    destroy: true,
+            keyboard: false
+				    // destroy: true,
 			    },
 		    },
 	    } );
 
 	    var splide02 = new Splide( '#splide02', {
-		    type            : 'loop',
+		    // type            : 'loop',
 		    width           : 600,
 		    fixedWidth      : 100,
 		    fixedHeight     : 56,
@@ -41,7 +41,7 @@ $settings = get_settings();
 		    focus           : 'center',
 		    pagination      : false,
 		    rewind          : true,
-		    keyboard        : false,
+		    keyboard        : true,
         drag            : 'free',
         updateOnDragged : false,
 		    dragMinThreshold: {
@@ -60,7 +60,7 @@ $settings = get_settings();
 		    gap         : '.7em',
 		    isNavigation: true,
 		    pagination  : false,
-		    keyboard    : false,
+		    keyboard    : true,
 	    } );
 
       splide01.sync( splide02 );

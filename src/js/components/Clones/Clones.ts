@@ -110,7 +110,7 @@ export const Clones: ComponentConstructor<ClonesComponent> = ( Splide, Component
       push( slides.slice( -count ), slides.slice( 0, count ) ).forEach( ( Slide, index ) => {
         const isHead = index < count;
         const clone  = cloneDeep( Slide.slide, index );
-        isHead ? before( clone, slides[ 0 ].slide ) : append( Elements.list, clone );
+        isHead ? before( slides[ 0 ].slide, clone ) : append( Elements.list, clone );
         push( clones, clone );
         Slides.register( clone, index - count + ( isHead ? 0 : length ), Slide.index );
       } );

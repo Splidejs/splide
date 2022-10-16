@@ -89,16 +89,11 @@
   function addClass(elm, classes) {
     toggleClass(elm, classes, true);
   }
-  function append(parent, children2) {
-    forEach(children2, parent.appendChild.bind(parent));
+  function append(parent, ...children2) {
+    parent && parent.append(...children2);
   }
-  function before(nodes, ref) {
-    forEach(nodes, (node) => {
-      const parent = (ref || node).parentNode;
-      if (parent) {
-        parent.insertBefore(node, ref);
-      }
-    });
+  function before(ref, ...nodes) {
+    ref && ref.before(...nodes);
   }
   function matches(elm, selector) {
     return isHTMLElement(elm) && elm.matches(selector);
@@ -929,7 +924,7 @@
         }
         if (isHTMLElement(slide)) {
           const ref = slides[index];
-          ref ? before(slide, ref) : append(list, slide);
+          ref ? before(ref, slide) : append(list, slide);
           addClass(slide, options.classes.slide);
           observeImages(slide, apply(emit, EVENT_RESIZE));
         }
@@ -1140,7 +1135,7 @@
         push(slides.slice(-count), slides.slice(0, count)).forEach((Slide, index) => {
           const isHead = index < count;
           const clone = cloneDeep(Slide.slide, index);
-          isHead ? before(clone, slides[0].slide) : append(Elements.list, clone);
+          isHead ? before(slides[0].slide, clone) : append(Elements.list, clone);
           push(clones, clone);
           Slides.register(clone, index - count + (isHead ? 0 : length), Slide.index);
         });
@@ -1547,8 +1542,8 @@
       prev = createArrow(true);
       next = createArrow(false);
       created = true;
-      append(wrapper, [prev, next]);
-      !placeholder && before(wrapper, track);
+      append(wrapper, prev, next);
+      !placeholder && before(track, wrapper);
     }
     function createArrow(prev2) {
       const arrow = `<button class="${classes.arrow} ${prev2 ? classes.prev : classes.next}" type="button"><svg xmlns="${XML_NAME_SPACE}" viewBox="0 0 ${SIZE} ${SIZE}" width="${SIZE}" height="${SIZE}"><path d="${options.arrowPath || PATH}" />`;
@@ -1927,41 +1922,24 @@
 
   const KEYBOARD_EVENT = "keydown";
   const Keyboard = (Splide, Components, options, event) => {
-    const { on, bind, destroy } = event;
-    const { root } = Splide;
+    const { destroy } = event;
     const { resolve } = Components.Direction;
-    let target;
-    let disabled;
     function mount() {
-      init();
-      on(EVENT_UPDATED, destroy);
-      on(EVENT_UPDATED, init);
-      on(EVENT_MOVE, onMove);
-    }
-    function init() {
       const { keyboard } = options;
-      if (keyboard) {
-        target = keyboard === "global" ? window : root;
-        bind(target, KEYBOARD_EVENT, onKeydown);
-      }
+      destroy();
+      keyboard && event.bind(keyboard === "global" ? window : Splide.root, KEYBOARD_EVENT, onKeydown);
+      event.on(EVENT_UPDATED, mount);
     }
     function disable(value) {
-      disabled = value;
-    }
-    function onMove() {
-      const _disabled = disabled;
-      disabled = true;
-      nextTick(() => {
-        disabled = _disabled;
-      });
+      value ? destroy() : mount();
     }
     function onKeydown(e) {
-      if (!disabled) {
-        if (e.key === resolve(ARROW_LEFT)) {
-          Splide.go("<");
-        } else if (e.key === resolve(ARROW_RIGHT)) {
-          Splide.go(">");
-        }
+      if (e.key === resolve(ARROW_LEFT)) {
+        Splide.go("<");
+        prevent(e, true);
+      } else if (e.key === resolve(ARROW_RIGHT)) {
+        Splide.go(">");
+        prevent(e, true);
       }
     }
     return {

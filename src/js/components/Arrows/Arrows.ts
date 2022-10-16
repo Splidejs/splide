@@ -170,8 +170,8 @@ export const Arrows: ComponentConstructor<ArrowsComponent> = ( Splide, Component
     next    = createArrow( false );
     created = true;
 
-    append( wrapper, [ prev, next ] );
-    ! placeholder && before( wrapper, track );
+    append( wrapper, prev, next );
+    ! placeholder && before( track, wrapper );
   }
 
   /**
