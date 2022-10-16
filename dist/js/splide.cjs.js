@@ -1926,14 +1926,13 @@ const Drag = (Splide, Components, options, event) => {
 
 const KEYBOARD_EVENT = "keydown";
 const Keyboard = (Splide, Components, options, event) => {
-  const { on, bind, destroy } = event;
-  const { root } = Splide;
+  const { destroy } = event;
   const { resolve } = Components.Direction;
   function mount() {
     const { keyboard } = options;
     destroy();
-    keyboard && bind(keyboard === "global" ? window : root, KEYBOARD_EVENT, onKeydown);
-    on(EVENT_UPDATED, mount);
+    keyboard && event.bind(keyboard === "global" ? window : Splide.root, KEYBOARD_EVENT, onKeydown);
+    event.on(EVENT_UPDATED, mount);
   }
   function disable(value) {
     value ? destroy() : mount();
@@ -1986,9 +1985,8 @@ const LazyLoad = (Splide, Components, options, event) => {
         const src = getAttribute(img, SRC_DATA_ATTRIBUTE);
         const srcset = getAttribute(img, SRCSET_DATA_ATTRIBUTE);
         if (src !== img.src || srcset !== img.srcset) {
-          const className = options.classes.spinner;
           const parent = img.parentElement;
-          const spinner = child(parent, `.${className}`) || create("span", className, parent);
+          const spinner = child(parent, `.${CLASS_SPINNER}`) || create("span", options.classes.spinner, parent);
           entries.push([img, Slide, spinner]);
           img.src || display(img, "none");
         }
@@ -2008,8 +2006,7 @@ const LazyLoad = (Splide, Components, options, event) => {
     bind(img, "load error", apply(onLoad, data));
     setAttribute(img, "src", getAttribute(img, SRC_DATA_ATTRIBUTE));
     setAttribute(img, "srcset", getAttribute(img, SRCSET_DATA_ATTRIBUTE));
-    removeAttribute(img, SRC_DATA_ATTRIBUTE);
-    removeAttribute(img, SRCSET_DATA_ATTRIBUTE);
+    removeAttribute(img, [SRC_DATA_ATTRIBUTE, SRCSET_DATA_ATTRIBUTE]);
   }
   function onLoad(data, e) {
     const [img, Slide] = data;
@@ -2253,8 +2250,6 @@ const Wheel = (Splide, Components, options, event) => {
   };
 };
 
-const VISUALLY_HIDDEN = `border:0;clip:rect(0,0,0,0);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px`;
-
 const SR_REMOVAL_DELAY = 90;
 const Live = (Splide, Components, options, event) => {
   const { on } = event;
@@ -2268,7 +2263,6 @@ const Live = (Splide, Components, options, event) => {
       disable(!Components.Autoplay.isPaused());
       setAttribute(track, ARIA_ATOMIC, true);
       sr.textContent = "\u2026";
-      sr.style.cssText = VISUALLY_HIDDEN;
       on(EVENT_AUTOPLAY_PLAY, apply(disable, true));
       on(EVENT_AUTOPLAY_PAUSE, apply(disable, false));
       on([EVENT_MOVED, EVENT_SCROLLED], apply(toggle, true));

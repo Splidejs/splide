@@ -3,7 +3,6 @@ import { CLASS_SR } from '../../constants/classes';
 import { EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_MOVED, EVENT_SCROLLED } from '../../constants/events';
 import { BaseComponent, ComponentConstructor } from '../../types';
 import { append, apply, create, removeAttribute, removeNode, RequestInterval, setAttribute } from '@splidejs/utils';
-import { VISUALLY_HIDDEN } from './constants';
 
 
 /**
@@ -63,8 +62,7 @@ export const Live: ComponentConstructor<LiveComponent> = ( Splide, Components, o
     if ( enabled ) {
       disable( ! Components.Autoplay.isPaused() );
       setAttribute( track, ARIA_ATOMIC, true );
-      sr.textContent   = '…';
-      sr.style.cssText = VISUALLY_HIDDEN;
+      sr.textContent = '…';
 
       on( EVENT_AUTOPLAY_PLAY, apply( disable, true ) );
       on( EVENT_AUTOPLAY_PAUSE, apply( disable, false ) );

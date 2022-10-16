@@ -1,4 +1,4 @@
-import { CLASS_LOADING } from '../../constants/classes';
+import { CLASS_LOADING, CLASS_SPINNER } from '../../constants/classes';
 import {
   EVENT_LAZYLOAD_ERROR,
   EVENT_LAZYLOAD_LOADED,
@@ -104,9 +104,8 @@ export const LazyLoad: ComponentConstructor<LazyLoadComponent> = ( Splide, Compo
         const srcset = getAttribute( img, SRCSET_DATA_ATTRIBUTE );
 
         if ( src !== img.src || srcset !== img.srcset ) {
-          const className = options.classes.spinner;
-          const parent    = img.parentElement;
-          const spinner   = child( parent, `.${ className }` ) || create( 'span', className, parent );
+          const parent  = img.parentElement;
+          const spinner = child( parent, `.${ CLASS_SPINNER }` ) || create( 'span', options.classes.spinner, parent );
 
           entries.push( [ img, Slide, spinner ] );
           img.src || display( img, 'none' );
@@ -141,8 +140,8 @@ export const LazyLoad: ComponentConstructor<LazyLoadComponent> = ( Splide, Compo
 
     setAttribute( img, 'src', getAttribute( img, SRC_DATA_ATTRIBUTE ) );
     setAttribute( img, 'srcset', getAttribute( img, SRCSET_DATA_ATTRIBUTE ) );
-    removeAttribute( img, SRC_DATA_ATTRIBUTE );
-    removeAttribute( img, SRCSET_DATA_ATTRIBUTE );
+
+    removeAttribute( img, [ SRC_DATA_ATTRIBUTE, SRCSET_DATA_ATTRIBUTE ] );
   }
 
   /**

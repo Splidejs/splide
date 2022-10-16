@@ -1981,9 +1981,8 @@
           const src = getAttribute(img, SRC_DATA_ATTRIBUTE);
           const srcset = getAttribute(img, SRCSET_DATA_ATTRIBUTE);
           if (src !== img.src || srcset !== img.srcset) {
-            const className = options.classes.spinner;
             const parent = img.parentElement;
-            const spinner = child(parent, `.${className}`) || create("span", className, parent);
+            const spinner = child(parent, `.${CLASS_SPINNER}`) || create("span", options.classes.spinner, parent);
             entries.push([img, Slide, spinner]);
             img.src || display(img, "none");
           }
@@ -2003,8 +2002,7 @@
       bind(img, "load error", apply(onLoad, data));
       setAttribute(img, "src", getAttribute(img, SRC_DATA_ATTRIBUTE));
       setAttribute(img, "srcset", getAttribute(img, SRCSET_DATA_ATTRIBUTE));
-      removeAttribute(img, SRC_DATA_ATTRIBUTE);
-      removeAttribute(img, SRCSET_DATA_ATTRIBUTE);
+      removeAttribute(img, [SRC_DATA_ATTRIBUTE, SRCSET_DATA_ATTRIBUTE]);
     }
     function onLoad(data, e) {
       const [img, Slide] = data;
@@ -2248,8 +2246,6 @@
     };
   };
 
-  const VISUALLY_HIDDEN = `border:0;clip:rect(0,0,0,0);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px`;
-
   const SR_REMOVAL_DELAY = 90;
   const Live = (Splide, Components, options, event) => {
     const { on } = event;
@@ -2263,7 +2259,6 @@
         disable(!Components.Autoplay.isPaused());
         setAttribute(track, ARIA_ATOMIC, true);
         sr.textContent = "\u2026";
-        sr.style.cssText = VISUALLY_HIDDEN;
         on(EVENT_AUTOPLAY_PLAY, apply(disable, true));
         on(EVENT_AUTOPLAY_PAUSE, apply(disable, false));
         on([EVENT_MOVED, EVENT_SCROLLED], apply(toggle, true));
