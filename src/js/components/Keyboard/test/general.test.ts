@@ -23,6 +23,8 @@ describe( 'Keyboard', () => {
 
     keydown( 'ArrowLeft' );
     expect( splide.index ).toBe( 0 );
+
+    splide.destroy();
   } );
 
   test( 'can control the slider by keyboards in TTB mode.', async () => {
@@ -45,6 +47,8 @@ describe( 'Keyboard', () => {
 
     keydown( 'ArrowUp' );
     expect( splide.index ).toBe( 0 );
+
+    splide.destroy();
   } );
 
   test( 'can control the slider by keyboards in RTL mode.', async () => {
@@ -67,6 +71,8 @@ describe( 'Keyboard', () => {
 
     keydown( 'ArrowRight' );
     expect( splide.index ).toBe( 0 );
+
+    splide.destroy();
   } );
 
   test( 'can control the slider by keyboards only when the slider has focus in the `focused` mode.', async () => {
@@ -84,6 +90,8 @@ describe( 'Keyboard', () => {
 
     keydown( 'ArrowRight', root );
     expect( splide.index ).toBe( 1 );
+
+    splide.destroy();
   } );
 
   test( 'can disable the keyboard input.', async () => {
@@ -111,5 +119,7 @@ describe( 'Keyboard', () => {
 
     keydown( 'ArrowLeft' );
     expect( splide.index ).toBe( 0 );
+
+    splide.destroy();
   } );
 } );
