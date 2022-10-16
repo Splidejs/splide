@@ -159,7 +159,10 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
         const expired     = diffTime( e ) > LOG_INTERVAL;
         const hasExceeded = exceeded !== ( exceeded = exceededLimit() );
 
-        expired || hasExceeded && save( e );
+        if ( expired || hasExceeded ) {
+          save( e );
+        }
+
         clickPrevented = true;
         emit( EVENT_DRAGGING );
         prevent( e );
@@ -191,7 +194,7 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
 
     binder.destroy();
     dragging = false;
-    exceeded = false;
+    // exceeded = false;
   }
 
   /**
