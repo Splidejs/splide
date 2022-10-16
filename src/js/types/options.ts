@@ -400,6 +400,12 @@ export interface ResponsiveOptions {
   flickMaxPages?: number;
 
   /**
+   * If `drag` is `'free'`, determines whether to activate the closest slide after drag or not.
+   * The default value is `true`.
+   */
+  updateOnDragged?: boolean;
+
+  /**
    * Enables navigation by the mouse wheel.
    * You'll need to set `waitForTransition` to `ture` or provide the `wheelSleep` duration to avoid quick change.
    */

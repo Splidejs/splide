@@ -1800,7 +1800,9 @@
           Move.translate(basePosition + constrain(diffCoord(e)));
           const expired = diffTime(e) > LOG_INTERVAL;
           const hasExceeded = exceeded !== (exceeded = exceededLimit());
-          expired || hasExceeded && save(e);
+          if (expired || hasExceeded) {
+            save(e);
+          }
           clickPrevented = true;
           emit(EVENT_DRAGGING);
           prevent(e);
@@ -1821,7 +1823,6 @@
       }
       binder.destroy();
       dragging = false;
-      exceeded = false;
     }
     function onClick(e) {
       if (!disabled && clickPrevented) {
@@ -1834,12 +1835,14 @@
       basePosition = getPosition();
     }
     function move(e) {
+      const { updateOnDragged = true } = options;
       const velocity = computeVelocity(e);
       const destination = computeDestination(velocity);
       const rewind = options.rewind && options.rewindByDrag;
+      const scroll = updateOnDragged ? Controller.scroll : Scroll.scroll;
       reduce(false);
       if (isFree) {
-        Controller.scroll(destination, void 0, options.snap);
+        scroll(destination, void 0, options.snap);
       } else if (Splide.is(FADE)) {
         Controller.go(orient(sign(velocity)) < 0 ? rewind ? "<" : "-" : rewind ? ">" : "+");
       } else if (Splide.is(SLIDE) && exceeded && rewind) {

@@ -228,14 +228,16 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
    * @param e - A TouchEvent or MouseEvent object.
    */
   function move( e: TouchEvent | MouseEvent ): void {
+    const { updateOnDragged = true } = options;
     const velocity    = computeVelocity( e );
     const destination = computeDestination( velocity );
     const rewind      = options.rewind && options.rewindByDrag;
+    const scroll      = updateOnDragged ? Controller.scroll : Scroll.scroll;
 
     reduce( false );
 
     if ( isFree ) {
-      Controller.scroll( destination, undefined, options.snap );
+      scroll( destination, undefined, options.snap );
     } else if ( Splide.is( FADE ) ) {
       Controller.go( orient( sign( velocity ) ) < 0 ? ( rewind ? '<' : '-' ) : ( rewind ? '>' : '+' ) );
     } else if ( Splide.is( SLIDE ) && exceeded && rewind ) {

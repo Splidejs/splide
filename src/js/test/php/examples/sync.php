@@ -32,7 +32,7 @@ $settings = get_settings();
 	    } );
 
 	    var splide02 = new Splide( '#splide02', {
-		    // type             : 'loop',
+		    type            : 'loop',
 		    width           : 600,
 		    fixedWidth      : 100,
 		    fixedHeight     : 56,
@@ -42,6 +42,8 @@ $settings = get_settings();
 		    pagination      : false,
 		    rewind          : true,
 		    keyboard        : false,
+        drag            : 'free',
+        updateOnDragged : false,
 		    dragMinThreshold: {
 			    mouse: 10,
 			    touch: 10,
