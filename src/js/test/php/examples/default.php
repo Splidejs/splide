@@ -22,8 +22,9 @@ $settings = get_settings();
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide = new Splide( '#splide01', {
         width: 800,
-        // type        : 'fade',
+        type        : 'loop',
         perPage: 2,
+        releaseTouch: true,
         // perMove: 3,
         // rewind: true,
         // rewindByDrag: true,
@@ -38,6 +39,10 @@ $settings = get_settings();
         label: 'Changed Label',
         // focus: 0,
         // omitEnd: true,
+        wheel: true,
+        wheelAxis: 'xy',
+        // wheelSleep: 200,
+        // direction: 'rtl',
 
         breakpoints: {
           1200: {

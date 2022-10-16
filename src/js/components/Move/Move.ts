@@ -93,6 +93,8 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
     if ( dest !== index && canShift( dest > prev ) ) {
       cancel();
       translate( shift( getPosition(), dest > prev ), true );
+    } else {
+      Transition.cancel();
     }
 
     set( MOVING );

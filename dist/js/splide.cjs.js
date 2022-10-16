@@ -1195,6 +1195,8 @@ const Move = (Splide, Components, options, event) => {
     if (dest !== index && canShift(dest > prev)) {
       cancel();
       translate(shift(getPosition(), dest > prev), true);
+    } else {
+      Transition.cancel();
     }
     set(MOVING);
     emit(EVENT_MOVE, index, prev, dest);

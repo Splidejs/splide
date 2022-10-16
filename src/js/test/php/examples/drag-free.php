@@ -26,8 +26,11 @@ $settings = get_settings();
         // height : 400,
         type   : 'loop',
         // direction: 'rtl',
-        waitForTransition: false,
+        // waitForTransition: false,
       } );
+
+      splide.on( 'move', () => console.log( 'move' ) );
+      splide.on( 'moved', () => console.log( 'moved' ) );
 
       splide.mount();
     } );
