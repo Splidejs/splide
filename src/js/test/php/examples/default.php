@@ -16,7 +16,7 @@ $settings = get_settings();
   <link rel="stylesheet" href="../../assets/css/styles.css">
   <script type="text/javascript" src="../../../../../dist/js/splide.js"></script>
 
-<!--	https://cdn.jsdelivr.net/npm/@splidejs/splide@3.6.12/dist/js/splide.min.js-->
+<!--	https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/js/splide.min.js-->
 
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
@@ -33,7 +33,7 @@ $settings = get_settings();
         // direction: 'ltr',
         // height: undefined,
         // gap: '30%',
-        // paginationDirection: 'ttb',
+        paginationDirection: 'ttb',
         // rewindSpeed: 2000,
         // role: '',
         label: 'Changed Label',

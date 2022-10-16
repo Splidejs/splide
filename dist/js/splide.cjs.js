@@ -1184,7 +1184,7 @@ const Move = (Splide, Components, options, event) => {
     if (!Components.Controller.isBusy()) {
       Components.Scroll.cancel();
       jump(Splide.index);
-      Components.Slides.update();
+      Slides.update();
     }
   }
   function move(dest, index, prev, callback) {
@@ -1703,8 +1703,9 @@ const Scroll = (Splide, Components, options, event) => {
     emit(EVENT_SCROLLED);
   }
   function update(from, to, noConstrain, rate) {
+    const { easingFunc = (t) => 1 - Math.pow(1 - t, 4) } = options;
     const position = getPosition();
-    const target = from + (to - from) * easing(rate);
+    const target = from + (to - from) * easingFunc(rate);
     const diff = (target - position) * friction;
     translate(position + diff);
     if (isSlide && !noConstrain && exceededLimit()) {
@@ -1724,10 +1725,6 @@ const Scroll = (Splide, Components, options, event) => {
       clear();
       onEnd();
     }
-  }
-  function easing(t) {
-    const { easingFunc } = options;
-    return easingFunc ? easingFunc(t) : 1 - Math.pow(1 - t, 4);
   }
   return {
     mount,
@@ -2065,20 +2062,21 @@ const Pagination = (Splide, Components, options, event) => {
     const { length } = Splide;
     const { classes, i18n, perPage, paginationKeyboard = true } = options;
     const max = hasFocus() ? Controller.getEnd() + 1 : ceil(length / perPage);
+    const dir = getDirection();
     list = placeholder || create("ul", classes.pagination, Elements.track.parentElement);
-    addClass(list, paginationClasses = `${CLASS_PAGINATION}--${getDirection()}`);
+    addClass(list, paginationClasses = `${CLASS_PAGINATION}--${dir}`);
     setAttribute(list, ROLE, "tablist");
     setAttribute(list, ARIA_LABEL, i18n.select);
-    setAttribute(list, ARIA_ORIENTATION, getDirection() === TTB ? "vertical" : "");
+    setAttribute(list, ARIA_ORIENTATION, dir === TTB ? "vertical" : "");
     for (let i = 0; i < max; i++) {
       const li = create("li", null, list);
       const button = create("button", { class: classes.page, type: "button" }, li);
       const controls = Slides.getIn(i).map((Slide) => Slide.slide.id);
       const text = !hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
-      bind(button, "click", apply(onClick, i));
-      if (paginationKeyboard) {
-        bind(button, "keydown", apply(onKeydown, i));
-      }
+      bind(button, "click", () => {
+        go(`>${i}`, true);
+      });
+      paginationKeyboard && bind(button, "keydown", apply(onKeydown, i));
       setAttribute(li, ROLE, "presentation");
       setAttribute(button, ROLE, "tab");
       setAttribute(button, ARIA_CONTROLS, controls.join(" "));
@@ -2086,9 +2084,6 @@ const Pagination = (Splide, Components, options, event) => {
       setAttribute(button, TAB_INDEX, -1);
       items.push({ li, button, page: i });
     }
-  }
-  function onClick(page) {
-    go(`>${page}`, true);
   }
   function onKeydown(page, e) {
     const { length } = items;

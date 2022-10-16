@@ -114,8 +114,9 @@ export const Scroll: ComponentConstructor<ScrollComponent> = ( Splide, Component
    * @param rate        - A current rate.
    */
   function update( from: number, to: number, noConstrain: boolean | undefined, rate: number ): void {
+    const { easingFunc = t => 1 - Math.pow( 1 - t, 4 ) } = options;
     const position = getPosition();
-    const target   = from + ( to - from ) * easing( rate );
+    const target   = from + ( to - from ) * easingFunc( rate );
     const diff     = ( target - position ) * friction;
 
     translate( position + diff );
@@ -146,18 +147,6 @@ export const Scroll: ComponentConstructor<ScrollComponent> = ( Splide, Component
       clear();
       onEnd();
     }
-  }
-
-  /**
-   * The easing function.
-   *
-   * @param t - A value to ease.
-   *
-   * @return An eased value.
-   */
-  function easing( t: number ): number {
-    const { easingFunc } = options;
-    return easingFunc ? easingFunc( t ) : 1 - Math.pow( 1 - t, 4 );
   }
 
   return {

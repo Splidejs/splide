@@ -49,8 +49,11 @@ export const Direction: ComponentConstructor<DirectionComponent> = ( Splide: Spl
    * @param axisOnly  - Optional. If `ture`, returns the same property for LTR and RTL.
    * @param direction - Optional. Specify the direction. The default value is the `direction` option.
    */
-  function resolve<R extends string>( prop: string, axisOnly?: boolean, direction?: Options['direction'] ): R {
-    direction = direction || options.direction;
+  function resolve<R extends string>(
+    prop: string,
+    axisOnly?: boolean,
+    direction: Options['direction'] = options.direction
+  ): R {
     const index = direction === RTL && ! axisOnly ? 1 : direction === TTB ? 0 : -1;
 
     return ORIENTATION_MAP[ prop ] && ORIENTATION_MAP[ prop ][ index ]

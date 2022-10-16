@@ -143,13 +143,14 @@ export const Pagination: ComponentConstructor<PaginationComponent> = ( Splide, C
     const { length } = Splide;
     const { classes, i18n, perPage, paginationKeyboard = true } = options;
     const max = hasFocus() ? Controller.getEnd() + 1 : ceil( length / perPage );
+    const dir = getDirection();
 
     list = placeholder || create( 'ul', classes.pagination, Elements.track.parentElement );
 
-    addClass( list, ( paginationClasses = `${ CLASS_PAGINATION }--${ getDirection() }` ) );
+    addClass( list, ( paginationClasses = `${ CLASS_PAGINATION }--${ dir }` ) );
     setAttribute( list, ROLE, 'tablist' );
     setAttribute( list, ARIA_LABEL, i18n.select );
-    setAttribute( list, ARIA_ORIENTATION, getDirection() === TTB ? 'vertical' : '' );
+    setAttribute( list, ARIA_ORIENTATION, dir === TTB ? 'vertical' : '' );
 
     for ( let i = 0; i < max; i++ ) {
       const li       = create( 'li', null, list );
@@ -157,11 +158,8 @@ export const Pagination: ComponentConstructor<PaginationComponent> = ( Splide, C
       const controls = Slides.getIn( i ).map( Slide => Slide.slide.id );
       const text     = ! hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
 
-      bind( button, 'click', apply( onClick, i ) );
-
-      if ( paginationKeyboard ) {
-        bind( button, 'keydown', apply( onKeydown, i ) );
-      }
+      bind( button, 'click', () => { go( `>${ i }`, true ) } );
+      paginationKeyboard && bind( button, 'keydown', apply( onKeydown, i ) );
 
       setAttribute( li, ROLE, 'presentation' );
       setAttribute( button, ROLE, 'tab' );
@@ -171,16 +169,6 @@ export const Pagination: ComponentConstructor<PaginationComponent> = ( Splide, C
 
       items.push( { li, button, page: i } );
     }
-  }
-
-  /**
-   * Called when the user clicks each pagination dot.
-   * Moves the focus to the active slide for accessibility.
-   *
-   * @param page - A clicked page index.
-   */
-  function onClick( page: number ): void {
-    go( `>${ page }`, true );
   }
 
   /**
@@ -219,8 +207,10 @@ export const Pagination: ComponentConstructor<PaginationComponent> = ( Splide, C
 
   /**
    * Returns the latest direction for pagination.
+   *
+   * @return The direction for pagination.
    */
-  function getDirection(): Options['direction'] {
+  function getDirection(): Options[ 'direction' ] {
     return options.paginationDirection || options.direction;
   }
 

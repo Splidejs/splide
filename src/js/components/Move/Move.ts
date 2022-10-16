@@ -77,7 +77,7 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
     if ( ! Components.Controller.isBusy() ) {
       Components.Scroll.cancel();
       jump( Splide.index );
-      Components.Slides.update();
+      Slides.update();
     }
   }
 

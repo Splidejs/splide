@@ -14,6 +14,14 @@ $settings = get_settings();
   <link rel="stylesheet" href="../../assets/css/styles.css">
   <script src="../../../../../dist/js/splide.js"></script>
 
+<!--  <style>-->
+<!--    .splide__slide img {-->
+<!--      width: 100%;-->
+<!--      height: 100%;-->
+<!--      object-fit: cover;-->
+<!--    }-->
+<!--  </style>-->
+
   <script>
     document.addEventListener( 'DOMContentLoaded', function () {
       var splide01 = new Splide( '#splide01', {
