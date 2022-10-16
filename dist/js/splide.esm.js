@@ -705,8 +705,8 @@ const Elements = (Splide, Components, options, event) => {
     });
   }
   function init() {
+    const { role = "region" } = options;
     const id = root.id || uniqueId(PROJECT_CODE);
-    const role = options.role;
     root.id = id;
     track.id = track.id || `${id}-track`;
     list.id = list.id || `${id}-list`;
@@ -834,7 +834,8 @@ const Slide$1 = (Splide2, index, slideIndex, slide) => {
   }
   function isActive() {
     const { index: curr } = Splide2;
-    return curr === index || options.cloneStatus && curr === slideIndex;
+    const { cloneStatus = true } = options;
+    return curr === index || cloneStatus && curr === slideIndex;
   }
   function isVisible() {
     if (Splide2.is(FADE)) {
@@ -1507,7 +1508,7 @@ const Arrows = (Splide, Components, options, event) => {
     mount();
   }
   function init() {
-    const enabled = options.arrows;
+    const { arrows: enabled = true } = options;
     if (enabled && !(prev && next)) {
       createArrows();
     }
@@ -1579,7 +1580,8 @@ const INTERVAL_DATA_ATTRIBUTE = `${DATA_ATTRIBUTE}-interval`;
 
 const Autoplay = (Splide, Components, options, event) => {
   const { on, bind, emit } = event;
-  const interval = RequestInterval(options.interval, Splide.go.bind(Splide, ">"), onAnimationFrame);
+  const { interval: duration = 5e3, pauseOnHover = true, pauseOnFocus = true, resetProgress = true } = options;
+  const interval = RequestInterval(duration, Splide.go.bind(Splide, ">"), onAnimationFrame);
   const { isPaused } = interval;
   const { Elements, Elements: { root, toggle } } = Components;
   const { autoplay } = options;
@@ -1595,13 +1597,13 @@ const Autoplay = (Splide, Components, options, event) => {
     }
   }
   function listen() {
-    if (options.pauseOnHover) {
+    if (pauseOnHover) {
       bind(root, "mouseenter mouseleave", (e) => {
         hovered = e.type === "mouseenter";
         autoToggle();
       });
     }
-    if (options.pauseOnFocus) {
+    if (pauseOnFocus) {
       bind(root, "focusin focusout", (e) => {
         focused = e.type === "focusin";
         autoToggle();
@@ -1617,7 +1619,7 @@ const Autoplay = (Splide, Components, options, event) => {
   }
   function play() {
     if (isPaused() && Components.Slides.isEnough()) {
-      interval.start(!options.resetProgress);
+      interval.start(!resetProgress);
       focused = hovered = stopped = false;
       update();
       emit(EVENT_AUTOPLAY_PLAY);
@@ -1800,7 +1802,9 @@ const Drag = (Splide, Components, options, event) => {
         Move.translate(basePosition + constrain(diffCoord(e)));
         const expired = diffTime(e) > LOG_INTERVAL;
         const hasExceeded = exceeded !== (exceeded = exceededLimit());
-        expired || hasExceeded && save(e);
+        if (expired || hasExceeded) {
+          save(e);
+        }
         clickPrevented = true;
         emit(EVENT_DRAGGING);
         prevent(e);
@@ -1834,12 +1838,14 @@ const Drag = (Splide, Components, options, event) => {
     basePosition = getPosition();
   }
   function move(e) {
+    const { updateOnDragged = true } = options;
     const velocity = computeVelocity(e);
     const destination = computeDestination(velocity);
     const rewind = options.rewind && options.rewindByDrag;
+    const scroll = updateOnDragged ? Controller.scroll : Scroll.scroll;
     reduce(false);
     if (isFree) {
-      Controller.scroll(destination, void 0, options.snap);
+      scroll(destination, void 0, options.snap);
     } else if (Splide.is(FADE)) {
       Controller.go(orient(sign(velocity)) < 0 ? rewind ? "<" : "-" : rewind ? ">" : "+");
     } else if (Splide.is(SLIDE) && exceeded && rewind) {
@@ -2057,7 +2063,7 @@ const Pagination = (Splide, Components, options, event) => {
   function mount() {
     destroy();
     on([EVENT_UPDATED, EVENT_REFRESH, EVENT_END_INDEX_CHANGED], mount);
-    const enabled = options.pagination;
+    const { pagination: enabled = true } = options;
     placeholder && display(placeholder, enabled ? "" : "none");
     if (enabled) {
       on([EVENT_MOVE, EVENT_SCROLL, EVENT_SCROLLED], update);
@@ -2077,7 +2083,7 @@ const Pagination = (Splide, Components, options, event) => {
   }
   function createPagination() {
     const { length } = Splide;
-    const { classes, i18n, perPage } = options;
+    const { classes, i18n, perPage, paginationKeyboard = true } = options;
     const max = hasFocus() ? Controller.getEnd() + 1 : ceil(length / perPage);
     list = placeholder || create("ul", classes.pagination, Elements.track.parentElement);
     addClass(list, paginationClasses = `${CLASS_PAGINATION}--${getDirection()}`);
@@ -2090,7 +2096,7 @@ const Pagination = (Splide, Components, options, event) => {
       const controls = Slides.getIn(i).map((Slide) => Slide.slide.id);
       const text = !hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
       bind(button, "click", apply(onClick, i));
-      if (options.paginationKeyboard) {
+      if (paginationKeyboard) {
         bind(button, "keydown", apply(onKeydown, i));
       }
       setAttribute(li, ROLE, "presentation");
@@ -2270,7 +2276,8 @@ const SR_REMOVAL_DELAY = 90;
 const Live = (Splide, Components, options, event) => {
   const { on } = event;
   const { track } = Components.Elements;
-  const enabled = options.live && !options.isNavigation;
+  const { live = true } = options;
+  const enabled = live && !options.isNavigation;
   const sr = create("span", CLASS_SR);
   const interval = RequestInterval(SR_REMOVAL_DELAY, apply(toggle, false));
   function mount() {
@@ -2348,23 +2355,13 @@ const I18N = {
 
 const DEFAULTS = {
   type: "slide",
-  role: "region",
   speed: 400,
   perPage: 1,
-  cloneStatus: true,
-  arrows: true,
-  pagination: true,
-  paginationKeyboard: true,
-  interval: 5e3,
-  pauseOnHover: true,
-  pauseOnFocus: true,
-  resetProgress: true,
   easing: "cubic-bezier(0.25, 1, 0.5, 1)",
   drag: true,
   direction: "ltr",
   trimSpace: true,
   focusableNodes: "a, button, textarea, input, select, iframe",
-  live: true,
   classes: CLASSES,
   i18n: I18N,
   reducedMotion: {

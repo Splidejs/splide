@@ -37,11 +37,12 @@ const SR_REMOVAL_DELAY = 90;
 export const Live: ComponentConstructor<LiveComponent> = ( Splide, Components, options, event ) => {
   const { on } = event;
   const { track } = Components.Elements;
+  const { live = true } = options;
 
   /**
    * Indicates whether the live region is enabled or not.
    */
-  const enabled = options.live && ! options.isNavigation;
+  const enabled = live && ! options.isNavigation;
 
   /**
    * The span element for the SR only text.

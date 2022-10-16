@@ -194,7 +194,7 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
 
     binder.destroy();
     dragging = false;
-    // exceeded = false;
+    exceeded = false;
   }
 
   /**

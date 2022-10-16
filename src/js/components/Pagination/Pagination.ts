@@ -111,7 +111,7 @@ export const Pagination: ComponentConstructor<PaginationComponent> = ( Splide, C
     destroy();
     on( [ EVENT_UPDATED, EVENT_REFRESH, EVENT_END_INDEX_CHANGED ], mount );
 
-    const enabled = options.pagination;
+    const { pagination: enabled = true } = options;
     placeholder && display( placeholder, enabled ? '' : 'none' );
 
     if ( enabled ) {
@@ -141,7 +141,7 @@ export const Pagination: ComponentConstructor<PaginationComponent> = ( Splide, C
    */
   function createPagination(): void {
     const { length } = Splide;
-    const { classes, i18n, perPage } = options;
+    const { classes, i18n, perPage, paginationKeyboard = true } = options;
     const max = hasFocus() ? Controller.getEnd() + 1 : ceil( length / perPage );
 
     list = placeholder || create( 'ul', classes.pagination, Elements.track.parentElement );
@@ -159,7 +159,7 @@ export const Pagination: ComponentConstructor<PaginationComponent> = ( Splide, C
 
       bind( button, 'click', apply( onClick, i ) );
 
-      if ( options.paginationKeyboard ) {
+      if ( paginationKeyboard ) {
         bind( button, 'keydown', apply( onKeydown, i ) );
       }
 

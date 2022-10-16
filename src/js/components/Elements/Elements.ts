@@ -199,8 +199,8 @@ export const Elements: ComponentConstructor<ElementsComponent> = ( Splide, Compo
    * which removes the region from the accessibility tree.
    */
   function init(): void {
-    const id   = root.id || uniqueId( PROJECT_CODE );
-    const role = options.role;
+    const { role = 'region' } = options;
+    const id = root.id || uniqueId( PROJECT_CODE );
 
     root.id  = id;
     track.id = track.id || `${ id }-track`;

@@ -108,7 +108,7 @@ export const Arrows: ComponentConstructor<ArrowsComponent> = ( Splide, Component
    * Initializes the component.
    */
   function init(): void {
-    const enabled = options.arrows;
+    const { arrows: enabled = true } = options;
 
     if ( enabled && ! ( prev && next ) ) {
       createArrows();

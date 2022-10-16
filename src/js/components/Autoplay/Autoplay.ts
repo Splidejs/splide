@@ -38,7 +38,8 @@ export interface AutoplayComponent extends BaseComponent {
  */
 export const Autoplay: ComponentConstructor<AutoplayComponent> = ( Splide, Components, options, event ) => {
   const { on, bind, emit } = event;
-  const interval = RequestInterval( options.interval, Splide.go.bind( Splide, '>' ), onAnimationFrame );
+  const { interval: duration = 5000, pauseOnHover = true, pauseOnFocus = true, resetProgress = true } = options;
+  const interval = RequestInterval( duration, Splide.go.bind( Splide, '>' ), onAnimationFrame );
   const { isPaused } = interval;
   const { Elements, Elements: { root, toggle } } = Components;
   const { autoplay } = options;
@@ -75,14 +76,14 @@ export const Autoplay: ComponentConstructor<AutoplayComponent> = ( Splide, Compo
    * Listens to some events.
    */
   function listen(): void {
-    if ( options.pauseOnHover ) {
+    if ( pauseOnHover ) {
       bind( root, 'mouseenter mouseleave', e => {
         hovered = e.type === 'mouseenter';
         autoToggle();
       } );
     }
 
-    if ( options.pauseOnFocus ) {
+    if ( pauseOnFocus ) {
       bind( root, 'focusin focusout', e => {
         focused = e.type === 'focusin';
         autoToggle();
@@ -104,7 +105,7 @@ export const Autoplay: ComponentConstructor<AutoplayComponent> = ( Splide, Compo
    */
   function play(): void {
     if ( isPaused() && Components.Slides.isEnough() ) {
-      interval.start( ! options.resetProgress );
+      interval.start( ! resetProgress );
       focused = hovered = stopped = false;
       update();
       emit( EVENT_AUTOPLAY_PLAY );

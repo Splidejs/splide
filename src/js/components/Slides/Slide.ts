@@ -243,7 +243,8 @@ export const Slide = ( Splide: Splide, index: number, slideIndex: number, slide:
    */
   function isActive(): boolean {
     const { index: curr } = Splide;
-    return curr === index || ( options.cloneStatus && curr === slideIndex );
+    const { cloneStatus = true } = options;
+    return curr === index || ( cloneStatus && curr === slideIndex );
   }
 
   /**
