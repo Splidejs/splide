@@ -2,7 +2,7 @@ import { EVENT_MOVE, EVENT_REFRESH, EVENT_SCROLL, EVENT_SCROLLED, EVENT_UPDATED 
 import { IDLE, SCROLLING } from '../../constants/states';
 import { SLIDE } from '../../constants/types';
 import { AnyFunction, BaseComponent, ComponentConstructor } from '../../types';
-import { abs, apply, approximatelyEqual, floor, max, RequestInterval, sign } from '@splidejs/utils';
+import { abs, apply, approximatelyEqual, max, RequestInterval } from '@splidejs/utils';
 import { BASE_VELOCITY, BOUNCE_DIFF_THRESHOLD, BOUNCE_DURATION, FRICTION_FACTOR, MIN_DURATION } from './constants';
 
 
@@ -74,26 +74,40 @@ export const Scroll: ComponentConstructor<ScrollComponent> = ( Splide, Component
     onScrolled?: AnyFunction,
     noConstrain?: boolean
   ): void {
-    const from = getPosition();
-
     clear();
 
-    if ( snap && ( ! isSlide || ! exceededLimit() ) ) {
-      const size   = Components.Layout.sliderSize();
-      const offset = sign( destination ) * size * floor( abs( destination ) / size ) || 0;
-      destination = Move.toPosition( Components.Controller.toDest( destination % size ) ) + offset;
-    }
-
-    const immediately = approximatelyEqual( from, destination, 1 ) || duration === 0;
+    const dest        = computeDestination( destination, snap );
+    const from        = getPosition();
+    const immediately = approximatelyEqual( from, dest, 1 ) || duration === 0;
 
     friction = 1;
-    duration = immediately ? 0 : duration || max( abs( destination - from ) / BASE_VELOCITY, MIN_DURATION );
+    duration = immediately ? 0 : duration || max( abs( dest - from ) / BASE_VELOCITY, MIN_DURATION );
     callback = onScrolled;
-    interval = RequestInterval( duration, onEnd, apply( update, from, destination, noConstrain ), 1 );
+    interval = RequestInterval( duration, onEnd, apply( update, from, dest, noConstrain ), 1 );
 
     set( SCROLLING );
     emit( EVENT_SCROLL );
     interval.start();
+  }
+
+  /**
+   * Computes destination.
+   *
+   * @param destination - A desired destination.
+   * @param snap        - Optional. Whether to snap the slider to the closest slide or not.
+   *
+   * @return A computed destination.
+   */
+  function computeDestination( destination: number, snap?: boolean ): number {
+    if ( snap ) {
+      if ( ! isSlide || ! exceededLimit() ) {
+        const position = destination % Components.Layout.sliderSize();
+        const snapped  = Move.toPosition( Components.Controller.toDest( position ) );
+        destination -= position - snapped;
+      }
+    }
+
+    return destination;
   }
 
   /**
