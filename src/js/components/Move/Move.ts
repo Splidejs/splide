@@ -27,6 +27,7 @@ export interface MoveComponent extends BaseComponent {
   toIndex( position: number ): number;
   toPosition( index: number, trimming?: boolean ): number;
   getPosition(): number;
+  getRate(): number;
   getLimit( max: boolean ): number;
   exceededLimit( max?: boolean | undefined, position?: number ): boolean;
 
@@ -61,6 +62,11 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
   let Transition: TransitionComponent;
 
   /**
+   * Keeps the latest indices.
+   */
+  let indices: [ number, number, number ];
+
+  /**
    * Called when the component is mounted.
    */
   function mount(): void {
@@ -90,13 +96,13 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    * @param callback - Optional. A callback function invoked after transition ends.
    */
   function move( dest: number, index: number, prev: number, callback?: AnyFunction ): void {
+    Transition.cancel();
+
     if ( dest !== index && canShift( dest > prev ) ) {
-      cancel();
       translate( shift( getPosition(), dest > prev ), true );
-    } else {
-      Transition.cancel();
     }
 
+    indices = [ index, prev, dest ];
     set( MOVING );
     emit( EVENT_MOVE, index, prev, dest );
 
@@ -168,8 +174,11 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    * Cancels transition.
    */
   function cancel(): void {
-    translate( getPosition(), true );
-    Transition.cancel();
+    if ( Splide.state.is( MOVING ) && indices ) {
+      translate( getPosition(), true );
+      Transition.cancel();
+      emit( EVENT_MOVED, ...indices );
+    }
   }
 
   /**
@@ -221,6 +230,35 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
   function getPosition(): number {
     const left = resolve( 'left' );
     return rect( list )[ left ] - rect( track )[ left ] + orient( getPadding( false ) );
+  }
+
+  /**
+   * Returns the carousel progress rate.
+   *
+   * @return The progress rate.
+   */
+  function getRate(): number {
+    let rate;
+
+    if ( Splide.is( FADE ) ) {
+      rate = Splide.index / ( Splide.length - 1 );
+    } else {
+      const isLoop   = Splide.is( LOOP );
+      const position = orient( getPosition() );
+      const min      = orient( getLimit( false ) );
+      const max      = orient( getLimit( true ) );
+      const size     = sliderSize();
+      const curr     = ( position - min ) % size;
+      const base     = isLoop ? size : max - min;
+
+      rate = ( curr / base ) || 0;
+
+      if ( isLoop && rate < 0 ) {
+        rate += 1;
+      }
+    }
+
+    return clamp( rate, 0, 1 );
   }
 
   /**
@@ -301,6 +339,7 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
     toIndex,
     toPosition,
     getPosition,
+    getRate,
     getLimit,
     exceededLimit,
     reposition,

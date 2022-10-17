@@ -31,6 +31,11 @@ $settings = get_settings();
 
       splide.on( 'move', () => console.log( 'move' ) );
       splide.on( 'moved', () => console.log( 'moved' ) );
+      splide.on( 'dragging scrolling', () => {
+        const bar = document.querySelector( '.bar' );
+        bar.style.width = `${ splide.Components.Move.getRate() * 100 }%`;
+        splide.Components.Move.getRate()
+      } );
 
       splide.mount();
     } );
@@ -45,6 +50,9 @@ $settings = get_settings();
 <body>
 
 <?php render( 'splide01', 10 ); ?>
+
+<div class="bar" style="height: 3px; background: #00bbff">
+</div>
 
 </body>
 </html>
