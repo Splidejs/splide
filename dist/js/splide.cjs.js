@@ -424,6 +424,7 @@ const EVENT_DRAG = "drag";
 const EVENT_DRAGGING = "dragging";
 const EVENT_DRAGGED = "dragged";
 const EVENT_SCROLL = "scroll";
+const EVENT_SCROLLING = "scrolling";
 const EVENT_SCROLLED = "scrolled";
 const EVENT_OVERFLOW = "overflow";
 const EVENT_DESTROY = "destroy";
@@ -530,8 +531,7 @@ const ORIENTATION_MAP = {
   ArrowRight: [ARROW_DOWN, ARROW_LEFT]
 };
 const Direction = (Splide2, Components2, options) => {
-  function resolve(prop, axisOnly, direction) {
-    direction = direction || options.direction;
+  function resolve(prop, axisOnly, direction = options.direction) {
     const index = direction === RTL && !axisOnly ? 1 : direction === TTB ? 0 : -1;
     return ORIENTATION_MAP[prop] && ORIENTATION_MAP[prop][index] || prop.replace(/width|left|right/i, (match, offset) => {
       const replacement = ORIENTATION_MAP[match.toLowerCase()][index] || match;
@@ -1176,6 +1176,7 @@ const Move = (Splide, Components, options, event) => {
   const { resolve, orient } = Components.Direction;
   const { list, track } = Components.Elements;
   let Transition;
+  let indices;
   function mount() {
     Transition = Components.Transition;
     on([EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition);
@@ -1188,12 +1189,11 @@ const Move = (Splide, Components, options, event) => {
     }
   }
   function move(dest, index, prev, callback) {
+    Transition.cancel();
     if (dest !== index && canShift(dest > prev)) {
-      cancel();
       translate(shift(getPosition(), dest > prev), true);
-    } else {
-      Transition.cancel();
     }
+    indices = [index, prev, dest];
     set(MOVING);
     emit(EVENT_MOVE, index, prev, dest);
     Transition.start(index, () => {
@@ -1214,10 +1214,9 @@ const Move = (Splide, Components, options, event) => {
   }
   function loop(position) {
     if (Splide.is(LOOP)) {
-      const exceededMax = exceededLimit(true, position);
-      const exceededMin = exceededLimit(false, position);
-      if (exceededMin || exceededMax) {
-        position = shift(position, exceededMax);
+      const diff = orient(position) - orient(getPosition());
+      if (diff && exceededLimit(diff > 0, position)) {
+        position = shift(position, diff > 0);
       }
     }
     return position;
@@ -1229,8 +1228,11 @@ const Move = (Splide, Components, options, event) => {
     return position;
   }
   function cancel() {
-    translate(getPosition(), true);
-    Transition.cancel();
+    if (Splide.state.is(MOVING) && indices) {
+      translate(getPosition(), true);
+      Transition.cancel();
+      emit(EVENT_MOVED, ...indices);
+    }
   }
   function toIndex(position) {
     const slides = Slides.get();
@@ -1255,6 +1257,25 @@ const Move = (Splide, Components, options, event) => {
   function getPosition() {
     const left = resolve("left");
     return rect(list)[left] - rect(track)[left] + orient(getPadding(false));
+  }
+  function getRate() {
+    let rate;
+    if (Splide.is(FADE)) {
+      rate = Splide.index / (Splide.length - 1);
+    } else {
+      const isLoop = Splide.is(LOOP);
+      const position = orient(getPosition());
+      const min = orient(getLimit(false));
+      const max = orient(getLimit(true));
+      const size = sliderSize();
+      const curr = (position - min) % size;
+      const base = isLoop ? size : max - min;
+      rate = curr / base || 0;
+      if (isLoop && rate < 0) {
+        rate += 1;
+      }
+    }
+    return clamp(rate, 0, 1);
   }
   function trim(position) {
     if (options.trimSpace && Splide.is(SLIDE)) {
@@ -1289,6 +1310,7 @@ const Move = (Splide, Components, options, event) => {
     toIndex,
     toPosition,
     getPosition,
+    getRate,
     getLimit,
     exceededLimit,
     reposition,
@@ -1681,21 +1703,27 @@ const Scroll = (Splide, Components, options, event) => {
     on([EVENT_UPDATED, EVENT_REFRESH], cancel);
   }
   function scroll(destination, duration, snap, onScrolled, noConstrain) {
-    const from = getPosition();
     clear();
-    if (snap && (!isSlide || !exceededLimit())) {
-      const size = Components.Layout.sliderSize();
-      const offset = sign(destination) * size * floor(abs(destination) / size) || 0;
-      destination = Move.toPosition(Components.Controller.toDest(destination % size)) + offset;
-    }
-    const immediately = approximatelyEqual(from, destination, 1) || duration === 0;
+    const dest = computeDestination(destination, snap);
+    const from = getPosition();
+    const immediately = approximatelyEqual(from, dest, 1) || duration === 0;
     friction = 1;
-    duration = immediately ? 0 : duration || max(abs(destination - from) / BASE_VELOCITY, MIN_DURATION);
+    duration = immediately ? 0 : duration || max(abs(dest - from) / BASE_VELOCITY, MIN_DURATION);
     callback = onScrolled;
-    interval = RequestInterval(duration, onEnd, apply(update, from, destination, noConstrain), 1);
+    interval = RequestInterval(duration, onEnd, apply(update, from, dest, noConstrain), 1);
     set(SCROLLING);
     emit(EVENT_SCROLL);
     interval.start();
+  }
+  function computeDestination(destination, snap) {
+    if (snap) {
+      if (!isSlide || !exceededLimit()) {
+        const position = destination % Components.Layout.sliderSize();
+        const snapped = Move.toPosition(Components.Controller.toDest(position));
+        destination -= position - snapped;
+      }
+    }
+    return destination;
   }
   function onEnd() {
     set(IDLE);
@@ -1708,6 +1736,7 @@ const Scroll = (Splide, Components, options, event) => {
     const target = from + (to - from) * easingFunc(rate);
     const diff = (target - position) * friction;
     translate(position + diff);
+    emit(EVENT_SCROLLING);
     if (isSlide && !noConstrain && exceededLimit()) {
       friction *= FRICTION_FACTOR;
       if (abs(diff) < BOUNCE_DIFF_THRESHOLD) {
@@ -2969,6 +2998,7 @@ exports.EVENT_RESIZE = EVENT_RESIZE;
 exports.EVENT_RESIZED = EVENT_RESIZED;
 exports.EVENT_SCROLL = EVENT_SCROLL;
 exports.EVENT_SCROLLED = EVENT_SCROLLED;
+exports.EVENT_SCROLLING = EVENT_SCROLLING;
 exports.EVENT_SHIFTED = EVENT_SHIFTED;
 exports.EVENT_SLIDE_KEYDOWN = EVENT_SLIDE_KEYDOWN;
 exports.EVENT_UPDATED = EVENT_UPDATED;

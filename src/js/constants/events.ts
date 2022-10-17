@@ -15,6 +15,7 @@ export const EVENT_DRAG               = 'drag';
 export const EVENT_DRAGGING           = 'dragging';
 export const EVENT_DRAGGED            = 'dragged';
 export const EVENT_SCROLL             = 'scroll';
+export const EVENT_SCROLLING          = 'scrolling';
 export const EVENT_SCROLLED           = 'scrolled';
 export const EVENT_OVERFLOW           = 'overflow';
 export const EVENT_DESTROY            = 'destroy';

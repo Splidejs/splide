@@ -217,6 +217,7 @@ interface MoveComponent extends BaseComponent {
     toIndex(position: number): number;
     toPosition(index: number, trimming?: boolean): number;
     getPosition(): number;
+    getRate(): number;
     getLimit(max: boolean): number;
     exceededLimit(max?: boolean | undefined, position?: number): boolean;
     /** @internal */
@@ -779,6 +780,7 @@ declare const EVENT_DRAG = "drag";
 declare const EVENT_DRAGGING = "dragging";
 declare const EVENT_DRAGGED = "dragged";
 declare const EVENT_SCROLL = "scroll";
+declare const EVENT_SCROLLING = "scrolling";
 declare const EVENT_SCROLLED = "scrolled";
 declare const EVENT_OVERFLOW = "overflow";
 declare const EVENT_DESTROY = "destroy";
@@ -820,6 +822,7 @@ interface EventMap {
     [EVENT_DRAGGING]: () => void;
     [EVENT_DRAGGED]: () => void;
     [EVENT_SCROLL]: () => void;
+    [EVENT_SCROLLING]: () => void;
     [EVENT_SCROLLED]: () => void;
     [EVENT_OVERFLOW]: (overflow: boolean) => void;
     [EVENT_DESTROY]: () => void;
@@ -1719,4 +1722,4 @@ declare const LOOP = "loop";
  */
 declare const FADE = "fade";
 
-export { AnyFunction, ArrowsComponent, AutoplayComponent, BaseComponent, BreakpointsComponent, CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_CLONE, CLASS_CONTAINER, CLASS_FOCUS_IN, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_OVERFLOW, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SPINNER, CLASS_SR, CLASS_TOGGLE, CLASS_TOGGLE_PAUSE, CLASS_TOGGLE_PLAY, CLASS_TRACK, CLASS_VISIBLE, Cast, ClonesComponent, ComponentConstructor, Components, ControllerComponent, DEFAULTS, DirectionComponent, DragComponent, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_END_INDEX_CHANGED, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_ERROR, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_OVERFLOW, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, ElementsComponent, EventInterface, EventMap, FADE, Head, KeyboardComponent, LOOP, LTR, LayoutComponent, LazyLoadComponent, LiveComponent, MoveComponent, Options, PaginationComponent, PaginationData, PaginationItem, Push, RTL, Resolve, ResponsiveOptions, SLIDE, STATUS_CLASSES, ScrollComponent, Shift, ShiftN, SlideComponent, SlidesComponent, Splide, SplideRenderer, SyncComponent, SyncTarget, TTB, TransitionComponent, WheelComponent, Splide as default };
+export { AnyFunction, ArrowsComponent, AutoplayComponent, BaseComponent, BreakpointsComponent, CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_CLONE, CLASS_CONTAINER, CLASS_FOCUS_IN, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_OVERFLOW, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SPINNER, CLASS_SR, CLASS_TOGGLE, CLASS_TOGGLE_PAUSE, CLASS_TOGGLE_PLAY, CLASS_TRACK, CLASS_VISIBLE, Cast, ClonesComponent, ComponentConstructor, Components, ControllerComponent, DEFAULTS, DirectionComponent, DragComponent, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_END_INDEX_CHANGED, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_ERROR, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_OVERFLOW, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SCROLLING, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, ElementsComponent, EventInterface, EventMap, FADE, Head, KeyboardComponent, LOOP, LTR, LayoutComponent, LazyLoadComponent, LiveComponent, MoveComponent, Options, PaginationComponent, PaginationData, PaginationItem, Push, RTL, Resolve, ResponsiveOptions, SLIDE, STATUS_CLASSES, ScrollComponent, Shift, ShiftN, SlideComponent, SlidesComponent, Splide, SplideRenderer, SyncComponent, SyncTarget, TTB, TransitionComponent, WheelComponent, Splide as default };

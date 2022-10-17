@@ -1,4 +1,11 @@
-import { EVENT_MOVE, EVENT_REFRESH, EVENT_SCROLL, EVENT_SCROLLED, EVENT_UPDATED } from '../../constants/events';
+import {
+  EVENT_MOVE,
+  EVENT_REFRESH,
+  EVENT_SCROLL,
+  EVENT_SCROLLED,
+  EVENT_SCROLLING,
+  EVENT_UPDATED,
+} from '../../constants/events';
 import { IDLE, SCROLLING } from '../../constants/states';
 import { SLIDE } from '../../constants/types';
 import { AnyFunction, BaseComponent, ComponentConstructor } from '../../types';
@@ -134,6 +141,7 @@ export const Scroll: ComponentConstructor<ScrollComponent> = ( Splide, Component
     const diff     = ( target - position ) * friction;
 
     translate( position + diff );
+    emit( EVENT_SCROLLING );
 
     if ( isSlide && ! noConstrain && exceededLimit() ) {
       friction *= FRICTION_FACTOR;

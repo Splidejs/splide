@@ -420,6 +420,7 @@ const EVENT_DRAG = "drag";
 const EVENT_DRAGGING = "dragging";
 const EVENT_DRAGGED = "dragged";
 const EVENT_SCROLL = "scroll";
+const EVENT_SCROLLING = "scrolling";
 const EVENT_SCROLLED = "scrolled";
 const EVENT_OVERFLOW = "overflow";
 const EVENT_DESTROY = "destroy";
@@ -526,8 +527,7 @@ const ORIENTATION_MAP = {
   ArrowRight: [ARROW_DOWN, ARROW_LEFT]
 };
 const Direction = (Splide2, Components2, options) => {
-  function resolve(prop, axisOnly, direction) {
-    direction = direction || options.direction;
+  function resolve(prop, axisOnly, direction = options.direction) {
     const index = direction === RTL && !axisOnly ? 1 : direction === TTB ? 0 : -1;
     return ORIENTATION_MAP[prop] && ORIENTATION_MAP[prop][index] || prop.replace(/width|left|right/i, (match, offset) => {
       const replacement = ORIENTATION_MAP[match.toLowerCase()][index] || match;
@@ -1172,6 +1172,7 @@ const Move = (Splide, Components, options, event) => {
   const { resolve, orient } = Components.Direction;
   const { list, track } = Components.Elements;
   let Transition;
+  let indices;
   function mount() {
     Transition = Components.Transition;
     on([EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition);
@@ -1184,12 +1185,11 @@ const Move = (Splide, Components, options, event) => {
     }
   }
   function move(dest, index, prev, callback) {
+    Transition.cancel();
     if (dest !== index && canShift(dest > prev)) {
-      cancel();
       translate(shift(getPosition(), dest > prev), true);
-    } else {
-      Transition.cancel();
     }
+    indices = [index, prev, dest];
     set(MOVING);
     emit(EVENT_MOVE, index, prev, dest);
     Transition.start(index, () => {
@@ -1210,10 +1210,9 @@ const Move = (Splide, Components, options, event) => {
   }
   function loop(position) {
     if (Splide.is(LOOP)) {
-      const exceededMax = exceededLimit(true, position);
-      const exceededMin = exceededLimit(false, position);
-      if (exceededMin || exceededMax) {
-        position = shift(position, exceededMax);
+      const diff = orient(position) - orient(getPosition());
+      if (diff && exceededLimit(diff > 0, position)) {
+        position = shift(position, diff > 0);
       }
     }
     return position;
@@ -1225,8 +1224,11 @@ const Move = (Splide, Components, options, event) => {
     return position;
   }
   function cancel() {
-    translate(getPosition(), true);
-    Transition.cancel();
+    if (Splide.state.is(MOVING) && indices) {
+      translate(getPosition(), true);
+      Transition.cancel();
+      emit(EVENT_MOVED, ...indices);
+    }
   }
   function toIndex(position) {
     const slides = Slides.get();
@@ -1251,6 +1253,25 @@ const Move = (Splide, Components, options, event) => {
   function getPosition() {
     const left = resolve("left");
     return rect(list)[left] - rect(track)[left] + orient(getPadding(false));
+  }
+  function getRate() {
+    let rate;
+    if (Splide.is(FADE)) {
+      rate = Splide.index / (Splide.length - 1);
+    } else {
+      const isLoop = Splide.is(LOOP);
+      const position = orient(getPosition());
+      const min = orient(getLimit(false));
+      const max = orient(getLimit(true));
+      const size = sliderSize();
+      const curr = (position - min) % size;
+      const base = isLoop ? size : max - min;
+      rate = curr / base || 0;
+      if (isLoop && rate < 0) {
+        rate += 1;
+      }
+    }
+    return clamp(rate, 0, 1);
   }
   function trim(position) {
     if (options.trimSpace && Splide.is(SLIDE)) {
@@ -1285,6 +1306,7 @@ const Move = (Splide, Components, options, event) => {
     toIndex,
     toPosition,
     getPosition,
+    getRate,
     getLimit,
     exceededLimit,
     reposition,
@@ -1677,21 +1699,27 @@ const Scroll = (Splide, Components, options, event) => {
     on([EVENT_UPDATED, EVENT_REFRESH], cancel);
   }
   function scroll(destination, duration, snap, onScrolled, noConstrain) {
-    const from = getPosition();
     clear();
-    if (snap && (!isSlide || !exceededLimit())) {
-      const size = Components.Layout.sliderSize();
-      const offset = sign(destination) * size * floor(abs(destination) / size) || 0;
-      destination = Move.toPosition(Components.Controller.toDest(destination % size)) + offset;
-    }
-    const immediately = approximatelyEqual(from, destination, 1) || duration === 0;
+    const dest = computeDestination(destination, snap);
+    const from = getPosition();
+    const immediately = approximatelyEqual(from, dest, 1) || duration === 0;
     friction = 1;
-    duration = immediately ? 0 : duration || max(abs(destination - from) / BASE_VELOCITY, MIN_DURATION);
+    duration = immediately ? 0 : duration || max(abs(dest - from) / BASE_VELOCITY, MIN_DURATION);
     callback = onScrolled;
-    interval = RequestInterval(duration, onEnd, apply(update, from, destination, noConstrain), 1);
+    interval = RequestInterval(duration, onEnd, apply(update, from, dest, noConstrain), 1);
     set(SCROLLING);
     emit(EVENT_SCROLL);
     interval.start();
+  }
+  function computeDestination(destination, snap) {
+    if (snap) {
+      if (!isSlide || !exceededLimit()) {
+        const position = destination % Components.Layout.sliderSize();
+        const snapped = Move.toPosition(Components.Controller.toDest(position));
+        destination -= position - snapped;
+      }
+    }
+    return destination;
   }
   function onEnd() {
     set(IDLE);
@@ -1704,6 +1732,7 @@ const Scroll = (Splide, Components, options, event) => {
     const target = from + (to - from) * easingFunc(rate);
     const diff = (target - position) * friction;
     translate(position + diff);
+    emit(EVENT_SCROLLING);
     if (isSlide && !noConstrain && exceededLimit()) {
       friction *= FRICTION_FACTOR;
       if (abs(diff) < BOUNCE_DIFF_THRESHOLD) {
@@ -2907,4 +2936,4 @@ class SplideRenderer {
   }
 }
 
-export { CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_CLONE, CLASS_CONTAINER, CLASS_FOCUS_IN, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_OVERFLOW, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SPINNER, CLASS_SR, CLASS_TOGGLE, CLASS_TOGGLE_PAUSE, CLASS_TOGGLE_PLAY, CLASS_TRACK, CLASS_VISIBLE, DEFAULTS, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_END_INDEX_CHANGED, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_ERROR, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_OVERFLOW, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, FADE, LOOP, LTR, RTL, SLIDE, STATUS_CLASSES, Splide, SplideRenderer, TTB, Splide as default };
+export { CLASSES, CLASS_ACTIVE, CLASS_ARROW, CLASS_ARROWS, CLASS_ARROW_NEXT, CLASS_ARROW_PREV, CLASS_CLONE, CLASS_CONTAINER, CLASS_FOCUS_IN, CLASS_INITIALIZED, CLASS_LIST, CLASS_LOADING, CLASS_NEXT, CLASS_OVERFLOW, CLASS_PAGINATION, CLASS_PAGINATION_PAGE, CLASS_PREV, CLASS_PROGRESS, CLASS_PROGRESS_BAR, CLASS_ROOT, CLASS_SLIDE, CLASS_SPINNER, CLASS_SR, CLASS_TOGGLE, CLASS_TOGGLE_PAUSE, CLASS_TOGGLE_PLAY, CLASS_TRACK, CLASS_VISIBLE, DEFAULTS, EVENT_ACTIVE, EVENT_ARROWS_MOUNTED, EVENT_ARROWS_UPDATED, EVENT_AUTOPLAY_PAUSE, EVENT_AUTOPLAY_PLAY, EVENT_AUTOPLAY_PLAYING, EVENT_CLICK, EVENT_DESTROY, EVENT_DRAG, EVENT_DRAGGED, EVENT_DRAGGING, EVENT_END_INDEX_CHANGED, EVENT_HIDDEN, EVENT_INACTIVE, EVENT_LAZYLOAD_ERROR, EVENT_LAZYLOAD_LOADED, EVENT_MOUNTED, EVENT_MOVE, EVENT_MOVED, EVENT_NAVIGATION_MOUNTED, EVENT_OVERFLOW, EVENT_PAGINATION_MOUNTED, EVENT_PAGINATION_UPDATED, EVENT_READY, EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_SCROLL, EVENT_SCROLLED, EVENT_SCROLLING, EVENT_SHIFTED, EVENT_SLIDE_KEYDOWN, EVENT_UPDATED, EVENT_VISIBLE, FADE, LOOP, LTR, RTL, SLIDE, STATUS_CLASSES, Splide, SplideRenderer, TTB, Splide as default };

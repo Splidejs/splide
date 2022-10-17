@@ -423,6 +423,7 @@
   const EVENT_DRAGGING = "dragging";
   const EVENT_DRAGGED = "dragged";
   const EVENT_SCROLL = "scroll";
+  const EVENT_SCROLLING = "scrolling";
   const EVENT_SCROLLED = "scrolled";
   const EVENT_OVERFLOW = "overflow";
   const EVENT_DESTROY = "destroy";
@@ -1731,6 +1732,7 @@
       const target = from + (to - from) * easingFunc(rate);
       const diff = (target - position) * friction;
       translate(position + diff);
+      emit(EVENT_SCROLLING);
       if (isSlide && !noConstrain && exceededLimit()) {
         friction *= FRICTION_FACTOR;
         if (abs(diff) < BOUNCE_DIFF_THRESHOLD) {

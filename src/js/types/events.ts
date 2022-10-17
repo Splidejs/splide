@@ -30,6 +30,7 @@ export interface EventMap {
   [ E.EVENT_DRAGGING ]: () => void;
   [ E.EVENT_DRAGGED ]: () => void;
   [ E.EVENT_SCROLL ]: () => void;
+  [ E.EVENT_SCROLLING ]: () => void;
   [ E.EVENT_SCROLLED ]: () => void;
   [ E.EVENT_OVERFLOW ]: ( overflow: boolean ) => void;
   [ E.EVENT_DESTROY ]: () => void;
