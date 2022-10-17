@@ -139,11 +139,10 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    */
   function loop( position: number ): number {
     if ( Splide.is( LOOP ) ) {
-      const exceededMax = exceededLimit( true, position );
-      const exceededMin = exceededLimit( false, position );
+      const diff = orient( position ) - orient( getPosition() );
 
-      if ( exceededMin || exceededMax ) {
-        position = shift( position, exceededMax );
+      if ( diff && exceededLimit( diff > 0, position ) ) {
+        position = shift( position, diff > 0 );
       }
     }
 
