@@ -5,14 +5,14 @@ import { PROJECT_CODE } from './project';
  *
  * @since 4.1.0
  */
-const CLASS_PREFIX = `${ PROJECT_CODE }__`;
+export const CLASS_PREFIX = `${ PROJECT_CODE }__`;
 
 /**
  * The prefix for status classes.
  *
  * @since 4.1.0
  */
-const STATUS_CLASS_PREFIX = 'is-';
+export const STATUS_CLASS_PREFIX = 'is-';
 
 /**
  * All classes as constants.
