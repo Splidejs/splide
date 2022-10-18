@@ -15,6 +15,7 @@ export interface DirectionComponent extends BaseComponent {
   orient( value: number ): number;
   left(): string;
   right(): string;
+  width(): string;
 }
 
 /**
@@ -82,5 +83,6 @@ export const Direction: ComponentConstructor<DirectionComponent> = ( Splide: Spl
     orient,
     left: apply( resolve, 'left' ),
     right: apply( resolve, 'right' ),
+    width: apply( resolve, 'width' ),
   };
 };

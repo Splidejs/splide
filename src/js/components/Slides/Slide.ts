@@ -69,7 +69,6 @@ export interface  SlideComponent extends BaseComponent {
   readonly isClone: boolean;
 
   update(): void;
-  size(): number;
   style( prop: CSSProperties, value: string | number, useContainer?: boolean ): void
   isWithin( from: number, distance: number ): boolean;
   isVisible( partial?: boolean ): boolean;
@@ -93,7 +92,7 @@ export const Slide = ( Splide: Splide, index: number, slideIndex: number, slide:
   const { Components, root, options } = Splide;
   const { isNavigation, updateOnMove, i18n, pagination, slideFocus } = options;
   const { Elements } = Components;
-  const { resolve, orient } = Components.Direction;
+  const { resolve } = Components.Direction;
   const styles    = getAttribute( slide, 'style' );
   const label     = getAttribute( slide, ARIA_LABEL );
   const isClone   = slideIndex > -1;
@@ -283,15 +282,6 @@ export const Slide = ( Splide: Splide, index: number, slideIndex: number, slide:
     return diff <= distance;
   }
 
-  /**
-   * Returns width of the slide in a horizontal carousel, or height in a vertical one.
-   *
-   * @return Width of height of the slide.
-   */
-  function size(): number {
-    return rect( slide )[ resolve( 'width' ) ];
-  }
-
   const self = {
     index,
     slideIndex,
@@ -301,7 +291,6 @@ export const Slide = ( Splide: Splide, index: number, slideIndex: number, slide:
     mount,
     destroy,
     update,
-    size,
     style,
     isVisible,
     isWithin,

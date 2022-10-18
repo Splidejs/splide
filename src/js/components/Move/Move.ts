@@ -52,7 +52,7 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
   const { on, emit } = event;
   const { set } = Splide.state;
   const { Slides } = Components;
-  const { slideSize, getPadding, listSize, sliderSize, totalSize } = Components.Layout;
+  const { slideSize, getPadding, listSize, sliderSize, totalSize, trackSize } = Components.Layout;
   const { resolve, orient } = Components.Direction;
   const { list, track } = Components.Elements;
 
@@ -298,10 +298,7 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
   function canShift( backwards: boolean ): boolean {
     const padding = getPadding( false );
     const shifted = orient( shift( getPosition(), backwards ) );
-
-    return backwards
-      ? shifted >= padding
-      : shifted <= list[ resolve( 'scrollWidth' ) ] - rect( track )[ resolve( 'width' ) ] + padding;
+    return backwards ? shifted >= padding : shifted <= listSize( true ) - trackSize() + padding;
   }
 
   /**

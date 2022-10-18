@@ -543,7 +543,8 @@
       resolve,
       orient,
       left: apply(resolve, "left"),
-      right: apply(resolve, "right")
+      right: apply(resolve, "right"),
+      width: apply(resolve, "width")
     };
   };
 
@@ -743,7 +744,7 @@
     const { Components, root, options } = Splide2;
     const { isNavigation, updateOnMove, i18n, pagination, slideFocus } = options;
     const { Elements } = Components;
-    const { resolve, orient } = Components.Direction;
+    const { resolve } = Components.Direction;
     const styles = getAttribute(slide, "style");
     const label = getAttribute(slide, ARIA_LABEL);
     const isClone = slideIndex > -1;
@@ -851,9 +852,6 @@
       }
       return diff <= distance;
     }
-    function size() {
-      return rect(slide)[resolve("width")];
-    }
     const self = {
       index,
       slideIndex,
@@ -863,7 +861,6 @@
       mount,
       destroy,
       update,
-      size,
       style: style$1,
       isVisible,
       isWithin
@@ -987,7 +984,7 @@
   const Layout = (Splide, Components, options, event) => {
     const { on, bind, emit } = event;
     const { Slides } = Components;
-    const { resolve, left, right } = Components.Direction;
+    const { resolve, left, right, width } = Components.Direction;
     const { root, track, list } = Components.Elements;
     const { getAt, style: styleSlides } = Slides;
     let vertical;
@@ -1048,18 +1045,20 @@
       const gap = unit(options.gap);
       return `calc((100%${gap && ` + ${gap}`})/${options.perPage || 1}${gap && ` - ${gap}`})`;
     }
-    function listSize() {
-      return rect(list)[resolve("width")];
+    function trackSize() {
+      return rect(track)[width()];
+    }
+    function listSize(full) {
+      return full ? list[resolve("scrollWidth")] : rect(list)[width()];
     }
     function slideSize(index = 0, withoutGap) {
-      const Slide = getAt(index);
-      return (Slide ? Slide.size() : 0) + (withoutGap ? 0 : getGap());
+      const slide = getAt(index);
+      return (slide ? rect(slide.slide)[width()] : 0) + (withoutGap ? 0 : getGap());
     }
     function totalSize(index, withoutGap) {
       const first = Components.Slides.get()[0];
       const target = getAt(index);
-      const gap = withoutGap ? 0 : getGap();
-      return first && target ? rect(target.slide)[right()] - rect(first.slide)[left()] + gap : 0;
+      return first && target ? abs(rect(target.slide)[right()] - rect(first.slide)[left()]) + (withoutGap ? 0 : getGap()) : 0;
     }
     function sliderSize(withoutGap) {
       return totalSize(Splide.length - 1) - totalSize(0) + slideSize(0, withoutGap);
@@ -1067,7 +1066,11 @@
     function getGap() {
       const first = getAt(0);
       const second = getAt(1);
-      return first && second ? rect(second.slide)[left()] - rect(first.slide)[right()] : 0;
+      if (first && second) {
+        const firstRect = rect(first.slide);
+        return abs(rect(second.slide)[left()] - firstRect[left()]) - firstRect[width()];
+      }
+      return 0;
     }
     function getPadding(right2) {
       return parseFloat(style(
@@ -1081,6 +1084,7 @@
     return {
       mount,
       resize,
+      trackSize,
       listSize,
       slideSize,
       sliderSize,
@@ -1093,7 +1097,7 @@
   const MULTIPLIER = 2;
   const Clones = (Splide, Components, options, event) => {
     const { on } = event;
-    const { Elements, Slides, Layout: { resize } } = Components;
+    const { Elements, Slides, Layout: { resize, trackSize } } = Components;
     const { resolve } = Components.Direction;
     const clones = [];
     let cloneCount;
@@ -1152,7 +1156,7 @@
         clones2 = 0;
       } else if (isUndefined(clones2)) {
         const fixedSize = options[resolve("fixedWidth")] && Components.Layout.slideSize(0);
-        const fixedCount = fixedSize && ceil(rect(Elements.track)[resolve("width")] / fixedSize);
+        const fixedCount = fixedSize && ceil(trackSize() / fixedSize);
         clones2 = fixedCount || options[resolve("autoWidth")] && Splide.length || options.perPage * MULTIPLIER;
       }
       return clones2;
@@ -1167,7 +1171,7 @@
     const { on, emit } = event;
     const { set } = Splide.state;
     const { Slides } = Components;
-    const { slideSize, getPadding, listSize, sliderSize, totalSize } = Components.Layout;
+    const { slideSize, getPadding, listSize, sliderSize, totalSize, trackSize } = Components.Layout;
     const { resolve, orient } = Components.Direction;
     const { list, track } = Components.Elements;
     let Transition;
@@ -1285,7 +1289,7 @@
     function canShift(backwards) {
       const padding = getPadding(false);
       const shifted = orient(shift(getPosition(), backwards));
-      return backwards ? shifted >= padding : shifted <= list[resolve("scrollWidth")] - rect(track)[resolve("width")] + padding;
+      return backwards ? shifted >= padding : shifted <= listSize(true) - trackSize() + padding;
     }
     function exceededLimit(max, position = getPosition()) {
       const exceededMin = max !== true && orient(position) < orient(getLimit(false));

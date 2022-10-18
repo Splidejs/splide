@@ -1,7 +1,7 @@
 import { EVENT_REFRESH, EVENT_RESIZE, EVENT_UPDATED } from '../../constants/events';
 import { LOOP } from '../../constants/types';
 import { BaseComponent, ComponentConstructor } from '../../types';
-import { addClass, append, before, ceil, empty, isUndefined, pad, push, rect, removeNode } from '@splidejs/utils';
+import { addClass, append, before, ceil, empty, isUndefined, pad, push, removeNode } from '@splidejs/utils';
 
 
 /**
@@ -33,7 +33,7 @@ export const MULTIPLIER = 2;
  */
 export const Clones: ComponentConstructor<ClonesComponent> = ( Splide, Components, options, event ) => {
   const { on } = event;
-  const { Elements, Slides, Layout: { resize } } = Components;
+  const { Elements, Slides, Layout: { resize, trackSize } } = Components;
   const { resolve } = Components.Direction;
 
   /**
@@ -145,7 +145,7 @@ export const Clones: ComponentConstructor<ClonesComponent> = ( Splide, Component
       clones = 0;
     } else if ( isUndefined( clones ) ) {
       const fixedSize  = options[ resolve( 'fixedWidth' ) ] && Components.Layout.slideSize( 0 );
-      const fixedCount = fixedSize && ceil( rect( Elements.track )[ resolve( 'width' ) ] / fixedSize );
+      const fixedCount = fixedSize && ceil( trackSize() / fixedSize );
       clones = fixedCount || ( options[ resolve( 'autoWidth' ) ] && Splide.length ) || options.perPage * MULTIPLIER;
     }
 

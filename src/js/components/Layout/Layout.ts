@@ -1,7 +1,7 @@
 import { TTB } from '../../constants/directions';
 import { EVENT_OVERFLOW, EVENT_REFRESH, EVENT_RESIZE, EVENT_RESIZED, EVENT_UPDATED } from '../../constants/events';
 import { BaseComponent, ComponentConstructor } from '../../types';
-import { apply, isObject, rect, style, Throttle, toggleClass, unit } from '@splidejs/utils';
+import { abs, apply, isObject, rect, style, Throttle, toggleClass, unit } from '@splidejs/utils';
 import { assert } from '../../utils';
 import { FADE } from '../../constants/types';
 import { CLASS_OVERFLOW } from '../../constants/classes';
@@ -13,7 +13,8 @@ import { CLASS_OVERFLOW } from '../../constants/classes';
  * @since 3.0.0
  */
 export interface LayoutComponent extends BaseComponent {
-  listSize(): number;
+  trackSize(): number;
+  listSize( full?: boolean ): number;
   slideSize( index: number, withoutGap?: boolean ): number;
   sliderSize( withoutGap?: boolean ): number;
   totalSize( index?: number, withoutGap?: boolean ): number;
@@ -39,7 +40,7 @@ export interface LayoutComponent extends BaseComponent {
 export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Components, options, event ) => {
   const { on, bind, emit } = event;
   const { Slides } = Components;
-  const { resolve, left, right } = Components.Direction;
+  const { resolve, left, right, width } = Components.Direction;
   const { root, track, list } = Components.Elements;
   const { getAt, style: styleSlides } = Slides;
 
@@ -182,12 +183,21 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
   }
 
   /**
-   * Returns the list width for the horizontal slider, or the height for the vertical slider.
+   * Returns the track width for the horizontal carousel, or the height for the vertical one.
+   */
+  function trackSize(): number {
+    return rect( track )[ width() ];
+  }
+
+  /**
+   * Returns the list width for the horizontal carousel, or the height for the vertical one.
+   *
+   * @param full - Optional. If `true`, returns the width includes overflowed elements.
    *
    * @return The size of the list element in pixel.
    */
-  function listSize(): number {
-    return rect( list )[ resolve( 'width' ) ];
+  function listSize( full?: boolean ): number {
+    return full ? list[ resolve( 'scrollWidth' ) ] : rect( list )[ width() ];
   }
 
   /**
@@ -199,8 +209,8 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
    * @return The size of the specified slide element in pixel.
    */
   function slideSize( index = 0, withoutGap?: boolean ): number {
-    const Slide = getAt( index );
-    return ( Slide ? Slide.size() : 0 ) + ( withoutGap ? 0 : getGap() );
+    const slide = getAt( index );
+    return ( slide ? rect( slide.slide )[ width() ] : 0 ) + ( withoutGap ? 0 : getGap() );
   }
 
   /**
@@ -215,10 +225,8 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
   function totalSize( index: number, withoutGap?: boolean ): number {
     const first  = Components.Slides.get()[ 0 ];
     const target = getAt( index );
-    const gap    = withoutGap ? 0 : getGap();
-
     return first && target
-      ? rect( target.slide )[ right() ] - rect( first.slide )[ left() ] + gap
+      ? abs( rect( target.slide )[ right() ] - rect( first.slide )[ left() ] ) + ( withoutGap ? 0 : getGap() )
       : 0;
   }
 
@@ -244,7 +252,13 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
   function getGap(): number {
     const first  = getAt( 0 );
     const second = getAt( 1 );
-    return first && second ? rect( second.slide )[ left() ] - rect( first.slide )[ right() ] : 0;
+
+    if ( first && second ) {
+      const firstRect = rect( first.slide );
+      return abs( rect( second.slide )[ left() ] - firstRect[ left() ] ) - firstRect[ width() ];
+    }
+
+    return 0;
   }
 
   /**
@@ -275,6 +289,7 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
   return {
     mount,
     resize,
+    trackSize,
     listSize,
     slideSize,
     sliderSize,
