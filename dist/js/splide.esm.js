@@ -1188,9 +1188,10 @@ const Move = (Splide, Components, options, event) => {
     }
   }
   function move(dest, index, prev, callback) {
-    Transition.cancel();
-    if (dest !== index && canShift(dest > prev)) {
-      translate(shift(getPosition(), dest > prev), true);
+    const forward = dest > prev;
+    cancel();
+    if ((dest !== index || exceededLimit(forward)) && canShift(forward)) {
+      translate(shift(getPosition(), forward), true);
     }
     indices = [index, prev, dest];
     set(MOVING);
@@ -1357,14 +1358,16 @@ const Controller = (Splide, Components, options, event) => {
     if (!isBusy()) {
       const dest = parse(control);
       const index = loop(dest);
-      const validIndex = index > -1 && (allowSameIndex || index !== currIndex);
-      const canMove = dest === index || Move.canShift(dest > prevIndex);
-      if (validIndex && canMove) {
+      if (canGo(dest, index)) {
         Scroll.cancel();
         setIndex(index);
         Move.move(dest, index, prevIndex, callback);
       }
     }
+  }
+  function canGo(dest, index) {
+    const forward = dest > prevIndex;
+    return index > -1 && (index !== currIndex || !isMoving()) && (dest === index || Move.exceededLimit(!forward) || Move.canShift(forward));
   }
   function jump(control) {
     const { set } = Components.Breakpoints;
@@ -1480,8 +1483,11 @@ const Controller = (Splide, Components, options, event) => {
   function hasFocus() {
     return !isUndefined(options.focus) || options.isNavigation;
   }
+  function isMoving() {
+    return Splide.state.is([MOVING, SCROLLING]);
+  }
   function isBusy() {
-    return Splide.state.is([MOVING, SCROLLING]) && !!options.waitForTransition;
+    return isMoving() && !!options.waitForTransition;
   }
   return {
     mount,

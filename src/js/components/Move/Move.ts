@@ -89,6 +89,10 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
 
   /**
    * Moves the slider to the dest index with the Transition component.
+   * Needs to shift the carousel when:
+   * - Crossing bounds (`dest !== index && ! exceededLimit( ! forward )`).
+   *   But the second condition is not necessary because of `canShift()`.
+   * - Going further although the carousel already outside bounds (`exceededLimit( forward )`)
    *
    * @param dest     - A destination index to go to, including clones'.
    * @param index    - A slide index.
@@ -96,10 +100,12 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    * @param callback - Optional. A callback function invoked after transition ends.
    */
   function move( dest: number, index: number, prev: number, callback?: AnyFunction ): void {
-    Transition.cancel();
+    const forward = dest > prev;
 
-    if ( dest !== index && canShift( dest > prev ) ) {
-      translate( shift( getPosition(), dest > prev ), true );
+    cancel();
+
+    if ( ( dest !== index || exceededLimit( forward ) ) && canShift( forward ) ) {
+      translate( shift( getPosition(), forward ), true );
     }
 
     indices = [ index, prev, dest ];

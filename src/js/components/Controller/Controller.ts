@@ -134,17 +134,35 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    */
   function go( control: number | string, allowSameIndex?: boolean, callback?: AnyFunction ): void {
     if ( ! isBusy() ) {
-      const dest       = parse( control );
-      const index      = loop( dest );
-      const validIndex = index > -1 && ( allowSameIndex || index !== currIndex );
-      const canMove    = dest === index || Move.canShift( dest > prevIndex );
+      const dest  = parse( control );
+      const index = loop( dest );
 
-      if ( validIndex && canMove ) {
+      if ( canGo( dest, index ) ) {
         Scroll.cancel();
         setIndex( index );
         Move.move( dest, index, prevIndex, callback );
       }
     }
+  }
+
+  /**
+   * Checks if the carousel can move or not.
+   * - If target and current index are same, allows going only when the carousel is not moving.
+   *   Otherwise, synced carousels will provoke the infinite loop.
+   * - If the carousel is looping (`dest !== index`),
+   *   the carousel can be shifted or has been already shifted.
+   *
+   * @param dest  - A dest index.
+   * @param index - An actual index.
+   *
+   * @return `true` if the carousel can currently move, or otherwise `false`.
+   */
+  function canGo( dest: number, index: number ): boolean {
+    const forward = dest > prevIndex;
+
+    return index > -1
+      &&( index !== currIndex || ! isMoving() )
+      && ( dest === index || Move.exceededLimit( ! forward ) || Move.canShift( forward ) );
   }
 
   /**
@@ -396,12 +414,21 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
   }
 
   /**
+   * Checks if the carousel is moving now or not.
+   *
+   * @return `true` if the carousel is moving or scrolling, or otherwise `false`.
+   */
+  function isMoving(): boolean {
+    return Splide.state.is( [ MOVING, SCROLLING ] );
+  }
+
+  /**
    * Checks if the slider is moving/scrolling or not.
    *
    * @return `true` if the slider can move, or otherwise `false`.
    */
   function isBusy(): boolean {
-    return Splide.state.is( [ MOVING, SCROLLING ] ) && !! options.waitForTransition;
+    return isMoving() && !! options.waitForTransition;
   }
 
   return {
