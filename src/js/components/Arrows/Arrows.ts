@@ -158,7 +158,7 @@ export const Arrows: ComponentConstructor<ArrowsComponent> = ( Splide, Component
    * @param control - The control pattern.
    */
   function go( control: string ): void {
-    Controller.go( control, true );
+    Controller.go( control );
   }
 
   /**

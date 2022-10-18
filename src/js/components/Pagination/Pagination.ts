@@ -158,7 +158,7 @@ export const Pagination: ComponentConstructor<PaginationComponent> = ( Splide, C
       const controls = Slides.getIn( i ).map( Slide => Slide.slide.id );
       const text     = ! hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
 
-      bind( button, 'click', () => { go( `>${ i }`, true ) } );
+      bind( button, 'click', () => { go( `>${ i }` ) } );
       paginationKeyboard && bind( button, 'keydown', apply( onKeydown, i ) );
 
       setAttribute( li, ROLE, 'presentation' );

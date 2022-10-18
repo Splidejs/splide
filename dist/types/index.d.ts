@@ -234,7 +234,7 @@ interface MoveComponent extends BaseComponent {
  * @since 3.0.0
  */
 interface ControllerComponent extends BaseComponent {
-    go(control: number | string, allowSameIndex?: boolean, callback?: AnyFunction): void;
+    go(control: number | string, callback?: AnyFunction): void;
     jump(control: number | string): void;
     scroll(destination: number, duration?: number, snap?: boolean, callback?: AnyFunction): void;
     getNext(destination?: boolean): number;

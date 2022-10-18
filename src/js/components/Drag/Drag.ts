@@ -243,7 +243,7 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
     } else if ( Splide.is( SLIDE ) && exceeded && rewind ) {
       Controller.go( exceededLimit( true ) ? '>' : '<' );
     } else {
-      Controller.go( Controller.toDest( destination ), true );
+      Controller.go( Controller.toDest( destination ) );
     }
 
     reduce( true );

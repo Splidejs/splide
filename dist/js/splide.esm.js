@@ -1354,7 +1354,7 @@ const Controller = (Splide, Components, options, event) => {
       emit(EVENT_END_INDEX_CHANGED);
     }
   }
-  function go(control, allowSameIndex, callback) {
+  function go(control, callback) {
     if (!isBusy()) {
       const dest = parse(control);
       const index = loop(dest);
@@ -1564,7 +1564,7 @@ const Arrows = (Splide, Components, options, event) => {
     bind(prev, "click", apply(go, "<"));
   }
   function go(control) {
-    Controller.go(control, true);
+    Controller.go(control);
   }
   function createArrows() {
     wrapper = placeholder || create("div", classes.arrows);
@@ -1879,7 +1879,7 @@ const Drag = (Splide, Components, options, event) => {
     } else if (Splide.is(SLIDE) && exceeded && rewind) {
       Controller.go(exceededLimit(true) ? ">" : "<");
     } else {
-      Controller.go(Controller.toDest(destination), true);
+      Controller.go(Controller.toDest(destination));
     }
     reduce(true);
   }
@@ -2106,7 +2106,7 @@ const Pagination = (Splide, Components, options, event) => {
       const controls = Slides.getIn(i).map((Slide) => Slide.slide.id);
       const text = !hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
       bind(button, "click", () => {
-        go(`>${i}`, true);
+        go(`>${i}`);
       });
       paginationKeyboard && bind(button, "keydown", apply(onKeydown, i));
       setAttribute(li, ROLE, "presentation");

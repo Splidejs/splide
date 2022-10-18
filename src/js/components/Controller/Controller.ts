@@ -11,7 +11,7 @@ import { apply, approximatelyEqual, between, clamp, floor, isString, isUndefined
  * @since 3.0.0
  */
 export interface ControllerComponent extends BaseComponent {
-  go( control: number | string, allowSameIndex?: boolean, callback?: AnyFunction ): void;
+  go( control: number | string, callback?: AnyFunction ): void;
   jump( control: number | string ): void;
   scroll( destination: number, duration?: number, snap?: boolean, callback?: AnyFunction ): void;
   getNext( destination?: boolean ): number;
@@ -128,11 +128,10 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    *
    * @see `Splide#go()`
    *
-   * @param control        - A control pattern.
-   * @param allowSameIndex - Optional. Determines whether to allow going to the current index or not.
-   * @param callback       - Optional. A callback function invoked after transition ends.
+   * @param control  - A control pattern.
+   * @param callback - Optional. A callback function invoked after transition ends.
    */
-  function go( control: number | string, allowSameIndex?: boolean, callback?: AnyFunction ): void {
+  function go( control: number | string, callback?: AnyFunction ): void {
     if ( ! isBusy() ) {
       const dest  = parse( control );
       const index = loop( dest );
