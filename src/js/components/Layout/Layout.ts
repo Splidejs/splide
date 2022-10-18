@@ -39,7 +39,7 @@ export interface LayoutComponent extends BaseComponent {
 export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Components, options, event ) => {
   const { on, bind, emit } = event;
   const { Slides } = Components;
-  const { resolve } = Components.Direction;
+  const { resolve, left, right } = Components.Direction;
   const { root, track, list } = Components.Elements;
   const { getAt, style: styleSlides } = Slides;
 
@@ -112,13 +112,13 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
    * Parses the padding option and returns the value for each side.
    * This method returns `paddingTop` or `paddingBottom` for the vertical slider.
    *
-   * @param right - Determines whether to get `paddingRight/Bottom` or `paddingLeft/Top`.
+   * @param rightPadding - Determines whether to get `paddingRight/Bottom` or `paddingLeft/Top`.
    *
    * @return The padding value as a CSS string.
    */
-  function cssPadding( right: boolean ): string {
+  function cssPadding( rightPadding: boolean ): string {
     const { padding } = options;
-    const prop = resolve( right ? 'right' : 'left' );
+    const prop = rightPadding ? right() : left();
     return padding
       && unit( padding[ prop ] || ( isObject( padding ) ? 0 : padding ) )
       || '0px';
@@ -213,8 +213,13 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
    * @return The total width of slides in the horizontal slider, or the height in the vertical one.
    */
   function totalSize( index: number, withoutGap?: boolean ): number {
-    const Slide = getAt( index );
-    return Slide ? Slide.pos() + Slide.size() + ( withoutGap ? 0 : getGap() ) : 0;
+    const first  = Components.Slides.get()[ 0 ];
+    const target = getAt( index );
+    const gap    = withoutGap ? 0 : getGap();
+
+    return first && target
+      ? rect( target.slide )[ right() ] - rect( first.slide )[ left() ] + gap
+      : 0;
   }
 
   /**
@@ -239,7 +244,7 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
   function getGap(): number {
     const first  = getAt( 0 );
     const second = getAt( 1 );
-    return first && second ? second.pos() - first.pos() - first.size() : 0;
+    return first && second ? rect( second.slide )[ left() ] - rect( first.slide )[ right() ] : 0;
   }
 
   /**

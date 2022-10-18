@@ -69,10 +69,10 @@ export interface  SlideComponent extends BaseComponent {
   readonly isClone: boolean;
 
   update(): void;
-  pos(): number;
   size(): number;
   style( prop: CSSProperties, value: string | number, useContainer?: boolean ): void
   isWithin( from: number, distance: number ): boolean;
+  isVisible( partial?: boolean ): boolean;
 }
 
 /**
@@ -93,7 +93,7 @@ export const Slide = ( Splide: Splide, index: number, slideIndex: number, slide:
   const { Components, root, options } = Splide;
   const { isNavigation, updateOnMove, i18n, pagination, slideFocus } = options;
   const { Elements } = Components;
-  const { resolve } = Components.Direction;
+  const { resolve, orient } = Components.Direction;
   const styles    = getAttribute( slide, 'style' );
   const label     = getAttribute( slide, ARIA_LABEL );
   const isClone   = slideIndex > -1;
@@ -250,7 +250,7 @@ export const Slide = ( Splide: Splide, index: number, slideIndex: number, slide:
   /**
    * Checks if the slide is visible or not.
    */
-  function isVisible(): boolean {
+  function isVisible( partial?: boolean ): boolean {
     if ( Splide.is( FADE ) ) {
       return isActive();
     }
@@ -260,8 +260,8 @@ export const Slide = ( Splide: Splide, index: number, slideIndex: number, slide:
     const left      = resolve( 'left', true );
     const right     = resolve( 'right', true );
 
-    return floor( trackRect[ left ] ) <= ceil( slideRect[ left ] )
-      && floor( slideRect[ right ] ) <= ceil( trackRect[ right ] );
+    return floor( trackRect[ left ] ) <= ceil( slideRect[ partial ? right : left ] )
+      && floor( slideRect[ partial ? left : right ] ) <= ceil( trackRect[ right ] );
   }
 
   /**
@@ -284,17 +284,6 @@ export const Slide = ( Splide: Splide, index: number, slideIndex: number, slide:
   }
 
   /**
-   * Returns the slide offset position that is relative to the list element.
-   *
-   * @return The slide position.
-   */
-  function pos(): number {
-    const first = Components.Slides.get()[ 0 ];
-    const left  = resolve( 'left' );
-    return first ? abs( rect( slide )[ left ] - rect( first.slide )[ left ] ) : 0;
-  }
-
-  /**
    * Returns width of the slide in a horizontal carousel, or height in a vertical one.
    *
    * @return Width of height of the slide.
@@ -312,9 +301,9 @@ export const Slide = ( Splide: Splide, index: number, slideIndex: number, slide:
     mount,
     destroy,
     update,
-    pos,
     size,
     style,
+    isVisible,
     isWithin,
   };
 

@@ -2,6 +2,7 @@ import { ARROW_DOWN, ARROW_LEFT, ARROW_RIGHT, ARROW_UP } from '../../constants/a
 import { RTL, TTB } from '../../constants/directions';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, ComponentConstructor, Components, Options } from '../../types';
+import { apply } from '../../../../../utils';
 
 
 /**
@@ -12,6 +13,8 @@ import { BaseComponent, ComponentConstructor, Components, Options } from '../../
 export interface DirectionComponent extends BaseComponent {
   resolve<R extends string>( prop: string, axisOnly?: boolean, direction?: Options['direction'] ): R;
   orient( value: number ): number;
+  left(): string;
+  right(): string;
 }
 
 /**
@@ -77,5 +80,7 @@ export const Direction: ComponentConstructor<DirectionComponent> = ( Splide: Spl
   return {
     resolve,
     orient,
+    left: apply( resolve, 'left' ),
+    right: apply( resolve, 'right' ),
   };
 };

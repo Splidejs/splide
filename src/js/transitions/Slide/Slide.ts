@@ -45,7 +45,7 @@ export const Slide: ComponentConstructor<TransitionComponent> = ( Splide, Compon
    * @param done  - The callback function that must be called after the transition ends.
    */
   function start( index: number, done: () => void ): void {
-    const destination = Move.toPosition( index, true );
+    const destination = Move.toPosition( index );
     const position    = Move.getPosition();
     const speed       = getSpeed( index );
 

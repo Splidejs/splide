@@ -288,7 +288,7 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
     if ( isSlide && options.trimSpace === 'move' && dest !== currIndex ) {
       const position = getPosition();
 
-      while ( position === toPosition( dest, true ) && between( dest, 0, Splide.length - 1, ! options.rewind ) ) {
+      while ( position === toPosition( dest ) && between( dest, 0, Splide.length - 1, ! options.rewind ) ) {
         dest < currIndex ? --dest : ++dest;
       }
     }
@@ -319,7 +319,7 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
     let end = slideCount - ( hasFocus() || ( isLoop && perMove ) ? 1 : perPage );
 
     while ( omitEnd && end-- > 0 ) {
-      if ( toPosition( slideCount - 1, true ) !== toPosition( end, true ) ) {
+      if ( toPosition( slideCount - 1 ) !== toPosition( end ) ) {
         end++;
         break;
       }

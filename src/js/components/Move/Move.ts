@@ -25,7 +25,7 @@ export interface MoveComponent extends BaseComponent {
   shift( position: number, backwards: boolean ): number;
   cancel(): void;
   toIndex( position: number ): number;
-  toPosition( index: number, trimming?: boolean ): number;
+  toPosition( index: number ): number;
   getPosition(): number;
   getRate(): number;
   getLimit( max: boolean ): number;
@@ -119,7 +119,7 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    * @param index - An index to jump to.
    */
   function jump( index: number ): void {
-    translate( toPosition( index, true ) );
+    translate( toPosition( index ) );
   }
 
   /**
@@ -196,7 +196,7 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
 
     for ( let i = 0; i < slides.length; i++ ) {
       const slideIndex = slides[ i ].index;
-      const distance   = abs( toPosition( slideIndex, true ) - position );
+      const distance   = abs( toPosition( slideIndex ) - position );
 
       if ( distance <= minDistance ) {
         minDistance = distance;
@@ -212,14 +212,18 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
   /**
    * Converts the slide index to the position.
    *
-   * @param index    - An index to convert.
-   * @param trimming - Optional. Whether to trim edge spaces or not.
+   * @param index - An index to convert.
    *
    * @return The position corresponding with the index.
    */
-  function toPosition( index: number, trimming?: boolean ): number {
-    const position = orient( totalSize( index - 1 ) - offset( index ) );
-    return trimming ? trim( position ) : position;
+  function toPosition( index: number ): number {
+    let position = orient( totalSize( index - 1 ) - offset( index ) );
+
+    if ( options.trimSpace && Splide.is( SLIDE ) ) {
+      position = clamp( position, 0, orient( sliderSize( true ) - listSize() ) );
+    }
+
+    return position;
   }
 
   /**
@@ -262,21 +266,6 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
   }
 
   /**
-   * Trims spaces on the edge of the slider.
-   *
-   * @param position - A position to trim.
-   *
-   * @return A trimmed position.
-   */
-  function trim( position: number ): number {
-    if ( options.trimSpace && Splide.is( SLIDE ) ) {
-      position = clamp( position, 0, orient( sliderSize( true ) - listSize() ) );
-    }
-
-    return position;
-  }
-
-  /**
    * Returns the offset amount.
    *
    * @param index - An index.
@@ -296,7 +285,7 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    * @return The border number.
    */
   function getLimit( max: boolean ): number {
-    return toPosition( max ? Components.Controller.getEnd() : 0, !! options.trimSpace );
+    return toPosition( max ? Components.Controller.getEnd() : 0 );
   }
 
   /**
