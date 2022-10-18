@@ -43,7 +43,7 @@ export interface ControllerComponent extends BaseComponent {
  */
 export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, Components, options, event ) => {
   const { on, emit } = event;
-  const { Move } = Components;
+  const { Move, Scroll } = Components;
   const { getPosition, getLimit, toPosition } = Move;
   const { isEnough, getLength } = Components.Slides;
   const { omitEnd } = options;
@@ -140,6 +140,7 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
       const canMove    = dest === index || Move.canShift( dest > prevIndex );
 
       if ( validIndex && canMove ) {
+        Scroll.cancel();
         setIndex( index );
         Move.move( dest, index, prevIndex, callback );
       }
@@ -169,7 +170,7 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    * @param callback    - Optional. A callback function invoked after scroll ends.
    */
   function scroll( destination: number, duration?: number, snap?: boolean, callback?: AnyFunction ): void {
-    Components.Scroll.scroll( destination, duration, snap, () => {
+    Scroll.scroll( destination, duration, snap, () => {
       const index = loop( Move.toIndex( getPosition() ) );
       setIndex( omitEnd ? min( index, endIndex ) : index );
       callback && callback();

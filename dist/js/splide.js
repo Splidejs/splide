@@ -1312,7 +1312,7 @@
 
   const Controller = (Splide, Components, options, event) => {
     const { on, emit } = event;
-    const { Move } = Components;
+    const { Move, Scroll } = Components;
     const { getPosition, getLimit, toPosition } = Move;
     const { isEnough, getLength } = Components.Slides;
     const { omitEnd } = options;
@@ -1356,6 +1356,7 @@
         const validIndex = index > -1 && (allowSameIndex || index !== currIndex);
         const canMove = dest === index || Move.canShift(dest > prevIndex);
         if (validIndex && canMove) {
+          Scroll.cancel();
           setIndex(index);
           Move.move(dest, index, prevIndex, callback);
         }
@@ -1369,7 +1370,7 @@
       set({ speed });
     }
     function scroll(destination, duration, snap, callback) {
-      Components.Scroll.scroll(destination, duration, snap, () => {
+      Scroll.scroll(destination, duration, snap, () => {
         const index = loop(Move.toIndex(getPosition()));
         setIndex(omitEnd ? min(index, endIndex) : index);
         callback && callback();
@@ -2318,10 +2319,10 @@
     Layout,
     Clones,
     Move,
+    Scroll,
     Controller,
     Arrows,
     Autoplay,
-    Scroll,
     Drag,
     Keyboard,
     LazyLoad,
