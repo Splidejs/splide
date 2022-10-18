@@ -543,7 +543,10 @@ const Direction = (Splide2, Components2, options) => {
   }
   return {
     resolve,
-    orient
+    orient,
+    left: apply(resolve, "left"),
+    right: apply(resolve, "right"),
+    width: apply(resolve, "width")
   };
 };
 
@@ -836,7 +839,7 @@ const Slide$1 = (Splide2, index, slideIndex, slide) => {
     const { cloneStatus = true } = options;
     return curr === index || cloneStatus && curr === slideIndex;
   }
-  function isVisible() {
+  function isVisible(partial) {
     if (Splide2.is(FADE)) {
       return isActive();
     }
@@ -844,7 +847,7 @@ const Slide$1 = (Splide2, index, slideIndex, slide) => {
     const slideRect = rect(slide);
     const left = resolve("left", true);
     const right = resolve("right", true);
-    return floor(trackRect[left]) <= ceil(slideRect[left]) && floor(slideRect[right]) <= ceil(trackRect[right]);
+    return floor(trackRect[left]) <= ceil(slideRect[partial ? right : left]) && floor(slideRect[partial ? left : right]) <= ceil(trackRect[right]);
   }
   function isWithin(from, distance) {
     let diff = abs(from - index);
@@ -852,14 +855,6 @@ const Slide$1 = (Splide2, index, slideIndex, slide) => {
       diff = min(diff, Splide2.length - diff);
     }
     return diff <= distance;
-  }
-  function pos() {
-    const first = Components.Slides.get()[0];
-    const left = resolve("left");
-    return first ? abs(rect(slide)[left] - rect(first.slide)[left]) : 0;
-  }
-  function size() {
-    return rect(slide)[resolve("width")];
   }
   const self = {
     index,
@@ -870,9 +865,8 @@ const Slide$1 = (Splide2, index, slideIndex, slide) => {
     mount,
     destroy,
     update,
-    pos,
-    size,
     style: style$1,
+    isVisible,
     isWithin
   };
   return self;
@@ -994,7 +988,7 @@ const Slides = (Splide, Components, options, event) => {
 const Layout = (Splide, Components, options, event) => {
   const { on, bind, emit } = event;
   const { Slides } = Components;
-  const { resolve } = Components.Direction;
+  const { resolve, left, right, width } = Components.Direction;
   const { root, track, list } = Components.Elements;
   const { getAt, style: styleSlides } = Slides;
   let vertical;
@@ -1028,9 +1022,9 @@ const Layout = (Splide, Components, options, event) => {
       }
     }
   }
-  function cssPadding(right) {
+  function cssPadding(rightPadding) {
     const { padding } = options;
-    const prop = resolve(right ? "right" : "left");
+    const prop = rightPadding ? right() : left();
     return padding && unit(padding[prop] || (isObject(padding) ? 0 : padding)) || "0px";
   }
   function cssTrackHeight() {
@@ -1055,16 +1049,20 @@ const Layout = (Splide, Components, options, event) => {
     const gap = unit(options.gap);
     return `calc((100%${gap && ` + ${gap}`})/${options.perPage || 1}${gap && ` - ${gap}`})`;
   }
-  function listSize() {
-    return rect(list)[resolve("width")];
+  function trackSize() {
+    return rect(track)[width()];
+  }
+  function listSize(full) {
+    return full ? list[resolve("scrollWidth")] : rect(list)[width()];
   }
   function slideSize(index = 0, withoutGap) {
-    const Slide = getAt(index);
-    return (Slide ? Slide.size() : 0) + (withoutGap ? 0 : getGap());
+    const slide = getAt(index);
+    return (slide ? rect(slide.slide)[width()] : 0) + (withoutGap ? 0 : getGap());
   }
   function totalSize(index, withoutGap) {
-    const Slide = getAt(index);
-    return Slide ? Slide.pos() + Slide.size() + (withoutGap ? 0 : getGap()) : 0;
+    const first = Components.Slides.get()[0];
+    const target = getAt(index);
+    return first && target ? abs(rect(target.slide)[right()] - rect(first.slide)[left()]) + (withoutGap ? 0 : getGap()) : 0;
   }
   function sliderSize(withoutGap) {
     return totalSize(Splide.length - 1) - totalSize(0) + slideSize(0, withoutGap);
@@ -1072,12 +1070,16 @@ const Layout = (Splide, Components, options, event) => {
   function getGap() {
     const first = getAt(0);
     const second = getAt(1);
-    return first && second ? second.pos() - first.pos() - first.size() : 0;
+    if (first && second) {
+      const firstRect = rect(first.slide);
+      return abs(rect(second.slide)[left()] - firstRect[left()]) - firstRect[width()];
+    }
+    return 0;
   }
-  function getPadding(right) {
+  function getPadding(right2) {
     return parseFloat(style(
       track,
-      resolve(`padding${right ? "Right" : "Left"}`)
+      resolve(`padding${right2 ? "Right" : "Left"}`)
     )) || 0;
   }
   function isOverflow() {
@@ -1086,6 +1088,7 @@ const Layout = (Splide, Components, options, event) => {
   return {
     mount,
     resize,
+    trackSize,
     listSize,
     slideSize,
     sliderSize,
@@ -1098,7 +1101,7 @@ const Layout = (Splide, Components, options, event) => {
 const MULTIPLIER = 2;
 const Clones = (Splide, Components, options, event) => {
   const { on } = event;
-  const { Elements, Slides, Layout: { resize } } = Components;
+  const { Elements, Slides, Layout: { resize, trackSize } } = Components;
   const { resolve } = Components.Direction;
   const clones = [];
   let cloneCount;
@@ -1157,7 +1160,7 @@ const Clones = (Splide, Components, options, event) => {
       clones2 = 0;
     } else if (isUndefined(clones2)) {
       const fixedSize = options[resolve("fixedWidth")] && Components.Layout.slideSize(0);
-      const fixedCount = fixedSize && ceil(rect(Elements.track)[resolve("width")] / fixedSize);
+      const fixedCount = fixedSize && ceil(trackSize() / fixedSize);
       clones2 = fixedCount || options[resolve("autoWidth")] && Splide.length || options.perPage * MULTIPLIER;
     }
     return clones2;
@@ -1172,7 +1175,7 @@ const Move = (Splide, Components, options, event) => {
   const { on, emit } = event;
   const { set } = Splide.state;
   const { Slides } = Components;
-  const { slideSize, getPadding, listSize, sliderSize, totalSize } = Components.Layout;
+  const { slideSize, getPadding, listSize, sliderSize, totalSize, trackSize } = Components.Layout;
   const { resolve, orient } = Components.Direction;
   const { list, track } = Components.Elements;
   let Transition;
@@ -1203,7 +1206,7 @@ const Move = (Splide, Components, options, event) => {
     });
   }
   function jump(index) {
-    translate(toPosition(index, true));
+    translate(toPosition(index));
   }
   function translate(position, preventLoop) {
     if (!Splide.is(FADE)) {
@@ -1240,7 +1243,7 @@ const Move = (Splide, Components, options, event) => {
     let minDistance = Infinity;
     for (let i = 0; i < slides.length; i++) {
       const slideIndex = slides[i].index;
-      const distance = abs(toPosition(slideIndex, true) - position);
+      const distance = abs(toPosition(slideIndex) - position);
       if (distance <= minDistance) {
         minDistance = distance;
         index = slideIndex;
@@ -1250,9 +1253,12 @@ const Move = (Splide, Components, options, event) => {
     }
     return index;
   }
-  function toPosition(index, trimming) {
-    const position = orient(totalSize(index - 1) - offset(index));
-    return trimming ? trim(position) : position;
+  function toPosition(index) {
+    let position = orient(totalSize(index - 1) - offset(index));
+    if (options.trimSpace && Splide.is(SLIDE)) {
+      position = clamp(position, 0, orient(sliderSize(true) - listSize()));
+    }
+    return position;
   }
   function getPosition() {
     const left = resolve("left");
@@ -1277,23 +1283,17 @@ const Move = (Splide, Components, options, event) => {
     }
     return clamp(rate, 0, 1);
   }
-  function trim(position) {
-    if (options.trimSpace && Splide.is(SLIDE)) {
-      position = clamp(position, 0, orient(sliderSize(true) - listSize()));
-    }
-    return position;
-  }
   function offset(index) {
     const { focus } = options;
     return focus === "center" ? (listSize() - slideSize(index, true)) / 2 : +focus * slideSize(index) || 0;
   }
   function getLimit(max) {
-    return toPosition(max ? Components.Controller.getEnd() : 0, !!options.trimSpace);
+    return toPosition(max ? Components.Controller.getEnd() : 0);
   }
   function canShift(backwards) {
     const padding = getPadding(false);
     const shifted = orient(shift(getPosition(), backwards));
-    return backwards ? shifted >= padding : shifted <= list[resolve("scrollWidth")] - rect(track)[resolve("width")] + padding;
+    return backwards ? shifted >= padding : shifted <= listSize(true) - trackSize() + padding;
   }
   function exceededLimit(max, position = getPosition()) {
     const exceededMin = max !== true && orient(position) < orient(getLimit(false));
@@ -1320,7 +1320,7 @@ const Move = (Splide, Components, options, event) => {
 
 const Controller = (Splide, Components, options, event) => {
   const { on, emit } = event;
-  const { Move } = Components;
+  const { Move, Scroll } = Components;
   const { getPosition, getLimit, toPosition } = Move;
   const { isEnough, getLength } = Components.Slides;
   const { omitEnd } = options;
@@ -1364,6 +1364,7 @@ const Controller = (Splide, Components, options, event) => {
       const validIndex = index > -1 && (allowSameIndex || index !== currIndex);
       const canMove = dest === index || Move.canShift(dest > prevIndex);
       if (validIndex && canMove) {
+        Scroll.cancel();
         setIndex(index);
         Move.move(dest, index, prevIndex, callback);
       }
@@ -1377,7 +1378,7 @@ const Controller = (Splide, Components, options, event) => {
     set({ speed });
   }
   function scroll(destination, duration, snap, callback) {
-    Components.Scroll.scroll(destination, duration, snap, () => {
+    Scroll.scroll(destination, duration, snap, () => {
       const index = loop(Move.toIndex(getPosition()));
       setIndex(omitEnd ? min(index, endIndex) : index);
       callback && callback();
@@ -1442,7 +1443,7 @@ const Controller = (Splide, Components, options, event) => {
   function computeMovableDestIndex(dest) {
     if (isSlide && options.trimSpace === "move" && dest !== currIndex) {
       const position = getPosition();
-      while (position === toPosition(dest, true) && between(dest, 0, Splide.length - 1, !options.rewind)) {
+      while (position === toPosition(dest) && between(dest, 0, Splide.length - 1, !options.rewind)) {
         dest < currIndex ? --dest : ++dest;
       }
     }
@@ -1454,7 +1455,7 @@ const Controller = (Splide, Components, options, event) => {
   function getEnd() {
     let end = slideCount - (hasFocus() || isLoop && perMove ? 1 : perPage);
     while (omitEnd && end-- > 0) {
-      if (toPosition(slideCount - 1, true) !== toPosition(end, true)) {
+      if (toPosition(slideCount - 1) !== toPosition(end)) {
         end++;
         break;
       }
@@ -2326,10 +2327,10 @@ const COMPONENTS = {
   Layout,
   Clones,
   Move,
+  Scroll,
   Controller,
   Arrows,
   Autoplay,
-  Scroll,
   Drag,
   Keyboard,
   LazyLoad,
@@ -2407,7 +2408,7 @@ const Slide = (Splide, Components, options, event) => {
     });
   }
   function start(index, done) {
-    const destination = Move.toPosition(index, true);
+    const destination = Move.toPosition(index);
     const position = Move.getPosition();
     const speed = getSpeed(index);
     if (abs(destination - position) >= 1 && speed >= 1) {

@@ -184,6 +184,8 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
 
   /**
    * Returns the track width for the horizontal carousel, or the height for the vertical one.
+   *
+   * @return The size of the track element in pixel.
    */
   function trackSize(): number {
     return rect( track )[ width() ];

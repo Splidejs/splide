@@ -134,6 +134,9 @@ interface BreakpointsComponent extends BaseComponent {
 interface DirectionComponent extends BaseComponent {
     resolve<R extends string>(prop: string, axisOnly?: boolean, direction?: Options['direction']): R;
     orient(value: number): number;
+    left(): string;
+    right(): string;
+    width(): string;
 }
 
 /**
@@ -173,10 +176,9 @@ interface SlideComponent extends BaseComponent {
     readonly container: HTMLElement;
     readonly isClone: boolean;
     update(): void;
-    pos(): number;
-    size(): number;
     style(prop: CSSProperties, value: string | number, useContainer?: boolean): void;
     isWithin(from: number, distance: number): boolean;
+    isVisible(partial?: boolean): boolean;
 }
 
 /**
@@ -185,7 +187,8 @@ interface SlideComponent extends BaseComponent {
  * @since 3.0.0
  */
 interface LayoutComponent extends BaseComponent {
-    listSize(): number;
+    trackSize(): number;
+    listSize(full?: boolean): number;
     slideSize(index: number, withoutGap?: boolean): number;
     sliderSize(withoutGap?: boolean): number;
     totalSize(index?: number, withoutGap?: boolean): number;
@@ -215,7 +218,7 @@ interface MoveComponent extends BaseComponent {
     shift(position: number, backwards: boolean): number;
     cancel(): void;
     toIndex(position: number): number;
-    toPosition(index: number, trimming?: boolean): number;
+    toPosition(index: number): number;
     getPosition(): number;
     getRate(): number;
     getLimit(max: boolean): number;
