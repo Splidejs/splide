@@ -132,12 +132,28 @@ interface BreakpointsComponent extends BaseComponent {
  * @since 3.0.0
  */
 interface DirectionComponent extends BaseComponent {
-    resolve<R extends string>(prop: string, axisOnly?: boolean, direction?: Options['direction']): R;
+    resolve<K extends keyof typeof ORIENTATION_MAP>(prop: K, axisOnly?: boolean, direction?: Options['direction']): typeof ORIENTATION_MAP[K][number] | K;
+    resolve<R extends string>(prop: R, axisOnly?: boolean, direction?: Options['direction']): R;
     orient(value: number): number;
     left(): string;
     right(): string;
     width(): string;
 }
+/**
+ * The translation map for directions.
+ *
+ * @since 3.0.0
+ */
+declare const ORIENTATION_MAP: {
+    readonly width: readonly ["height"];
+    readonly left: readonly ["top", "right"];
+    readonly right: readonly ["bottom", "left"];
+    readonly x: readonly ["y"];
+    readonly X: readonly ["Y"];
+    readonly Y: readonly ["X"];
+    readonly ArrowLeft: readonly [string, string];
+    readonly ArrowRight: readonly [string, string];
+};
 
 /**
  * The interface for elements which the slider consists of.
@@ -220,7 +236,7 @@ interface MoveComponent extends BaseComponent {
     toIndex(position: number): number;
     toPosition(index: number): number;
     getPosition(): number;
-    getRate(): number;
+    getRate(index?: number): number;
     getLimit(max: boolean): number;
     exceededLimit(max?: boolean | undefined, position?: number): boolean;
     /** @internal */

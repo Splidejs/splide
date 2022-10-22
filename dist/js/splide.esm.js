@@ -534,8 +534,8 @@ const Direction = (Splide2, Components2, options) => {
       return offset > 0 ? replacement.charAt(0).toUpperCase() + replacement.slice(1) : replacement;
     });
   }
-  function orient(value) {
-    return value * (options.direction === RTL ? 1 : -1);
+  function orient(value, direction = options.direction) {
+    return value * (direction === RTL ? 1 : -1);
   }
   return {
     resolve,
@@ -1261,13 +1261,14 @@ const Move = (Splide, Components, options, event) => {
     const left = resolve("left");
     return rect(list)[left] - rect(track)[left] + orient(getPadding(false));
   }
-  function getRate() {
+  function getRate(index) {
+    const useIndex = !isUndefined(index);
     let rate;
     if (Splide.is(FADE)) {
-      rate = Splide.index / (Splide.length - 1);
+      rate = (useIndex ? index : Splide.index) / (Splide.length - 1);
     } else {
       const isLoop = Splide.is(LOOP);
-      const position = orient(getPosition());
+      const position = orient(useIndex ? toPosition(index) : getPosition());
       const min = orient(getLimit(false));
       const max = orient(getLimit(true));
       const size = sliderSize();

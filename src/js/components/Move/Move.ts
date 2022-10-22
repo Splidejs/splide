@@ -10,7 +10,7 @@ import {
 import { IDLE, MOVING } from '../../constants/states';
 import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { AnyFunction, BaseComponent, ComponentConstructor, TransitionComponent } from '../../types';
-import { abs, ceil, clamp, rect, style } from '@splidejs/utils';
+import { abs, ceil, clamp, isUndefined, rect, style } from '@splidejs/utils';
 
 
 /**
@@ -27,7 +27,7 @@ export interface MoveComponent extends BaseComponent {
   toIndex( position: number ): number;
   toPosition( index: number ): number;
   getPosition(): number;
-  getRate(): number;
+  getRate( index?: number ): number;
   getLimit( max: boolean ): number;
   exceededLimit( max?: boolean | undefined, position?: number ): boolean;
 
@@ -245,16 +245,19 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
   /**
    * Returns the carousel progress rate.
    *
+   * @param index - Optional. If specified, returns the rate of the slide at the index.
+   *
    * @return The progress rate.
    */
-  function getRate(): number {
+  function getRate( index?: number ): number {
+    const useIndex = ! isUndefined( index );
     let rate;
 
     if ( Splide.is( FADE ) ) {
-      rate = Splide.index / ( Splide.length - 1 );
+      rate = ( useIndex ? index : Splide.index ) / ( Splide.length - 1 );
     } else {
       const isLoop   = Splide.is( LOOP );
-      const position = orient( getPosition() );
+      const position = orient( useIndex ? toPosition( index ) : getPosition() );
       const min      = orient( getLimit( false ) );
       const max      = orient( getLimit( true ) );
       const size     = sliderSize();
