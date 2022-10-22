@@ -11,7 +11,9 @@ import { apply } from '../../../../../utils';
  * @since 3.0.0
  */
 export interface DirectionComponent extends BaseComponent {
-  resolve<R extends string>( prop: string, axisOnly?: boolean, direction?: Options['direction'] ): R;
+  resolve<K extends keyof typeof ORIENTATION_MAP>( prop: K, axisOnly?: boolean, direction?: Options['direction'] ): typeof ORIENTATION_MAP[ K ][ number ] | K;
+  resolve<R extends string>( prop: R, axisOnly?: boolean, direction?: Options['direction'] ): R;
+
   orient( value: number ): number;
   left(): string;
   right(): string;
@@ -32,7 +34,7 @@ export const ORIENTATION_MAP = {
   Y         : [ 'X' ],
   ArrowLeft : [ ARROW_UP, ARROW_RIGHT ],
   ArrowRight: [ ARROW_DOWN, ARROW_LEFT ],
-};
+} as const;
 
 /**
  * The component that absorbs the difference among directions.
@@ -53,11 +55,11 @@ export const Direction: ComponentConstructor<DirectionComponent> = ( Splide: Spl
    * @param axisOnly  - Optional. If `ture`, returns the same property for LTR and RTL.
    * @param direction - Optional. Specify the direction. The default value is the `direction` option.
    */
-  function resolve<R extends string>(
+  function resolve(
     prop: string,
     axisOnly?: boolean,
-    direction: Options['direction'] = options.direction
-  ): R {
+    direction: Options[ 'direction' ] = options.direction
+  ): string {
     const index = direction === RTL && ! axisOnly ? 1 : direction === TTB ? 0 : -1;
 
     return ORIENTATION_MAP[ prop ] && ORIENTATION_MAP[ prop ][ index ]
@@ -70,12 +72,13 @@ export const Direction: ComponentConstructor<DirectionComponent> = ( Splide: Spl
   /**
    * Orients the value towards the current direction.
    *
-   * @param value - A value to orient.
+   * @param value     - A value to orient.
+   * @param direction - Optional. Specify the direction. The default value is the `direction` option.
    *
    * @return The oriented value.
    */
-  function orient( value: number ): number {
-    return value * ( options.direction === RTL ? 1 : -1 );
+  function orient( value: number, direction: Options[ 'direction' ] = options.direction ): number {
+    return value * ( direction === RTL ? 1 : -1 );
   }
 
   return {
