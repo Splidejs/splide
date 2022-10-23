@@ -233,11 +233,8 @@ function clamp(number, x, y) {
 function camelToKebab(string) {
   return string.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
 }
-function format(string, replacements) {
-  forEach(replacements, (replacement) => {
-    string = string.replace("%s", `${replacement}`);
-  });
-  return string;
+function format(string, ...replacements) {
+  return replacements.reduce((prev, curr) => prev.replace("%s", `${curr}`), string);
 }
 function pad(number, length = 2) {
   return `${number}`.padStart(length, "0");
@@ -759,7 +756,7 @@ const Slide$1 = (Splide2, index, slideIndex, slide) => {
       slide.id = `${root.id}-slide${pad(index + 1)}`;
       setAttribute(slide, ROLE, pagination ? "tabpanel" : "group");
       setAttribute(slide, ARIA_ROLEDESCRIPTION, i18n.slide);
-      setAttribute(slide, ARIA_LABEL, label || format(i18n.slideLabel, [index + 1, Splide2.length]));
+      setAttribute(slide, ARIA_LABEL, label || format(i18n.slideLabel, index + 1, Splide2.length));
     }
     listen();
   }

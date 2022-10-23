@@ -99,7 +99,10 @@ $settings = get_settings();
 
 
       document.querySelector( '#jump' ).addEventListener( 'click', () => {
-        splide.Components.Controller.jump( '>' )
+        splide.Components.Controller.jump( '>' );
+        console.log( splide.Components.Move.getRate() );
+        console.log( splide.Components.Move.getRate( 1 ) );
+        console.log( splide.Components.Move.getRate( 2 ) );
       } );
 
 	    // Array.from( document.getElementsByTagName( 'button' ) ).forEach( button => {

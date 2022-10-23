@@ -232,11 +232,8 @@
     const maximum = max(x, y);
     return min(max(minimum, number), maximum);
   }
-  function format(string, replacements) {
-    forEach(replacements, (replacement) => {
-      string = string.replace("%s", `${replacement}`);
-    });
-    return string;
+  function format(string, ...replacements) {
+    return replacements.reduce((prev, curr) => prev.replace("%s", `${curr}`), string);
   }
   function pad(number, length = 2) {
     return `${number}`.padStart(length, "0");
@@ -755,7 +752,7 @@
         slide.id = `${root.id}-slide${pad(index + 1)}`;
         setAttribute(slide, ROLE, pagination ? "tabpanel" : "group");
         setAttribute(slide, ARIA_ROLEDESCRIPTION, i18n.slide);
-        setAttribute(slide, ARIA_LABEL, label || format(i18n.slideLabel, [index + 1, Splide2.length]));
+        setAttribute(slide, ARIA_LABEL, label || format(i18n.slideLabel, index + 1, Splide2.length));
       }
       listen();
     }

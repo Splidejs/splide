@@ -111,7 +111,7 @@ export const Slide = ( Splide: Splide, index: number, slideIndex: number, slide:
       slide.id = `${ root.id }-slide${ pad( index + 1 ) }`;
       setAttribute( slide, ROLE, pagination ? 'tabpanel' : 'group' );
       setAttribute( slide, ARIA_ROLEDESCRIPTION, i18n.slide );
-      setAttribute( slide, ARIA_LABEL, label || format( i18n.slideLabel, [ index + 1, Splide.length ] ) );
+      setAttribute( slide, ARIA_LABEL, label || format( i18n.slideLabel, index + 1, Splide.length ) );
     }
 
     listen();
