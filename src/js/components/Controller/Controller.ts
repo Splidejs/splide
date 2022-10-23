@@ -205,7 +205,7 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
     let index = currIndex;
 
     if ( isString( control ) ) {
-      const [ , indicator, number ] = control.match( /([+\-<>])(\d+)?/ ) || [];
+      const [ , indicator, number ] = control.match( /([+\-<>]\|?)(\d+)?/ ) || [];
 
       if ( indicator === '+' || indicator === '-' ) {
         index = computeDestIndex( currIndex + +`${ indicator }${ +number || 1 }`, currIndex );
@@ -213,6 +213,8 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
         index = number ? toIndex( +number ) : getNext( true );
       } else if ( indicator === '<' ) {
         index = getPrev( true );
+      } else if ( indicator === '>|' ) {
+        index = endIndex;
       }
     } else {
       index = isLoop ? control : clamp( control, 0, endIndex );

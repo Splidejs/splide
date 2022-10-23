@@ -1388,13 +1388,15 @@ const Controller = (Splide, Components, options, event) => {
   function parse(control) {
     let index = currIndex;
     if (isString(control)) {
-      const [, indicator, number] = control.match(/([+\-<>])(\d+)?/) || [];
+      const [, indicator, number] = control.match(/([+\-<>]\|?)(\d+)?/) || [];
       if (indicator === "+" || indicator === "-") {
         index = computeDestIndex(currIndex + +`${indicator}${+number || 1}`, currIndex);
       } else if (indicator === ">") {
         index = number ? toIndex(+number) : getNext(true);
       } else if (indicator === "<") {
         index = getPrev(true);
+      } else if (indicator === ">|") {
+        index = endIndex;
       }
     } else {
       index = isLoop ? control : clamp(control, 0, endIndex);

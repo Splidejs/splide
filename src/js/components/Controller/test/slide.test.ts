@@ -115,4 +115,11 @@ describe( 'Controller#go()', () => {
     splide.go( -100 );
     expect( splide.index ).toBe( 0 );
   } );
+
+  test( 'can move the slider to the end page.', () => {
+    const splide = init( { speed: 0 } );
+
+    splide.go( '>|' );
+    expect( splide.index ).toBe( splide.length - 1 );
+  } );
 } );
