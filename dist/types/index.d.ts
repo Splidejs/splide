@@ -1,4 +1,69 @@
 /**
+ * The interface for the Media component.
+ *
+ * @since 4.0.0
+ */
+interface BreakpointsComponent extends BaseComponent {
+    /** @internal */
+    reduce(reduced: boolean): void;
+    set(options: Options, base?: boolean, notify?: boolean): void;
+}
+
+/**
+ * The interface for the Direction component.
+ *
+ * @since 3.0.0
+ */
+interface DirectionComponent extends BaseComponent {
+    resolve<K extends keyof typeof ORIENTATION_MAP>(prop: K, axisOnly?: boolean, direction?: Options['direction']): typeof ORIENTATION_MAP[K][number] | K;
+    resolve<R extends string>(prop: R, axisOnly?: boolean, direction?: Options['direction']): R;
+    orient(value: number): number;
+    left(): string;
+    right(): string;
+    width(): string;
+}
+/**
+ * The translation map for directions.
+ *
+ * @since 3.0.0
+ */
+declare const ORIENTATION_MAP: {
+    readonly width: readonly ["height"];
+    readonly left: readonly ["top", "right"];
+    readonly right: readonly ["bottom", "left"];
+    readonly x: readonly ["y"];
+    readonly X: readonly ["Y"];
+    readonly Y: readonly ["X"];
+    readonly ArrowLeft: readonly [string, string];
+    readonly ArrowRight: readonly [string, string];
+};
+
+/**
+ * The interface for elements which the slider consists of.
+ *
+ * @since 3.0.0
+ */
+interface ElementCollection {
+    root: HTMLElement;
+    track: HTMLElement;
+    list: HTMLElement;
+    slides: HTMLElement[];
+    arrows?: HTMLElement;
+    pagination?: HTMLUListElement;
+    prev?: HTMLButtonElement;
+    next?: HTMLButtonElement;
+    bar?: HTMLElement;
+    toggle?: HTMLElement;
+}
+/**
+ * The interface for the Elements component.
+ *
+ * @since 3.0.0
+ */
+interface ElementsComponent extends BaseComponent, Readonly<ElementCollection> {
+}
+
+/**
  * The type that matches any function.
  */
 declare type AnyFunction$1 = (...args: any[]) => any;
@@ -116,71 +181,6 @@ interface State {
 declare function State(initialState: number): State;
 
 /**
- * The interface for the Media component.
- *
- * @since 4.0.0
- */
-interface BreakpointsComponent extends BaseComponent {
-    /** @internal */
-    reduce(reduced: boolean): void;
-    set(options: Options, base?: boolean, notify?: boolean): void;
-}
-
-/**
- * The interface for the Direction component.
- *
- * @since 3.0.0
- */
-interface DirectionComponent extends BaseComponent {
-    resolve<K extends keyof typeof ORIENTATION_MAP>(prop: K, axisOnly?: boolean, direction?: Options['direction']): typeof ORIENTATION_MAP[K][number] | K;
-    resolve<R extends string>(prop: R, axisOnly?: boolean, direction?: Options['direction']): R;
-    orient(value: number): number;
-    left(): string;
-    right(): string;
-    width(): string;
-}
-/**
- * The translation map for directions.
- *
- * @since 3.0.0
- */
-declare const ORIENTATION_MAP: {
-    readonly width: readonly ["height"];
-    readonly left: readonly ["top", "right"];
-    readonly right: readonly ["bottom", "left"];
-    readonly x: readonly ["y"];
-    readonly X: readonly ["Y"];
-    readonly Y: readonly ["X"];
-    readonly ArrowLeft: readonly [string, string];
-    readonly ArrowRight: readonly [string, string];
-};
-
-/**
- * The interface for elements which the slider consists of.
- *
- * @since 3.0.0
- */
-interface ElementCollection {
-    root: HTMLElement;
-    track: HTMLElement;
-    list: HTMLElement;
-    slides: HTMLElement[];
-    arrows?: HTMLElement;
-    pagination?: HTMLUListElement;
-    prev?: HTMLButtonElement;
-    next?: HTMLButtonElement;
-    bar?: HTMLElement;
-    toggle?: HTMLElement;
-}
-/**
- * The interface for the Elements component.
- *
- * @since 3.0.0
- */
-interface ElementsComponent extends BaseComponent, Readonly<ElementCollection> {
-}
-
-/**
  * The interface for the Slide sub component.
  *
  * @since 3.0.0
@@ -228,7 +228,7 @@ interface ClonesComponent extends BaseComponent {
  * @since 3.0.0
  */
 interface MoveComponent extends BaseComponent {
-    move(dest: number, index: number, prev: number, callback?: AnyFunction): void;
+    move(dest: number, index: number, prev: number, forwards: boolean, callback?: AnyFunction): void;
     jump(index: number): void;
     translate(position: number, preventLoop?: boolean): void;
     shift(position: number, backwards: boolean): number;
@@ -1043,7 +1043,7 @@ declare class Splide {
     /**
      * The EventBusObject object.
      */
-    readonly event: EventInterface$1<Record<string, AnyFunction$1>>;
+    readonly event: EventInterface$1<EventMap & Record<string, AnyFunction>>;
     /**
      * The collection of all component objects.
      */
@@ -1118,6 +1118,8 @@ declare class Splide {
      * | `'>'` | Goes to the next page |
      * | `'<'` | Goes to the previous page |
      * | `>${i}` | Goes to the page `i` |
+     * | `>>` | Goes to the first page |
+     * | `<<` | Goes to the last page |
      *
      * In most cases, `'>'` and `'<'` notations are enough to control the slider
      * because they respect `perPage` and `perMove` options.

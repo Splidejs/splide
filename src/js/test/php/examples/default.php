@@ -100,7 +100,7 @@ $settings = get_settings();
 
 
       document.querySelector( '#jump' ).addEventListener( 'click', () => {
-        splide.Components.Controller.go( 160 );
+        splide.Components.Controller.go( '<<' );
       } );
 
 	    // Array.from( document.getElementsByTagName( 'button' ) ).forEach( button => {
