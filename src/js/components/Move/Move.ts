@@ -50,7 +50,7 @@ export interface MoveComponent extends BaseComponent {
  */
 export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, options, event ) => {
   const { on, emit } = event;
-  const { set } = Splide.state;
+  const { set, is } = Splide.state;
   const { Slides } = Components;
   const { slideSize, getPadding, listSize, sliderSize, totalSize, trackSize } = Components.Layout;
   const { resolve, orient } = Components.Direction;
@@ -65,6 +65,8 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    * Keeps the latest indices.
    */
   let indices: [ number, number, number ];
+
+  let callback: AnyFunction;
 
   /**
    * Called when the component is mounted.
@@ -93,43 +95,45 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    * - Crossing bounds (dest !== index)
    * - The destination is further than the opposite destination.
    *
-   * @todo trigger the callback when the transition is cancelled
-   *
    * @param dest     - A destination index to go to, including clones'.
    * @param index    - A slide index.
    * @param prev     - A previous index.
    * @param forwards - Specifies the move direction.
-   * @param callback - Optional. A callback function invoked after transition ends.
+   * @param onMoved  - Optional. A callback function invoked after transition ends.
    */
-  function move( dest: number, index: number, prev: number, forwards: boolean, callback?: AnyFunction ): void {
+  function move( dest: number, index: number, prev: number, forwards: boolean, onMoved?: AnyFunction ): void {
     cancel();
 
     const shiftBackwards = dest !== index ? dest > index : forwards;
+    const shouldShift    = ( dest !== index || exceededLimit( forwards ) ) && canShift( shiftBackwards );
 
-    if ( ( dest !== index || exceededLimit( forwards ) ) && canShift( shiftBackwards ) ) {
-      translate( shift( getPosition(), shiftBackwards ), true );
-    }
+    shouldShift && translate( shift( getPosition(), shiftBackwards ), true );
 
-    indices = [ index, prev, dest ];
+    indices  = [ index, prev, dest ];
+    callback = onMoved;
+
     set( MOVING );
     emit( EVENT_MOVE, index, prev, dest );
+    Transition.start( index, onTransitionEnd );
+  }
 
-    Transition.start( index, () => {
-      set( IDLE );
-      emit( EVENT_MOVED, index, prev, dest );
-      callback && callback();
-    } );
+  /**
+   * Called when transition ends or is cancelled.
+   */
+  function onTransitionEnd(): void {
+    set( IDLE );
+    emit( EVENT_MOVED, ...indices );
+    callback && callback();
   }
 
   /**
    * Cancels transition.
    */
   function cancel(): void {
-    if ( Splide.state.is( MOVING ) && indices ) {
+    if ( is( MOVING ) && indices ) {
       translate( getPosition(), true );
       Transition.cancel();
-      set( IDLE );
-      emit( EVENT_MOVED, ...indices );
+      onTransitionEnd();
     }
   }
 

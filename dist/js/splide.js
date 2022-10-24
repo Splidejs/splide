@@ -1166,13 +1166,14 @@
 
   const Move = (Splide, Components, options, event) => {
     const { on, emit } = event;
-    const { set } = Splide.state;
+    const { set, is } = Splide.state;
     const { Slides } = Components;
     const { slideSize, getPadding, listSize, sliderSize, totalSize, trackSize } = Components.Layout;
     const { resolve, orient } = Components.Direction;
     const { list, track } = Components.Elements;
     let Transition;
     let indices;
+    let callback;
     function mount() {
       Transition = Components.Transition;
       on([EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition);
@@ -1184,27 +1185,27 @@
         Slides.update();
       }
     }
-    function move(dest, index, prev, forwards, callback) {
+    function move(dest, index, prev, forwards, onMoved) {
       cancel();
       const shiftBackwards = dest !== index ? dest > index : forwards;
-      if ((dest !== index || exceededLimit(forwards)) && canShift(shiftBackwards)) {
-        translate(shift(getPosition(), shiftBackwards), true);
-      }
+      const shouldShift = (dest !== index || exceededLimit(forwards)) && canShift(shiftBackwards);
+      shouldShift && translate(shift(getPosition(), shiftBackwards), true);
       indices = [index, prev, dest];
+      callback = onMoved;
       set(MOVING);
       emit(EVENT_MOVE, index, prev, dest);
-      Transition.start(index, () => {
-        set(IDLE);
-        emit(EVENT_MOVED, index, prev, dest);
-        callback && callback();
-      });
+      Transition.start(index, onTransitionEnd);
+    }
+    function onTransitionEnd() {
+      set(IDLE);
+      emit(EVENT_MOVED, ...indices);
+      callback && callback();
     }
     function cancel() {
-      if (Splide.state.is(MOVING) && indices) {
+      if (is(MOVING) && indices) {
         translate(getPosition(), true);
         Transition.cancel();
-        set(IDLE);
-        emit(EVENT_MOVED, ...indices);
+        onTransitionEnd();
       }
     }
     function jump(index) {
