@@ -119,7 +119,7 @@ describe( 'Controller#go()', () => {
   test( 'can move the slider to the end page.', () => {
     const splide = init( { speed: 0 } );
 
-    splide.go( '>|' );
+    splide.go( '>>' );
     expect( splide.index ).toBe( splide.length - 1 );
   } );
 } );

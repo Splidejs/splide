@@ -39,6 +39,11 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
   const { getPosition, exceededLimit } = Move;
 
   /**
+   * The position where the pointer gets active.
+   */
+  let startCoord: number;
+
+  /**
    * The base slider position to calculate the delta of coords.
    */
   let basePosition: number;
@@ -124,6 +129,7 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
           target        = isTouch ? track : window;
           dragging      = state.is( [ MOVING, SCROLLING ] );
           prevBaseEvent = null;
+          startCoord    = coordOf( e );
 
           binder.bind( target, POINTER_MOVE_EVENTS, onPointerMove, SCROLL_LISTENER_OPTIONS );
           binder.bind( target, POINTER_UP_EVENTS, onPointerUp, SCROLL_LISTENER_OPTIONS );
@@ -228,9 +234,11 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
    * @param e - A TouchEvent or MouseEvent object.
    */
   function move( e: TouchEvent | MouseEvent ): void {
+    const { go } = Controller;
     const { updateOnDragged = true } = options;
     const velocity    = computeVelocity( e );
     const destination = computeDestination( velocity );
+    const forwards    = orient( coordOf( e ) - startCoord ) > 0;
     const rewind      = options.rewind && options.rewindByDrag;
     const scroll      = updateOnDragged ? Controller.scroll : Scroll.scroll;
 
@@ -239,11 +247,11 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
     if ( isFree ) {
       scroll( destination, undefined, options.snap );
     } else if ( Splide.is( FADE ) ) {
-      Controller.go( orient( sign( velocity ) ) < 0 ? ( rewind ? '<' : '-' ) : ( rewind ? '>' : '+' ) );
+      go( forwards ? ( rewind ? '>' : '+' ) : ( rewind ? '<' : '-' ) );
     } else if ( Splide.is( SLIDE ) && exceeded && rewind ) {
-      Controller.go( exceededLimit( true ) ? '>' : '<' );
+      go( exceededLimit( true ) ? '>' : '<' ); // todo
     } else {
-      Controller.go( Controller.toDest( destination ) );
+      go( `${ forwards ? '>>' : '<<' }${ Controller.toDest( destination ) }` );
     }
 
     reduce( true );

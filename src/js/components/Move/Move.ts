@@ -19,7 +19,7 @@ import { abs, ceil, clamp, isUndefined, rect, style } from '@splidejs/utils';
  * @since 3.0.0
  */
 export interface MoveComponent extends BaseComponent {
-  move( dest: number, index: number, prev: number, callback?: AnyFunction ): void;
+  move( dest: number, index: number, prev: number, forwards: boolean, callback?: AnyFunction ): void;
   jump( index: number ): void;
   translate( position: number, preventLoop?: boolean ): void;
   shift( position: number, backwards: boolean ): number;
@@ -100,15 +100,13 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    * @param prev     - A previous index.
    * @param callback - Optional. A callback function invoked after transition ends.
    */
-  function move( dest: number, index: number, prev: number, callback?: AnyFunction ): void {
-    const forwards  = dest > prev;
-    const closest   = toIndex( getPosition() );
-    const detouring = exceededLimit( forwards ) && ( abs( dest - closest ) > abs( dest - prev ) );
-
+  function move( dest: number, index: number, prev: number, forwards: boolean, callback?: AnyFunction ): void {
     cancel();
 
-    if ( ( dest !== index || detouring ) && canShift( forwards ) ) {
-      translate( shift( getPosition(), forwards  ), true );
+    const shiftBackwards = dest !== index ? dest > index : forwards;
+
+    if ( ( dest !== index || exceededLimit( forwards ) ) && canShift( shiftBackwards ) ) {
+      translate( shift( getPosition(), shiftBackwards ), true );
     }
 
     indices = [ index, prev, dest ];
@@ -177,10 +175,10 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
   }
 
   /**
-   * Adds or subtracts the slider width to the provided position.
+   * Adds or subtracts the carousel width to the provided position.
    *
    * @param position  - A position to shift.
-   * @param backwards - Determines whether to shift the slider backwards or forwards.
+   * @param backwards - Determines whether to shift the carousel backwards or forwards.
    *
    * @return The shifted position.
    */

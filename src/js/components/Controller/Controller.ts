@@ -2,7 +2,17 @@ import { EVENT_END_INDEX_CHANGED, EVENT_REFRESH, EVENT_RESIZED, EVENT_UPDATED } 
 import { MOVING, SCROLLING } from '../../constants/states';
 import { LOOP, SLIDE } from '../../constants/types';
 import { AnyFunction, BaseComponent, ComponentConstructor } from '../../types';
-import { apply, approximatelyEqual, between, clamp, floor, isString, isUndefined, min } from '@splidejs/utils';
+import {
+  apply,
+  approximatelyEqual,
+  between,
+  clamp,
+  floor,
+  includes,
+  isString,
+  isUndefined,
+  min,
+} from '@splidejs/utils';
 
 
 /**
@@ -133,13 +143,13 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    */
   function go( control: number | string, callback?: AnyFunction ): void {
     if ( ! isBusy() ) {
-      const dest  = parse( control );
+      const [ dest, forwards ] = parse( control );
       const index = loop( dest );
 
       if ( canGo( dest, index ) ) {
         Scroll.cancel();
         setIndex( index );
-        Move.move( dest, index, prevIndex, callback );
+        Move.move( dest, index, prevIndex, forwards, callback );
       }
     }
   }
@@ -197,32 +207,34 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
   }
 
   /**
-   * Parses the control and returns a slide index.
+   * Parses the control and returns a dest index.
    *
    * @param control - A control pattern to parse.
    *
    * @return A `dest` index.
    */
-  function parse( control: number | string ): number {
-    let index = currIndex;
+  function parse( control: number | string ): [ number, boolean ] {
+    let dest     = currIndex;
+    let forwards = true;
 
     if ( isString( control ) ) {
-      const [ , indicator, number ] = control.match( /([+\-<>]\|?)(\d+)?/ ) || [];
+      const [ , indicator, number ] = control.match( /([+-]|>>?|<<?)(-?\d+)?/ ) || [];
+      const oneOf = ( ...indicators: string[] ) => includes( indicators, indicator );
 
-      if ( indicator === '+' || indicator === '-' ) {
-        index = computeDestIndex( currIndex + +`${ indicator }${ +number || 1 }`, currIndex );
-      } else if ( indicator === '>' ) {
-        index = number ? toIndex( +number ) : getNext( true );
-      } else if ( indicator === '<' ) {
-        index = getPrev( true );
-      } else if ( indicator === '>|' ) {
-        index = endIndex;
+      forwards = oneOf( '+', '>', '>>' );
+
+      if ( oneOf( '+', '-' ) ) {
+        dest = computeDestIndex( currIndex + +`${ indicator }${ +number || 1 }`, currIndex );
+      } else if ( oneOf( '>', '<' ) ) {
+        dest = number ? toIndex( +number ) : getAdjacent( ! forwards, true );
+      } else if ( oneOf( '>>', '<<' ) ) {
+        dest = number ? +number || 0 : forwards ? endIndex : 0;
       }
     } else {
-      index = isLoop ? control : clamp( control, 0, endIndex );
+      dest = isLoop ? control : clamp( control, 0, endIndex );
     }
 
-    return index;
+    return [ dest, forwards ];
   }
 
   /**

@@ -1184,13 +1184,11 @@
         Slides.update();
       }
     }
-    function move(dest, index, prev, callback) {
-      const forwards = dest > prev;
-      const closest = toIndex(getPosition());
-      const detouring = exceededLimit(forwards) && abs(dest - closest) > abs(dest - prev);
+    function move(dest, index, prev, forwards, callback) {
       cancel();
-      if ((dest !== index || detouring) && canShift(forwards)) {
-        translate(shift(getPosition(), forwards), true);
+      const shiftBackwards = dest !== index ? dest > index : forwards;
+      if ((dest !== index || exceededLimit(forwards)) && canShift(shiftBackwards)) {
+        translate(shift(getPosition(), shiftBackwards), true);
       }
       indices = [index, prev, dest];
       set(MOVING);
@@ -1357,12 +1355,12 @@
     }
     function go(control, callback) {
       if (!isBusy()) {
-        const dest = parse(control);
+        const [dest, forwards] = parse(control);
         const index = loop(dest);
         if (canGo(dest, index)) {
           Scroll.cancel();
           setIndex(index);
-          Move.move(dest, index, prevIndex, callback);
+          Move.move(dest, index, prevIndex, forwards, callback);
         }
       }
     }
@@ -1385,22 +1383,23 @@
       });
     }
     function parse(control) {
-      let index = currIndex;
+      let dest = currIndex;
+      let forwards = true;
       if (isString(control)) {
-        const [, indicator, number] = control.match(/([+\-<>]\|?)(\d+)?/) || [];
-        if (indicator === "+" || indicator === "-") {
-          index = computeDestIndex(currIndex + +`${indicator}${+number || 1}`, currIndex);
-        } else if (indicator === ">") {
-          index = number ? toIndex(+number) : getNext(true);
-        } else if (indicator === "<") {
-          index = getPrev(true);
-        } else if (indicator === ">|") {
-          index = endIndex;
+        const [, indicator, number] = control.match(/([+-]|>>?|<<?)(-?\d+)?/) || [];
+        const oneOf = (...indicators) => includes(indicators, indicator);
+        forwards = oneOf("+", ">", ">>");
+        if (oneOf("+", "-")) {
+          dest = computeDestIndex(currIndex + +`${indicator}${+number || 1}`, currIndex);
+        } else if (oneOf(">", "<")) {
+          dest = number ? toIndex(+number) : getAdjacent(!forwards, true);
+        } else if (oneOf(">>", "<<")) {
+          dest = number ? +number || 0 : forwards ? endIndex : 0;
         }
       } else {
-        index = isLoop ? control : clamp(control, 0, endIndex);
+        dest = isLoop ? control : clamp(control, 0, endIndex);
       }
-      return index;
+      return [dest, forwards];
     }
     function getAdjacent(prev, destination) {
       const number = perMove || (hasFocus() ? 1 : perPage);
@@ -1778,6 +1777,7 @@
     const { Move, Scroll, Controller, Elements: { track }, Breakpoints: { reduce } } = Components;
     const { resolve, orient } = Components.Direction;
     const { getPosition, exceededLimit } = Move;
+    let startCoord;
     let basePosition;
     let baseEvent;
     let prevBaseEvent;
@@ -1809,6 +1809,7 @@
             target = isTouch ? track : window;
             dragging = state.is([MOVING, SCROLLING]);
             prevBaseEvent = null;
+            startCoord = coordOf(e);
             binder.bind(target, POINTER_MOVE_EVENTS, onPointerMove, SCROLL_LISTENER_OPTIONS);
             binder.bind(target, POINTER_UP_EVENTS, onPointerUp, SCROLL_LISTENER_OPTIONS);
             Move.cancel();
@@ -1869,20 +1870,22 @@
       basePosition = getPosition();
     }
     function move(e) {
+      const { go } = Controller;
       const { updateOnDragged = true } = options;
       const velocity = computeVelocity(e);
       const destination = computeDestination(velocity);
+      const forwards = orient(coordOf(e) - startCoord) > 0;
       const rewind = options.rewind && options.rewindByDrag;
       const scroll = updateOnDragged ? Controller.scroll : Scroll.scroll;
       reduce(false);
       if (isFree) {
         scroll(destination, void 0, options.snap);
       } else if (Splide.is(FADE)) {
-        Controller.go(orient(sign(velocity)) < 0 ? rewind ? "<" : "-" : rewind ? ">" : "+");
+        go(forwards ? rewind ? ">" : "+" : rewind ? "<" : "-");
       } else if (Splide.is(SLIDE) && exceeded && rewind) {
-        Controller.go(exceededLimit(true) ? ">" : "<");
+        go(exceededLimit(true) ? ">" : "<");
       } else {
-        Controller.go(Controller.toDest(destination));
+        go(`${forwards ? ">>" : "<<"}${Controller.toDest(destination)}`);
       }
       reduce(true);
     }
