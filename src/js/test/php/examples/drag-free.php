@@ -22,15 +22,15 @@ $settings = get_settings();
         perPage: 3,
         gap    : '2em',
         drag   : 'free',
-	      snap   : true,
+	      // snap   : true,
         // height : 400,
         type   : 'loop',
         // direction: 'rtl',
         // waitForTransition: false,
       } );
 
-      splide.on( 'move', () => console.log( 'move' ) );
-      splide.on( 'moved', () => console.log( 'moved' ) );
+      // splide.on( 'move', () => console.log( 'move' ) );
+      // splide.on( 'moved', () => console.log( 'moved' ) );
       splide.on( 'dragging scrolling', () => {
         const bar = document.querySelector( '.bar' );
         bar.style.width = `${ splide.Components.Move.getRate() * 100 }%`;

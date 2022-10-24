@@ -32,8 +32,8 @@ $settings = get_settings();
         // updateOnMove: true,
         // direction: 'ltr',
         // height: undefined,
-        // gap: '30%',
-        paginationDirection: 'ttb',
+        // padding: '30%',
+        // paginationDirection: 'ttb',
         // rewindSpeed: 2000,
         // role: '',
         label: 'Changed Label',
@@ -43,6 +43,7 @@ $settings = get_settings();
         wheelAxis: 'xy',
         // wheelSleep: 200,
         // direction: 'rtl',
+        // drag: 'free',
 
         breakpoints: {
           1200: {
@@ -99,10 +100,7 @@ $settings = get_settings();
 
 
       document.querySelector( '#jump' ).addEventListener( 'click', () => {
-        splide.Components.Controller.jump( '>' );
-        console.log( splide.Components.Move.getRate() );
-        console.log( splide.Components.Move.getRate( 1 ) );
-        console.log( splide.Components.Move.getRate( 2 ) );
+        splide.Components.Controller.go( 160 );
       } );
 
 	    // Array.from( document.getElementsByTagName( 'button' ) ).forEach( button => {

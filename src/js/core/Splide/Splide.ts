@@ -192,6 +192,8 @@ export class Splide {
    * | `'>'` | Goes to the next page |
    * | `'<'` | Goes to the previous page |
    * | `>${i}` | Goes to the page `i` |
+   * | `>>` | Goes to the first page |
+   * | `<<` | Goes to the last page |
    *
    * In most cases, `'>'` and `'<'` notations are enough to control the slider
    * because they respect `perPage` and `perMove` options.

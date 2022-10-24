@@ -116,10 +116,33 @@ describe( 'Controller#go()', () => {
     expect( splide.index ).toBe( 0 );
   } );
 
+  test( 'can move the slider to the specified index with direction (internal use only).', () => {
+    const splide = init( { speed: 0, type: 'loop' } );
+
+    splide.go( '>>2' );
+    expect( splide.index ).toBe( 2 );
+
+    splide.go( '<<4' );
+    expect( splide.index ).toBe( 4 );
+
+    splide.go( '>>-1' );
+    expect( splide.index ).toBe( splide.length - 1 );
+
+    splide.go( '>>-2' );
+    expect( splide.index ).toBe( splide.length - 2 );
+  } );
+
   test( 'can move the slider to the end page.', () => {
     const splide = init( { speed: 0 } );
 
     splide.go( '>>' );
     expect( splide.index ).toBe( splide.length - 1 );
+  } );
+
+  test( 'can move the slider to the first page.', () => {
+    const splide = init( { speed: 0 } );
+
+    splide.go( '<<' );
+    expect( splide.index ).toBe( 0 );
   } );
 } );
