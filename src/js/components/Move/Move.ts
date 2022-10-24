@@ -98,6 +98,7 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    * @param dest     - A destination index to go to, including clones'.
    * @param index    - A slide index.
    * @param prev     - A previous index.
+   * @param forwards - Specifies the move direction.
    * @param callback - Optional. A callback function invoked after transition ends.
    */
   function move( dest: number, index: number, prev: number, forwards: boolean, callback?: AnyFunction ): void {
