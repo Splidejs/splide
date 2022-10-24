@@ -90,9 +90,10 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
   /**
    * Moves the slider to the dest index with the Transition component.
    * Needs to shift the carousel when:
-   * - Crossing bounds (`dest !== index && ! exceededLimit( ! forward )`).
-   *   But the second condition is not necessary because of `canShift()`.
-   * - Going further although the carousel already outside bounds (`exceededLimit( forward )`)
+   * - Crossing bounds (dest !== index)
+   * - The destination is further than the opposite destination.
+   *
+   * @todo trigger the callback when the transition is cancelled
    *
    * @param dest     - A destination index to go to, including clones'.
    * @param index    - A slide index.
@@ -100,12 +101,14 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    * @param callback - Optional. A callback function invoked after transition ends.
    */
   function move( dest: number, index: number, prev: number, callback?: AnyFunction ): void {
-    const forward = dest > prev;
+    const forwards  = dest > prev;
+    const closest   = toIndex( getPosition() );
+    const detouring = exceededLimit( forwards ) && ( abs( dest - closest ) > abs( dest - prev ) );
 
     cancel();
 
-    if ( ( dest !== index || exceededLimit( forward ) ) && canShift( forward ) ) {
-      translate( shift( getPosition(), forward ), true );
+    if ( ( dest !== index || detouring ) && canShift( forwards ) ) {
+      translate( shift( getPosition(), forwards  ), true );
     }
 
     indices = [ index, prev, dest ];
@@ -117,6 +120,18 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
       emit( EVENT_MOVED, index, prev, dest );
       callback && callback();
     } );
+  }
+
+  /**
+   * Cancels transition.
+   */
+  function cancel(): void {
+    if ( Splide.state.is( MOVING ) && indices ) {
+      translate( getPosition(), true );
+      Transition.cancel();
+      set( IDLE );
+      emit( EVENT_MOVED, ...indices );
+    }
   }
 
   /**
@@ -174,17 +189,6 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
     const size   = sliderSize();
     position -= orient( size * ( ceil( abs( excess ) / size ) || 1 ) ) * ( backwards ? 1 : -1 );
     return position;
-  }
-
-  /**
-   * Cancels transition.
-   */
-  function cancel(): void {
-    if ( Splide.state.is( MOVING ) && indices ) {
-      translate( getPosition(), true );
-      Transition.cancel();
-      emit( EVENT_MOVED, ...indices );
-    }
   }
 
   /**

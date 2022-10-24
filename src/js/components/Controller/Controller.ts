@@ -151,6 +151,8 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    * - If the carousel is looping (`dest !== index`),
    *   the carousel can be shifted or has been already shifted.
    *
+   *   @todo dest
+   *
    * @param dest  - A dest index.
    * @param index - An actual index.
    *
@@ -160,7 +162,7 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
     const forward = dest > prevIndex;
 
     return index > -1
-      &&( index !== currIndex || ! isMoving() )
+      && ( index !== currIndex || ! isMoving() )
       && ( dest === index || Move.exceededLimit( ! forward ) || Move.canShift( forward ) );
   }
 

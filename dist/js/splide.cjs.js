@@ -1189,10 +1189,12 @@ const Move = (Splide, Components, options, event) => {
     }
   }
   function move(dest, index, prev, callback) {
-    const forward = dest > prev;
+    const forwards = dest > prev;
+    const closest = toIndex(getPosition());
+    const detouring = exceededLimit(forwards) && abs(dest - closest) > abs(dest - prev);
     cancel();
-    if ((dest !== index || exceededLimit(forward)) && canShift(forward)) {
-      translate(shift(getPosition(), forward), true);
+    if ((dest !== index || detouring) && canShift(forwards)) {
+      translate(shift(getPosition(), forwards), true);
     }
     indices = [index, prev, dest];
     set(MOVING);
@@ -1202,6 +1204,14 @@ const Move = (Splide, Components, options, event) => {
       emit(EVENT_MOVED, index, prev, dest);
       callback && callback();
     });
+  }
+  function cancel() {
+    if (Splide.state.is(MOVING) && indices) {
+      translate(getPosition(), true);
+      Transition.cancel();
+      set(IDLE);
+      emit(EVENT_MOVED, ...indices);
+    }
   }
   function jump(index) {
     translate(toPosition(index));
@@ -1227,13 +1237,6 @@ const Move = (Splide, Components, options, event) => {
     const size = sliderSize();
     position -= orient(size * (ceil(abs(excess) / size) || 1)) * (backwards ? 1 : -1);
     return position;
-  }
-  function cancel() {
-    if (Splide.state.is(MOVING) && indices) {
-      translate(getPosition(), true);
-      Transition.cancel();
-      emit(EVENT_MOVED, ...indices);
-    }
   }
   function toIndex(position) {
     const slides = Slides.get();
