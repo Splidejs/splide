@@ -1358,16 +1358,13 @@
       if (!isBusy()) {
         const [dest, forwards] = parse(control);
         const index = loop(dest);
-        if (canGo(dest, index)) {
+        const canGo = dest === index || Move.exceededLimit(!forwards) || Move.canShift(forwards);
+        if (index > -1 && canGo) {
           Scroll.cancel();
           setIndex(index);
           Move.move(dest, index, prevIndex, forwards, callback);
         }
       }
-    }
-    function canGo(dest, index) {
-      const forward = dest > prevIndex;
-      return index > -1 && (index !== currIndex || !isMoving()) && (dest === index || Move.exceededLimit(!forward) || Move.canShift(forward));
     }
     function jump(control) {
       const { set } = Components.Breakpoints;
@@ -2205,7 +2202,7 @@
     function sync(splide, target) {
       const event2 = splide.event.create();
       event2.on(EVENT_MOVE, (index, prev, dest) => {
-        target.go(target.is(LOOP) ? dest : index);
+        target.index !== index && target.go(target.is(LOOP) ? dest : index);
       });
       events.push(event2);
     }

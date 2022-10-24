@@ -95,7 +95,7 @@ export const Sync: ComponentConstructor<SyncComponent> = ( Splide, Components, o
     const event = splide.event.create();
 
     event.on( EVENT_MOVE, ( index, prev, dest ) => {
-      target.go( target.is( LOOP ) ? dest : index );
+      target.index !== index && target.go( target.is( LOOP ) ? dest : index );
     } );
 
     events.push( event );

@@ -134,7 +134,9 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
   }
 
   /**
-   * Moves the slider by the control pattern.
+   * Moves the carousel by the control pattern.
+   * - `Move.exceededLimit( ! forwards )` checks if the carousel is already shifted
+   * - `Move.canShift( forwards )` checks if there is enough space to shift the carousel.
    *
    * @see `Splide#go()`
    *
@@ -145,35 +147,14 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
     if ( ! isBusy() ) {
       const [ dest, forwards ] = parse( control );
       const index = loop( dest );
+      const canGo = dest === index || Move.exceededLimit( ! forwards ) || Move.canShift( forwards );
 
-      if ( canGo( dest, index ) ) {
+      if ( index > -1 && canGo ) {
         Scroll.cancel();
         setIndex( index );
         Move.move( dest, index, prevIndex, forwards, callback );
       }
     }
-  }
-
-  /**
-   * Checks if the carousel can move or not.
-   * - If target and current index are same, allows going only when the carousel is not moving.
-   *   Otherwise, synced carousels will provoke the infinite loop.
-   * - If the carousel is looping (`dest !== index`),
-   *   the carousel can be shifted or has been already shifted.
-   *
-   *   @todo dest
-   *
-   * @param dest  - A dest index.
-   * @param index - An actual index.
-   *
-   * @return `true` if the carousel can currently move, or otherwise `false`.
-   */
-  function canGo( dest: number, index: number ): boolean {
-    const forward = dest > prevIndex;
-
-    return index > -1
-      && ( index !== currIndex || ! isMoving() )
-      && ( dest === index || Move.exceededLimit( ! forward ) || Move.canShift( forward ) );
   }
 
   /**
