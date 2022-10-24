@@ -48,7 +48,7 @@ export class Splide {
   /**
    * The EventBusObject object.
    */
-  readonly event = EventInterface();
+  readonly event = EventInterface<EventMap & Record<string, AnyFunction>>();
 
   /**
    * The collection of all component objects.
