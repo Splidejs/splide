@@ -295,7 +295,7 @@
       forEachEvent(events, (event) => {
         arrayRemove(listeners, (listener) => {
           return listener[0] === event && (!callback || listener[1] === callback) && listener[2] === key;
-        });
+        }).forEach(empty);
       });
     }
     function emit(event, ...args) {
@@ -305,8 +305,9 @@
     }
     function destroy() {
       if (key) {
-        arrayRemove(listeners, (listener) => listener[2] === key);
+        arrayRemove(listeners, (listener) => listener[2] === key).forEach(empty);
       } else {
+        listeners.forEach(empty);
         empty(listeners);
       }
     }
