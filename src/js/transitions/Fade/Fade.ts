@@ -16,7 +16,7 @@ import { nextTick, noop } from '@splidejs/utils';
  * @return A Transition component object.
  */
 export const Fade: ComponentConstructor<TransitionComponent> = ( Splide, Components, options, event ) => {
-  const { Slides } = Components;
+  const { Slides, Direction } = Components;
 
   /**
    * Called when the component is mounted.
@@ -32,7 +32,7 @@ export const Fade: ComponentConstructor<TransitionComponent> = ( Splide, Compone
    */
   function init(): void {
     Slides.forEach( Slide => {
-      Slide.style( 'transform', `translateX(-${ 100 * Slide.index }%)` );
+      Slide.style( 'transform', `translateX(${ Direction.orient( 100 * Slide.index ) }%)` );
     } );
   }
 
