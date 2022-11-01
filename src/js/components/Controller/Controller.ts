@@ -334,7 +334,7 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
     let end = slideCount - ( hasFocus() || ( isLoop && perMove ) ? 1 : perPage );
 
     while ( omitEnd && end-- > 0 ) {
-      if ( toPosition( slideCount - 1 ) !== toPosition( end ) ) {
+      if ( ! approximatelyEqual( toPosition( slideCount - 1 ), toPosition( end ), 0.01 ) ) {
         end++;
         break;
       }
