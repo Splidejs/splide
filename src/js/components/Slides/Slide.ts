@@ -87,7 +87,7 @@ export interface  SlideComponent extends BaseComponent {
  * @return A Slide subcomponent.
  */
 export const Slide = ( Splide: Splide, index: number, slideIndex: number, slide: HTMLElement ): SlideComponent => {
-  const event = Splide.event.create();
+  const event = Splide.event.lock();
   const { on, emit, bind } = event;
   const { Components, root, options } = Splide;
   const { isNavigation, updateOnMove, i18n, pagination, slideFocus } = options;

@@ -46,7 +46,7 @@ export class Splide {
   readonly root: HTMLElement;
 
   /**
-   * The EventBusObject object.
+   * The EventInterface object.
    */
   readonly event = EventInterface<EventMap & Record<string, AnyFunction>>();
 
@@ -132,7 +132,7 @@ export class Splide {
     const Constructors = assign( {}, COMPONENTS, this._E, { Transition: this._T } );
 
     forOwn( Constructors, ( Component, key ) => {
-      const component = Component( this, Components, this._o, this.event.create() );
+      const component = Component( this, Components, this._o, this.event.lock() );
       Components[ key ] = component;
       component.setup && component.setup();
     } );

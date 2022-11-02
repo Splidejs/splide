@@ -80,7 +80,7 @@ declare type CSSProperties = Exclude<keyof CSSStyleDeclaration, number | 'length
  *
  * @since 0.0.1
  */
-declare type Removers = [() => void, object?][];
+declare type Removers = Set<[() => void, object?]>;
 /**
  * The interface for the EventBinder instance.
  *
@@ -88,8 +88,8 @@ declare type Removers = [() => void, object?][];
  */
 interface EventBinder {
     bind(target: EventTarget, events: string | string[], callback: AnyFunction$1, options?: AddEventListenerOptions): void;
-    create(): EventBinder;
-    destroy(): void;
+    lock(): EventBinder;
+    destroy(hard?: boolean): void;
 }
 /**
  * The constructor function to provide methods to subscribe native events.
@@ -102,11 +102,17 @@ interface EventBinder {
 declare function EventBinder(removersRef?: Removers): EventBinder;
 
 /**
- * The type for an array with listener data as `[ event, callback, key ]`.
+ * The type for an array with a listener entry as `[ callback, key ]`.
  *
  * @since 0.0.1
  */
-declare type Listeners = [string, AnyFunction$1, object?][];
+declare type Listener = [AnyFunction$1, object?];
+/**
+ * The collection of listeners.
+ *
+ * @since 0.0.1
+ */
+declare type Listeners = Record<string, Listener[]>;
 /**
  * The interface for the EventBus instance.
  *
@@ -119,8 +125,8 @@ interface EventBus<M extends Record<string, AnyFunction$1> = Record<string, AnyF
     off(events: string | string[], callback?: AnyFunction$1): void;
     emit<K extends keyof M & string>(event: K, ...args: Parameters<M[K]>): void;
     emit(event: string, ...args: any[]): void;
-    create(): EventBus<M>;
-    destroy(): void;
+    lock(): EventBus<M>;
+    destroy(hard?: boolean): void;
 }
 /**
  * Provides the simple event system.
@@ -135,7 +141,7 @@ interface EventBus<M extends Record<string, AnyFunction$1> = Record<string, AnyF
  * @since 0.0.1
  * @constructor
  *
- * @param listenersRef - An array with listener data. Internal use only.
+ * @param listenersRef
  *
  * @return An EventBus instance.
  */
@@ -146,12 +152,13 @@ declare function EventBus<M extends Record<string, AnyFunction$1>, K extends key
  *
  * @since 0.0.1
  */
-interface EventInterface$1<M extends Record<string, AnyFunction$1> = Record<string, AnyFunction$1>> extends Omit<EventBinder, 'create'>, Omit<EventBus<M>, 'create'> {
-    create(): EventInterface$1<M>;
-    destroy(): void;
+interface EventInterface$1<M extends Record<string, AnyFunction$1> = Record<string, AnyFunction$1>> extends Omit<EventBinder, 'lock'>, Omit<EventBus<M>, 'lock'> {
+    lock(): EventInterface$1<M>;
+    destroy(hard?: boolean): void;
 }
 /**
  * The constructor function that provides interface for both internal and native events.
+ * Only the root `EventInterface` instance can destroy all locked instances.
  *
  * @since 0.0.1
  * @constructor
@@ -1041,7 +1048,7 @@ declare class Splide {
      */
     readonly root: HTMLElement;
     /**
-     * The EventBusObject object.
+     * The EventInterface object.
      */
     readonly event: EventInterface$1<EventMap & Record<string, AnyFunction>>;
     /**

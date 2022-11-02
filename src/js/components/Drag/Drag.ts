@@ -32,7 +32,7 @@ export interface DragComponent extends BaseComponent {
  */
 export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, options, event ) => {
   const { on, emit, bind } = event;
-  const binder = event.create();
+  const binder = event.lock();
   const { state } = Splide;
   const { Move, Scroll, Controller, Elements: { track }, Breakpoints: { reduce } } = Components;
   const { resolve, orient } = Components.Direction;

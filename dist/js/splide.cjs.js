@@ -248,87 +248,86 @@ function forEachEvent(events, iteratee) {
     isString(event) && event.split(" ").forEach(iteratee);
   });
 }
-function arrayRemove(array, predicate) {
-  const removed = [];
-  for (let i = array.length - 1; i >= 0; i--) {
-    if (predicate(array[i])) {
-      removed.push(...array.splice(i, 1));
-    }
+function assert$1(assertion) {
+  if (!assertion) {
+    throw new Error();
   }
-  return removed;
 }
 function EventBinder(removersRef) {
-  const removers = removersRef || [];
+  const removers = removersRef || /* @__PURE__ */ new Set();
   const key = removersRef ? {} : void 0;
+  let destroyed;
   function bind(target, events, callback, options) {
+    assert$1(!destroyed);
     forEachEvent(events, (event) => {
       target.addEventListener(event, callback, options);
-      removers.push([target.removeEventListener.bind(target, event, callback, options), key]);
+      removers.add([target.removeEventListener.bind(target, event, callback, options), key]);
     });
   }
-  function destroy() {
-    if (key) {
-      arrayRemove(removers, (remover) => remover[1] === key).forEach((remover) => {
+  function destroy(hard) {
+    removers.forEach((remover) => {
+      if (!key || remover[1] === key) {
         remover[0]();
-      });
-    } else {
-      removers.forEach((remover) => {
-        remover[0]();
-      });
-      empty(removers);
-    }
+        removers.delete(remover);
+      }
+    });
+    destroyed = hard;
   }
   return {
     bind,
-    create: apply(EventBinder, removers),
+    lock: apply(EventBinder, removers),
     destroy
   };
 }
 function EventBus(listenersRef) {
-  const listeners = listenersRef || [];
+  const listeners = listenersRef || {};
   const key = listenersRef ? {} : void 0;
+  let destroyed;
   function on(events, callback) {
+    assert$1(!destroyed);
     forEachEvent(events, (event) => {
-      listeners.push([event, callback, key]);
+      listeners[event] = push(get(event), [[callback, key]]);
     });
   }
   function off(events, callback) {
     forEachEvent(events, (event) => {
-      arrayRemove(listeners, (listener) => {
-        return listener[0] === event && (!callback || listener[1] === callback) && listener[2] === key;
-      }).forEach(empty);
+      listeners[event] = get(event).filter((listener) => !((!callback || listener[0] === callback) && listener[1] === key));
     });
   }
   function emit(event, ...args) {
-    listeners.slice().forEach((listener) => {
-      listener[0] === event && listener[1](...args);
-    });
+    get(event).forEach((listener) => listener[0] && listener[0](...args));
   }
-  function destroy() {
-    if (key) {
-      arrayRemove(listeners, (listener) => listener[2] === key).forEach(empty);
-    } else {
-      listeners.forEach(empty);
-      empty(listeners);
-    }
+  function get(event) {
+    return listeners[event] || [];
+  }
+  function destroy(hard) {
+    forOwn(listeners, (entries, event) => {
+      listeners[event] = entries.filter((listener) => {
+        const unlocked = !key || listener[1] === key;
+        unlocked && empty(listener);
+        return !unlocked;
+      });
+    });
+    !key && omit(listeners);
+    destroyed = hard;
   }
   return {
     on,
     off,
     emit,
-    create: apply(EventBus, listeners),
+    lock: apply(EventBus, listeners),
     destroy
   };
 }
 function EventInterface(binder = EventBinder(), bus = EventBus()) {
-  function create2() {
-    return EventInterface(binder.create(), bus.create());
+  function lock() {
+    return EventInterface(binder.lock(), bus.lock());
   }
-  function destroy() {
-    binder.destroy();
-    bus.destroy();
+  function destroy(hard) {
+    binder.destroy(hard);
+    bus.destroy(hard);
   }
-  return assign({}, binder, bus, { create: create2, destroy });
+  return assign({}, binder, bus, { lock, destroy });
 }
 function RequestInterval(interval, onInterval, onUpdate, limit) {
   const { now } = Date;
@@ -741,7 +740,7 @@ const LOOP = "loop";
 const FADE = "fade";
 
 const Slide$1 = (Splide2, index, slideIndex, slide) => {
-  const event = Splide2.event.create();
+  const event = Splide2.event.lock();
   const { on, emit, bind } = event;
   const { Components, root, options } = Splide2;
   const { isNavigation, updateOnMove, i18n, pagination, slideFocus } = options;
@@ -1459,7 +1458,7 @@ const Controller = (Splide, Components, options, event) => {
   function getEnd() {
     let end = slideCount - (hasFocus() || isLoop && perMove ? 1 : perPage);
     while (omitEnd && end-- > 0) {
-      if (toPosition(slideCount - 1) !== toPosition(end)) {
+      if (!approximatelyEqual(toPosition(slideCount - 1), toPosition(end), 0.01)) {
         end++;
         break;
       }
@@ -1775,7 +1774,7 @@ const SCROLL_LISTENER_OPTIONS = { passive: false, capture: true };
 
 const Drag = (Splide, Components, options, event) => {
   const { on, emit, bind } = event;
-  const binder = event.create();
+  const binder = event.lock();
   const { state } = Splide;
   const { Move, Scroll, Controller, Elements: { track }, Breakpoints: { reduce } } = Components;
   const { resolve, orient } = Components.Direction;
@@ -2205,14 +2204,14 @@ const Sync = (Splide2, Components, options, event) => {
     mount();
   }
   function sync(splide, target) {
-    const event2 = splide.event.create();
+    const event2 = splide.event.lock();
     event2.on(EVENT_MOVE, (index, prev, dest) => {
       target.index !== index && target.go(target.is(LOOP) ? dest : index);
     });
     events.push(event2);
   }
   function navigate() {
-    const ev = event.create();
+    const ev = event.lock();
     const { on } = ev;
     on(EVENT_CLICK, onClick);
     on(EVENT_SLIDE_KEYDOWN, onKeydown);
@@ -2385,13 +2384,13 @@ const DEFAULTS = {
 };
 
 const Fade = (Splide, Components, options, event) => {
-  const { Slides } = Components;
+  const { Slides, Direction } = Components;
   function mount() {
     event.on([EVENT_MOUNTED, EVENT_REFRESH], init);
   }
   function init() {
     Slides.forEach((Slide) => {
-      Slide.style("transform", `translateX(-${100 * Slide.index}%)`);
+      Slide.style("transform", `translateX(${Direction.orient(100 * Slide.index)}%)`);
     });
   }
   function start(index, done) {
@@ -2493,7 +2492,7 @@ class Splide {
     this._E = Extensions;
     const Constructors = assign({}, COMPONENTS, this._E, { Transition: this._T });
     forOwn(Constructors, (Component, key) => {
-      const component = Component(this, Components2, this._o, this.event.create());
+      const component = Component(this, Components2, this._o, this.event.lock());
       Components2[key] = component;
       component.setup && component.setup();
     });

@@ -92,7 +92,7 @@ export const Sync: ComponentConstructor<SyncComponent> = ( Splide, Components, o
    * @param target - A target splide instance.
    */
   function sync( splide: Splide, target: Splide ): void {
-    const event = splide.event.create();
+    const event = splide.event.lock();
 
     event.on( EVENT_MOVE, ( index, prev, dest ) => {
       target.index !== index && target.go( target.is( LOOP ) ? dest : index );
@@ -106,7 +106,7 @@ export const Sync: ComponentConstructor<SyncComponent> = ( Splide, Components, o
    * Note that the direction of `menu` is implicitly `vertical` as default.
    */
   function navigate(): void {
-    const ev = event.create();
+    const ev = event.lock();
     const { on } = ev;
 
     on( EVENT_CLICK, onClick );
