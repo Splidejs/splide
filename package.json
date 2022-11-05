@@ -93,7 +93,8 @@
     ".": {
       "require": "./dist/js/splide.cjs.js",
       "import": "./dist/js/splide.esm.js",
-      "default": "./dist/js/splide.esm.js"
+      "default": "./dist/js/splide.esm.js",
+      "types": "./dist/types/index.d.ts"
     },
     "./src/js/utils": {
       "require": "./dist/js/utils/splide-utils.cjs.js",
