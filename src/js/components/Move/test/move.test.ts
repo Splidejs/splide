@@ -9,11 +9,11 @@ describe( 'Move#move()', () => {
     const { Move } = splide.Components;
     const { list } = splide.Components.Elements;
 
-    Move.move( 1, 1, -1 );
+    Move.move( 1, 1, -1, true );
     fire( list, 'transitionend' );
     expect( list.style.transform ).toBe( 'translateX(-200px)' );
 
-    Move.move( 2, 2, -1 );
+    Move.move( 2, 2, -1, true );
     fire( list, 'transitionend' );
     expect( list.style.transform ).toBe( 'translateX(-400px)' );
   } );
@@ -23,7 +23,7 @@ describe( 'Move#move()', () => {
     const { Move } = splide.Components;
     const { list } = splide.Components.Elements;
 
-    Move.move( 1, 1, -1 );
+    Move.move( 1, 1, -1, true );
     expect( splide.state.is( MOVING ) ).toBe( true );
 
     fire( list, 'transitionend' );
@@ -49,7 +49,7 @@ describe( 'Move#move()', () => {
       done();
     } );
 
-    Move.move( 3, 2, 1 );
+    Move.move( 3, 2, 1, true );
     fire( list, 'transitionend' );
   } );
 } );

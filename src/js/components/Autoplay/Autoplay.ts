@@ -38,8 +38,8 @@ export interface AutoplayComponent extends BaseComponent {
  */
 export const Autoplay: ComponentConstructor<AutoplayComponent> = ( Splide, Components, options, event ) => {
   const { on, bind, emit } = event;
-  const { interval: duration = 5000, pauseOnHover = true, pauseOnFocus = true, resetProgress = true } = options;
-  const interval = RequestInterval( duration, Splide.go.bind( Splide, '>' ), onAnimationFrame );
+  const { interval: duration, pauseOnHover = true, pauseOnFocus = true, resetProgress = true } = options;
+  const interval = RequestInterval( duration, () => Splide.go( '>' ), onAnimationFrame );
   const { isPaused } = interval;
   const { Elements, Elements: { root, toggle } } = Components;
   const { autoplay } = options;

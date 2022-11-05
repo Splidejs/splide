@@ -51,7 +51,7 @@ describe( 'Move', () => {
     const { Move } = splide.Components;
     const { list } = splide.Components.Elements;
 
-    Move.move( 1, 1, -1 );
+    Move.move( 1, 1, -1, true );
 
     expect( list.style.transition ).not.toBe( '' );
 

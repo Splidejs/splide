@@ -16,6 +16,7 @@ export const DEFAULTS: Options = {
   easing        : 'cubic-bezier(0.25, 1, 0.5, 1)',
   drag          : true,
   direction     : 'ltr',
+  interval      : 5000,
   trimSpace     : true,
   focusableNodes: 'a, button, textarea, input, select, iframe',
   classes       : CLASSES,
