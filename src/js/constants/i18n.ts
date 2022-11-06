@@ -4,16 +4,16 @@
  * @since 3.0.0
  */
 export const I18N = {
-  prev      : 'Previous slide',
-  next      : 'Next slide',
-  first     : 'Go to first slide',
-  last      : 'Go to last slide',
-  slideX    : 'Go to slide %s',
-  pageX     : 'Go to page %s',
-  play      : 'Start autoplay',
-  pause     : 'Pause autoplay',
-  carousel  : 'carousel',
-  slide     : 'slide',
-  select    : 'Select a slide to show',
+  prev: 'Previous slide',
+  next: 'Next slide',
+  first: 'Go to first slide',
+  last: 'Go to last slide',
+  slideX: 'Go to slide %s',
+  pageX: 'Go to page %s',
+  play: 'Start autoplay',
+  pause: 'Pause autoplay',
+  carousel: 'carousel',
+  slide: 'slide',
+  select: 'Select a slide to show',
   slideLabel: '%s of %s', // [ slide number ] / [ slide size ]
 };

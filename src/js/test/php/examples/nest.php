@@ -17,30 +17,30 @@ $settings = get_settings();
   <script type="text/javascript" src="../../../../../dist/js/splide.js"></script>
 
   <script>
-    document.addEventListener( 'DOMContentLoaded', function () {
-      var primary = new Splide( '#splide01', {
-        gap : '1.5rem',
+    document.addEventListener('DOMContentLoaded', function () {
+      var primary = new Splide('#splide01', {
+        gap: '1.5rem',
         // drag: false,
         height: 600,
-      } );
+      });
 
-      var nested01 = new Splide( '#nested01', {
-        rewind : true,
-        gap    : '1rem',
+      var nested01 = new Splide('#nested01', {
+        rewind: true,
+        gap: '1rem',
         perPage: 2,
-      } );
+      });
 
-      var nested02 = new Splide( '#nested02', {
+      var nested02 = new Splide('#nested02', {
         direction: 'ttb',
-        gap      : '1rem',
-        height   : 400,
-        perPage  : 2,
-      } );
+        gap: '1rem',
+        height: 400,
+        perPage: 2,
+      });
 
       primary.mount();
       nested01.mount();
       nested02.mount();
-    } );
+    });
   </script>
 </head>
 <body>
@@ -48,14 +48,14 @@ $settings = get_settings();
 <div id="splide01" class="splide">
   <div class="splide__track">
     <ul class="splide__list">
-      <?php render_slides( 2 ); ?>
+      <?php render_slides(2); ?>
 
       <div class="splide__slide">
-        <?php render( 'nested01', 8 ); ?>
+        <?php render('nested01', 8); ?>
       </div>
 
       <div class="splide__slide">
-        <?php render( 'nested02', 6 ); ?>
+        <?php render('nested02', 6); ?>
       </div>
     </ul>
   </div>

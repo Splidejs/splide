@@ -75,7 +75,7 @@ export interface ElementsComponent extends BaseComponent, Readonly<ElementCollec
  *
  * @return An Elements component object.
  */
-export const Elements: ComponentConstructor<ElementsComponent> = ( Splide, Components, options, event ) => {
+export const Elements: ComponentConstructor<ElementsComponent> = (Splide, Components, options, event) => {
   const { on, bind } = event;
   const { root } = Splide;
   const { i18n } = options;
@@ -124,17 +124,17 @@ export const Elements: ComponentConstructor<ElementsComponent> = ( Splide, Compo
    * Called when the component is mounted.
    */
   function mount(): void {
-    on( EVENT_REFRESH, destroy );
-    on( EVENT_REFRESH, setup );
-    on( EVENT_UPDATED, update );
+    on(EVENT_REFRESH, destroy);
+    on(EVENT_REFRESH, setup);
+    on(EVENT_UPDATED, update);
 
-    bind( document, `${ POINTER_DOWN_EVENTS } keydown`, e => {
+    bind(document, `${ POINTER_DOWN_EVENTS } keydown`, e => {
       isUsingKey = e.type === 'keydown';
-    }, { capture: true } );
+    }, { capture: true });
 
-    bind( root, 'focusin', () => {
-      toggleClass( root, CLASS_FOCUS_IN, !! isUsingKey );
-    } );
+    bind(root, 'focusin', () => {
+      toggleClass(root, CLASS_FOCUS_IN, !!isUsingKey);
+    });
   }
 
   /**
@@ -142,55 +142,55 @@ export const Elements: ComponentConstructor<ElementsComponent> = ( Splide, Compo
    *
    * @param completely - Whether to destroy the component completely or not.
    */
-  function destroy( completely?: boolean ): void {
-    const attrs = ALL_ATTRIBUTES.concat( 'style' );
+  function destroy(completely?: boolean): void {
+    const attrs = ALL_ATTRIBUTES.concat('style');
 
-    empty( slides );
-    removeClass( root, rootClasses );
-    removeClass( track, trackClasses );
-    removeAttribute( [ track, list ], attrs );
-    removeAttribute( root, completely ? attrs : [ 'style', ARIA_ROLEDESCRIPTION ] );
+    empty(slides);
+    removeClass(root, rootClasses);
+    removeClass(track, trackClasses);
+    removeAttribute([track, list], attrs);
+    removeAttribute(root, completely ? attrs : ['style', ARIA_ROLEDESCRIPTION]);
   }
 
   /**
    * Updates the status of elements.
    */
   function update(): void {
-    removeClass( root, rootClasses );
-    removeClass( track, trackClasses );
+    removeClass(root, rootClasses);
+    removeClass(track, trackClasses);
 
-    rootClasses  = getClasses( CLASS_ROOT );
-    trackClasses = getClasses( CLASS_TRACK );
+    rootClasses = getClasses(CLASS_ROOT);
+    trackClasses = getClasses(CLASS_TRACK);
 
-    addClass( root, rootClasses );
-    addClass( track, trackClasses );
+    addClass(root, rootClasses);
+    addClass(track, trackClasses);
 
-    setAttribute( root, ARIA_LABEL, options.label );
-    setAttribute( root, ARIA_LABELLEDBY, options.labelledby );
+    setAttribute(root, ARIA_LABEL, options.label);
+    setAttribute(root, ARIA_LABELLEDBY, options.labelledby);
   }
 
   /**
    * Collects elements which the slider consists of.
    */
   function collect(): void {
-    track = find( CLASS_TRACK );
-    list  = child( track, `.${ CLASS_LIST }` );
+    track = find(CLASS_TRACK);
+    list = child(track, `.${ CLASS_LIST }`);
 
-    assert( track && list, 'A track/list element is missing.' );
-    push( slides, children( list, `.${ CLASS_SLIDE }:not(.${ CLASS_CLONE })` ) );
+    assert(track && list, 'A track/list element is missing.');
+    push(slides, children(list, `.${ CLASS_SLIDE }:not(.${ CLASS_CLONE })`));
 
-    assign( elements, {
+    assign(elements, {
       root,
       track,
       list,
       slides,
-      arrows    : find( CLASS_ARROWS ),
-      pagination: find( CLASS_PAGINATION ),
-      prev      : find( CLASS_ARROW_PREV ),
-      next      : find( CLASS_ARROW_NEXT ),
-      bar       : find( CLASS_PROGRESS_BAR ),
-      toggle    : find( CLASS_TOGGLE ),
-    } );
+      arrows: find(CLASS_ARROWS),
+      pagination: find(CLASS_PAGINATION),
+      prev: find(CLASS_ARROW_PREV),
+      next: find(CLASS_ARROW_NEXT),
+      bar: find(CLASS_PROGRESS_BAR),
+      toggle: find(CLASS_TOGGLE),
+    });
   }
 
   /**
@@ -200,18 +200,18 @@ export const Elements: ComponentConstructor<ElementsComponent> = ( Splide, Compo
    */
   function init(): void {
     const { role = 'region' } = options;
-    const id = root.id || uniqueId( PROJECT_CODE );
+    const id = root.id || uniqueId(PROJECT_CODE);
 
-    root.id  = id;
+    root.id = id;
     track.id = track.id || `${ id }-track`;
-    list.id  = list.id || `${ id }-list`;
+    list.id = list.id || `${ id }-list`;
 
-    if ( ! getAttribute( root, ROLE ) && root.tagName !== 'SECTION' && role ) {
-      setAttribute( root, ROLE, role );
+    if (!getAttribute(root, ROLE) && root.tagName !== 'SECTION' && role) {
+      setAttribute(root, ROLE, role);
     }
 
-    setAttribute( root, ARIA_ROLEDESCRIPTION, i18n.carousel );
-    setAttribute( list, ROLE, 'presentation' );
+    setAttribute(root, ARIA_ROLEDESCRIPTION, i18n.carousel);
+    setAttribute(list, ROLE, 'presentation');
   }
 
   /**
@@ -221,9 +221,9 @@ export const Elements: ComponentConstructor<ElementsComponent> = ( Splide, Compo
    *
    * @return A found element or null.
    */
-  function find( className: string ): HTMLElement | undefined {
-    const elm = query<HTMLElement>( root, `.${ className }` );
-    return elm && closest( elm, `.${ CLASS_ROOT }` ) === root ? elm : undefined;
+  function find(className: string): HTMLElement | undefined {
+    const elm = query<HTMLElement>(root, `.${ className }`);
+    return elm && closest(elm, `.${ CLASS_ROOT }`) === root ? elm : undefined;
   }
 
   /**
@@ -233,7 +233,7 @@ export const Elements: ComponentConstructor<ElementsComponent> = ( Splide, Compo
    *
    * @return An array with classes.
    */
-  function getClasses( base: string ): string[] {
+  function getClasses(base: string): string[] {
     return [
       `${ base }--${ options.type }`,
       `${ base }--${ options.direction }`,
@@ -243,9 +243,9 @@ export const Elements: ComponentConstructor<ElementsComponent> = ( Splide, Compo
     ];
   }
 
-  return assign( elements, {
+  return assign(elements, {
     setup,
     mount,
     destroy,
-  } );
+  });
 };

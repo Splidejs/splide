@@ -13,14 +13,14 @@ interface InitArgs extends BuildHtmlArgs {
 }
 
 const DOM_RECT = {
-  x     : 0,
-  y     : 0,
-  width : 0,
+  x: 0,
+  y: 0,
+  width: 0,
   height: 0,
-  top   : 0,
-  right : 0,
+  top: 0,
+  right: 0,
   bottom: 0,
-  left  : 0,
+  left: 0,
   toJSON: () => '',
 };
 
@@ -32,7 +32,7 @@ const DOM_RECT = {
  *
  * @return A created Splide instance.
  */
-export function init( options: Options = {}, args: InitArgs = {} ): Splide {
+export function init(options: Options = {}, args: InitArgs = {}): Splide {
   const { width = SLIDER_WIDTH, height = 0 } = options;
   const {
     id,
@@ -40,7 +40,7 @@ export function init( options: Options = {}, args: InitArgs = {} ): Splide {
     arrows,
     autoplay,
     progress,
-    mount  = true,
+    mount = true,
     html,
     src,
     dataSrc,
@@ -50,47 +50,47 @@ export function init( options: Options = {}, args: InitArgs = {} ): Splide {
     dataInterval,
   } = args;
 
-  const slideWidth  = +width / ( options.perPage || 1 );
-  const slideHeight = +height / ( options.perPage || 1 );
-  const innerHtml   = html
-    || buildHtml( { length, arrows, autoplay, progress, src, dataSrc, dataSrcset, json, id, dataInterval } );
+  const slideWidth = +width / (options.perPage || 1);
+  const slideHeight = +height / (options.perPage || 1);
+  const innerHtml = html
+    || buildHtml({ length, arrows, autoplay, progress, src, dataSrc, dataSrcset, json, id, dataInterval });
 
-  if ( insertHtml ) {
-    if ( ! document.body.innerHTML ) {
-      throw new Error( 'Invalid usage.' );
+  if (insertHtml) {
+    if (!document.body.innerHTML) {
+      throw new Error('Invalid usage.');
     }
 
-    document.body.insertAdjacentHTML( 'beforeend', innerHtml );
+    document.body.insertAdjacentHTML('beforeend', innerHtml);
   } else {
     document.head.innerHTML = '';
     document.body.innerHTML = innerHtml;
   }
 
-  const root   = id ? document.getElementById( id ) : document.querySelector( `.${ CLASS_ROOT }` );
-  const track  = root.querySelector( `.${ CLASS_TRACK }` );
-  const list   = root.querySelector<HTMLElement>( `.${ CLASS_LIST }` );
-  const slides = root.querySelectorAll<HTMLElement>( `.${ CLASS_SLIDE }` );
+  const root = id ? document.getElementById(id) : document.querySelector(`.${ CLASS_ROOT }`);
+  const track = root.querySelector(`.${ CLASS_TRACK }`);
+  const list = root.querySelector<HTMLElement>(`.${ CLASS_LIST }`);
+  const slides = root.querySelectorAll<HTMLElement>(`.${ CLASS_SLIDE }`);
 
   root.getBoundingClientRect = (): DOMRect => {
-    return assign( {}, DOM_RECT, { width: +width } );
+    return assign({}, DOM_RECT, { width: +width });
   };
 
   track.getBoundingClientRect = (): DOMRect => {
-    return assign( {}, DOM_RECT, { width: +width, right: +width } );
+    return assign({}, DOM_RECT, { width: +width, right: +width });
   };
 
   list.getBoundingClientRect = (): DOMRect => {
-    return assign( {}, DOM_RECT, {
+    return assign({}, DOM_RECT, {
       width: +width,
-      ...parseTransform( list ),
-    } );
+      ...parseTransform(list),
+    });
   };
 
-  setSlidesRect( Array.from( slides ), list, slideWidth, slideHeight );
+  setSlidesRect(Array.from(slides), list, slideWidth, slideHeight);
 
-  const splide = new Splide( root as HTMLElement, options );
+  const splide = new Splide(root as HTMLElement, options);
 
-  if ( mount ) {
+  if (mount) {
     splide.mount();
 
     // Can not simulate this method.
@@ -108,21 +108,21 @@ export function init( options: Options = {}, args: InitArgs = {} ): Splide {
  * @param width  - Width of each slide.
  * @param height - Height of each slide.
  */
-export function setSlidesRect( slides: HTMLElement[], list: HTMLElement, width: number, height: number ): void {
-  slides.forEach( ( slide, index ) => {
+export function setSlidesRect(slides: HTMLElement[], list: HTMLElement, width: number, height: number): void {
+  slides.forEach((slide, index) => {
     slide.getBoundingClientRect = (): DOMRect => {
-      const offsets = parseTransform( list );
+      const offsets = parseTransform(list);
 
-      return assign( {}, DOM_RECT, {
-        width : width,
+      return assign({}, DOM_RECT, {
+        width: width,
         height: height,
-        left  : width * index + offsets.left,
-        right : width * index + width + offsets.left,
-        top   : height * index + offsets.top,
+        left: width * index + offsets.left,
+        right: width * index + width + offsets.left,
+        top: height * index + offsets.top,
         bottom: height * index + width + offsets.top,
-      } );
+      });
     };
-  } );
+  });
 }
 
 /**
@@ -132,18 +132,18 @@ export function setSlidesRect( slides: HTMLElement[], list: HTMLElement, width: 
  *
  * @return An object with left and top offsets.
  */
-export function parseTransform( elm: HTMLElement ): { left: number, top: number } {
+export function parseTransform(elm: HTMLElement): { left: number, top: number } {
   const position = { left: 0, top: 0 };
 
-  if ( elm && elm.style.transform ) {
+  if (elm && elm.style.transform) {
     const { transform } = elm.style;
 
-    if ( transform.includes( 'translateX' ) ) {
-      position.left = parseFloat( transform.replace( /translateX\(|\)/g, '' ) ) || 0;
+    if (transform.includes('translateX')) {
+      position.left = parseFloat(transform.replace(/translateX\(|\)/g, '')) || 0;
     }
 
-    if ( transform.includes( 'translateY' ) ) {
-      position.top = parseFloat( transform.replace( /translateY\(|\)/g, '' ) ) || 0;
+    if (transform.includes('translateY')) {
+      position.top = parseFloat(transform.replace(/translateY\(|\)/g, '')) || 0;
     }
   }
 
@@ -164,16 +164,16 @@ export function fire(
   target: Window | Document | Element,
   type: string,
   data: any = {},
-  eventInitDict: EventInit = {}
+  eventInitDict: EventInit = {},
 ): Event {
-  const e = new Event( type, eventInitDict );
+  const e = new Event(type, eventInitDict);
 
-  if ( data.timeStamp !== undefined ) {
-    Object.defineProperty( e, 'timeStamp', { value: data.timeStamp } );
+  if (data.timeStamp !== undefined) {
+    Object.defineProperty(e, 'timeStamp', { value: data.timeStamp });
     delete data.timeStamp;
   }
 
-  target.dispatchEvent( Object.assign( e, data ) );
+  target.dispatchEvent(Object.assign(e, data));
   return e;
 }
 
@@ -183,8 +183,8 @@ export function fire(
  * @param key    - A key to press.
  * @param target - A target.
  */
-export function keydown( key: string, target: Window | Element = window ): void {
-  fire( target, 'keydown', { key } );
+export function keydown(key: string, target: Window | Element = window): void {
+  fire(target, 'keydown', { key });
 }
 
 /**
@@ -194,8 +194,8 @@ export function keydown( key: string, target: Window | Element = window ): void 
  *
  * @return A Promise instance.
  */
-export function wait( duration = 0 ): Promise<void> {
-  return new Promise( resolve => {
-    setTimeout( resolve, duration );
-  } );
+export function wait(duration = 0): Promise<void> {
+  return new Promise(resolve => {
+    setTimeout(resolve, duration);
+  });
 }

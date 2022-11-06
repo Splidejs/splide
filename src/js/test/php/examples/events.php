@@ -15,50 +15,50 @@ $settings = get_settings();
   <script src="../../../../../dist/js/splide.js"></script>
 
   <script>
-    document.addEventListener( 'DOMContentLoaded', function () {
-      var splide01 = new Splide( '#splide01', {
-        width  : 800,
+    document.addEventListener('DOMContentLoaded', function () {
+      var splide01 = new Splide('#splide01', {
+        width: 800,
         perPage: 2,
-        gap    : 10,
-      } );
+        gap: 10,
+      });
 
-      splide01.on( 'arrows:mounted', function( prev, next ) {
-        console.log( 'arrows:mounted', prev, next );
-      } );
+      splide01.on('arrows:mounted', function (prev, next) {
+        console.log('arrows:mounted', prev, next);
+      });
 
-      splide01.on( 'arrows:updated', function( prev, next ) {
-        console.log( 'arrows:updated', prev, next );
-      } );
+      splide01.on('arrows:updated', function (prev, next) {
+        console.log('arrows:updated', prev, next);
+      });
 
-      splide01.on( 'pagination:mounted', function( data ) {
-        console.log( 'pagination:mounted', data );
-      } );
+      splide01.on('pagination:mounted', function (data) {
+        console.log('pagination:mounted', data);
+      });
 
-      splide01.on( 'pagination:updated', function( data ) {
-        console.log( 'pagination:updated', data );
-      } );
+      splide01.on('pagination:updated', function (data) {
+        console.log('pagination:updated', data);
+      });
 
-      splide01.on( 'active', function( Slide ) {
-        console.log( 'active', Slide.index );
-      } );
+      splide01.on('active', function (Slide) {
+        console.log('active', Slide.index);
+      });
 
-      var splide02 = new Splide( '#splide02', {
-        width       : 800,
-        fixedWidth  : 100,
-        fixedHeight : 56,
+      var splide02 = new Splide('#splide02', {
+        width: 800,
+        fixedWidth: 100,
+        fixedHeight: 56,
         isNavigation: true,
-        gap         : 10,
-        focus       : 'center',
-        pagination  : false,
-      } );
+        gap: 10,
+        focus: 'center',
+        pagination: false,
+      });
 
-      splide02.on( 'navigation:mounted', function( splides ) {
-        console.log( 'navigation:mounted', splides );
-      } );
+      splide02.on('navigation:mounted', function (splides) {
+        console.log('navigation:mounted', splides);
+      });
 
-      splide01.sync( splide02 ).mount();
+      splide01.sync(splide02).mount();
       splide02.mount();
-    } );
+    });
   </script>
 </head>
 <body>
@@ -67,9 +67,9 @@ $settings = get_settings();
   <div class="splide__track">
     <ul class="splide__list">
       <?php
-      for ( $i = 0; $i < 10; $i++ ) {
+      for ($i = 0; $i < 10; $i++) {
         echo '<li class="splide__slide">';
-        printf( '<img src="../../assets/images/pics/slide%02d.jpg">', $i + 1 );
+        printf('<img src="../../assets/images/pics/slide%02d.jpg">', $i + 1);
         echo '</li>' . PHP_EOL;
       }
       ?>
@@ -81,9 +81,9 @@ $settings = get_settings();
   <div class="splide__track">
     <ul class="splide__list">
       <?php
-      for ( $i = 0; $i < 10; $i++ ) {
+      for ($i = 0; $i < 10; $i++) {
         echo '<li class="splide__slide">';
-        printf( '<img src="../../assets/images/pics/slide%02d.jpg">', $i + 1 );
+        printf('<img src="../../assets/images/pics/slide%02d.jpg">', $i + 1);
         echo '</li>' . PHP_EOL;
       }
       ?>

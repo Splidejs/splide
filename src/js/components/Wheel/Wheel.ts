@@ -25,7 +25,7 @@ export interface WheelComponent extends BaseComponent {
  *
  * @return A Wheel component object.
  */
-export const Wheel: ComponentConstructor<WheelComponent> = ( Splide, Components, options, event ) => {
+export const Wheel: ComponentConstructor<WheelComponent> = (Splide, Components, options, event) => {
   /**
    * Holds the last time when the wheel moves the slider.
    */
@@ -37,11 +37,11 @@ export const Wheel: ComponentConstructor<WheelComponent> = ( Splide, Components,
   function mount(): void {
     event.destroy();
 
-    if ( options.wheel ) {
-      event.bind( Components.Elements.track, 'wheel', onWheel, SCROLL_LISTENER_OPTIONS );
+    if (options.wheel) {
+      event.bind(Components.Elements.track, 'wheel', onWheel, SCROLL_LISTENER_OPTIONS);
     }
 
-    event.on( EVENT_UPDATED, mount );
+    event.on(EVENT_UPDATED, mount);
   }
 
   /**
@@ -49,20 +49,20 @@ export const Wheel: ComponentConstructor<WheelComponent> = ( Splide, Components,
    *
    * @param e - A WheelEvent object.
    */
-  function onWheel( e: WheelEvent ): void {
-    if ( e.cancelable ) {
-      const delta     = parse( e );
+  function onWheel(e: WheelEvent): void {
+    if (e.cancelable) {
+      const delta = parse(e);
       const backwards = delta < 0;
-      const timeStamp = timeOf( e );
-      const min       = options.wheelMinThreshold || 0;
-      const sleep     = options.wheelSleep || 0;
+      const timeStamp = timeOf(e);
+      const min = options.wheelMinThreshold || 0;
+      const sleep = options.wheelSleep || 0;
 
-      if ( abs( delta ) > min && timeStamp - lastTime > sleep ) {
-        Splide.go( delta < 0 ? '<' : '>' );
+      if (abs(delta) > min && timeStamp - lastTime > sleep) {
+        Splide.go(delta < 0 ? '<' : '>');
         lastTime = timeStamp;
       }
 
-      shouldPrevent( backwards ) && prevent( e );
+      shouldPrevent(backwards) && prevent(e);
     }
   }
 
@@ -71,11 +71,11 @@ export const Wheel: ComponentConstructor<WheelComponent> = ( Splide, Components,
    *
    * @param e - A WheelEvent object.
    */
-  function parse( e: WheelEvent ): number {
+  function parse(e: WheelEvent): number {
     const { wheelAxis = 'y' } = options;
     const { deltaX, deltaY } = e;
-    const x = includes( wheelAxis, 'x' ) ? Components.Direction.orient( -deltaX ) : 0;
-    const y = includes( wheelAxis, 'y' ) ? deltaY : 0;
+    const x = includes(wheelAxis, 'x') ? Components.Direction.orient(-deltaX) : 0;
+    const y = includes(wheelAxis, 'y') ? deltaY : 0;
 
     return x || y;
   }
@@ -87,10 +87,10 @@ export const Wheel: ComponentConstructor<WheelComponent> = ( Splide, Components,
    *
    * @return `true` if the action should be prevented.
    */
-  function shouldPrevent( backwards: boolean ): boolean {
-    return ! options.releaseWheel
-      || Splide.state.is( MOVING )
-      || Components.Controller.getAdjacent( backwards ) !== -1;
+  function shouldPrevent(backwards: boolean): boolean {
+    return !options.releaseWheel
+      || Splide.state.is(MOVING)
+      || Components.Controller.getAdjacent(backwards) !== -1;
   }
 
   return {

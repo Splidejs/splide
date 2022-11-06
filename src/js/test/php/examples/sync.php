@@ -15,55 +15,55 @@ $settings = get_settings();
   <script src="../../../../../dist/js/splide.js"></script>
 
   <script>
-    document.addEventListener( 'DOMContentLoaded', function () {
-	    var splide01 = new Splide( '#splide01', {
-		    width      : 800,
-		    type       : 'loop',
-		    heightRatio: 0.3,
-		    perPage    : 1,
-		    pagination : false,
-		    keyboard   : true,
-		    breakpoints: {
-			    1000: {
-            keyboard: false
-				    // destroy: true,
-			    },
-		    },
-	    } );
+    document.addEventListener('DOMContentLoaded', function () {
+      var splide01 = new Splide('#splide01', {
+        width: 800,
+        type: 'loop',
+        heightRatio: 0.3,
+        perPage: 1,
+        pagination: false,
+        keyboard: true,
+        breakpoints: {
+          1000: {
+            keyboard: false,
+            // destroy: true,
+          },
+        },
+      });
 
-	    var splide02 = new Splide( '#splide02', {
-		    // type            : 'loop',
-		    width           : 600,
-		    fixedWidth      : 100,
-		    fixedHeight     : 56,
-		    gap             : '.7em',
-		    isNavigation    : true,
-		    focus           : 'center',
-		    pagination      : false,
-		    rewind          : true,
-		    keyboard        : true,
-        drag            : 'free',
-        updateOnDragged : false,
-		    dragMinThreshold: {
-			    mouse: 10,
-			    touch: 10,
-		    },
-	    } );
+      var splide02 = new Splide('#splide02', {
+        // type            : 'loop',
+        width: 600,
+        fixedWidth: 100,
+        fixedHeight: 56,
+        gap: '.7em',
+        isNavigation: true,
+        focus: 'center',
+        pagination: false,
+        rewind: true,
+        keyboard: true,
+        drag: 'free',
+        updateOnDragged: false,
+        dragMinThreshold: {
+          mouse: 10,
+          touch: 10,
+        },
+      });
 
-	    var splide03 = new Splide( '#splide03', {
-		    width       : 100,
-		    type        : 'loop',
-		    direction   : 'ttb',
-		    height      : 300,
-		    fixedWidth  : 100,
-		    fixedHeight : 56,
-		    gap         : '.7em',
-		    isNavigation: true,
-		    pagination  : false,
-		    keyboard    : true,
-	    } );
+      var splide03 = new Splide('#splide03', {
+        width: 100,
+        type: 'loop',
+        direction: 'ttb',
+        height: 300,
+        fixedWidth: 100,
+        fixedHeight: 56,
+        gap: '.7em',
+        isNavigation: true,
+        pagination: false,
+        keyboard: true,
+      });
 
-      splide01.sync( splide02 );
+      splide01.sync(splide02);
 
       splide01.mount();
       splide02.mount();
@@ -74,8 +74,8 @@ $settings = get_settings();
       // splide03.on( 'move', function () { console.log( 3 ) } );
 
       // Attempts to sync after mount.
-      splide01.sync( splide03 );
-    } );
+      splide01.sync(splide03);
+    });
   </script>
 </head>
 <body>
@@ -84,28 +84,28 @@ $settings = get_settings();
   <div class="splide__track">
     <ul class="splide__list">
       <?php
-      for ( $i = 0; $i < 10; $i++ ) {
+      for ($i = 0; $i < 10; $i++) {
         echo '<li class="splide__slide">';
-        printf( '<img src="../../assets/images/pics/slide%1$02d.jpg" alt="Alt Slide %1$d">%1$02d', $i + 1 );
+        printf('<img src="../../assets/images/pics/slide%1$02d.jpg" alt="Alt Slide %1$d">%1$02d', $i + 1);
         echo '</li>' . PHP_EOL;
       }
       ?>
     </ul>
   </div>
 
-	<div id="splide02" class="splide">
-		<div class="splide__track">
-			<ul class="splide__list">
-				<?php
-				for ( $i = 0; $i < 10; $i++ ) {
-					echo '<li class="splide__slide">';
-					printf( '<img src="../../assets/images/pics/slide%1$02d.jpg" alt="Thumbnail %1$d">', $i + 1 );
-					echo '</li>' . PHP_EOL;
-				}
-				?>
-			</ul>
-		</div>
-	</div>
+  <div id="splide02" class="splide">
+    <div class="splide__track">
+      <ul class="splide__list">
+        <?php
+        for ($i = 0; $i < 10; $i++) {
+          echo '<li class="splide__slide">';
+          printf('<img src="../../assets/images/pics/slide%1$02d.jpg" alt="Thumbnail %1$d">', $i + 1);
+          echo '</li>' . PHP_EOL;
+        }
+        ?>
+      </ul>
+    </div>
+  </div>
 </div>
 
 <!--<div id="splide02" class="splide">-->
@@ -126,9 +126,9 @@ $settings = get_settings();
   <div class="splide__track">
     <ul class="splide__list">
       <?php
-      for ( $i = 0; $i < 10; $i++ ) {
+      for ($i = 0; $i < 10; $i++) {
         echo '<li class="splide__slide">';
-        printf( '<img src="../../assets/images/pics/slide%1$02d.jpg" alt="Thumbnail %1$d">', $i + 1 );
+        printf('<img src="../../assets/images/pics/slide%1$02d.jpg" alt="Thumbnail %1$d">', $i + 1);
         echo '</li>' . PHP_EOL;
       }
       ?>

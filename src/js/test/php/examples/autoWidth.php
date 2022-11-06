@@ -15,32 +15,32 @@ $settings = get_settings();
   <script src="../../../../../dist/js/splide.js"></script>
 
   <script>
-    document.addEventListener( 'DOMContentLoaded', function () {
-      var splide01 = new Splide( '#splide01', {
+    document.addEventListener('DOMContentLoaded', function () {
+      var splide01 = new Splide('#splide01', {
         // width     : 1000,
-        autoWidth : true,
-        gap       : '1rem',
+        autoWidth: true,
+        gap: '1rem',
         // trimSpace : tr,
-        focus     : 0,
-        drag      : 'free',
-        omitEnd   : true,
-      } );
+        focus: 0,
+        drag: 'free',
+        omitEnd: true,
+      });
 
       splide01.mount();
 
-      var splide02 = new Splide( '#splide02', {
+      var splide02 = new Splide('#splide02', {
         // width     : 1000,
-        type      : 'loop',
-        autoWidth : true,
-        gap       : '1rem',
-        focus     : 'center',
-        trimSpace : false,
-        drag      : 'free',
+        type: 'loop',
+        autoWidth: true,
+        gap: '1rem',
+        focus: 'center',
+        trimSpace: false,
+        drag: 'free',
 
-      } );
+      });
 
       splide02.mount();
-    } );
+    });
   </script>
 </head>
 <body>

@@ -9,7 +9,7 @@ export type Cast<T, U> = T extends U ? T : U;
  * Makes the T easy to read.
  */
 export type Resolve<T> = {
-  [ K in keyof T ]: T[ K ];
+  [K in keyof T]: T[ K ];
 } & unknown;
 
 /**
@@ -17,14 +17,14 @@ export type Resolve<T> = {
  *
  * @internal
  */
-export type Push<T extends any[], U = any> = [ ...T, U ];
+export type Push<T extends any[], U = any> = [...T, U];
 
 /**
  * Returns the first type of the tuple.
  *
  * @internal
  */
-export type Head<T extends any[]> = ( ( ...args: T ) => any ) extends ( arg: infer A, ...args: any[] ) => any
+export type Head<T extends any[]> = ((...args: T) => any) extends (arg: infer A, ...args: any[]) => any
   ? A
   : never;
 
@@ -33,7 +33,7 @@ export type Head<T extends any[]> = ( ( ...args: T ) => any ) extends ( arg: inf
  *
  * @internal
  */
-export type Shift<T extends any[]> = ( ( ...args: T ) => any ) extends ( arg: any, ...args: infer A ) => any
+export type Shift<T extends any[]> = ((...args: T) => any) extends (arg: any, ...args: infer A) => any
   ? A
   : never;
 

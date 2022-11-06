@@ -15,10 +15,10 @@ import { abs, apply, style } from '@splidejs/utils';
  *
  * @return A Transition component object.
  */
-export const Slide: ComponentConstructor<TransitionComponent> = ( Splide, Components, options, event ) => {
+export const Slide: ComponentConstructor<TransitionComponent> = (Splide, Components, options, event) => {
   const { Move, Controller, Scroll } = Components;
   const { list } = Components.Elements;
-  const transition = apply( style, list, 'transition' );
+  const transition = apply(style, list, 'transition');
 
   /**
    * Holds the `done` callback function.
@@ -29,12 +29,12 @@ export const Slide: ComponentConstructor<TransitionComponent> = ( Splide, Compon
    * Called when the component is mounted.
    */
   function mount(): void {
-    event.bind( list, 'transitionend', e => {
-      if ( e.target === list && endCallback ) {
+    event.bind(list, 'transitionend', e => {
+      if (e.target === list && endCallback) {
         cancel();
         endCallback();
       }
-    } );
+    });
   }
 
   /**
@@ -44,21 +44,21 @@ export const Slide: ComponentConstructor<TransitionComponent> = ( Splide, Compon
    * @param index - A destination index.
    * @param done  - The callback function that must be called after the transition ends.
    */
-  function start( index: number, done: () => void ): void {
-    const destination = Move.toPosition( index );
-    const position    = Move.getPosition();
-    const speed       = getSpeed( index );
+  function start(index: number, done: () => void): void {
+    const destination = Move.toPosition(index);
+    const position = Move.getPosition();
+    const speed = getSpeed(index);
 
-    if ( abs( destination - position ) >= 1 && speed >= 1 ) {
-      if ( options.useScroll ) {
-        Scroll.scroll( destination, speed, false, done );
+    if (abs(destination - position) >= 1 && speed >= 1) {
+      if (options.useScroll) {
+        Scroll.scroll(destination, speed, false, done);
       } else {
-        transition( `transform ${ speed }ms ${ options.easing }` );
-        Move.translate( destination, true );
+        transition(`transform ${ speed }ms ${ options.easing }`);
+        Move.translate(destination, true);
         endCallback = done;
       }
     } else {
-      Move.jump( index );
+      Move.jump(index);
       done();
     }
   }
@@ -67,7 +67,7 @@ export const Slide: ComponentConstructor<TransitionComponent> = ( Splide, Compon
    * Cancels the transition.
    */
   function cancel(): void {
-    transition( '' );
+    transition('');
     Scroll.cancel();
   }
 
@@ -76,14 +76,14 @@ export const Slide: ComponentConstructor<TransitionComponent> = ( Splide, Compon
    *
    * @param index - A destination index.
    */
-  function getSpeed( index: number ): number {
+  function getSpeed(index: number): number {
     const { rewindSpeed } = options;
 
-    if ( Splide.is( SLIDE ) && rewindSpeed ) {
-      const prev = Controller.getIndex( true );
-      const end  = Controller.getEnd();
+    if (Splide.is(SLIDE) && rewindSpeed) {
+      const prev = Controller.getIndex(true);
+      const end = Controller.getEnd();
 
-      if ( ( prev === 0 && index >= end ) || ( prev >= end && index === 0 ) ) {
+      if ((prev === 0 && index >= end) || (prev >= end && index === 0)) {
         return rewindSpeed;
       }
     }

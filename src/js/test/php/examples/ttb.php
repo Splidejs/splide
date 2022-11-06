@@ -25,24 +25,24 @@ $settings = get_settings();
   </style>
 
   <script>
-    document.addEventListener( 'DOMContentLoaded', function () {
-      var splide = new Splide( '#splide01', {
-        width            : 400,
-        type             : 'loop',
-        perPage          : 2,
-        padding          : '3rem',
-        gap              : 5,
-        direction        : 'ttb',
-        height           : '90vh',
+    document.addEventListener('DOMContentLoaded', function () {
+      var splide = new Splide('#splide01', {
+        width: 400,
+        type: 'loop',
+        perPage: 2,
+        padding: '3rem',
+        gap: 5,
+        direction: 'ttb',
+        height: '90vh',
         waitForTransition: false,
         // releaseWheel     : true,
         // releaseTouch     : true,
-        wheel            : 'free',
-        wheelSleep       : 200,
-      } );
+        wheel: 'free',
+        wheelSleep: 200,
+      });
 
       splide.mount();
-    } );
+    });
   </script>
 </head>
 <body style="padding: 50vh 0">

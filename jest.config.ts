@@ -1,9 +1,9 @@
-import type { JestConfigWithTsJest } from 'ts-jest/dist/types';
+import type { Config } from 'jest';
 
 
-const config: JestConfigWithTsJest = {
+const config: Config = {
   transform: {
-    '^.+\\.(ts|tsx)$': 'ts-jest',
+    '^.+\\.(ts|tsx)$': '@swc/jest',
   },
   testEnvironment: 'jsdom',
   setupFiles: [

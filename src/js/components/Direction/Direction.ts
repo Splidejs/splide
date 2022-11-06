@@ -11,10 +11,10 @@ import { apply } from '../../../../../utils';
  * @since 3.0.0
  */
 export interface DirectionComponent extends BaseComponent {
-  resolve<K extends keyof typeof ORIENTATION_MAP>( prop: K, axisOnly?: boolean, direction?: Options['direction'] ): typeof ORIENTATION_MAP[ K ][ number ] | K;
-  resolve<R extends string>( prop: R, axisOnly?: boolean, direction?: Options['direction'] ): R;
+  resolve<K extends keyof typeof ORIENTATION_MAP>(prop: K, axisOnly?: boolean, direction?: Options['direction']): typeof ORIENTATION_MAP[ K ][ number ] | K;
+  resolve<R extends string>(prop: R, axisOnly?: boolean, direction?: Options['direction']): R;
 
-  orient( value: number ): number;
+  orient(value: number): number;
   left(): string;
   right(): string;
   width(): string;
@@ -26,14 +26,14 @@ export interface DirectionComponent extends BaseComponent {
  * @since 3.0.0
  */
 export const ORIENTATION_MAP = {
-  width     : [ 'height' ],
-  left      : [ 'top', 'right' ],
-  right     : [ 'bottom', 'left' ],
-  x         : [ 'y' ],
-  X         : [ 'Y' ],
-  Y         : [ 'X' ],
-  ArrowLeft : [ ARROW_UP, ARROW_RIGHT ],
-  ArrowRight: [ ARROW_DOWN, ARROW_LEFT ],
+  width: ['height'],
+  left: ['top', 'right'],
+  right: ['bottom', 'left'],
+  x: ['y'],
+  X: ['Y'],
+  Y: ['X'],
+  ArrowLeft: [ARROW_UP, ARROW_RIGHT],
+  ArrowRight: [ARROW_DOWN, ARROW_LEFT],
 } as const;
 
 /**
@@ -47,7 +47,7 @@ export const ORIENTATION_MAP = {
  *
  * @return A Direction component object.
  */
-export const Direction: ComponentConstructor<DirectionComponent> = ( Splide: Splide, Components: Components, options: Options ) => {
+export const Direction: ComponentConstructor<DirectionComponent> = (Splide: Splide, Components: Components, options: Options) => {
   /**
    * Resolves the provided property name.
    *
@@ -58,15 +58,15 @@ export const Direction: ComponentConstructor<DirectionComponent> = ( Splide: Spl
   function resolve(
     prop: string,
     axisOnly?: boolean,
-    direction: Options[ 'direction' ] = options.direction
+    direction: Options[ 'direction' ] = options.direction,
   ): string {
-    const index = direction === RTL && ! axisOnly ? 1 : direction === TTB ? 0 : -1;
+    const index = direction === RTL && !axisOnly ? 1 : direction === TTB ? 0 : -1;
 
-    return ORIENTATION_MAP[ prop ] && ORIENTATION_MAP[ prop ][ index ]
-      || prop.replace( /width|left|right/i, ( match, offset ) => {
-        const replacement = ORIENTATION_MAP[ match.toLowerCase() ][ index ] || match;
-        return offset > 0 ? replacement.charAt( 0 ).toUpperCase() + replacement.slice( 1 ) : replacement;
-      } );
+    return ORIENTATION_MAP[prop] && ORIENTATION_MAP[prop][index]
+      || prop.replace(/width|left|right/i, (match, offset) => {
+        const replacement = ORIENTATION_MAP[match.toLowerCase()][index] || match;
+        return offset > 0 ? replacement.charAt(0).toUpperCase() + replacement.slice(1) : replacement;
+      });
   }
 
   /**
@@ -77,15 +77,15 @@ export const Direction: ComponentConstructor<DirectionComponent> = ( Splide: Spl
    *
    * @return The oriented value.
    */
-  function orient( value: number, direction: Options[ 'direction' ] = options.direction ): number {
-    return value * ( direction === RTL ? 1 : -1 );
+  function orient(value: number, direction: Options[ 'direction' ] = options.direction): number {
+    return value * (direction === RTL ? 1 : -1);
   }
 
   return {
     resolve,
     orient,
-    left: apply( resolve, 'left' ),
-    right: apply( resolve, 'right' ),
-    width: apply( resolve, 'width' ),
+    left: apply(resolve, 'left'),
+    right: apply(resolve, 'right'),
+    width: apply(resolve, 'width'),
   };
 };

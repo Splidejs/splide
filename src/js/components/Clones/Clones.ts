@@ -31,7 +31,7 @@ export const MULTIPLIER = 2;
  *
  * @return A Clones component object.
  */
-export const Clones: ComponentConstructor<ClonesComponent> = ( Splide, Components, options, event ) => {
+export const Clones: ComponentConstructor<ClonesComponent> = (Splide, Components, options, event) => {
   const { on } = event;
   const { Elements, Slides, Layout: { resize, trackSize } } = Components;
   const { resolve } = Components.Direction;
@@ -51,12 +51,12 @@ export const Clones: ComponentConstructor<ClonesComponent> = ( Splide, Component
    * Needs to remount the component on refresh, otherwise `refresh` event will be triggered again while refreshing.
    */
   function mount(): void {
-    on( EVENT_REFRESH, remount );
-    on( [ EVENT_UPDATED, EVENT_RESIZE ], observe );
+    on(EVENT_REFRESH, remount);
+    on([EVENT_UPDATED, EVENT_RESIZE], observe);
 
-    if ( ( cloneCount = computeCloneCount() ) ) {
-      generate( cloneCount );
-      resize( true );
+    if ((cloneCount = computeCloneCount())) {
+      generate(cloneCount);
+      resize(true);
     }
   }
 
@@ -66,15 +66,15 @@ export const Clones: ComponentConstructor<ClonesComponent> = ( Splide, Component
   function remount(): void {
     destroy();
     mount();
-    resize( true );
+    resize(true);
   }
 
   /**
    * Destroys clones.
    */
   function destroy(): void {
-    removeNode( clones );
-    empty( clones );
+    removeNode(clones);
+    empty(clones);
     event.destroy();
   }
 
@@ -85,10 +85,10 @@ export const Clones: ComponentConstructor<ClonesComponent> = ( Splide, Component
   function observe(): void {
     const count = computeCloneCount();
 
-    if ( cloneCount !== count ) {
-      if ( cloneCount < count || ! count ) {
-        ! count && Splide.go( 0 );
-        event.emit( EVENT_REFRESH );
+    if (cloneCount !== count) {
+      if (cloneCount < count || !count) {
+        !count && Splide.go(0);
+        event.emit(EVENT_REFRESH);
       }
     }
   }
@@ -98,22 +98,22 @@ export const Clones: ComponentConstructor<ClonesComponent> = ( Splide, Component
    *
    * @param count - The number of clones to generate for each side.
    */
-  function generate( count: number ): void {
+  function generate(count: number): void {
     const slides = Slides.get().slice();
     const { length } = slides;
 
-    if ( length ) {
-      while ( slides.length < count ) {
-        push( slides, slides );
+    if (length) {
+      while (slides.length < count) {
+        push(slides, slides);
       }
 
-      push( slides.slice( -count ), slides.slice( 0, count ) ).forEach( ( Slide, index ) => {
+      push(slides.slice(-count), slides.slice(0, count)).forEach((Slide, index) => {
         const isHead = index < count;
-        const clone  = cloneDeep( Slide.slide, index );
-        isHead ? before( slides[ 0 ].slide, clone ) : append( Elements.list, clone );
-        push( clones, clone );
-        Slides.register( clone, index - count + ( isHead ? 0 : length ), Slide.index );
-      } );
+        const clone = cloneDeep(Slide.slide, index);
+        isHead ? before(slides[0].slide, clone) : append(Elements.list, clone);
+        push(clones, clone);
+        Slides.register(clone, index - count + (isHead ? 0 : length), Slide.index);
+      });
     }
   }
 
@@ -125,10 +125,10 @@ export const Clones: ComponentConstructor<ClonesComponent> = ( Splide, Component
    *
    * @return A cloned element.
    */
-  function cloneDeep( elm: HTMLElement, index: number ): HTMLElement {
-    const clone = elm.cloneNode( true ) as HTMLElement;
-    addClass( clone, options.classes.clone );
-    clone.id = `${ Splide.root.id }-clone${ pad( index + 1 ) }`;
+  function cloneDeep(elm: HTMLElement, index: number): HTMLElement {
+    const clone = elm.cloneNode(true) as HTMLElement;
+    addClass(clone, options.classes.clone);
+    clone.id = `${ Splide.root.id }-clone${ pad(index + 1) }`;
     return clone;
   }
 
@@ -141,12 +141,12 @@ export const Clones: ComponentConstructor<ClonesComponent> = ( Splide, Component
   function computeCloneCount(): number {
     let { clones } = options;
 
-    if ( ! Splide.is( LOOP ) ) {
+    if (!Splide.is(LOOP)) {
       clones = 0;
-    } else if ( isUndefined( clones ) ) {
-      const fixedSize  = options[ resolve( 'fixedWidth' ) ] && Components.Layout.slideSize( 0 );
-      const fixedCount = fixedSize && ceil( trackSize() / fixedSize );
-      clones = fixedCount || ( options[ resolve( 'autoWidth' ) ] && Splide.length ) || options.perPage * MULTIPLIER;
+    } else if (isUndefined(clones)) {
+      const fixedSize = options[resolve('fixedWidth')] && Components.Layout.slideSize(0);
+      const fixedCount = fixedSize && ceil(trackSize() / fixedSize);
+      clones = fixedCount || (options[resolve('autoWidth')] && Splide.length) || options.perPage * MULTIPLIER;
     }
 
     return clones;

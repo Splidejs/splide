@@ -41,6 +41,11 @@ export class Splide {
   static readonly STATES = STATES;
 
   /**
+   * Stores extension constructors.
+   */
+  static readonly Extensions: Record<string, ComponentConstructor>;
+
+  /**
    * The root element where the Splide is applied.
    */
   readonly root: HTMLElement;
@@ -51,14 +56,14 @@ export class Splide {
   readonly event = EventInterface<EventMap & Record<string, AnyFunction>>();
 
   /**
-   * The collection of all component objects.
+   * The collection of all component instances, including extensions.
    */
   readonly Components: Components = {} as Components;
 
   /**
    * The StateObject object.
    */
-  readonly state = State( CREATED );
+  readonly state = State(CREATED);
 
   /**
    * An array with SyncTarget objects for splide instances to sync with.
@@ -91,24 +96,24 @@ export class Splide {
    * @param target  - The selector for the target element, or the element itself.
    * @param options - Optional. An object with options.
    */
-  constructor( target: string | HTMLElement, options: Options = {} ) {
-    const root = isString( target ) ? query<HTMLElement>( document, target ) : target;
-    assert( root, `${ root } is invalid.` );
+  constructor(target: string | HTMLElement, options: Options = {}) {
+    const root = isString(target) ? query<HTMLElement>(document, target) : target;
+    assert(root, `${ root } is invalid.`);
 
     this.root = root;
 
-    options = merge( {
-      label     : getAttribute( root, ARIA_LABEL ) || '',
-      labelledby: getAttribute( root, ARIA_LABELLEDBY ) || '',
-    }, DEFAULTS, Splide.defaults, options );
+    options = merge({
+      label: getAttribute(root, ARIA_LABEL) || '',
+      labelledby: getAttribute(root, ARIA_LABELLEDBY) || '',
+    }, DEFAULTS, Splide.defaults, options);
 
     try {
-      merge( options, JSON.parse( getAttribute( root, DATA_ATTRIBUTE ) ) );
-    } catch ( e ) {
-      assert( false, 'Invalid JSON' );
+      merge(options, JSON.parse(getAttribute(root, DATA_ATTRIBUTE)));
+    } catch (e) {
+      assert(false, 'Invalid JSON');
     }
 
-    this._o = Object.create( merge( {}, options ) );
+    this._o = Object.create(merge({}, options));
   }
 
   /**
@@ -119,34 +124,34 @@ export class Splide {
    *
    * @return `this`
    */
-  mount( Extensions: Record<string, ComponentConstructor> = this._E, Transition: ComponentConstructor = this._T ): this {
+  mount(Extensions: Record<string, ComponentConstructor> = this._E, Transition: ComponentConstructor = this._T): this {
     const { state, Components } = this;
-    assert( state.is( [ CREATED, DESTROYED ] ), 'Already mounted!' );
+    assert(state.is([CREATED, DESTROYED]), 'Already mounted!');
 
-    state.set( CREATED );
+    state.set(CREATED);
 
     this._C = Components;
-    this._T = Transition || ( this.is( FADE ) ? Fade : Slide );
+    this._T = Transition || (this.is(FADE) ? Fade : Slide);
     this._E = Extensions;
 
-    const Constructors = assign( {}, COMPONENTS, this._E, { Transition: this._T } );
+    const Constructors = assign({}, COMPONENTS, this._E, { Transition: this._T });
 
-    forOwn( Constructors, ( Component, key ) => {
-      const component = Component( this, Components, this._o, this.event.lock() );
-      Components[ key ] = component;
+    forOwn(Constructors, (Component, key) => {
+      const component = Component(this, Components, this._o, this.event.lock());
+      Components[key] = component;
       component.setup && component.setup();
-    } );
+    });
 
-    forOwn( Components, component => {
+    forOwn(Components, component => {
       component.mount && component.mount();
-    } );
+    });
 
-    this.emit( EVENT_MOUNTED );
+    this.emit(EVENT_MOUNTED);
 
-    addClass( this.root, CLASS_INITIALIZED );
+    addClass(this.root, CLASS_INITIALIZED);
 
-    state.set( IDLE );
-    this.emit( EVENT_READY );
+    state.set(IDLE);
+    this.emit(EVENT_READY);
 
     return this;
   }
@@ -169,11 +174,11 @@ export class Splide {
    *
    * @return `this`
    */
-  sync( splide: Splide ): this {
-    this.splides.push( { splide } );
-    splide.splides.push( { splide: this, isParent: true } );
+  sync(splide: Splide): this {
+    this.splides.push({ splide });
+    splide.splides.push({ splide: this, isParent: true });
 
-    if ( this.state.is( IDLE ) ) {
+    if (this.state.is(IDLE)) {
       this._C.Sync.remount();
       splide.Components.Sync.remount();
     }
@@ -219,8 +224,8 @@ export class Splide {
    *
    * @return `this`
    */
-  go( control: number | string ): this {
-    this._C.Controller.go( control );
+  go(control: number | string): this {
+    this._C.Controller.go(control);
     return this;
   }
 
@@ -231,8 +236,8 @@ export class Splide {
    *
    * @return `this`
    */
-  jump( control: number | string ): this {
-    this._C.Controller.jump( control );
+  jump(control: number | string): this {
+    this._C.Controller.jump(control);
     return this;
   }
 
@@ -258,10 +263,10 @@ export class Splide {
    *
    * @return `this`
    */
-  on<K extends keyof EventMap>( events: K, callback: EventMap[ K ] ): this;
-  on( events: string | string[], callback: AnyFunction ): this;
-  on( events: string | string[], callback: AnyFunction ): this {
-    this.event.on( events, callback );
+  on<K extends keyof EventMap>(events: K, callback: EventMap[ K ]): this;
+  on(events: string | string[], callback: AnyFunction): this;
+  on(events: string | string[], callback: AnyFunction): this {
+    this.event.on(events, callback);
     return this;
   }
 
@@ -285,8 +290,8 @@ export class Splide {
    *
    * @return `this`
    */
-  off<K extends keyof EventMap>( events: K | K[] | string | string[], callback: AnyFunction ): this {
-    this.event.off( events, callback );
+  off<K extends keyof EventMap>(events: K | K[] | string | string[], callback: AnyFunction): this {
+    this.event.off(events, callback);
     return this;
   }
 
@@ -298,10 +303,10 @@ export class Splide {
    *
    * @return `this`
    */
-  emit<K extends keyof EventMap>( event: K, ...args: Parameters<EventMap[ K ]> ): this;
-  emit( event: string, ...args: any[] ): this;
-  emit( event: string, ...args: any[] ): this {
-    this.event.emit( event, ...args );
+  emit<K extends keyof EventMap>(event: K, ...args: Parameters<EventMap[ K ]>): this;
+  emit(event: string, ...args: any[]): this;
+  emit(event: string, ...args: any[]): this {
+    this.event.emit(event, ...args);
     return this;
   }
 
@@ -325,8 +330,8 @@ export class Splide {
    *
    * @return `this`
    */
-  add( slides: string | HTMLElement | Array<string | HTMLElement>, index?: number ): this {
-    this._C.Slides.add( slides, index );
+  add(slides: string | HTMLElement | Array<string | HTMLElement>, index?: number): this {
+    this._C.Slides.add(slides, index);
     return this;
   }
 
@@ -336,8 +341,8 @@ export class Splide {
    *
    * @param matcher - An index, an array with indices, a selector string, or an iteratee function.
    */
-  remove( matcher: SlideMatcher ): this {
-    this._C.Slides.remove( matcher );
+  remove(matcher: SlideMatcher): this {
+    this._C.Slides.remove(matcher);
     return this;
   }
 
@@ -348,7 +353,7 @@ export class Splide {
    *
    * @return `true` if the type matches the current one, or otherwise `false`.
    */
-  is( type: string ): boolean {
+  is(type: string): boolean {
     return this._o.type === type;
   }
 
@@ -358,7 +363,7 @@ export class Splide {
    * @return `this`
    */
   refresh(): this {
-    this.emit( EVENT_REFRESH );
+    this.emit(EVENT_REFRESH);
     return this;
   }
 
@@ -369,21 +374,21 @@ export class Splide {
    *
    * @return `this`
    */
-  destroy( completely = true ): this {
+  destroy(completely = true): this {
     const { event, state } = this;
 
-    if ( state.is( CREATED ) ) {
+    if (state.is(CREATED)) {
       // Postpones destruction requested before the slider becomes ready.
-      this.on( EVENT_READY, this.destroy.bind( this, completely ) );
+      this.on(EVENT_READY, this.destroy.bind(this, completely));
     } else {
-      forOwn( this._C, component => {
-        component.destroy && component.destroy( completely );
-      }, true );
+      forOwn(this._C, component => {
+        component.destroy && component.destroy(completely);
+      }, true);
 
-      event.emit( EVENT_DESTROY );
+      event.emit(EVENT_DESTROY);
       event.destroy();
-      completely && empty( this.splides );
-      state.set( DESTROYED );
+      completely && empty(this.splides);
+      state.set(DESTROYED);
     }
 
     return this;
@@ -403,8 +408,8 @@ export class Splide {
    *
    * @param options - An object with new options.
    */
-  set options( options: Options ) {
-    this._C.Breakpoints.set( options, true, true );
+  set options(options: Options) {
+    this._C.Breakpoints.set(options, true, true);
   }
 
   /**
@@ -413,7 +418,7 @@ export class Splide {
    * @return The number of slides.
    */
   get length(): number {
-    return this._C.Slides.getLength( true );
+    return this._C.Slides.getLength(true);
   }
 
   /**

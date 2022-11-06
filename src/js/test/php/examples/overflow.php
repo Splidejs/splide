@@ -17,26 +17,26 @@ $settings = get_settings();
   <script src="../../../../../dist/js/splide.js"></script>
 
   <script>
-    document.addEventListener( 'DOMContentLoaded', function () {
-      var splide01 = new Splide( '#splide01', {
-        fixedWidth : '6rem',
-        type       : 'loop',
-        gap        : 10,
-        omitEnd    : true,
-        focus      : 0,
+    document.addEventListener('DOMContentLoaded', function () {
+      var splide01 = new Splide('#splide01', {
+        fixedWidth: '6rem',
+        type: 'loop',
+        gap: 10,
+        omitEnd: true,
+        focus: 0,
         breakpoints: {
           1200: {
             arrows: true,
           },
 
           '!overflow': {
-            arrows    : false,
-            drag      : false,
+            arrows: false,
+            drag: false,
             pagination: false,
-            clones    : 0,
-          }
-        }
-      } );
+            clones: 0,
+          },
+        },
+      });
 
       // splide01.on( 'overflow', overflow => {
       //   console.log( 'splide01:', overflow );
@@ -120,7 +120,7 @@ $settings = get_settings();
       // } );
       //
       // splide04.mount();
-    } );
+    });
   </script>
 
   <style>
@@ -135,10 +135,10 @@ $settings = get_settings();
 </head>
 <body>
 
-<?php render( 'splide01' ); ?>
-<?php render( 'splide02' ); ?>
+<?php render('splide01'); ?>
+<?php render('splide02'); ?>
 
-<?php render( 'splide03', 1 ); ?>
+<?php render('splide03', 1); ?>
 <button id="add">Add</button>
 <button id="remove">Remove</button>
 

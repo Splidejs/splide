@@ -17,15 +17,15 @@ $settings = get_settings();
   <script type="text/javascript" src="../../../../../dist/js/splide.js"></script>
 
   <script>
-    document.addEventListener( 'DOMContentLoaded', function () {
-      var splide = new Splide( '#splide01', {
+    document.addEventListener('DOMContentLoaded', function () {
+      var splide = new Splide('#splide01', {
         perPage: 2,
-        gap    : '1rem',
-      } );
+        gap: '1rem',
+      });
 
-      var Extension = function ( Splide ) {
+      var Extension = function (Splide) {
         function setup() {
-          Splide.Components.Controller.setIndex( 4 );
+          Splide.Components.Controller.setIndex(4);
         }
 
         return {
@@ -33,8 +33,8 @@ $settings = get_settings();
         }
       }
 
-      splide.mount( { Extension: Extension } );
-    } );
+      splide.mount({ Extension: Extension });
+    });
   </script>
 </head>
 <body>

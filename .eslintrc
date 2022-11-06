@@ -28,11 +28,11 @@
     ],
     "space-in-parens": [
       "error",
-      "always"
+      "never"
     ],
     "array-bracket-spacing": [
       "error",
-      "always"
+      "never"
     ],
     "object-curly-spacing": [
       "error",
@@ -40,7 +40,7 @@
     ],
     "computed-property-spacing": [
       "error",
-      "always"
+      "never"
     ],
     "camelcase": "error",
     "comma-dangle": [
@@ -50,7 +50,7 @@
         "objects": "always-multiline",
         "imports": "always-multiline",
         "exports": "always-multiline",
-        "functions": "never"
+        "functions": "always-multiline"
       }
     ],
     "comma-spacing": [

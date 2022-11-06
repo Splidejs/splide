@@ -29,16 +29,16 @@ import { Slide, SlideComponent } from './Slide';
  */
 export interface SlidesComponent extends BaseComponent {
   update(): void;
-  register( slide: HTMLElement, index: number, slideIndex: number ): void;
-  get( excludeClones?: boolean ): SlideComponent[];
-  getIn( page: number ): SlideComponent[];
-  getAt( index: number ): SlideComponent | undefined;
-  add( slide: string | Element | Array<string | Element>, index?: number ): void;
-  remove( selector: SlideMatcher ): void;
-  forEach( iteratee: SlidesIteratee, excludeClones?: boolean ): void;
-  filter( matcher: SlideMatcher ): SlideComponent[];
-  style( prop: string, value: string | number, useContainer?: boolean ): void
-  getLength( excludeClones?: boolean ): number;
+  register(slide: HTMLElement, index: number, slideIndex: number): void;
+  get(excludeClones?: boolean): SlideComponent[];
+  getIn(page: number): SlideComponent[];
+  getAt(index: number): SlideComponent | undefined;
+  add(slide: string | Element | Array<string | Element>, index?: number): void;
+  remove(selector: SlideMatcher): void;
+  forEach(iteratee: SlidesIteratee, excludeClones?: boolean): void;
+  filter(matcher: SlideMatcher): SlideComponent[];
+  style(prop: string, value: string | number, useContainer?: boolean): void
+  getLength(excludeClones?: boolean): number;
   isEnough(): boolean;
 }
 
@@ -47,14 +47,14 @@ export interface SlidesComponent extends BaseComponent {
  *
  * @since 3.0.0
  */
-export type SlidesIteratee = ( Slide: SlideComponent, index: number, Slides: SlideComponent[] ) => void
+export type SlidesIteratee = (Slide: SlideComponent, index: number, Slides: SlideComponent[]) => void
 
 /**
  * The predicate function for Slides.
  *
  * @since 3.0.0
  */
-export type SlidesPredicate = ( Slide: SlideComponent, index: number, Slides: SlideComponent[] ) => any
+export type SlidesPredicate = (Slide: SlideComponent, index: number, Slides: SlideComponent[]) => any
 
 /**
  * The type for filtering SlideComponent objects.
@@ -75,7 +75,7 @@ export type SlideMatcher = number | number[] | string | SlidesPredicate;
  *
  * @return An Slides component object.
  */
-export const Slides: ComponentConstructor<SlidesComponent> = ( Splide, Components, options, event ) => {
+export const Slides: ComponentConstructor<SlidesComponent> = (Splide, Components, options, event) => {
   const { on, emit, bind } = event;
   const { slides, list } = Components.Elements;
 
@@ -89,30 +89,30 @@ export const Slides: ComponentConstructor<SlidesComponent> = ( Splide, Component
    */
   function mount(): void {
     init();
-    on( EVENT_REFRESH, destroy );
-    on( EVENT_REFRESH, init );
+    on(EVENT_REFRESH, destroy);
+    on(EVENT_REFRESH, init);
   }
 
   /**
    * Initializes the component.
    */
   function init(): void {
-    slides.forEach( ( slide, index ) => { register( slide, index, -1 ) } );
+    slides.forEach((slide, index) => register(slide, index, -1));
   }
 
   /**
    * Destroys the component.
    */
   function destroy(): void {
-    forEach( Slide => { Slide.destroy() } );
-    empty( Slides );
+    forEach(Slide => Slide.destroy());
+    empty(Slides);
   }
 
   /**
    * Manually updates the status of all slides.
    */
   function update(): void {
-    forEach( Slide => { Slide.update() } );
+    forEach(Slide => Slide.update());
   }
 
   /**
@@ -123,11 +123,11 @@ export const Slides: ComponentConstructor<SlidesComponent> = ( Splide, Component
    * @param index      - A slide index.
    * @param slideIndex - A slide index for clones. This must be `-1` for regular slides.
    */
-  function register( slide: HTMLElement, index: number, slideIndex: number ): void {
-    const object = Slide( Splide, index, slideIndex, slide );
+  function register(slide: HTMLElement, index: number, slideIndex: number): void {
+    const object = Slide(Splide, index, slideIndex, slide);
     object.mount();
-    Slides.push( object );
-    Slides.sort( ( Slide1, Slide2 ) => Slide1.index - Slide2.index );
+    Slides.push(object);
+    Slides.sort((Slide1, Slide2) => Slide1.index - Slide2.index);
   }
 
   /**
@@ -137,8 +137,8 @@ export const Slides: ComponentConstructor<SlidesComponent> = ( Splide, Component
    *
    * @return An array with Slide objects.
    */
-  function get( excludeClones?: boolean ): SlideComponent[] {
-    return excludeClones ? filter( Slide => ! Slide.isClone ) : Slides;
+  function get(excludeClones?: boolean): SlideComponent[] {
+    return excludeClones ? filter(Slide => !Slide.isClone) : Slides;
   }
 
   /**
@@ -148,11 +148,11 @@ export const Slides: ComponentConstructor<SlidesComponent> = ( Splide, Component
    *
    * @return An array with slides that belong to the page.
    */
-  function getIn( page: number ): SlideComponent[] {
+  function getIn(page: number): SlideComponent[] {
     const { Controller } = Components;
-    const index = Controller.toIndex( page );
-    const max   = Controller.hasFocus() ? 1 : options.perPage;
-    return filter( Slide => between( Slide.index, index, index + max - 1 ) );
+    const index = Controller.toIndex(page);
+    const max = Controller.hasFocus() ? 1 : options.perPage;
+    return filter(Slide => between(Slide.index, index, index + max - 1));
   }
 
   /**
@@ -162,8 +162,8 @@ export const Slides: ComponentConstructor<SlidesComponent> = ( Splide, Component
    *
    * @return A Slide object if available, or otherwise `undefined`.
    */
-  function getAt( index: number ): SlideComponent | undefined {
-    return filter( index )[ 0 ];
+  function getAt(index: number): SlideComponent | undefined {
+    return filter(index)[0];
   }
 
   /**
@@ -172,21 +172,21 @@ export const Slides: ComponentConstructor<SlidesComponent> = ( Splide, Component
    * @param items - A slide element, an HTML string or an array with them.
    * @param index - Optional. An index to insert the slide at. If omitted, appends it to the list.
    */
-  function add( items: string | Element | Array<string | Element>, index?: number ): void {
-    forEachItem( items, slide => {
-      if ( isString( slide ) ) {
-        slide = parseHtml( slide );
+  function add(items: string | Element | Array<string | Element>, index?: number): void {
+    forEachItem(items, slide => {
+      if (isString(slide)) {
+        slide = parseHtml(slide);
       }
 
-      if ( isHTMLElement( slide ) ) {
-        const ref = slides[ index ];
-        ref ? before( ref, slide ) : append( list, slide );
-        addClass( slide, options.classes.slide );
-        observeImages( slide, apply( emit, EVENT_RESIZE ) );
+      if (isHTMLElement(slide)) {
+        const ref = slides[index];
+        ref ? before(ref, slide) : append(list, slide);
+        addClass(slide, options.classes.slide);
+        observeImages(slide, apply(emit, EVENT_RESIZE));
       }
-    } );
+    });
 
-    emit( EVENT_REFRESH );
+    emit(EVENT_REFRESH);
   }
 
   /**
@@ -195,9 +195,9 @@ export const Slides: ComponentConstructor<SlidesComponent> = ( Splide, Component
    *
    * @param matcher - An index, an array with indices, a selector string, or an iteratee function.
    */
-  function remove( matcher: SlideMatcher ): void {
-    removeNode( filter( matcher ).map( Slide => Slide.slide ) );
-    emit( EVENT_REFRESH );
+  function remove(matcher: SlideMatcher): void {
+    removeNode(filter(matcher).map(Slide => Slide.slide));
+    emit(EVENT_REFRESH);
   }
 
   /**
@@ -206,8 +206,8 @@ export const Slides: ComponentConstructor<SlidesComponent> = ( Splide, Component
    * @param iteratee      - An iteratee function that takes a Slide object, an index and an array with Slides.
    * @param excludeClones - Optional. Determines whether to exclude clones or not.
    */
-  function forEach( iteratee: SlidesIteratee, excludeClones?: boolean ): void {
-    get( excludeClones ).forEach( iteratee );
+  function forEach(iteratee: SlidesIteratee, excludeClones?: boolean): void {
+    get(excludeClones).forEach(iteratee);
   }
 
   /**
@@ -218,12 +218,12 @@ export const Slides: ComponentConstructor<SlidesComponent> = ( Splide, Component
    *
    * @return An array with SlideComponent objects.
    */
-  function filter( matcher: SlideMatcher ): SlideComponent[] {
-    return Slides.filter( isFunction( matcher )
+  function filter(matcher: SlideMatcher): SlideComponent[] {
+    return Slides.filter(isFunction(matcher)
       ? matcher
-      : Slide => isString( matcher )
-        ? matches( Slide.slide, matcher )
-        : includes( toArray( matcher ), Slide.index )
+      : Slide => isString(matcher)
+        ? matches(Slide.slide, matcher)
+        : includes(toArray(matcher), Slide.index),
     );
   }
 
@@ -234,8 +234,8 @@ export const Slides: ComponentConstructor<SlidesComponent> = ( Splide, Component
    * @param value        - A CSS value to add.
    * @param useContainer - Optional. Determines whether to apply the rule to the container or not.
    */
-  function style( prop: CSSProperties, value: string | number, useContainer?: boolean ): void {
-    forEach( Slide => { Slide.style( prop, value, useContainer ) } );
+  function style(prop: CSSProperties, value: string | number, useContainer?: boolean): void {
+    forEach(Slide => Slide.style(prop, value, useContainer));
   }
 
   /**
@@ -244,18 +244,18 @@ export const Slides: ComponentConstructor<SlidesComponent> = ( Splide, Component
    * @param elm      - An element that may contain images.
    * @param callback - A callback function.
    */
-  function observeImages( elm: Element, callback: AnyFunction ): void {
-    const images = queryAll( elm, 'img' );
+  function observeImages(elm: Element, callback: AnyFunction): void {
+    const images = queryAll(elm, 'img');
     let { length } = images;
 
-    if ( length ) {
-      images.forEach( img => {
-        bind( img, 'load error', () => {
-          if ( ! --length ) {
+    if (length) {
+      images.forEach(img => {
+        bind(img, 'load error', () => {
+          if (!--length) {
             callback();
           }
-        } );
-      } );
+        });
+      });
     } else {
       callback();
     }
@@ -268,7 +268,7 @@ export const Slides: ComponentConstructor<SlidesComponent> = ( Splide, Component
    *
    * @return The length of slides.
    */
-  function getLength( excludeClones?: boolean ): number {
+  function getLength(excludeClones?: boolean): number {
     return excludeClones ? slides.length : Slides.length;
   }
 

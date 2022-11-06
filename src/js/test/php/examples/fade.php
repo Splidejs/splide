@@ -17,27 +17,27 @@ $settings = get_settings();
   <script src="../../../../../dist/js/splide.js"></script>
 
   <script>
-    document.addEventListener( 'DOMContentLoaded', function () {
-      var splide = new Splide( '#splide01', {
+    document.addEventListener('DOMContentLoaded', function () {
+      var splide = new Splide('#splide01', {
         width: 800,
-        type : 'fade',
-	      // rewind: false,
-	      // rewindByDrag: false,
-	      // autoplay: true,
-	      // interval: 1000,
+        type: 'fade',
+        // rewind: false,
+        // rewindByDrag: false,
+        // autoplay: true,
+        // interval: 1000,
         breakpoints: {
           640: {
             width: '100%',
           },
         },
-      } );
+      });
 
       splide.mount();
 
       // setTimeout( () => {
       //   splide.refresh();
       // }, 1000 );
-    } );
+    });
   </script>
 
   <style>
@@ -58,22 +58,28 @@ $settings = get_settings();
       <li class="splide__slide">
         <img src="../../assets/images/pics/slide01.jpg">
         <p>
-          Lorem ipsum dolor sit amet, quod sale at pro, everti iisque tractatos sit ea. Agam alterum sit at. Libris petentium his ne, ne eam detraxit inimicus tractatos. Ius mundi verear ad, at percipit constituto pro, ei possim eirmod quo. Vim laudem aperiam reprehendunt in.
+          Lorem ipsum dolor sit amet, quod sale at pro, everti iisque tractatos sit ea. Agam alterum sit at. Libris
+          petentium his ne, ne eam detraxit inimicus tractatos. Ius mundi verear ad, at percipit constituto pro, ei
+          possim eirmod quo. Vim laudem aperiam reprehendunt in.
         </p>
       </li>
       <li class="splide__slide">
         <img src="../../assets/images/pics/slide02.jpg">
         <p>
-          Has cu etiam veniam recusabo, his animal nostrud fabellas ne. Vis suas qualisque eu, eum ei impedit civibus, an solum definiebas pro.
+          Has cu etiam veniam recusabo, his animal nostrud fabellas ne. Vis suas qualisque eu, eum ei impedit civibus,
+          an solum definiebas pro.
         </p>
       </li>
       <li class="splide__slide">
         <img src="../../assets/images/pics/slide03.jpg">
         <p>
-          Mollis epicuri laboramus ea qui, his ei meis graecis quaestio. Ius ne suscipit prodesset. Qui at delicata euripidis eloquentiam, eius solum volumus eum eu. Usu eu deserunt abhorreant, errem qualisque nec in. Te has labitur virtute hendrerit, cum quaeque oportere mediocritatem in, eos imperdiet intellegam id.
+          Mollis epicuri laboramus ea qui, his ei meis graecis quaestio. Ius ne suscipit prodesset. Qui at delicata
+          euripidis eloquentiam, eius solum volumus eum eu. Usu eu deserunt abhorreant, errem qualisque nec in. Te has
+          labitur virtute hendrerit, cum quaeque oportere mediocritatem in, eos imperdiet intellegam id.
         </p>
         <p>
-          Has cu etiam veniam recusabo, his animal nostrud fabellas ne. Vis suas qualisque eu, eum ei impedit civibus, an solum definiebas pro.
+          Has cu etiam veniam recusabo, his animal nostrud fabellas ne. Vis suas qualisque eu, eum ei impedit civibus,
+          an solum definiebas pro.
         </p>
       </li>
     </ul>

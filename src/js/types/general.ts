@@ -9,7 +9,7 @@ import { EventInterface } from './events';
  *
  * @since 3.0.0
  */
-export type AnyFunction = ( ...args: any[] ) => any;
+export type AnyFunction = (...args: any[]) => any;
 
 /**
  * The type for a component.
@@ -17,7 +17,7 @@ export type AnyFunction = ( ...args: any[] ) => any;
  * @since 3.0.0
  */
 export type ComponentConstructor<R extends BaseComponent = BaseComponent>
-  = ( Splide: Splide, Components: Components, options: Options, event: EventInterface ) => R;
+  = (Splide: Splide, Components: Components, options: Options, event: EventInterface) => R;
 
 /**
  * The interface for any component.
@@ -27,7 +27,7 @@ export type ComponentConstructor<R extends BaseComponent = BaseComponent>
 export interface BaseComponent {
   setup?(): void;
   mount?(): void;
-  destroy?( completely?: boolean ): void;
+  destroy?(completely?: boolean): void;
 }
 
 /**
@@ -36,7 +36,7 @@ export interface BaseComponent {
  * @since 3.0.0
  */
 export interface TransitionComponent extends BaseComponent {
-  start( index: number, done: () => void ): void;
+  start(index: number, done: () => void): void;
   cancel(): void;
 }
 

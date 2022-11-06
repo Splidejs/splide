@@ -19,21 +19,21 @@ import { abs, ceil, clamp, isUndefined, rect, style } from '@splidejs/utils';
  * @since 3.0.0
  */
 export interface MoveComponent extends BaseComponent {
-  move( dest: number, index: number, prev: number, forwards: boolean, callback?: AnyFunction ): void;
-  jump( index: number ): void;
-  translate( position: number, preventLoop?: boolean ): void;
-  shift( position: number, backwards: boolean ): number;
+  move(dest: number, index: number, prev: number, forwards: boolean, callback?: AnyFunction): void;
+  jump(index: number): void;
+  translate(position: number, preventLoop?: boolean): void;
+  shift(position: number, backwards: boolean): number;
   cancel(): void;
-  toIndex( position: number ): number;
-  toPosition( index: number ): number;
+  toIndex(position: number): number;
+  toPosition(index: number): number;
   getPosition(): number;
-  getRate( index?: number ): number;
-  getLimit( max: boolean ): number;
-  exceededLimit( max?: boolean | undefined, position?: number ): boolean;
+  getRate(index?: number): number;
+  getLimit(max: boolean): number;
+  exceededLimit(max?: boolean | undefined, position?: number): boolean;
 
   /** @internal */
   reposition(): void;
-  canShift( backwards: boolean ): boolean;
+  canShift(backwards: boolean): boolean;
 }
 
 /**
@@ -48,7 +48,7 @@ export interface MoveComponent extends BaseComponent {
  *
  * @return A Move component object.
  */
-export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, options, event ) => {
+export const Move: ComponentConstructor<MoveComponent> = (Splide, Components, options, event) => {
   const { on, emit } = event;
   const { set, is } = Splide.state;
   const { Slides } = Components;
@@ -64,7 +64,7 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
   /**
    * Keeps the latest indices.
    */
-  let indices: [ number, number, number ];
+  let indices: [number, number, number];
 
   let callback: AnyFunction;
 
@@ -73,7 +73,7 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    */
   function mount(): void {
     Transition = Components.Transition;
-    on( [ EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH ], reposition );
+    on([EVENT_MOUNTED, EVENT_RESIZED, EVENT_UPDATED, EVENT_REFRESH], reposition);
   }
 
   /**
@@ -82,9 +82,9 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    * - iOS Safari emits window resize event while the user swipes the slider because of the bottom bar.
    */
   function reposition(): void {
-    if ( ! Components.Controller.isBusy() ) {
+    if (!Components.Controller.isBusy()) {
       Components.Scroll.cancel();
-      jump( Splide.index );
+      jump(Splide.index);
       Slides.update();
     }
   }
@@ -101,28 +101,28 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    * @param forwards - Specifies the move direction.
    * @param onMoved  - Optional. A callback function invoked after transition ends.
    */
-  function move( dest: number, index: number, prev: number, forwards: boolean, onMoved?: AnyFunction ): void {
+  function move(dest: number, index: number, prev: number, forwards: boolean, onMoved?: AnyFunction): void {
     cancel();
 
     const shiftBackwards = dest !== index ? dest > index : forwards;
-    const shouldShift    = ( dest !== index || exceededLimit( forwards ) ) && canShift( shiftBackwards );
+    const shouldShift = (dest !== index || exceededLimit(forwards)) && canShift(shiftBackwards);
 
-    shouldShift && translate( shift( getPosition(), shiftBackwards ), true );
+    shouldShift && translate(shift(getPosition(), shiftBackwards), true);
 
-    indices  = [ index, prev, dest ];
+    indices = [index, prev, dest];
     callback = onMoved;
 
-    set( MOVING );
-    emit( EVENT_MOVE, index, prev, dest );
-    Transition.start( index, onTransitionEnd );
+    set(MOVING);
+    emit(EVENT_MOVE, index, prev, dest);
+    Transition.start(index, onTransitionEnd);
   }
 
   /**
    * Called when transition ends or is cancelled.
    */
   function onTransitionEnd(): void {
-    set( IDLE );
-    emit( EVENT_MOVED, ...indices );
+    set(IDLE);
+    emit(EVENT_MOVED, ...indices);
     callback && callback();
   }
 
@@ -130,8 +130,8 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    * Cancels transition.
    */
   function cancel(): void {
-    if ( is( MOVING ) && indices ) {
-      translate( getPosition(), true );
+    if (is(MOVING) && indices) {
+      translate(getPosition(), true);
       Transition.cancel();
       onTransitionEnd();
     }
@@ -142,8 +142,8 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    *
    * @param index - An index to jump to.
    */
-  function jump( index: number ): void {
-    translate( toPosition( index ) );
+  function jump(index: number): void {
+    translate(toPosition(index));
   }
 
   /**
@@ -152,11 +152,11 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    * @param position    - The position to move to.
    * @param preventLoop - Optional. If `true`, sets the provided position as is.
    */
-  function translate( position: number, preventLoop?: boolean ): void {
-    if ( ! Splide.is( FADE ) ) {
-      const destination = preventLoop ? position : loop( position );
-      style( list, 'transform', `translate${ resolve( 'X' ) }(${ destination }px)` );
-      position !== destination && emit( EVENT_SHIFTED );
+  function translate(position: number, preventLoop?: boolean): void {
+    if (!Splide.is(FADE)) {
+      const destination = preventLoop ? position : loop(position);
+      style(list, 'transform', `translate${ resolve('X') }(${ destination }px)`);
+      position !== destination && emit(EVENT_SHIFTED);
     }
   }
 
@@ -167,12 +167,12 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    *
    * @return A looped position.
    */
-  function loop( position: number ): number {
-    if ( Splide.is( LOOP ) ) {
-      const diff = orient( position ) - orient( getPosition() );
+  function loop(position: number): number {
+    if (Splide.is(LOOP)) {
+      const diff = orient(position) - orient(getPosition());
 
-      if ( diff && exceededLimit( diff > 0, position ) ) {
-        position = shift( position, diff > 0 );
+      if (diff && exceededLimit(diff > 0, position)) {
+        position = shift(position, diff > 0);
       }
     }
 
@@ -187,10 +187,10 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    *
    * @return The shifted position.
    */
-  function shift( position: number, backwards: boolean ): number {
-    const excess = position - getLimit( backwards );
-    const size   = sliderSize();
-    position -= orient( size * ( ceil( abs( excess ) / size ) || 1 ) ) * ( backwards ? 1 : -1 );
+  function shift(position: number, backwards: boolean): number {
+    const excess = position - getLimit(backwards);
+    const size = sliderSize();
+    position -= orient(size * (ceil(abs(excess) / size) || 1)) * (backwards ? 1 : -1);
     return position;
   }
 
@@ -201,19 +201,19 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    *
    * @return The closest index to the position.
    */
-  function toIndex( position: number ): number {
+  function toIndex(position: number): number {
     const slides = Slides.get();
 
-    let index       = 0;
+    let index = 0;
     let minDistance = Infinity;
 
-    for ( let i = 0; i < slides.length; i++ ) {
-      const slideIndex = slides[ i ].index;
-      const distance   = abs( toPosition( slideIndex ) - position );
+    for (let i = 0; i < slides.length; i++) {
+      const slideIndex = slides[i].index;
+      const distance = abs(toPosition(slideIndex) - position);
 
-      if ( distance <= minDistance ) {
+      if (distance <= minDistance) {
         minDistance = distance;
-        index       = slideIndex;
+        index = slideIndex;
       } else {
         break;
       }
@@ -229,11 +229,11 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    *
    * @return The position corresponding with the index.
    */
-  function toPosition( index: number ): number {
-    let position = orient( totalSize( index - 1 ) - offset( index ) );
+  function toPosition(index: number): number {
+    let position = orient(totalSize(index - 1) - offset(index));
 
-    if ( options.trimSpace && Splide.is( SLIDE ) ) {
-      position = clamp( position, 0, orient( sliderSize( true ) - listSize() ) );
+    if (options.trimSpace && Splide.is(SLIDE)) {
+      position = clamp(position, 0, orient(sliderSize(true) - listSize()));
     }
 
     return position;
@@ -245,8 +245,8 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    * @return The position of the list element.
    */
   function getPosition(): number {
-    const left = resolve( 'left' );
-    return rect( list )[ left ] - rect( track )[ left ] + orient( getPadding( false ) );
+    const left = resolve('left');
+    return rect(list)[left] - rect(track)[left] + orient(getPadding(false));
   }
 
   /**
@@ -256,29 +256,29 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    *
    * @return The progress rate.
    */
-  function getRate( index?: number ): number {
-    const useIndex = ! isUndefined( index );
+  function getRate(index?: number): number {
+    const useIndex = !isUndefined(index);
     let rate;
 
-    if ( Splide.is( FADE ) ) {
-      rate = ( useIndex ? index : Splide.index ) / ( Splide.length - 1 );
+    if (Splide.is(FADE)) {
+      rate = (useIndex ? index : Splide.index) / (Splide.length - 1);
     } else {
-      const isLoop   = Splide.is( LOOP );
-      const position = orient( useIndex ? toPosition( index ) : getPosition() );
-      const min      = orient( getLimit( false ) );
-      const max      = orient( getLimit( true ) );
-      const size     = sliderSize();
-      const curr     = ( position - min ) % size;
-      const base     = isLoop ? size : max - min;
+      const isLoop = Splide.is(LOOP);
+      const position = orient(useIndex ? toPosition(index) : getPosition());
+      const min = orient(getLimit(false));
+      const max = orient(getLimit(true));
+      const size = sliderSize();
+      const curr = (position - min) % size;
+      const base = isLoop ? size : max - min;
 
-      rate = ( curr / base ) || 0;
+      rate = (curr / base) || 0;
 
-      if ( isLoop && rate < 0 ) {
+      if (isLoop && rate < 0) {
         rate += 1;
       }
     }
 
-    return clamp( rate, 0, 1 );
+    return clamp(rate, 0, 1);
   }
 
   /**
@@ -286,11 +286,11 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    *
    * @param index - An index.
    */
-  function offset( index: number ): number {
+  function offset(index: number): number {
     const { focus } = options;
     return focus === 'center'
-      ? ( listSize() - slideSize( index, true ) ) / 2
-      : +focus * slideSize( index ) || 0;
+      ? (listSize() - slideSize(index, true)) / 2
+      : +focus * slideSize(index) || 0;
   }
 
   /**
@@ -300,8 +300,8 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    *
    * @return The border number.
    */
-  function getLimit( max: boolean ): number {
-    return toPosition( max ? Components.Controller.getEnd() : 0 );
+  function getLimit(max: boolean): number {
+    return toPosition(max ? Components.Controller.getEnd() : 0);
   }
 
   /**
@@ -311,10 +311,10 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    *
    * @return `true` if the slider can be shifted for the specified direction, or otherwise `false`.
    */
-  function canShift( backwards: boolean ): boolean {
-    const padding = getPadding( false );
-    const shifted = orient( shift( getPosition(), backwards ) );
-    return backwards ? shifted >= padding : shifted <= listSize( true ) - trackSize() + padding;
+  function canShift(backwards: boolean): boolean {
+    const padding = getPadding(false);
+    const shifted = orient(shift(getPosition(), backwards));
+    return backwards ? shifted >= padding : shifted <= listSize(true) - trackSize() + padding;
   }
 
   /**
@@ -325,9 +325,9 @@ export const Move: ComponentConstructor<MoveComponent> = ( Splide, Components, o
    *
    * @return `true` if the position exceeds the limit, or otherwise `false`.
    */
-  function exceededLimit( max?: boolean | undefined, position = getPosition() ): boolean {
-    const exceededMin = max !== true && orient( position ) < orient( getLimit( false ) );
-    const exceededMax = max !== false && orient( position ) > orient( getLimit( true ) );
+  function exceededLimit(max?: boolean | undefined, position = getPosition()): boolean {
+    const exceededMin = max !== true && orient(position) < orient(getLimit(false));
+    const exceededMax = max !== false && orient(position) > orient(getLimit(true));
     return exceededMin || exceededMax;
   }
 

@@ -24,27 +24,27 @@ $settings = get_settings();
 <button id="remove">Remove</button>
 
 <script>
-  var splide = new Splide( '#splide01', {
-    type   : 'loop',
+  var splide = new Splide('#splide01', {
+    type: 'loop',
     perPage: 3,
-    gap    : '1rem',
-  } );
+    gap: '1rem',
+  });
 
   splide.mount();
 
-  var add    = document.getElementById( 'add' );
-  var remove = document.getElementById( 'remove' );
+  var add = document.getElementById('add');
+  var remove = document.getElementById('remove');
 
-  add.addEventListener( 'click', function() {
-    splide.add( [
+  add.addEventListener('click', function () {
+    splide.add([
       '<li class="splide__slide"><img src="../../assets/images/pics/slide15.jpg"></li>',
       '<li class="splide__slide"><img src="../../assets/images/pics/slide16.jpg"></li>',
-    ] );
-  } );
+    ]);
+  });
 
-  remove.addEventListener( 'click', function() {
-    splide.remove( splide.length - 1 );
-  } );
+  remove.addEventListener('click', function () {
+    splide.remove(splide.length - 1);
+  });
 </script>
 
 </body>

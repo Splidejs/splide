@@ -17,16 +17,16 @@ $settings = get_settings();
   <script type="text/javascript" src="../../../../../dist/js/splide.js"></script>
 
   <script>
-    document.addEventListener( 'DOMContentLoaded', function () {
-      const splide = new Splide( '.splide', {
-        autoWidth : true,
+    document.addEventListener('DOMContentLoaded', function () {
+      const splide = new Splide('.splide', {
+        autoWidth: true,
         pagination: false,
         type: 'loop',
         drag: 'free',
-      } );
+      });
 
       splide.mount();
-    } );
+    });
   </script>
 
   <style>
@@ -37,7 +37,7 @@ $settings = get_settings();
     .splide__list {
       display: grid;
       grid-auto-flow: column;
-      grid-auto-columns: calc( (100% + 2rem) / 3 - 2rem );
+      grid-auto-columns: calc((100% + 2rem) / 3 - 2rem);
       grid-column-gap: 2rem;
     }
 

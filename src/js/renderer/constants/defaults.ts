@@ -7,6 +7,6 @@ import { RendererConfig } from '../types/types';
  * @since 3.0.0
  */
 export const RENDERER_DEFAULT_CONFIG: RendererConfig = {
-  listTag : 'ul',
+  listTag: 'ul',
   slideTag: 'li',
 };

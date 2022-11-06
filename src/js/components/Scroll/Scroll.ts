@@ -19,7 +19,7 @@ import { BASE_VELOCITY, BOUNCE_DIFF_THRESHOLD, BOUNCE_DURATION, FRICTION_FACTOR,
  * @since 3.0.0
  */
 export interface ScrollComponent extends BaseComponent {
-  scroll( position: number, duration?: number, snap?: boolean, callback?: AnyFunction ): void;
+  scroll(position: number, duration?: number, snap?: boolean, callback?: AnyFunction): void;
   cancel(): void;
 }
 
@@ -35,12 +35,12 @@ export interface ScrollComponent extends BaseComponent {
  *
  * @return A Scroll component object.
  */
-export const Scroll: ComponentConstructor<ScrollComponent> = ( Splide, Components, options, event ) => {
+export const Scroll: ComponentConstructor<ScrollComponent> = (Splide, Components, options, event) => {
   const { on, emit } = event;
   const { state: { set } } = Splide;
   const { Move } = Components;
   const { getPosition, getLimit, exceededLimit, translate } = Move;
-  const isSlide = Splide.is( SLIDE );
+  const isSlide = Splide.is(SLIDE);
 
   /**
    * Retains the active RequestInterval object.
@@ -61,8 +61,8 @@ export const Scroll: ComponentConstructor<ScrollComponent> = ( Splide, Component
    * Called when the component is mounted.
    */
   function mount(): void {
-    on( EVENT_MOVE, clear );
-    on( [ EVENT_UPDATED, EVENT_REFRESH ], cancel );
+    on(EVENT_MOVE, clear);
+    on([EVENT_UPDATED, EVENT_REFRESH], cancel);
   }
 
   /**
@@ -79,21 +79,21 @@ export const Scroll: ComponentConstructor<ScrollComponent> = ( Splide, Component
     duration?: number,
     snap?: boolean,
     onScrolled?: AnyFunction,
-    noConstrain?: boolean
+    noConstrain?: boolean,
   ): void {
     clear();
 
-    const dest        = computeDestination( destination, snap );
-    const from        = getPosition();
-    const immediately = approximatelyEqual( from, dest, 1 ) || duration === 0;
+    const dest = computeDestination(destination, snap);
+    const from = getPosition();
+    const immediately = approximatelyEqual(from, dest, 1) || duration === 0;
 
     friction = 1;
-    duration = immediately ? 0 : duration || max( abs( dest - from ) / BASE_VELOCITY, MIN_DURATION );
+    duration = immediately ? 0 : duration || max(abs(dest - from) / BASE_VELOCITY, MIN_DURATION);
     callback = onScrolled;
-    interval = RequestInterval( duration, onEnd, apply( update, from, dest, noConstrain ), 1 );
+    interval = RequestInterval(duration, onEnd, apply(update, from, dest, noConstrain), 1);
 
-    set( SCROLLING );
-    emit( EVENT_SCROLL );
+    set(SCROLLING);
+    emit(EVENT_SCROLL);
     interval.start();
   }
 
@@ -105,11 +105,11 @@ export const Scroll: ComponentConstructor<ScrollComponent> = ( Splide, Component
    *
    * @return A computed destination.
    */
-  function computeDestination( destination: number, snap?: boolean ): number {
-    if ( snap ) {
-      if ( ! isSlide || ! exceededLimit() ) {
+  function computeDestination(destination: number, snap?: boolean): number {
+    if (snap) {
+      if (!isSlide || !exceededLimit()) {
         const position = destination % Components.Layout.sliderSize();
-        const snapped  = Move.toPosition( Components.Controller.toDest( position ) );
+        const snapped = Move.toPosition(Components.Controller.toDest(position));
         destination -= position - snapped;
       }
     }
@@ -121,9 +121,9 @@ export const Scroll: ComponentConstructor<ScrollComponent> = ( Splide, Component
    * Called when scroll ends or has been just canceled.
    */
   function onEnd(): void {
-    set( IDLE );
+    set(IDLE);
     callback && callback();
-    emit( EVENT_SCROLLED );
+    emit(EVENT_SCROLLED);
   }
 
   /**
@@ -134,20 +134,20 @@ export const Scroll: ComponentConstructor<ScrollComponent> = ( Splide, Component
    * @param noConstrain - Whether to suppress constraint process when the slider exceeds bounds.
    * @param rate        - A current rate.
    */
-  function update( from: number, to: number, noConstrain: boolean | undefined, rate: number ): void {
-    const { easingFunc = t => 1 - Math.pow( 1 - t, 4 ) } = options;
+  function update(from: number, to: number, noConstrain: boolean | undefined, rate: number): void {
+    const { easingFunc = t => 1 - Math.pow(1 - t, 4) } = options;
     const position = getPosition();
-    const target   = from + ( to - from ) * easingFunc( rate );
-    const diff     = ( target - position ) * friction;
+    const target = from + (to - from) * easingFunc(rate);
+    const diff = (target - position) * friction;
 
-    translate( position + diff );
-    emit( EVENT_SCROLLING );
+    translate(position + diff);
+    emit(EVENT_SCROLLING);
 
-    if ( isSlide && ! noConstrain && exceededLimit() ) {
+    if (isSlide && !noConstrain && exceededLimit()) {
       friction *= FRICTION_FACTOR;
 
-      if ( abs( diff ) < BOUNCE_DIFF_THRESHOLD ) {
-        scroll( getLimit( exceededLimit( true ) ), BOUNCE_DURATION, false, callback, true );
+      if (abs(diff) < BOUNCE_DIFF_THRESHOLD) {
+        scroll(getLimit(exceededLimit(true)), BOUNCE_DURATION, false, callback, true);
       }
     }
   }
@@ -156,7 +156,7 @@ export const Scroll: ComponentConstructor<ScrollComponent> = ( Splide, Component
    * Clears the active interval.
    */
   function clear(): void {
-    if ( interval ) {
+    if (interval) {
       interval.cancel();
     }
   }
@@ -165,7 +165,7 @@ export const Scroll: ComponentConstructor<ScrollComponent> = ( Splide, Component
    * Cancels the active interval and emits the `scrolled` event.
    */
   function cancel(): void {
-    if ( interval && ! interval.isPaused() ) {
+    if (interval && !interval.isPaused()) {
       clear();
       onEnd();
     }

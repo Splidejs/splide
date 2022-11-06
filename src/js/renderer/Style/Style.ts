@@ -3,8 +3,8 @@ import { forOwn } from '@splidejs/utils';
 
 
 interface Styles {
-  [ breakpoint: string ]: {
-    [ selector: string ]: Record<string, string | number>
+  [breakpoint: string]: {
+    [selector: string]: Record<string, string | number>
   };
 }
 
@@ -35,8 +35,8 @@ export class Style {
    * @param id      - A slider ID.
    * @param options - Options.
    */
-  constructor( id: string, options: Options ) {
-    this.id      = id;
+  constructor(id: string, options: Options) {
+    this.id = id;
     this.options = options;
   }
 
@@ -48,11 +48,11 @@ export class Style {
    * @param value
    * @param breakpoint
    */
-  rule( selector: string, prop: string, value: string | number, breakpoint?: string ): void {
+  rule(selector: string, prop: string, value: string | number, breakpoint?: string): void {
     breakpoint = breakpoint || 'default';
-    const selectors = ( this.styles[ breakpoint ] = this.styles[ breakpoint ] || {} );
-    const styles    = ( selectors[ selector ] = selectors[ selector ] || {} );
-    styles[ prop ] = value;
+    const selectors = (this.styles[breakpoint] = this.styles[breakpoint] || {});
+    const styles = (selectors[selector] = selectors[selector] || {});
+    styles[prop] = value;
   }
 
   /**
@@ -63,19 +63,19 @@ export class Style {
   build(): string {
     let css = '';
 
-    if ( this.styles.default ) {
-      css += this.buildSelectors( this.styles.default );
+    if (this.styles.default) {
+      css += this.buildSelectors(this.styles.default);
     }
 
-    Object.keys( this.styles )
-      .sort( ( n, m ) => this.options.mediaQuery === 'min' ? +n - +m : +m - +n )
-      .forEach( breakpoint => {
-        if ( breakpoint !== 'default' ) {
+    Object.keys(this.styles)
+      .sort((n, m) => this.options.mediaQuery === 'min' ? +n - +m : +m - +n)
+      .forEach(breakpoint => {
+        if (breakpoint !== 'default') {
           css += `@media screen and (max-width: ${ breakpoint }px) {`;
-          css += this.buildSelectors( this.styles[ breakpoint ] );
+          css += this.buildSelectors(this.styles[breakpoint]);
           css += `}`;
         }
-      } );
+      });
 
     return css;
   }
@@ -87,20 +87,20 @@ export class Style {
    *
    * @return Built styles.
    */
-  private buildSelectors( selectors: Record<string, Record<string, string | number>> ): string {
+  private buildSelectors(selectors: Record<string, Record<string, string | number>>): string {
     let css = '';
 
-    forOwn( selectors, ( styles, selector ) => {
+    forOwn(selectors, (styles, selector) => {
       css += `${ `#${ this.id } ${ selector }`.trim() } {`;
 
-      forOwn( styles, ( value, prop ) => {
-        if ( value || value === 0 ) {
+      forOwn(styles, (value, prop) => {
+        if (value || value === 0) {
           css += `${ prop }: ${ value };`;
         }
-      } );
+      });
 
       css += '}';
-    } );
+    });
 
     return css;
   }

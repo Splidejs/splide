@@ -29,7 +29,7 @@ export interface SyncComponent extends BaseComponent {
  *
  * @since 3.0.0
  */
-const TRIGGER_KEYS = [ ' ', 'Enter' ];
+const TRIGGER_KEYS = [' ', 'Enter'];
 
 /**
  * The component for syncing multiple sliders.
@@ -43,7 +43,7 @@ const TRIGGER_KEYS = [ ' ', 'Enter' ];
  *
  * @return A Sync component object.
  */
-export const Sync: ComponentConstructor<SyncComponent> = ( Splide, Components, options, event ) => {
+export const Sync: ComponentConstructor<SyncComponent> = (Splide, Components, options, event) => {
   const { isNavigation, slideFocus } = options;
 
   /**
@@ -55,14 +55,14 @@ export const Sync: ComponentConstructor<SyncComponent> = ( Splide, Components, o
    * Called when the component is mounted.
    */
   function mount(): void {
-    Splide.splides.forEach( target => {
-      if ( ! target.isParent ) {
-        sync( Splide, target.splide );
-        sync( target.splide, Splide );
+    Splide.splides.forEach(target => {
+      if (!target.isParent) {
+        sync(Splide, target.splide);
+        sync(target.splide, Splide);
       }
-    } );
+    });
 
-    if ( isNavigation ) {
+    if (isNavigation) {
       navigate();
     }
   }
@@ -71,8 +71,8 @@ export const Sync: ComponentConstructor<SyncComponent> = ( Splide, Components, o
    * Destroys the component.
    */
   function destroy(): void {
-    events.forEach( event => { event.destroy() } );
-    empty( events );
+    events.forEach(event => event.destroy());
+    empty(events);
   }
 
   /**
@@ -91,14 +91,14 @@ export const Sync: ComponentConstructor<SyncComponent> = ( Splide, Components, o
    * @param splide - A splide instance to sync with.
    * @param target - A target splide instance.
    */
-  function sync( splide: Splide, target: Splide ): void {
+  function sync(splide: Splide, target: Splide): void {
     const event = splide.event.lock();
 
-    event.on( EVENT_MOVE, ( index, prev, dest ) => {
-      target.index !== index && target.go( target.is( LOOP ) ? dest : index );
-    } );
+    event.on(EVENT_MOVE, (index, prev, dest) => {
+      target.index !== index && target.go(target.is(LOOP) ? dest : index);
+    });
 
-    events.push( event );
+    events.push(event);
   }
 
   /**
@@ -109,12 +109,12 @@ export const Sync: ComponentConstructor<SyncComponent> = ( Splide, Components, o
     const ev = event.lock();
     const { on } = ev;
 
-    on( EVENT_CLICK, onClick );
-    on( EVENT_SLIDE_KEYDOWN, onKeydown );
-    on( [ EVENT_MOUNTED, EVENT_UPDATED ], update );
+    on(EVENT_CLICK, onClick);
+    on(EVENT_SLIDE_KEYDOWN, onKeydown);
+    on([EVENT_MOUNTED, EVENT_UPDATED], update);
 
-    events.push( ev );
-    ev.emit( EVENT_NAVIGATION_MOUNTED, Splide.splides );
+    events.push(ev);
+    ev.emit(EVENT_NAVIGATION_MOUNTED, Splide.splides);
   }
 
   /**
@@ -124,7 +124,7 @@ export const Sync: ComponentConstructor<SyncComponent> = ( Splide, Components, o
     setAttribute(
       Components.Elements.list,
       ARIA_ORIENTATION,
-      options.direction === TTB ? 'vertical' : ''
+      options.direction === TTB ? 'vertical' : '',
     );
   }
 
@@ -133,8 +133,8 @@ export const Sync: ComponentConstructor<SyncComponent> = ( Splide, Components, o
    *
    * @param Slide - A clicked Slide component.
    */
-  function onClick( Slide: SlideComponent ): void {
-    Splide.go( Slide.index );
+  function onClick(Slide: SlideComponent): void {
+    Splide.go(Slide.index);
   }
 
   /**
@@ -143,18 +143,18 @@ export const Sync: ComponentConstructor<SyncComponent> = ( Splide, Components, o
    * @param Slide - A Slide component.
    * @param e     - A KeyboardEvent object.
    */
-  function onKeydown( Slide: SlideComponent, e: KeyboardEvent ): void {
-    if ( includes( TRIGGER_KEYS, e.key ) ) {
-      onClick( Slide );
-      prevent( e );
+  function onKeydown(Slide: SlideComponent, e: KeyboardEvent): void {
+    if (includes(TRIGGER_KEYS, e.key)) {
+      onClick(Slide);
+      prevent(e);
     }
   }
 
   return {
     setup: apply(
       Components.Breakpoints.set,
-      { slideFocus: isUndefined( slideFocus ) ? isNavigation : slideFocus },
-      true
+      { slideFocus: isUndefined(slideFocus) ? isNavigation : slideFocus },
+      true,
     ),
     mount,
     destroy,

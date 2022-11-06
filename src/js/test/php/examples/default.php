@@ -16,13 +16,13 @@ $settings = get_settings();
   <link rel="stylesheet" href="../../assets/css/styles.css">
   <script type="text/javascript" src="../../../../../dist/js/splide.js"></script>
 
-<!--	https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/js/splide.min.js-->
+  <!--	https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/js/splide.min.js-->
 
   <script>
-    document.addEventListener( 'DOMContentLoaded', function () {
-      var splide = new Splide( '#splide01', {
+    document.addEventListener('DOMContentLoaded', function () {
+      var splide = new Splide('#splide01', {
         width: 800,
-        type        : 'loop',
+        type: 'loop',
         perPage: 2,
         releaseTouch: true,
         // perMove: 3,
@@ -60,59 +60,59 @@ $settings = get_settings();
           arrows: 'splide__arrows custom-arrows',
           pagination: 'splide__pagination custom-pagination',
         },
-      } );
+      });
 
       // splide.on( 'destroy', function () {
       //     console.log( 'destroy' );
       // } );
-	    //
+      //
       // splide.on( 'moved', function ( index, prev, dest ) {
       //   console.log( 'moved', index, prev, dest );
       // } );
-	    //
+      //
       // splide.on( 'visible', Slide => {
       //   console.log( 'visible', Slide );
       // } );
-	    //
+      //
       // splide.on( 'hidden', Slide => {
       //   console.log( 'hidden', Slide );
       // } );
-	    //
+      //
       // splide.on( 'click', function () {
       //   console.log( 'click' );
       // } );
-	    //
+      //
       // splide.on( 'shifted', function () {
       //   console.log( 'shifted' );
       // } );
-	    //
-	    // splide.on( 'drag', function () {
-		  //   console.log( 'drag' );
-	    // } );
-	    //
-	    // splide.on( 'dragged', function () {
-		  //   console.log( 'dragged' );
-	    // } );
+      //
+      // splide.on( 'drag', function () {
+      //   console.log( 'drag' );
+      // } );
+      //
+      // splide.on( 'dragged', function () {
+      //   console.log( 'dragged' );
+      // } );
 
       splide.mount();
 
-	    const pre = document.querySelector( 'pre' );
+      const pre = document.querySelector('pre');
 
 
-      document.querySelector( '#jump' ).addEventListener( 'click', () => {
-        splide.Components.Controller.go( '<<' );
-      } );
+      document.querySelector('#jump').addEventListener('click', () => {
+        splide.Components.Controller.go('<<');
+      });
 
-	    // Array.from( document.getElementsByTagName( 'button' ) ).forEach( button => {
-			// 	button.addEventListener( 'click', function () {
-			// 		alert( 'click' );
-			// 	} );
-			// } );
+      // Array.from( document.getElementsByTagName( 'button' ) ).forEach( button => {
+      // 	button.addEventListener( 'click', function () {
+      // 		alert( 'click' );
+      // 	} );
+      // } );
 
-			// console.log = ( ...args ) => {
-			// 	pre.textContent = args.join( ' ' ) + '\n' + pre.textContent;
-			// };
-    } );
+      // console.log = ( ...args ) => {
+      // 	pre.textContent = args.join( ' ' ) + '\n' + pre.textContent;
+      // };
+    });
   </script>
 
   <style>
@@ -123,7 +123,7 @@ $settings = get_settings();
 </head>
 <body>
 
-<?php render( 'splide01', 10 ); ?>
+<?php render('splide01', 10); ?>
 
 <button id="jump">
   jump

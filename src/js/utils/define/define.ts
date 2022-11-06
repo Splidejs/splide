@@ -12,13 +12,13 @@ import { forOwn } from '@splidejs/utils';
  */
 export function define<T, G extends Record<PropertyKey, () => unknown>>(
   object: T,
-  getters: G
+  getters: G,
 ): T & Readonly<{
-  [ K in keyof G ]: ReturnType<G[ K ]>
+  [K in keyof G]: ReturnType<G[ K ]>
 }> {
-  forOwn( getters, ( get, key ) => {
-    Object.defineProperty( object, key, { get, enumerable: true } );
-  } );
+  forOwn(getters, (get, key) => {
+    Object.defineProperty(object, key, { get, enumerable: true });
+  });
 
   return object as any;
 }

@@ -77,34 +77,10 @@ function slice(arrayLike, start, end) {
 function includes(arrayLike, value) {
   return arrayProto.includes.call(arrayLike, value);
 }
-function toggleClass(elm, classes, force) {
-  if (elm) {
-    forEach(isString(classes) ? classes.split(" ") : classes, (className) => {
-      className && elm.classList.toggle(className, force);
-    });
+function assert$1(assertion, message) {
+  if (!assertion) {
+    throw new Error(message);
   }
-}
-function addClass(elm, classes) {
-  toggleClass(elm, classes, true);
-}
-function append(parent, ...children2) {
-  parent && parent.append(...children2);
-}
-function before(ref, ...nodes) {
-  ref && ref.before(...nodes);
-}
-function matches(elm, selector) {
-  return isHTMLElement(elm) && elm.matches(selector);
-}
-function children(parent, selector) {
-  const children2 = parent ? slice(parent.children) : [];
-  return selector ? children2.filter((child2) => matches(child2, selector)) : children2;
-}
-function child(parent, selector) {
-  return selector ? children(parent, selector)[0] : parent.firstElementChild;
-}
-function closest(from, selector) {
-  return from.closest(selector);
 }
 const assign = Object.assign;
 const ownKeys = Object.keys;
@@ -134,6 +110,35 @@ function omit(object, keys) {
     delete object[key];
   });
   return object;
+}
+function toggleClass(elm, classes, force) {
+  if (elm) {
+    forEach(isString(classes) ? classes.split(" ") : classes, (className) => {
+      className && elm.classList.toggle(className, force);
+    });
+  }
+}
+function addClass(elm, classes) {
+  toggleClass(elm, classes, true);
+}
+function append(parent, ...children2) {
+  parent && parent.append(...children2);
+}
+function before(ref, ...nodes) {
+  ref && ref.before(...nodes);
+}
+function matches(elm, selector) {
+  return isHTMLElement(elm) && elm.matches(selector);
+}
+function children(parent, selector) {
+  const children2 = parent ? slice(parent.children) : [];
+  return selector ? children2.filter((child2) => matches(child2, selector)) : children2;
+}
+function child(parent, selector) {
+  return selector ? children(parent, selector)[0] : parent.firstElementChild;
+}
+function closest(from, selector) {
+  return from.closest(selector);
 }
 function removeAttribute(elms, attrs) {
   forEach(elms, (elm) => {
@@ -247,11 +252,6 @@ function forEachEvent(events, iteratee) {
   forEach(events, (event) => {
     isString(event) && event.split(" ").forEach(iteratee);
   });
-}
-function assert$1(assertion) {
-  if (!assertion) {
-    throw new Error();
-  }
 }
 function EventBinder(removersRef) {
   const removers = removersRef || /* @__PURE__ */ new Set();
@@ -879,20 +879,14 @@ const Slides = (Splide, Components, options, event) => {
     on(EVENT_REFRESH, init);
   }
   function init() {
-    slides.forEach((slide, index) => {
-      register(slide, index, -1);
-    });
+    slides.forEach((slide, index) => register(slide, index, -1));
   }
   function destroy() {
-    forEach$1((Slide2) => {
-      Slide2.destroy();
-    });
+    forEach$1((Slide2) => Slide2.destroy());
     empty(Slides2);
   }
   function update() {
-    forEach$1((Slide2) => {
-      Slide2.update();
-    });
+    forEach$1((Slide2) => Slide2.update());
   }
   function register(slide, index, slideIndex) {
     const object = Slide$1(Splide, index, slideIndex, slide);
@@ -939,9 +933,7 @@ const Slides = (Splide, Components, options, event) => {
     );
   }
   function style(prop, value, useContainer) {
-    forEach$1((Slide2) => {
-      Slide2.style(prop, value, useContainer);
-    });
+    forEach$1((Slide2) => Slide2.style(prop, value, useContainer));
   }
   function observeImages(elm, callback) {
     const images = queryAll(elm, "img");
@@ -1608,8 +1600,8 @@ const INTERVAL_DATA_ATTRIBUTE = `${DATA_ATTRIBUTE}-interval`;
 
 const Autoplay = (Splide, Components, options, event) => {
   const { on, bind, emit } = event;
-  const { interval: duration = 5e3, pauseOnHover = true, pauseOnFocus = true, resetProgress = true } = options;
-  const interval = RequestInterval(duration, Splide.go.bind(Splide, ">"), onAnimationFrame);
+  const { interval: duration, pauseOnHover = true, pauseOnFocus = true, resetProgress = true } = options;
+  const interval = RequestInterval(duration, () => Splide.go(">"), onAnimationFrame);
   const { isPaused } = interval;
   const { Elements, Elements: { root, toggle } } = Components;
   const { autoplay } = options;
@@ -2113,9 +2105,7 @@ const Pagination = (Splide, Components, options, event) => {
       const button = create("button", { class: classes.page, type: "button" }, li);
       const controls = Slides.getIn(i).map((Slide) => Slide.slide.id);
       const text = !hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
-      bind(button, "click", () => {
-        go(`>${i}`);
-      });
+      bind(button, "click", () => go(`>${i}`));
       paginationKeyboard && bind(button, "keydown", apply(onKeydown, i));
       setAttribute(li, ROLE, "presentation");
       setAttribute(button, ROLE, "tab");
@@ -2194,9 +2184,7 @@ const Sync = (Splide2, Components, options, event) => {
     }
   }
   function destroy() {
-    events.forEach((event2) => {
-      event2.destroy();
-    });
+    events.forEach((event2) => event2.destroy());
     empty(events);
   }
   function remount() {
@@ -2372,6 +2360,7 @@ const DEFAULTS = {
   easing: "cubic-bezier(0.25, 1, 0.5, 1)",
   drag: true,
   direction: "ltr",
+  interval: 5e3,
   trimSpace: true,
   focusableNodes: "a, button, textarea, input, select, iframe",
   classes: CLASSES,
@@ -2459,6 +2448,7 @@ const Slide = (Splide, Components, options, event) => {
 class Splide {
   static defaults = {};
   static STATES = STATES;
+  static Extensions;
   root;
   event = EventInterface();
   Components = {};

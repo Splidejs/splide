@@ -14,7 +14,7 @@ import { FRICTION, LOG_INTERVAL, POINTER_DOWN_EVENTS, POINTER_MOVE_EVENTS, POINT
  * @since 3.0.0
  */
 export interface DragComponent extends BaseComponent {
-  disable( disabled: boolean ): void;
+  disable(disabled: boolean): void;
   isDragging(): boolean;
 }
 
@@ -30,7 +30,7 @@ export interface DragComponent extends BaseComponent {
  *
  * @return A Drag component object.
  */
-export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, options, event ) => {
+export const Drag: ComponentConstructor<DragComponent> = (Splide, Components, options, event) => {
   const { on, emit, bind } = event;
   const binder = event.lock();
   const { state } = Splide;
@@ -93,12 +93,12 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
    * Called when the component is mounted.
    */
   function mount(): void {
-    bind( track, POINTER_MOVE_EVENTS, noop, SCROLL_LISTENER_OPTIONS );
-    bind( track, POINTER_UP_EVENTS, noop, SCROLL_LISTENER_OPTIONS );
-    bind( track, POINTER_DOWN_EVENTS, onPointerDown, SCROLL_LISTENER_OPTIONS );
-    bind( track, 'click', onClick, { capture: true } );
-    bind( track, 'dragstart', prevent );
-    on( [ EVENT_MOUNTED, EVENT_UPDATED ], init );
+    bind(track, POINTER_MOVE_EVENTS, noop, SCROLL_LISTENER_OPTIONS);
+    bind(track, POINTER_UP_EVENTS, noop, SCROLL_LISTENER_OPTIONS);
+    bind(track, POINTER_DOWN_EVENTS, onPointerDown, SCROLL_LISTENER_OPTIONS);
+    bind(track, 'click', onClick, { capture: true });
+    bind(track, 'dragstart', prevent);
+    on([EVENT_MOUNTED, EVENT_UPDATED], init);
   }
 
   /**
@@ -106,7 +106,7 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
    */
   function init(): void {
     const { drag } = options;
-    disable( ! drag );
+    disable(!drag);
     isFree = drag === 'free';
   }
 
@@ -118,26 +118,26 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
    *
    * @param e - A TouchEvent or MouseEvent object
    */
-  function onPointerDown( e: TouchEvent | MouseEvent ): void {
+  function onPointerDown(e: TouchEvent | MouseEvent): void {
     clickPrevented = false;
 
-    if ( ! disabled ) {
-      const isTouch = isTouchEvent( e );
+    if (!disabled) {
+      const isTouch = isTouchEvent(e);
 
-      if ( isDraggable( e.target ) && ( isTouch || ! e.button ) ) {
-        if ( ! Controller.isBusy() ) {
-          target        = isTouch ? track : window;
-          dragging      = state.is( [ MOVING, SCROLLING ] );
+      if (isDraggable(e.target) && (isTouch || !e.button)) {
+        if (!Controller.isBusy()) {
+          target = isTouch ? track : window;
+          dragging = state.is([MOVING, SCROLLING]);
           prevBaseEvent = null;
-          startCoord    = coordOf( e );
+          startCoord = coordOf(e);
 
-          binder.bind( target, POINTER_MOVE_EVENTS, onPointerMove, SCROLL_LISTENER_OPTIONS );
-          binder.bind( target, POINTER_UP_EVENTS, onPointerUp, SCROLL_LISTENER_OPTIONS );
+          binder.bind(target, POINTER_MOVE_EVENTS, onPointerMove, SCROLL_LISTENER_OPTIONS);
+          binder.bind(target, POINTER_UP_EVENTS, onPointerUp, SCROLL_LISTENER_OPTIONS);
           Move.cancel();
           Scroll.cancel();
-          save( e );
+          save(e);
         } else {
-          prevent( e, true );
+          prevent(e, true);
         }
       }
     }
@@ -148,33 +148,33 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
    *
    * @param e - A TouchEvent or MouseEvent object
    */
-  function onPointerMove( e: TouchEvent | MouseEvent ): void {
-    if ( ! state.is( DRAGGING ) ) {
-      state.set( DRAGGING );
-      emit( EVENT_DRAG );
+  function onPointerMove(e: TouchEvent | MouseEvent): void {
+    if (!state.is(DRAGGING)) {
+      state.set(DRAGGING);
+      emit(EVENT_DRAG);
     }
 
-    if ( shouldRelease( e ) ) {
-      return onPointerUp( e );
+    if (shouldRelease(e)) {
+      return onPointerUp(e);
     }
 
-    if ( e.cancelable ) {
-      if ( dragging ) {
-        Move.translate( basePosition + constrain( diffCoord( e ) ) );
+    if (e.cancelable) {
+      if (dragging) {
+        Move.translate(basePosition + constrain(diffCoord(e)));
 
-        const expired     = diffTime( e ) > LOG_INTERVAL;
-        const hasExceeded = exceeded !== ( exceeded = exceededLimit() );
+        const expired = diffTime(e) > LOG_INTERVAL;
+        const hasExceeded = exceeded !== (exceeded = exceededLimit());
 
-        if ( expired || hasExceeded ) {
-          save( e );
+        if (expired || hasExceeded) {
+          save(e);
         }
 
         clickPrevented = true;
-        emit( EVENT_DRAGGING );
-        prevent( e );
-      } else if ( isSliderDirection( e ) ) {
-        dragging = shouldStart( e );
-        prevent( e );
+        emit(EVENT_DRAGGING);
+        prevent(e);
+      } else if (isSliderDirection(e)) {
+        dragging = shouldStart(e);
+        prevent(e);
       }
     }
   }
@@ -187,15 +187,15 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
    *
    * @param e - A TouchEvent or MouseEvent object
    */
-  function onPointerUp( e: TouchEvent | MouseEvent ): void {
-    if ( state.is( DRAGGING ) ) {
-      state.set( IDLE );
-      emit( EVENT_DRAGGED );
+  function onPointerUp(e: TouchEvent | MouseEvent): void {
+    if (state.is(DRAGGING)) {
+      state.set(IDLE);
+      emit(EVENT_DRAGGED);
     }
 
-    if ( dragging ) {
-      move( e );
-      prevent( e );
+    if (dragging) {
+      move(e);
+      prevent(e);
     }
 
     binder.destroy();
@@ -209,9 +209,9 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
    *
    * @param e - A MouseEvent object.
    */
-  function onClick( e: MouseEvent ): void {
-    if ( ! disabled && clickPrevented ) {
-      prevent( e, true );
+  function onClick(e: MouseEvent): void {
+    if (!disabled && clickPrevented) {
+      prevent(e, true);
     }
   }
 
@@ -220,10 +220,10 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
    *
    * @param e - A TouchEvent or MouseEvent object.
    */
-  function save( e: TouchEvent | MouseEvent ): void {
+  function save(e: TouchEvent | MouseEvent): void {
     prevBaseEvent = baseEvent;
-    baseEvent     = e;
-    basePosition  = getPosition();
+    baseEvent = e;
+    basePosition = getPosition();
   }
 
   /**
@@ -233,28 +233,28 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
    *
    * @param e - A TouchEvent or MouseEvent object.
    */
-  function move( e: TouchEvent | MouseEvent ): void {
+  function move(e: TouchEvent | MouseEvent): void {
     const { go } = Controller;
     const { updateOnDragged = true } = options;
-    const velocity    = computeVelocity( e );
-    const destination = computeDestination( velocity );
-    const forwards    = orient( coordOf( e ) - startCoord ) > 0;
-    const rewind      = options.rewind && options.rewindByDrag;
-    const scroll      = updateOnDragged ? Controller.scroll : Scroll.scroll;
+    const velocity = computeVelocity(e);
+    const destination = computeDestination(velocity);
+    const forwards = orient(coordOf(e) - startCoord) > 0;
+    const rewind = options.rewind && options.rewindByDrag;
+    const scroll = updateOnDragged ? Controller.scroll : Scroll.scroll;
 
-    reduce( false );
+    reduce(false);
 
-    if ( isFree ) {
-      scroll( destination, undefined, options.snap );
-    } else if ( Splide.is( FADE ) ) {
-      go( forwards ? ( rewind ? '>' : '+' ) : ( rewind ? '<' : '-' ) );
-    } else if ( Splide.is( SLIDE ) && exceeded && rewind ) {
-      go( exceededLimit( true ) ? '>' : '<' ); // todo
+    if (isFree) {
+      scroll(destination, undefined, options.snap);
+    } else if (Splide.is(FADE)) {
+      go(forwards ? (rewind ? '>' : '+') : (rewind ? '<' : '-'));
+    } else if (Splide.is(SLIDE) && exceeded && rewind) {
+      go(exceededLimit(true) ? '>' : '<'); // todo
     } else {
-      go( `${ forwards ? '>>' : '<<' }${ Controller.toDest( destination ) }` );
+      go(`${ forwards ? '>>' : '<<' }${ Controller.toDest(destination) }`);
     }
 
-    reduce( true );
+    reduce(true);
   }
 
   /**
@@ -262,12 +262,12 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
    *
    * @param e - A TouchEvent or MouseEvent object.
    */
-  function shouldRelease( e: TouchEvent | MouseEvent ): boolean {
-    if ( options.releaseTouch && Splide.is( SLIDE ) && isTouchEvent( e ) ) {
+  function shouldRelease(e: TouchEvent | MouseEvent): boolean {
+    if (options.releaseTouch && Splide.is(SLIDE) && isTouchEvent(e)) {
       const { index } = Splide;
-      const diff = diffCoord( e );
+      const diff = diffCoord(e);
 
-      if ( exceededLimit() || index === 0 && diff > 0 || index === Splide.length - 1 && diff < 0 ) {
+      if (exceededLimit() || index === 0 && diff > 0 || index === Splide.length - 1 && diff < 0) {
         return true;
       }
     }
@@ -282,12 +282,12 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
    *
    * @return `true` if the distance exceeds the threshold, or `false` if not.
    */
-  function shouldStart( e: TouchEvent | MouseEvent ): boolean {
+  function shouldStart(e: TouchEvent | MouseEvent): boolean {
     const { dragMinThreshold: thresholds } = options;
-    const isObj = isObject( thresholds );
+    const isObj = isObject(thresholds);
     const mouse = isObj && thresholds.mouse || 0;
-    const touch = ( isObj ? thresholds.touch : +thresholds ) || 10;
-    return abs( diffCoord( e ) ) > ( isTouchEvent( e ) ? touch : mouse );
+    const touch = (isObj ? thresholds.touch : +thresholds) || 10;
+    return abs(diffCoord(e)) > (isTouchEvent(e) ? touch : mouse);
   }
 
   /**
@@ -297,8 +297,8 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
    *
    * @param e - A TouchEvent or MouseEvent object
    */
-  function isSliderDirection( e: TouchEvent | MouseEvent ): boolean {
-    return abs( diffCoord( e ) ) > abs( diffCoord( e, true ) );
+  function isSliderDirection(e: TouchEvent | MouseEvent): boolean {
+    return abs(diffCoord(e)) > abs(diffCoord(e, true));
   }
 
   /**
@@ -308,12 +308,12 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
    *
    * @return The drag velocity.
    */
-  function computeVelocity( e: TouchEvent | MouseEvent ): number {
-    if ( Splide.is( LOOP ) || ! exceeded ) {
-      const time = diffTime( e );
+  function computeVelocity(e: TouchEvent | MouseEvent): number {
+    if (Splide.is(LOOP) || !exceeded) {
+      const time = diffTime(e);
 
-      if ( time && time < LOG_INTERVAL ) {
-        return diffCoord( e ) / time;
+      if (time && time < LOG_INTERVAL) {
+        return diffCoord(e) / time;
       }
     }
 
@@ -327,10 +327,10 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
    *
    * @return The destination.
    */
-  function computeDestination( velocity: number ): number {
-    return getPosition() + sign( velocity ) * min(
-      abs( velocity ) * ( options.flickPower || 600 ),
-      isFree ? Infinity : Components.Layout.listSize() * ( options.flickMaxPages || 1 )
+  function computeDestination(velocity: number): number {
+    return getPosition() + sign(velocity) * min(
+      abs(velocity) * (options.flickPower || 600),
+      isFree ? Infinity : Components.Layout.listSize() * (options.flickMaxPages || 1),
     );
   }
 
@@ -342,8 +342,8 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
    *
    * @return The difference of the coord.
    */
-  function diffCoord( e: TouchEvent | MouseEvent, orthogonal?: boolean ): number {
-    return coordOf( e, orthogonal ) - coordOf( getBaseEvent( e ), orthogonal );
+  function diffCoord(e: TouchEvent | MouseEvent, orthogonal?: boolean): number {
+    return coordOf(e, orthogonal) - coordOf(getBaseEvent(e), orthogonal);
   }
 
   /**
@@ -353,8 +353,8 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
    *
    * @return The elapsed time in milliseconds.
    */
-  function diffTime( e: TouchEvent | MouseEvent ): number {
-    return timeOf( e ) - timeOf( getBaseEvent( e ) );
+  function diffTime(e: TouchEvent | MouseEvent): number {
+    return timeOf(e) - timeOf(getBaseEvent(e));
   }
 
   /**
@@ -365,7 +365,7 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
    *
    * @return A base event.
    */
-  function getBaseEvent( e: TouchEvent | MouseEvent ): TouchEvent | MouseEvent {
+  function getBaseEvent(e: TouchEvent | MouseEvent): TouchEvent | MouseEvent {
     return baseEvent === e && prevBaseEvent || baseEvent;
   }
 
@@ -378,8 +378,8 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
    *
    * @return A pageX or pageY coordinate.
    */
-  function coordOf( e: TouchEvent | MouseEvent, orthogonal?: boolean ): number {
-    return ( isTouchEvent( e ) ? e.changedTouches[ 0 ] : e )[ `page${ resolve( orthogonal ? 'Y' : 'X' ) }` ];
+  function coordOf(e: TouchEvent | MouseEvent, orthogonal?: boolean): number {
+    return (isTouchEvent(e) ? e.changedTouches[0] : e)[`page${ resolve(orthogonal ? 'Y' : 'X') }`];
   }
 
   /**
@@ -390,8 +390,8 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
    *
    * @return The constrained diff.
    */
-  function constrain( diff: number ): number {
-    return diff / ( exceeded && Splide.is( SLIDE ) ? FRICTION : 1 );
+  function constrain(diff: number): number {
+    return diff / (exceeded && Splide.is(SLIDE) ? FRICTION : 1);
   }
 
   /**
@@ -401,11 +401,11 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
    *
    * @return `true` if the target is draggable.
    */
-  function isDraggable( target: EventTarget ): boolean {
+  function isDraggable(target: EventTarget): boolean {
     const { noDrag } = options;
 
-    return ! matches( target, `.${ CLASS_PAGINATION_PAGE }, .${ CLASS_ARROW }` )
-      && ( ! noDrag || ! matches( target, noDrag ) );
+    return !matches(target, `.${ CLASS_PAGINATION_PAGE }, .${ CLASS_ARROW }`)
+      && (!noDrag || !matches(target, noDrag));
   }
 
   /**
@@ -415,7 +415,7 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
    *
    * @return `true` if the `e` is TouchEvent.
    */
-  function isTouchEvent( e: TouchEvent | MouseEvent ): e is TouchEvent {
+  function isTouchEvent(e: TouchEvent | MouseEvent): e is TouchEvent {
     return typeof TouchEvent !== 'undefined' && e instanceof TouchEvent;
   }
 
@@ -433,7 +433,7 @@ export const Drag: ComponentConstructor<DragComponent> = ( Splide, Components, o
    *
    * @param value - Set `true` to disable the component.
    */
-  function disable( value: boolean ): void {
+  function disable(value: boolean): void {
     disabled = value;
   }
 

@@ -42,7 +42,7 @@ export interface LazyLoadComponent extends BaseComponent {
  *
  * @since 4.0.0
  */
-type LazyLoadEntry = [ HTMLImageElement, SlideComponent, HTMLSpanElement ];
+type LazyLoadEntry = [HTMLImageElement, SlideComponent, HTMLSpanElement];
 
 /**
  * The component for lazily loading images.
@@ -56,10 +56,10 @@ type LazyLoadEntry = [ HTMLImageElement, SlideComponent, HTMLSpanElement ];
  *
  * @return An LazyLoad component object.
  */
-export const LazyLoad: ComponentConstructor<LazyLoadComponent> = ( Splide, Components, options, event ) => {
+export const LazyLoad: ComponentConstructor<LazyLoadComponent> = (Splide, Components, options, event) => {
   const { on, off, bind, emit } = event;
   const isSequential = options.lazyLoad === 'sequential';
-  const events       = [ EVENT_MOVED, EVENT_SCROLLED ];
+  const events = [EVENT_MOVED, EVENT_SCROLLED];
 
   /**
    * Stores data of images.
@@ -70,9 +70,9 @@ export const LazyLoad: ComponentConstructor<LazyLoadComponent> = ( Splide, Compo
    * Called when the component is mounted.
    */
   function mount(): void {
-    if ( options.lazyLoad ) {
+    if (options.lazyLoad) {
       init();
-      on( EVENT_REFRESH, init );
+      on(EVENT_REFRESH, init);
     }
   }
 
@@ -81,14 +81,14 @@ export const LazyLoad: ComponentConstructor<LazyLoadComponent> = ( Splide, Compo
    * Be aware that `refresh` also calls this method.
    */
   function init() {
-    empty( entries );
+    empty(entries);
     register();
 
-    if ( isSequential ) {
+    if (isSequential) {
       loadNext();
     } else {
-      off( events );
-      on( events, check );
+      off(events);
+      on(events, check);
       check();
     }
   }
@@ -98,20 +98,20 @@ export const LazyLoad: ComponentConstructor<LazyLoadComponent> = ( Splide, Compo
    * Note that spinner can be already available because of `refresh()`.
    */
   function register(): void {
-    Components.Slides.forEach( Slide => {
-      queryAll<HTMLImageElement>( Slide.slide, IMAGE_SELECTOR ).forEach( img => {
-        const src    = getAttribute( img, SRC_DATA_ATTRIBUTE );
-        const srcset = getAttribute( img, SRCSET_DATA_ATTRIBUTE );
+    Components.Slides.forEach(Slide => {
+      queryAll<HTMLImageElement>(Slide.slide, IMAGE_SELECTOR).forEach(img => {
+        const src = getAttribute(img, SRC_DATA_ATTRIBUTE);
+        const srcset = getAttribute(img, SRCSET_DATA_ATTRIBUTE);
 
-        if ( src !== img.src || srcset !== img.srcset ) {
-          const parent  = img.parentElement;
-          const spinner = child( parent, `.${ CLASS_SPINNER }` ) || create( 'span', options.classes.spinner, parent );
+        if (src !== img.src || srcset !== img.srcset) {
+          const parent = img.parentElement;
+          const spinner = child(parent, `.${ CLASS_SPINNER }`) || create('span', options.classes.spinner, parent);
 
-          entries.push( [ img, Slide, spinner ] );
-          img.src || display( img, 'none' );
+          entries.push([img, Slide, spinner]);
+          img.src || display(img, 'none');
         }
-      } );
-    } );
+      });
+    });
   }
 
   /**
@@ -119,12 +119,12 @@ export const LazyLoad: ComponentConstructor<LazyLoadComponent> = ( Splide, Compo
    * The last `+1` is for the current page.
    */
   function check(): void {
-    entries = entries.filter( data => {
-      const distance = options.perPage * ( ( options.preloadPages || 1 ) + 1 ) - 1;
-      return data[ 1 ].isWithin( Splide.index, distance ) ? load( data ) : true;
-    } );
+    entries = entries.filter(data => {
+      const distance = options.perPage * ((options.preloadPages || 1) + 1) - 1;
+      return data[1].isWithin(Splide.index, distance) ? load(data) : true;
+    });
 
-    entries.length || off( events );
+    entries.length || off(events);
   }
 
   /**
@@ -132,16 +132,16 @@ export const LazyLoad: ComponentConstructor<LazyLoadComponent> = ( Splide, Compo
    *
    * @param data - A LazyLoadEntry object.
    */
-  function load( data: LazyLoadEntry ): void {
-    const [ img ] = data;
+  function load(data: LazyLoadEntry): void {
+    const [img] = data;
 
-    addClass( data[ 1 ].slide, CLASS_LOADING );
-    bind( img, 'load error', apply( onLoad, data ) );
+    addClass(data[1].slide, CLASS_LOADING);
+    bind(img, 'load error', apply(onLoad, data));
 
-    setAttribute( img, 'src', getAttribute( img, SRC_DATA_ATTRIBUTE ) );
-    setAttribute( img, 'srcset', getAttribute( img, SRCSET_DATA_ATTRIBUTE ) );
+    setAttribute(img, 'src', getAttribute(img, SRC_DATA_ATTRIBUTE));
+    setAttribute(img, 'srcset', getAttribute(img, SRCSET_DATA_ATTRIBUTE));
 
-    removeAttribute( img, [ SRC_DATA_ATTRIBUTE, SRCSET_DATA_ATTRIBUTE ] );
+    removeAttribute(img, [SRC_DATA_ATTRIBUTE, SRCSET_DATA_ATTRIBUTE]);
   }
 
   /**
@@ -150,18 +150,18 @@ export const LazyLoad: ComponentConstructor<LazyLoadComponent> = ( Splide, Compo
    * @param data - A LazyLoadEntry object.
    * @param e    - An Event object.
    */
-  function onLoad( data: LazyLoadEntry, e: Event ): void {
-    const [ img, Slide ] = data;
+  function onLoad(data: LazyLoadEntry, e: Event): void {
+    const [img, Slide] = data;
 
-    removeClass( Slide.slide, CLASS_LOADING );
+    removeClass(Slide.slide, CLASS_LOADING);
 
-    if ( e.type !== 'error' ) {
-      removeNode( data[ 2 ] );
-      display( img, '' );
-      emit( EVENT_LAZYLOAD_LOADED, img, Slide );
-      emit( EVENT_RESIZE );
+    if (e.type !== 'error') {
+      removeNode(data[2]);
+      display(img, '');
+      emit(EVENT_LAZYLOAD_LOADED, img, Slide);
+      emit(EVENT_RESIZE);
     } else {
-      emit( EVENT_LAZYLOAD_ERROR, img, Slide );
+      emit(EVENT_LAZYLOAD_ERROR, img, Slide);
     }
 
     isSequential && loadNext();
@@ -171,12 +171,12 @@ export const LazyLoad: ComponentConstructor<LazyLoadComponent> = ( Splide, Compo
    * Starts loading a next image.
    */
   function loadNext(): void {
-    entries.length && load( entries.shift() );
+    entries.length && load(entries.shift());
   }
 
   return {
     mount,
-    destroy: apply( empty, entries ),
+    destroy: apply(empty, entries),
     check,
   };
 };

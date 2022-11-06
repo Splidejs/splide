@@ -18,7 +18,7 @@ $settings = get_settings();
   <script type="text/javascript" src="../../../../../dist/js/splide-renderer.min.js"></script>
 
   <script>
-    document.addEventListener( 'DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {
       const options = {
         // type: 'loop',
         // padding: '1rem',
@@ -42,7 +42,7 @@ $settings = get_settings();
             // perPage: 1,
             gap: '3rem',
             padding: 0,
-          }
+          },
         },
       };
 
@@ -60,32 +60,32 @@ $settings = get_settings();
       var renderer = new SplideRenderer(
         [
           {
-            html : '<img src="../../assets/images/pics/slide01.jpg">',
+            html: '<img src="../../assets/images/pics/slide01.jpg">',
             attrs: {
               dataTest: 1,
               class: 'test',
             },
           },
           {
-            html : '<img src="../../assets/images/pics/slide02.jpg">',
+            html: '<img src="../../assets/images/pics/slide02.jpg">',
             attrs: {
               dataTest: 2,
             },
           },
           {
-            html : '<img src="../../assets/images/pics/slide03.jpg">',
+            html: '<img src="../../assets/images/pics/slide03.jpg">',
             attrs: {
               dataTest: 3,
             },
           },
           {
-            html : '<img src="../../assets/images/pics/slide04.jpg">',
+            html: '<img src="../../assets/images/pics/slide04.jpg">',
             attrs: {
               dataTest: 4,
             },
           },
           {
-            html : '<img src="../../assets/images/pics/slide05.jpg">',
+            html: '<img src="../../assets/images/pics/slide05.jpg">',
             attrs: {
               dataTest: 5,
             },
@@ -96,18 +96,18 @@ $settings = get_settings();
           id: 'test',
           arrows: true,
           slider: true,
-        }
+        },
       );
 
-      var wrapper = document.getElementById( 'wrapper' );
+      var wrapper = document.getElementById('wrapper');
       wrapper.innerHTML = renderer.html();
 
-      setTimeout( () => {
-        var splide = new Splide( wrapper.firstElementChild, options );
-        SplideRenderer.clean( splide );
+      setTimeout(() => {
+        var splide = new Splide(wrapper.firstElementChild, options);
+        SplideRenderer.clean(splide);
         splide.mount();
-      }, 2000 );
-    } );
+      }, 2000);
+    });
   </script>
 </head>
 <body>

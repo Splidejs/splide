@@ -1,5 +1,6 @@
 <?php
-function get_settings() {
+function get_settings()
+{
   return [
     'theme' => 'default',
   ];

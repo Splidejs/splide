@@ -1044,6 +1044,10 @@ declare class Splide {
         DESTROYED: number;
     };
     /**
+     * Stores extension constructors.
+     */
+    static readonly Extensions: Record<string, ComponentConstructor>;
+    /**
      * The root element where the Splide is applied.
      */
     readonly root: HTMLElement;
@@ -1052,7 +1056,7 @@ declare class Splide {
      */
     readonly event: EventInterface$1<EventMap & Record<string, AnyFunction>>;
     /**
-     * The collection of all component objects.
+     * The collection of all component instances, including extensions.
      */
     readonly Components: Components;
     /**

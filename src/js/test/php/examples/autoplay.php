@@ -17,15 +17,15 @@ $settings = get_settings();
   <script type="text/javascript" src="../../../../../dist/js/splide.js"></script>
 
   <script>
-    document.addEventListener( 'DOMContentLoaded', function () {
-      var splide = new Splide( '#splide01', {
+    document.addEventListener('DOMContentLoaded', function () {
+      var splide = new Splide('#splide01', {
         // rewind       : true,
-        type         : 'loop',
-	      autoplay     : true,
+        type: 'loop',
+        autoplay: true,
         // autoplay     : 'pause',
         // pauseOnHover : false,
         // resetProgress: false,
-      } );
+      });
 
       // var toggleButton = document.querySelector( '.splide__toggle' );
 
@@ -34,7 +34,7 @@ $settings = get_settings();
       //   toggleButton.setAttribute( 'aria-label', 'Pause autoplay' );
       //   toggleButton.textContent = 'Pause';
       // } );
-			//
+      //
       // splide.on( 'autoplay:pause', function () {
       //   toggleButton.classList.remove( 'is-active' );
       //   toggleButton.setAttribute( 'aria-label', 'Start autoplay' );
@@ -43,7 +43,7 @@ $settings = get_settings();
 
       // toggleButton.addEventListener( 'click', function () {
       //   var Autoplay = splide.Components.Autoplay;
-			//
+      //
       //   if ( Autoplay.isPaused() ) {
       //     Autoplay.play();
       //   } else {
@@ -53,7 +53,7 @@ $settings = get_settings();
 
 
       splide.mount();
-    } );
+    });
   </script>
 </head>
 <body>
@@ -73,7 +73,7 @@ $settings = get_settings();
       <li class="splide__slide">
         <img src="../../assets/images/pics/slide04.jpg">
       </li>
-<!--      --><?php //render_slides(); ?>
+      <!--      --><?php //render_slides(); ?>
     </ul>
   </div>
 
@@ -82,8 +82,8 @@ $settings = get_settings();
   </div>
 
   <button class="splide__toggle" type="button">
-	  <span class="splide__toggle__play">Play</span>
-	  <span class="splide__toggle__pause">Pause</span>
+    <span class="splide__toggle__play">Play</span>
+    <span class="splide__toggle__pause">Pause</span>
   </button>
 </div>
 

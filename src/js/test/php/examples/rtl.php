@@ -17,21 +17,21 @@ $settings = get_settings();
   <script type="text/javascript" src="../../../../../dist/js/splide.js"></script>
 
   <script>
-    document.addEventListener( 'DOMContentLoaded', function () {
-      var splide = new Splide( '#splide01', {
-        type     : 'loop',
-        perPage  : 3,
-        gap      : 5,
+    document.addEventListener('DOMContentLoaded', function () {
+      var splide = new Splide('#splide01', {
+        type: 'loop',
+        perPage: 3,
+        gap: 5,
         direction: 'rtl',
-        rewind   : true,
-        padding  : {
+        rewind: true,
+        padding: {
           left: 40,
           right: 0,
         },
-      } );
+      });
 
       splide.mount();
-    } );
+    });
   </script>
 
   <style>

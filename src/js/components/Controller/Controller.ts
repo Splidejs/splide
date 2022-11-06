@@ -21,22 +21,22 @@ import {
  * @since 3.0.0
  */
 export interface ControllerComponent extends BaseComponent {
-  go( control: number | string, callback?: AnyFunction ): void;
-  jump( control: number | string ): void;
-  scroll( destination: number, duration?: number, snap?: boolean, callback?: AnyFunction ): void;
-  getNext( destination?: boolean ): number;
-  getPrev( destination?: boolean ): number;
+  go(control: number | string, callback?: AnyFunction): void;
+  jump(control: number | string): void;
+  scroll(destination: number, duration?: number, snap?: boolean, callback?: AnyFunction): void;
+  getNext(destination?: boolean): number;
+  getPrev(destination?: boolean): number;
   getEnd(): number;
-  setIndex( index: number ): void;
-  getIndex( prev?: boolean ): number;
-  toIndex( page: number ): number;
-  toPage( index: number ): number;
-  toDest( position: number ): number;
+  setIndex(index: number): void;
+  getIndex(prev?: boolean): number;
+  toIndex(page: number): number;
+  toPage(index: number): number;
+  toDest(position: number): number;
   hasFocus(): boolean;
   isBusy(): boolean;
 
   /** @internal */
-  getAdjacent( prev: boolean, destination?: boolean ): number;
+  getAdjacent(prev: boolean, destination?: boolean): number;
 }
 
 /**
@@ -51,16 +51,16 @@ export interface ControllerComponent extends BaseComponent {
  *
  * @return A Controller component object.
  */
-export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, Components, options, event ) => {
+export const Controller: ComponentConstructor<ControllerComponent> = (Splide, Components, options, event) => {
   const { on, emit } = event;
   const { Move, Scroll } = Components;
   const { getPosition, getLimit, toPosition } = Move;
   const { isEnough, getLength } = Components.Slides;
   const { omitEnd } = options;
-  const isLoop  = Splide.is( LOOP );
-  const isSlide = Splide.is( SLIDE );
-  const getNext = apply( getAdjacent, false );
-  const getPrev = apply( getAdjacent, true );
+  const isLoop = Splide.is(LOOP);
+  const isSlide = Splide.is(SLIDE);
+  const getNext = apply(getAdjacent, false);
+  const getPrev = apply(getAdjacent, true);
 
   /**
    * The current index.
@@ -97,8 +97,8 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    */
   function mount(): void {
     init();
-    on( [ EVENT_UPDATED, EVENT_REFRESH, EVENT_END_INDEX_CHANGED ], init );
-    on( EVENT_RESIZED, onResized );
+    on([EVENT_UPDATED, EVENT_REFRESH, EVENT_END_INDEX_CHANGED], init);
+    on(EVENT_RESIZED, onResized);
   }
 
   /**
@@ -107,17 +107,17 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    * The process order must be Elements -> Controller -> Move.
    */
   function init(): void {
-    slideCount = getLength( true );
-    perMove    = options.perMove;
-    perPage    = options.perPage;
-    endIndex   = getEnd();
+    slideCount = getLength(true);
+    perMove = options.perMove;
+    perPage = options.perPage;
+    endIndex = getEnd();
 
-    const end   = omitEnd ? endIndex : slideCount - 1;
-    const index = clamp( currIndex, 0, end );
+    const end = omitEnd ? endIndex : slideCount - 1;
+    const index = clamp(currIndex, 0, end);
 
     prevIndex = index;
 
-    if ( index !== currIndex ) {
+    if (index !== currIndex) {
       currIndex = index;
       Move.reposition();
     }
@@ -128,8 +128,8 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    * The end index can change if `autoWidth` or `fixedWidth` is enabled.
    */
   function onResized(): void {
-    if ( endIndex !== getEnd() ) {
-      emit( EVENT_END_INDEX_CHANGED );
+    if (endIndex !== getEnd()) {
+      emit(EVENT_END_INDEX_CHANGED);
     }
   }
 
@@ -143,16 +143,16 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    * @param control  - A control pattern.
    * @param callback - Optional. A callback function invoked after transition ends.
    */
-  function go( control: number | string, callback?: AnyFunction ): void {
-    if ( ! isBusy() ) {
-      const [ dest, forwards ] = parse( control );
-      const index = loop( dest );
-      const canGo = dest === index || Move.exceededLimit( ! forwards ) || Move.canShift( forwards );
+  function go(control: number | string, callback?: AnyFunction): void {
+    if (!isBusy()) {
+      const [dest, forwards] = parse(control);
+      const index = loop(dest);
+      const canGo = dest === index || Move.exceededLimit(!forwards) || Move.canShift(forwards);
 
-      if ( index > -1 && canGo ) {
+      if (index > -1 && canGo) {
         Scroll.cancel();
-        setIndex( index );
-        Move.move( dest, index, prevIndex, forwards, callback );
+        setIndex(index);
+        Move.move(dest, index, prevIndex, forwards, callback);
       }
     }
   }
@@ -162,13 +162,13 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    *
    * @param control - An index where to jump.
    */
-  function jump( control: number | string ): void {
+  function jump(control: number | string): void {
     const { set } = Components.Breakpoints;
     const { speed } = options;
 
-    set( { speed: 0 } );
-    go( control );
-    set( { speed } );
+    set({ speed: 0 });
+    go(control);
+    set({ speed });
   }
 
   /**
@@ -179,12 +179,12 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    * @param snap        - Optional. Whether to snap the slider to the closest slide or not.
    * @param callback    - Optional. A callback function invoked after scroll ends.
    */
-  function scroll( destination: number, duration?: number, snap?: boolean, callback?: AnyFunction ): void {
-    Scroll.scroll( destination, duration, snap, () => {
-      const index = loop( Move.toIndex( getPosition() ) );
-      setIndex( omitEnd ? min( index, endIndex ) : index );
+  function scroll(destination: number, duration?: number, snap?: boolean, callback?: AnyFunction): void {
+    Scroll.scroll(destination, duration, snap, () => {
+      const index = loop(Move.toIndex(getPosition()));
+      setIndex(omitEnd ? min(index, endIndex) : index);
       callback && callback();
-    } );
+    });
   }
 
   /**
@@ -194,28 +194,28 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    *
    * @return A `dest` index.
    */
-  function parse( control: number | string ): [ number, boolean ] {
-    let dest     = currIndex;
+  function parse(control: number | string): [number, boolean] {
+    let dest = currIndex;
     let forwards = true;
 
-    if ( isString( control ) ) {
-      const [ , indicator, number ] = control.match( /([+-]|>>?|<<?)(-?\d+)?/ ) || [];
-      const oneOf = ( ...indicators: string[] ) => includes( indicators, indicator );
+    if (isString(control)) {
+      const [, indicator, number] = control.match(/([+-]|>>?|<<?)(-?\d+)?/) || [];
+      const oneOf = (...indicators: string[]) => includes(indicators, indicator);
 
-      forwards = oneOf( '+', '>', '>>' );
+      forwards = oneOf('+', '>', '>>');
 
-      if ( oneOf( '+', '-' ) ) {
-        dest = computeDestIndex( currIndex + +`${ indicator }${ +number || 1 }`, currIndex );
-      } else if ( oneOf( '>', '<' ) ) {
-        dest = number ? toIndex( +number ) : getAdjacent( ! forwards, true );
-      } else if ( oneOf( '>>', '<<' ) ) {
+      if (oneOf('+', '-')) {
+        dest = computeDestIndex(currIndex + +`${ indicator }${ +number || 1 }`, currIndex);
+      } else if (oneOf('>', '<')) {
+        dest = number ? toIndex(+number) : getAdjacent(!forwards, true);
+      } else if (oneOf('>>', '<<')) {
         dest = number ? +number || 0 : forwards ? endIndex : 0;
       }
     } else {
-      dest = isLoop ? control : clamp( control, 0, endIndex );
+      dest = isLoop ? control : clamp(control, 0, endIndex);
     }
 
-    return [ dest, forwards ];
+    return [dest, forwards];
   }
 
   /**
@@ -228,17 +228,17 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    *
    * @return An adjacent index if available, or otherwise `-1`.
    */
-  function getAdjacent( prev: boolean, destination?: boolean ): number {
-    const number = perMove || ( hasFocus() ? 1 : perPage );
-    const dest   = computeDestIndex( currIndex + number * ( prev ? -1 : 1 ), currIndex, ! ( perMove || hasFocus() ) );
+  function getAdjacent(prev: boolean, destination?: boolean): number {
+    const number = perMove || (hasFocus() ? 1 : perPage);
+    const dest = computeDestIndex(currIndex + number * (prev ? -1 : 1), currIndex, !(perMove || hasFocus()));
 
-    if ( dest === -1 && isSlide ) {
-      if ( ! approximatelyEqual( getPosition(), getLimit( ! prev ), 1 ) ) {
+    if (dest === -1 && isSlide) {
+      if (!approximatelyEqual(getPosition(), getLimit(!prev), 1)) {
         return prev ? 0 : endIndex;
       }
     }
 
-    return destination ? dest : loop( dest );
+    return destination ? dest : loop(dest);
   }
 
   /**
@@ -255,33 +255,33 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    *
    * @return A converted destination index, including clones.
    */
-  function computeDestIndex( dest: number, from: number, snapPage?: boolean ): number {
-    if ( isEnough() || hasFocus() ) {
-      const index = computeMovableDestIndex( dest );
+  function computeDestIndex(dest: number, from: number, snapPage?: boolean): number {
+    if (isEnough() || hasFocus()) {
+      const index = computeMovableDestIndex(dest);
 
-      if ( index !== dest ) {
-        from     = dest;
-        dest     = index;
+      if (index !== dest) {
+        from = dest;
+        dest = index;
         snapPage = false;
       }
 
-      if ( dest < 0 || dest > endIndex ) {
-        if ( ! perMove && ( between( 0, dest, from, true ) || between( endIndex, from, dest, true ) ) ) {
-          dest = toIndex( toPage( dest ) );
+      if (dest < 0 || dest > endIndex) {
+        if (!perMove && (between(0, dest, from, true) || between(endIndex, from, dest, true))) {
+          dest = toIndex(toPage(dest));
         } else {
-          if ( isLoop ) {
+          if (isLoop) {
             dest = snapPage
-              ? dest < 0 ? - ( slideCount % perPage || perPage ) : slideCount
+              ? dest < 0 ? -(slideCount % perPage || perPage) : slideCount
               : dest;
-          } else if ( options.rewind ) {
+          } else if (options.rewind) {
             dest = dest < 0 ? endIndex : 0;
           } else {
             dest = -1;
           }
         }
       } else {
-        if ( snapPage && dest !== from ) {
-          dest = toIndex( toPage( from ) + ( dest < from ? -1 : 1 ) );
+        if (snapPage && dest !== from) {
+          dest = toIndex(toPage(from) + (dest < from ? -1 : 1));
         }
       }
     } else {
@@ -299,11 +299,11 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    *
    * @return A dest index.
    */
-  function computeMovableDestIndex( dest: number ): number {
-    if ( isSlide && options.trimSpace === 'move' && dest !== currIndex ) {
+  function computeMovableDestIndex(dest: number): number {
+    if (isSlide && options.trimSpace === 'move' && dest !== currIndex) {
       const position = getPosition();
 
-      while ( position === toPosition( dest ) && between( dest, 0, Splide.length - 1, ! options.rewind ) ) {
+      while (position === toPosition(dest) && between(dest, 0, Splide.length - 1, !options.rewind)) {
         dest < currIndex ? --dest : ++dest;
       }
     }
@@ -318,8 +318,8 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    *
    * @return A looped index.
    */
-  function loop( index: number ): number {
-    return isLoop ? ( index + slideCount ) % slideCount || 0 : index;
+  function loop(index: number): number {
+    return isLoop ? (index + slideCount) % slideCount || 0 : index;
   }
 
   /**
@@ -331,16 +331,16 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    * @return An end index.
    */
   function getEnd(): number {
-    let end = slideCount - ( hasFocus() || ( isLoop && perMove ) ? 1 : perPage );
+    let end = slideCount - (hasFocus() || (isLoop && perMove) ? 1 : perPage);
 
-    while ( omitEnd && end-- > 0 ) {
-      if ( ! approximatelyEqual( toPosition( slideCount - 1 ), toPosition( end ), 0.01 ) ) {
+    while (omitEnd && end-- > 0) {
+      if (!approximatelyEqual(toPosition(slideCount - 1), toPosition(end), 0.01)) {
         end++;
         break;
       }
     }
 
-    return clamp( end, 0, slideCount - 1 );
+    return clamp(end, 0, slideCount - 1);
   }
 
   /**
@@ -350,8 +350,8 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    *
    * @return A slide index.
    */
-  function toIndex( page: number ): number {
-    return clamp( hasFocus() ? page : perPage * page, 0, endIndex );
+  function toIndex(page: number): number {
+    return clamp(hasFocus() ? page : perPage * page, 0, endIndex);
   }
 
   /**
@@ -361,10 +361,10 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    *
    * @return A page index.
    */
-  function toPage( index: number ): number {
+  function toPage(index: number): number {
     return hasFocus()
-      ? min( index, endIndex )
-      : floor( ( index >= endIndex ? slideCount - 1 : index ) / perPage );
+      ? min(index, endIndex)
+      : floor((index >= endIndex ? slideCount - 1 : index) / perPage);
   }
 
   /**
@@ -374,9 +374,9 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    *
    * @return A dest index.
    */
-  function toDest( destination: number ): number {
-    const closest = Move.toIndex( destination );
-    return isSlide ? clamp( closest, 0, endIndex ) : closest;
+  function toDest(destination: number): number {
+    const closest = Move.toIndex(destination);
+    return isSlide ? clamp(closest, 0, endIndex) : closest;
   }
 
   /**
@@ -384,8 +384,8 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    *
    * @param index - A new index to set.
    */
-  function setIndex( index: number ): void {
-    if ( index !== currIndex ) {
+  function setIndex(index: number): void {
+    if (index !== currIndex) {
       prevIndex = currIndex;
       currIndex = index;
     }
@@ -396,7 +396,7 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    *
    * @param prev - Optional. Whether to return previous index or not.
    */
-  function getIndex( prev?: boolean ): number {
+  function getIndex(prev?: boolean): number {
     return prev ? prevIndex : currIndex;
   }
 
@@ -406,7 +406,7 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    * @return `true` if the slider has the focus option.
    */
   function hasFocus(): boolean {
-    return ! isUndefined( options.focus ) || options.isNavigation;
+    return !isUndefined(options.focus) || options.isNavigation;
   }
 
   /**
@@ -415,7 +415,7 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    * @return `true` if the carousel is moving or scrolling, or otherwise `false`.
    */
   function isMoving(): boolean {
-    return Splide.state.is( [ MOVING, SCROLLING ] );
+    return Splide.state.is([MOVING, SCROLLING]);
   }
 
   /**
@@ -424,7 +424,7 @@ export const Controller: ComponentConstructor<ControllerComponent> = ( Splide, C
    * @return `true` if the slider can move, or otherwise `false`.
    */
   function isBusy(): boolean {
-    return isMoving() && !! options.waitForTransition;
+    return isMoving() && !!options.waitForTransition;
   }
 
   return {

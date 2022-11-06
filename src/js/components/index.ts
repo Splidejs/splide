@@ -19,24 +19,25 @@ import { Sync } from './Sync/Sync';
 import { Wheel } from './Wheel/Wheel';
 import { Live } from './Live/Live';
 
+
 export { Breakpoints } from './Breakpoints/Breakpoints';
-export { Direction }   from './Direction/Direction';
-export { Elements }    from './Elements/Elements';
-export { Slides }      from './Slides/Slides';
-export { Layout }      from './Layout/Layout';
-export { Clones }      from './Clones/Clones';
-export { Move }        from './Move/Move';
-export { Controller }  from './Controller/Controller';
-export { Arrows }      from './Arrows/Arrows';
-export { Autoplay }    from './Autoplay/Autoplay';
-export { Scroll }      from './Scroll/Scroll';
-export { Drag }        from './Drag/Drag';
-export { Keyboard }    from './Keyboard/Keyboard';
-export { LazyLoad }    from './LazyLoad/LazyLoad';
-export { Pagination }  from './Pagination/Pagination';
-export { Sync }        from './Sync/Sync';
-export { Wheel }       from './Wheel/Wheel';
-export { Live }        from './Live/Live';
+export { Direction } from './Direction/Direction';
+export { Elements } from './Elements/Elements';
+export { Slides } from './Slides/Slides';
+export { Layout } from './Layout/Layout';
+export { Clones } from './Clones/Clones';
+export { Move } from './Move/Move';
+export { Controller } from './Controller/Controller';
+export { Arrows } from './Arrows/Arrows';
+export { Autoplay } from './Autoplay/Autoplay';
+export { Scroll } from './Scroll/Scroll';
+export { Drag } from './Drag/Drag';
+export { Keyboard } from './Keyboard/Keyboard';
+export { LazyLoad } from './LazyLoad/LazyLoad';
+export { Pagination } from './Pagination/Pagination';
+export { Sync } from './Sync/Sync';
+export { Wheel } from './Wheel/Wheel';
+export { Live } from './Live/Live';
 
 
 /**

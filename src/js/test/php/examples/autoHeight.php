@@ -15,19 +15,19 @@ $settings = get_settings();
   <script src="../../../../../dist/js/splide.js"></script>
 
   <script>
-    document.addEventListener( 'DOMContentLoaded', function () {
-      var splide = new Splide( '#splide01', {
-        width     : 1000,
-        height    : '90vh',
-        direction : 'ttb',
+    document.addEventListener('DOMContentLoaded', function () {
+      var splide = new Splide('#splide01', {
+        width: 1000,
+        height: '90vh',
+        direction: 'ttb',
         autoHeight: true,
-        gap       : '1rem',
-        trimSpace : 'move',
-        focus     : 'center',
-      } );
+        gap: '1rem',
+        trimSpace: 'move',
+        focus: 'center',
+      });
 
       splide.mount();
-    } );
+    });
   </script>
 
   <style>

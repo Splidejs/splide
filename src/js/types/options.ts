@@ -218,7 +218,7 @@ export interface ResponsiveOptions {
   /**
    * Accepts arbitrary properties for extensions, although it's not ideal typing.
    */
-  [ key: string ]: any;
+  [key: string]: any;
 
   /**
    * The label for the root element.
@@ -369,7 +369,7 @@ export interface ResponsiveOptions {
    * The easing function for the drag free mode.
    * The default function is the `easeOutQuart` interpolation.
    */
-  easingFunc?: ( t: number ) => number;
+  easingFunc?: (t: number) => number;
 
   /**
    * Allows to drag the slider by a mouse or swipe.

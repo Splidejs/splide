@@ -15,14 +15,14 @@ import { nextTick, noop } from '@splidejs/utils';
  *
  * @return A Transition component object.
  */
-export const Fade: ComponentConstructor<TransitionComponent> = ( Splide, Components, options, event ) => {
+export const Fade: ComponentConstructor<TransitionComponent> = (Splide, Components, options, event) => {
   const { Slides, Direction } = Components;
 
   /**
    * Called when the component is mounted.
    */
   function mount(): void {
-    event.on( [ EVENT_MOUNTED, EVENT_REFRESH ], init );
+    event.on([EVENT_MOUNTED, EVENT_REFRESH], init);
   }
 
   /**
@@ -31,9 +31,9 @@ export const Fade: ComponentConstructor<TransitionComponent> = ( Splide, Compone
    * The `nextTick` disables the initial fade transition of the first slide.
    */
   function init(): void {
-    Slides.forEach( Slide => {
-      Slide.style( 'transform', `translateX(${ Direction.orient( 100 * Slide.index ) }%)` );
-    } );
+    Slides.forEach(Slide => {
+      Slide.style('transform', `translateX(${ Direction.orient(100 * Slide.index) }%)`);
+    });
   }
 
   /**
@@ -42,9 +42,9 @@ export const Fade: ComponentConstructor<TransitionComponent> = ( Splide, Compone
    * @param index - A slide index to be active.
    * @param done  - The callback function that must be called after the transition ends.
    */
-  function start( index: number, done: () => void ): void {
-    Slides.style( 'transition', `opacity ${ options.speed }ms ${ options.easing }` );
-    nextTick( done );
+  function start(index: number, done: () => void): void {
+    Slides.style('transition', `opacity ${ options.speed }ms ${ options.easing }`);
+    nextTick(done);
   }
 
   return {

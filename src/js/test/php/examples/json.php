@@ -17,27 +17,27 @@ $settings = get_settings();
   <script type="text/javascript" src="../../../../../dist/js/splide.js"></script>
 
   <script>
-    document.addEventListener( 'DOMContentLoaded', function () {
-      var splide = new Splide( '#splide01' );
+    document.addEventListener('DOMContentLoaded', function () {
+      var splide = new Splide('#splide01');
       splide.mount();
-    } );
+    });
   </script>
 </head>
 <body>
 
 <?php
-	$options = [
-		'type' => 'fade',
+$options = [
+  'type' => 'fade',
 //		'perPage' => 2,
-	];
+];
 ?>
 
-<div id="splide01" class="splide" data-splide='<?php echo json_encode( $options ) ?>'>
-	<div class="splide__track">
-		<div class="splide__list">
-			<?php render_slides(); ?>
-		</div>
-	</div>
+<div id="splide01" class="splide" data-splide='<?php echo json_encode($options) ?>'>
+  <div class="splide__track">
+    <div class="splide__list">
+      <?php render_slides(); ?>
+    </div>
+  </div>
 </div>
 
 <pre></pre>

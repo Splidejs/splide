@@ -16,14 +16,14 @@ $settings = get_settings();
   <link rel="stylesheet" href="../../assets/css/styles.css">
   <script src="../../../../../dist/js/splide.js"></script>
 
-	<style>
-		.splide__slide {
-			overflow: hidden;
-		}
-	</style>
+  <style>
+    .splide__slide {
+      overflow: hidden;
+    }
+  </style>
 
   <script>
-    document.addEventListener( 'DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {
       const options = {
         perPage: 3,
         arrows: false,
@@ -51,38 +51,38 @@ $settings = get_settings();
         },
       }
 
-      new Splide( '#splide01', options ).mount();
-      new Splide( '#splide02', options ).mount();
-    } );
+      new Splide('#splide01', options).mount();
+      new Splide('#splide02', options).mount();
+    });
   </script>
 </head>
 <body>
 
 <div id="splide01" class="splide">
-	<div class="splide__track">
-		<div class="splide__list">
-			<?php render_slides(); ?>
-		</div>
-	</div>
+  <div class="splide__track">
+    <div class="splide__list">
+      <?php render_slides(); ?>
+    </div>
+  </div>
 </div>
 
 <div id="splide02" class="splide">
-	<div class="splide__track">
-		<div class="splide__list">
-			<?php render_slides(); ?>
-		</div>
+  <div class="splide__track">
+    <div class="splide__list">
+      <?php render_slides(); ?>
+    </div>
 
-		<div class="splide__arrows">
-			<button class="splide__arrow splide__arrow--prev">
-				←
-			</button>
-			<button class="splide__arrow splide__arrow--next">
-				→
-			</button>
-		</div>
+    <div class="splide__arrows">
+      <button class="splide__arrow splide__arrow--prev">
+        ←
+      </button>
+      <button class="splide__arrow splide__arrow--next">
+        →
+      </button>
+    </div>
 
-		<div class="splide__pagination"></div>
-	</div>
+    <div class="splide__pagination"></div>
+  </div>
 </div>
 
 </body>

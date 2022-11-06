@@ -40,22 +40,22 @@ $settings = get_settings();
 </div>
 
 <script>
-  setTimeout( function() {
-    var splide = new Splide( '#splide01', {
-      type   : 'loop',
+  setTimeout(function () {
+    var splide = new Splide('#splide01', {
+      type: 'loop',
       perPage: 3,
       perMove: 1,
-      gap    : '1.5rem',
+      gap: '1.5rem',
       // height : 300,
       // cover  : true,
       classes: {
         arrows: 'splide__arrows splide__test',
-        clone : 'splide__clone splide__test',
-      }
-    } ).mount();
+        clone: 'splide__clone splide__test',
+      },
+    }).mount();
 
     // splide.mount();
-  }, 0 )
+  }, 0)
 </script>
 
 </body>

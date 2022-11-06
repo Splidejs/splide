@@ -10,7 +10,7 @@ import { prevent } from '../../../../../utils';
  * @since 3.0.0
  */
 export interface KeyboardComponent extends BaseComponent {
-  disable( disabled: boolean ): void;
+  disable(disabled: boolean): void;
 }
 
 /**
@@ -32,7 +32,7 @@ const KEYBOARD_EVENT = 'keydown';
  *
  * @return A Keyboard component object.
  */
-export const Keyboard: ComponentConstructor<KeyboardComponent> = ( Splide, Components, options, event ) => {
+export const Keyboard: ComponentConstructor<KeyboardComponent> = (Splide, Components, options, event) => {
   const { destroy } = event;
   const { resolve } = Components.Direction;
 
@@ -43,8 +43,8 @@ export const Keyboard: ComponentConstructor<KeyboardComponent> = ( Splide, Compo
     const { keyboard } = options;
 
     destroy();
-    keyboard && event.bind( keyboard === 'global' ? window : Splide.root, KEYBOARD_EVENT, onKeydown );
-    event.on( EVENT_UPDATED, mount );
+    keyboard && event.bind(keyboard === 'global' ? window : Splide.root, KEYBOARD_EVENT, onKeydown);
+    event.on(EVENT_UPDATED, mount);
   }
 
   /**
@@ -52,7 +52,7 @@ export const Keyboard: ComponentConstructor<KeyboardComponent> = ( Splide, Compo
    *
    * @param value - Toggles disabling/enabling the keyboard input.
    */
-  function disable( value: boolean ): void {
+  function disable(value: boolean): void {
     value ? destroy() : mount();
   }
 
@@ -61,13 +61,13 @@ export const Keyboard: ComponentConstructor<KeyboardComponent> = ( Splide, Compo
    *
    * @param e - A KeyboardEvent object.
    */
-  function onKeydown( e: KeyboardEvent ): void {
-    if ( e.key === resolve( ARROW_LEFT ) ) {
-      Splide.go( '<' );
-      prevent( e, true );
-    } else if ( e.key === resolve( ARROW_RIGHT ) ) {
-      Splide.go( '>' );
-      prevent( e, true );
+  function onKeydown(e: KeyboardEvent): void {
+    if (e.key === resolve(ARROW_LEFT)) {
+      Splide.go('<');
+      prevent(e, true);
+    } else if (e.key === resolve(ARROW_RIGHT)) {
+      Splide.go('>');
+      prevent(e, true);
     }
   }
 

@@ -24,7 +24,7 @@ export interface BuildHtmlArgs {
  *
  * @return A built HTML.
  */
-export function buildHtml( args: BuildHtmlArgs = {} ): string {
+export function buildHtml(args: BuildHtmlArgs = {}): string {
   const {
     tag = 'div',
     id,
@@ -43,7 +43,7 @@ export function buildHtml( args: BuildHtmlArgs = {} ): string {
 <${ tag } class="splide"${ id ? ` id=${ id }` : '' }${ json ? ` data-splide='${ json }'` : '' }>
   <div class="splide__track">
     <ul class="splide__list">
-      ${ generateSlides( length, src, dataSrc, dataSrcset, dataInterval ) }
+      ${ generateSlides(length, src, dataSrc, dataSrcset, dataInterval) }
     </ul>
   </div>
 
@@ -70,41 +70,41 @@ export function generateSlides(
   src?: boolean | string,
   dataSrc?: boolean | string,
   dataSrcset?: boolean | string,
-  dataInterval: number[] = []
+  dataInterval: number[] = [],
 ): string {
-  return Array.from<string>( { length } ).reduce( ( html, item, index ) => {
+  return Array.from<string>({ length }).reduce((html, item, index) => {
     const attrs: string[] = [];
 
-    if ( dataInterval ) {
-      const interval = dataInterval[ index ];
+    if (dataInterval) {
+      const interval = dataInterval[index];
 
-      if ( interval ) {
-        attrs.push( `${ INTERVAL_DATA_ATTRIBUTE }="${ interval }"` );
+      if (interval) {
+        attrs.push(`${ INTERVAL_DATA_ATTRIBUTE }="${ interval }"`);
       }
     }
 
-    html += `<li class="splide__slide" ${ attrs.join( ' ' ) }>`;
+    html += `<li class="splide__slide" ${ attrs.join(' ') }>`;
 
-    const imgAttrs = [ `alt="${ index }"` ];
+    const imgAttrs = [`alt="${ index }"`];
 
-    if ( src ) {
-      imgAttrs.push( `src="${ URL }/${ typeof src === 'string' ? src + '-' : '' }${ index }.jpg"` );
+    if (src) {
+      imgAttrs.push(`src="${ URL }/${ typeof src === 'string' ? src + '-' : '' }${ index }.jpg"`);
     }
 
-    if ( dataSrc ) {
-      imgAttrs.push( `${ SRC_DATA_ATTRIBUTE }="${ URL }/${ typeof dataSrc === 'string' ? dataSrc + '-' : '' }${ index }.jpg"` );
+    if (dataSrc) {
+      imgAttrs.push(`${ SRC_DATA_ATTRIBUTE }="${ URL }/${ typeof dataSrc === 'string' ? dataSrc + '-' : '' }${ index }.jpg"`);
     }
 
-    if ( dataSrcset ) {
+    if (dataSrcset) {
       imgAttrs.push(
-        `${ SRCSET_DATA_ATTRIBUTE }="${ URL }/${ typeof dataSrcset === 'string' ? dataSrcset + '-' : '' }${ index }.jpg 320w"`
+        `${ SRCSET_DATA_ATTRIBUTE }="${ URL }/${ typeof dataSrcset === 'string' ? dataSrcset + '-' : '' }${ index }.jpg 320w"`,
       );
     }
 
-    html += `<img ${ imgAttrs.join( ' ' ) }>`;
+    html += `<img ${ imgAttrs.join(' ') }>`;
     html += `</li>`;
     return html;
-  }, '' );
+  }, '');
 }
 
 export const HTML_ARROWS = `

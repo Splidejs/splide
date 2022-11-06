@@ -14,15 +14,15 @@ import { CLASS_OVERFLOW } from '../../constants/classes';
  */
 export interface LayoutComponent extends BaseComponent {
   trackSize(): number;
-  listSize( full?: boolean ): number;
-  slideSize( index: number, withoutGap?: boolean ): number;
-  sliderSize( withoutGap?: boolean ): number;
-  totalSize( index?: number, withoutGap?: boolean ): number;
-  getPadding( right: boolean ): number;
+  listSize(full?: boolean): number;
+  slideSize(index: number, withoutGap?: boolean): number;
+  sliderSize(withoutGap?: boolean): number;
+  totalSize(index?: number, withoutGap?: boolean): number;
+  getPadding(right: boolean): number;
   isOverflow(): boolean;
 
   /** @internal */
-  resize( force?: boolean ): void;
+  resize(force?: boolean): void;
 }
 
 /**
@@ -37,7 +37,7 @@ export interface LayoutComponent extends BaseComponent {
  *
  * @return An Layout component object.
  */
-export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Components, options, event ) => {
+export const Layout: ComponentConstructor<LayoutComponent> = (Splide, Components, options, event) => {
   const { on, bind, emit } = event;
   const { Slides } = Components;
   const { resolve, left, right, width } = Components.Direction;
@@ -64,9 +64,9 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
    */
   function mount(): void {
     init();
-    bind( window, 'resize load', Throttle( apply( emit, EVENT_RESIZE ) ) );
-    on( [ EVENT_UPDATED, EVENT_REFRESH ], init );
-    on( EVENT_RESIZE, resize );
+    bind(window, 'resize load', Throttle(apply(emit, EVENT_RESIZE)));
+    on([EVENT_UPDATED, EVENT_REFRESH], init);
+    on(EVENT_RESIZE, resize);
   }
 
   /**
@@ -76,11 +76,11 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
   function init(): void {
     vertical = options.direction === TTB;
 
-    style( root, 'maxWidth', unit( options.width ) );
-    style( track, resolve( 'paddingLeft' ), cssPadding( false ) );
-    style( track, resolve( 'paddingRight' ), cssPadding( true ) );
+    style(root, 'maxWidth', unit(options.width));
+    style(track, resolve('paddingLeft'), cssPadding(false));
+    style(track, resolve('paddingRight'), cssPadding(true));
 
-    resize( true );
+    resize(true);
   }
 
   /**
@@ -89,22 +89,22 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
    *
    * @param force - Skips checking the root dimension change and always performs the resizing process.
    */
-  function resize( force?: boolean ): void {
-    const newRect = rect( root );
+  function resize(force?: boolean): void {
+    const newRect = rect(root);
 
-    if ( force || rootRect.width !== newRect.width || rootRect.height !== newRect.height ) {
-      style( track, 'height', cssTrackHeight() );
+    if (force || rootRect.width !== newRect.width || rootRect.height !== newRect.height) {
+      style(track, 'height', cssTrackHeight());
 
-      styleSlides( resolve( 'marginRight' ), unit( options.gap ) );
-      styleSlides( 'width', cssSlideWidth() );
-      styleSlides( 'height', cssSlideHeight(), true );
+      styleSlides(resolve('marginRight'), unit(options.gap));
+      styleSlides('width', cssSlideWidth());
+      styleSlides('height', cssSlideHeight(), true);
 
       rootRect = newRect;
-      emit( EVENT_RESIZED );
+      emit(EVENT_RESIZED);
 
-      if ( overflow !== ( overflow = isOverflow() ) ) {
-        toggleClass( root, CLASS_OVERFLOW, overflow );
-        emit( EVENT_OVERFLOW, overflow );
+      if (overflow !== (overflow = isOverflow())) {
+        toggleClass(root, CLASS_OVERFLOW, overflow);
+        emit(EVENT_OVERFLOW, overflow);
       }
     }
   }
@@ -117,11 +117,11 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
    *
    * @return The padding value as a CSS string.
    */
-  function cssPadding( rightPadding: boolean ): string {
+  function cssPadding(rightPadding: boolean): string {
     const { padding } = options;
     const prop = rightPadding ? right() : left();
     return padding
-      && unit( padding[ prop ] || ( isObject( padding ) ? 0 : padding ) )
+      && unit(padding[prop] || (isObject(padding) ? 0 : padding))
       || '0px';
   }
 
@@ -133,10 +133,10 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
   function cssTrackHeight(): string {
     let height = '';
 
-    if ( vertical ) {
+    if (vertical) {
       height = cssHeight();
-      assert( height, 'height or heightRatio is missing.' );
-      height = `calc(${ height } - ${ cssPadding( false ) } - ${ cssPadding( true ) })`;
+      assert(height, 'height or heightRatio is missing.');
+      height = `calc(${ height } - ${ cssPadding(false) } - ${ cssPadding(true) })`;
     }
 
     return height;
@@ -148,7 +148,7 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
    * @return The height as a CSS string if available, or otherwise an empty string.
    */
   function cssHeight(): string {
-    return unit( options.height || rect( list ).width * options.heightRatio );
+    return unit(options.height || rect(list).width * options.heightRatio);
   }
 
   /**
@@ -159,7 +159,7 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
   function cssSlideWidth(): string | null {
     return options.autoWidth
       ? null
-      : unit( options.fixedWidth ) || ( vertical ? '' : cssSlideSize() );
+      : unit(options.fixedWidth) || (vertical ? '' : cssSlideSize());
   }
 
   /**
@@ -168,8 +168,8 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
    * @return The height of the slide.
    */
   function cssSlideHeight(): string | null {
-    return unit( options.fixedHeight )
-      || ( vertical ? ( options.autoHeight ? null : cssSlideSize() ) : cssHeight() );
+    return unit(options.fixedHeight)
+      || (vertical ? (options.autoHeight ? null : cssSlideSize()) : cssHeight());
   }
 
   /**
@@ -178,7 +178,7 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
    * @return The CSS string for slide width or height.
    */
   function cssSlideSize(): string {
-    const gap = unit( options.gap );
+    const gap = unit(options.gap);
     return `calc((100%${ gap && ` + ${ gap }` })/${ options.perPage || 1 }${ gap && ` - ${ gap }` })`;
   }
 
@@ -188,7 +188,7 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
    * @return The size of the track element in pixel.
    */
   function trackSize(): number {
-    return rect( track )[ width() ];
+    return rect(track)[width()];
   }
 
   /**
@@ -198,8 +198,8 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
    *
    * @return The size of the list element in pixel.
    */
-  function listSize( full?: boolean ): number {
-    return full ? list[ resolve( 'scrollWidth' ) ] : rect( list )[ width() ];
+  function listSize(full?: boolean): number {
+    return full ? list[resolve('scrollWidth')] : rect(list)[width()];
   }
 
   /**
@@ -210,9 +210,9 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
    *
    * @return The size of the specified slide element in pixel.
    */
-  function slideSize( index = 0, withoutGap?: boolean ): number {
-    const slide = getAt( index );
-    return ( slide ? rect( slide.slide )[ width() ] : 0 ) + ( withoutGap ? 0 : getGap() );
+  function slideSize(index = 0, withoutGap?: boolean): number {
+    const slide = getAt(index);
+    return (slide ? rect(slide.slide)[width()] : 0) + (withoutGap ? 0 : getGap());
   }
 
   /**
@@ -224,11 +224,11 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
    *
    * @return The total width of slides in the horizontal slider, or the height in the vertical one.
    */
-  function totalSize( index: number, withoutGap?: boolean ): number {
-    const first  = Components.Slides.get()[ 0 ];
-    const target = getAt( index );
+  function totalSize(index: number, withoutGap?: boolean): number {
+    const first = Components.Slides.get()[0];
+    const target = getAt(index);
     return first && target
-      ? abs( rect( target.slide )[ right() ] - rect( first.slide )[ left() ] ) + ( withoutGap ? 0 : getGap() )
+      ? abs(rect(target.slide)[right()] - rect(first.slide)[left()]) + (withoutGap ? 0 : getGap())
       : 0;
   }
 
@@ -240,8 +240,8 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
    *
    * @return The width or height of the slider without clones.
    */
-  function sliderSize( withoutGap?: boolean ): number {
-    return totalSize( Splide.length - 1 ) - totalSize( 0 ) + slideSize( 0, withoutGap );
+  function sliderSize(withoutGap?: boolean): number {
+    return totalSize(Splide.length - 1) - totalSize(0) + slideSize(0, withoutGap);
   }
 
   /**
@@ -252,12 +252,12 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
    * @return The gap value in pixel.
    */
   function getGap(): number {
-    const first  = getAt( 0 );
-    const second = getAt( 1 );
+    const first = getAt(0);
+    const second = getAt(1);
 
-    if ( first && second ) {
-      const firstRect = rect( first.slide );
-      return abs( rect( second.slide )[ left() ] - firstRect[ left() ] ) - firstRect[ width() ];
+    if (first && second) {
+      const firstRect = rect(first.slide);
+      return abs(rect(second.slide)[left()] - firstRect[left()]) - firstRect[width()];
     }
 
     return 0;
@@ -271,11 +271,11 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
    *
    * @return The padding value in pixel.
    */
-  function getPadding( right: boolean ): number {
-    return parseFloat( style(
+  function getPadding(right: boolean): number {
+    return parseFloat(style(
       track,
-      resolve( `padding${ right ? 'Right' : 'Left' }` )
-    ) ) || 0;
+      resolve(`padding${ right ? 'Right' : 'Left' }`),
+    )) || 0;
   }
 
   /**
@@ -285,7 +285,7 @@ export const Layout: ComponentConstructor<LayoutComponent> = ( Splide, Component
    * @return `true` if the carousel is wider than the list, or otherwise `false`.
    */
   function isOverflow(): boolean {
-    return Splide.is( FADE ) || sliderSize( true ) > listSize();
+    return Splide.is(FADE) || sliderSize(true) > listSize();
   }
 
   return {

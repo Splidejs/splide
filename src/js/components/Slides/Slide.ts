@@ -61,7 +61,7 @@ import {
  *
  * @since 3.0.0
  */
-export interface  SlideComponent extends BaseComponent {
+export interface SlideComponent extends BaseComponent {
   readonly index: number;
   readonly slideIndex: number;
   readonly slide: HTMLElement;
@@ -69,9 +69,9 @@ export interface  SlideComponent extends BaseComponent {
   readonly isClone: boolean;
 
   update(): void;
-  style( prop: CSSProperties, value: string | number, useContainer?: boolean ): void
-  isWithin( from: number, distance: number ): boolean;
-  isVisible( partial?: boolean ): boolean;
+  style(prop: CSSProperties, value: string | number, useContainer?: boolean): void
+  isWithin(from: number, distance: number): boolean;
+  isVisible(partial?: boolean): boolean;
 }
 
 /**
@@ -86,17 +86,17 @@ export interface  SlideComponent extends BaseComponent {
  *
  * @return A Slide subcomponent.
  */
-export const Slide = ( Splide: Splide, index: number, slideIndex: number, slide: HTMLElement ): SlideComponent => {
+export const Slide = (Splide: Splide, index: number, slideIndex: number, slide: HTMLElement): SlideComponent => {
   const event = Splide.event.lock();
   const { on, emit, bind } = event;
   const { Components, root, options } = Splide;
   const { isNavigation, updateOnMove, i18n, pagination, slideFocus } = options;
   const { Elements } = Components;
   const { resolve } = Components.Direction;
-  const styles    = getAttribute( slide, 'style' );
-  const label     = getAttribute( slide, ARIA_LABEL );
-  const isClone   = slideIndex > -1;
-  const container = child( slide, `.${ CLASS_CONTAINER }` );
+  const styles = getAttribute(slide, 'style');
+  const label = getAttribute(slide, ARIA_LABEL);
+  const isClone = slideIndex > -1;
+  const container = child(slide, `.${ CLASS_CONTAINER }`);
 
   /**
    * Turns into `true` when the component is destroyed.
@@ -106,12 +106,12 @@ export const Slide = ( Splide: Splide, index: number, slideIndex: number, slide:
   /**
    * Called when the component is mounted.
    */
-  function mount( this: SlideComponent ): void {
-    if ( ! isClone ) {
-      slide.id = `${ root.id }-slide${ pad( index + 1 ) }`;
-      setAttribute( slide, ROLE, pagination ? 'tabpanel' : 'group' );
-      setAttribute( slide, ARIA_ROLEDESCRIPTION, i18n.slide );
-      setAttribute( slide, ARIA_LABEL, label || format( i18n.slideLabel, index + 1, Splide.length ) );
+  function mount(this: SlideComponent): void {
+    if (!isClone) {
+      slide.id = `${ root.id }-slide${ pad(index + 1) }`;
+      setAttribute(slide, ROLE, pagination ? 'tabpanel' : 'group');
+      setAttribute(slide, ARIA_ROLEDESCRIPTION, i18n.slide);
+      setAttribute(slide, ARIA_LABEL, label || format(i18n.slideLabel, index + 1, Splide.length));
     }
 
     listen();
@@ -121,13 +121,13 @@ export const Slide = ( Splide: Splide, index: number, slideIndex: number, slide:
    * Listens to some events.
    */
   function listen(): void {
-    bind( slide, 'click', apply( emit, EVENT_CLICK, self ) );
-    bind( slide, 'keydown', apply( emit, EVENT_SLIDE_KEYDOWN, self ) );
-    on( [ EVENT_MOVED, EVENT_SHIFTED, EVENT_SCROLLED ], update );
-    on( EVENT_NAVIGATION_MOUNTED, initNavigation );
+    bind(slide, 'click', apply(emit, EVENT_CLICK, self));
+    bind(slide, 'keydown', apply(emit, EVENT_SLIDE_KEYDOWN, self));
+    on([EVENT_MOVED, EVENT_SHIFTED, EVENT_SCROLLED], update);
+    on(EVENT_NAVIGATION_MOUNTED, initNavigation);
 
-    if ( updateOnMove ) {
-      on( EVENT_MOVE, onMove );
+    if (updateOnMove) {
+      on(EVENT_MOVE, onMove);
     }
   }
 
@@ -137,32 +137,32 @@ export const Slide = ( Splide: Splide, index: number, slideIndex: number, slide:
   function destroy(): void {
     destroyed = true;
     event.destroy();
-    removeClass( slide, STATUS_CLASSES );
-    removeAttribute( slide, ALL_ATTRIBUTES );
-    setAttribute( slide, 'style', styles );
-    setAttribute( slide, ARIA_LABEL, label || '' );
+    removeClass(slide, STATUS_CLASSES);
+    removeAttribute(slide, ALL_ATTRIBUTES);
+    setAttribute(slide, 'style', styles);
+    setAttribute(slide, ARIA_LABEL, label || '');
   }
 
   /**
    * Initializes slides as navigation.
    */
   function initNavigation(): void {
-    const controls = Splide.splides.map( target => {
-      const Slide = target.splide.Components.Slides.getAt( index );
+    const controls = Splide.splides.map(target => {
+      const Slide = target.splide.Components.Slides.getAt(index);
       return Slide ? Slide.slide.id : '';
-    } ).join( ' ' );
+    }).join(' ');
 
-    setAttribute( slide, ARIA_LABEL, format( i18n.slideX, ( isClone ? slideIndex : index ) + 1 ) );
-    setAttribute( slide, ARIA_CONTROLS, controls );
-    setAttribute( slide, ROLE, slideFocus ? 'button' : '' );
-    slideFocus && removeAttribute( slide, ARIA_ROLEDESCRIPTION );
+    setAttribute(slide, ARIA_LABEL, format(i18n.slideX, (isClone ? slideIndex : index) + 1));
+    setAttribute(slide, ARIA_CONTROLS, controls);
+    setAttribute(slide, ROLE, slideFocus ? 'button' : '');
+    slideFocus && removeAttribute(slide, ARIA_ROLEDESCRIPTION);
   }
 
   /**
    * If the `updateOnMove` option is `true`, called when the slider starts moving.
    */
   function onMove(): void {
-    if ( ! destroyed ) {
+    if (!destroyed) {
       update();
     }
   }
@@ -171,13 +171,13 @@ export const Slide = ( Splide: Splide, index: number, slideIndex: number, slide:
    * Updates attribute and classes of the slide.
    */
   function update(): void {
-    if ( ! destroyed ) {
+    if (!destroyed) {
       const { index: curr } = Splide;
 
       updateActivity();
       updateVisibility();
-      toggleClass( slide, CLASS_PREV, index === curr - 1 );
-      toggleClass( slide, CLASS_NEXT, index === curr + 1 );
+      toggleClass(slide, CLASS_PREV, index === curr - 1);
+      toggleClass(slide, CLASS_NEXT, index === curr + 1);
     }
   }
 
@@ -187,10 +187,10 @@ export const Slide = ( Splide: Splide, index: number, slideIndex: number, slide:
   function updateActivity(): void {
     const active = isActive();
 
-    if ( active !== hasClass( slide, CLASS_ACTIVE ) ) {
-      toggleClass( slide, CLASS_ACTIVE, active );
-      setAttribute( slide, ARIA_CURRENT, isNavigation && active || '' );
-      emit( active ? EVENT_ACTIVE : EVENT_INACTIVE, self );
+    if (active !== hasClass(slide, CLASS_ACTIVE)) {
+      toggleClass(slide, CLASS_ACTIVE, active);
+      setAttribute(slide, ARIA_CURRENT, isNavigation && active || '');
+      emit(active ? EVENT_ACTIVE : EVENT_INACTIVE, self);
     }
   }
 
@@ -201,26 +201,26 @@ export const Slide = ( Splide: Splide, index: number, slideIndex: number, slide:
    */
   function updateVisibility(): void {
     const visible = isVisible();
-    const hidden = ! visible && ( ! isActive() || isClone );
+    const hidden = !visible && (!isActive() || isClone);
 
-    if ( ! Splide.state.is( [ MOVING, SCROLLING ] ) ) {
-      setAttribute( slide, ARIA_HIDDEN, hidden || '' );
+    if (!Splide.state.is([MOVING, SCROLLING])) {
+      setAttribute(slide, ARIA_HIDDEN, hidden || '');
     }
 
-    setAttribute( queryAll( slide, options.focusableNodes || '' ), TAB_INDEX, hidden ? -1 : '' );
+    setAttribute(queryAll(slide, options.focusableNodes || ''), TAB_INDEX, hidden ? -1 : '');
 
-    if ( slideFocus ) {
-      setAttribute( slide, TAB_INDEX, hidden ? -1 : 0 );
+    if (slideFocus) {
+      setAttribute(slide, TAB_INDEX, hidden ? -1 : 0);
     }
 
-    if ( visible !== hasClass( slide, CLASS_VISIBLE ) ) {
-      toggleClass( slide, CLASS_VISIBLE, visible );
-      emit( visible ? EVENT_VISIBLE : EVENT_HIDDEN, self );
+    if (visible !== hasClass(slide, CLASS_VISIBLE)) {
+      toggleClass(slide, CLASS_VISIBLE, visible);
+      emit(visible ? EVENT_VISIBLE : EVENT_HIDDEN, self);
     }
 
-    if ( ! visible && document.activeElement === slide ) {
-      const Slide = Components.Slides.getAt( Splide.index );
-      Slide && focus( Slide.slide );
+    if (!visible && document.activeElement === slide) {
+      const Slide = Components.Slides.getAt(Splide.index);
+      Slide && focus(Slide.slide);
     }
   }
 
@@ -231,8 +231,8 @@ export const Slide = ( Splide: Splide, index: number, slideIndex: number, slide:
    * @param value        - A CSS value to add.
    * @param useContainer - Optional. Determines whether to apply the rule to the container or not.
    */
-  function style( prop: CSSProperties, value: string | number, useContainer?: boolean ): void {
-    _style( ( useContainer && container ) || slide, prop, value );
+  function style(prop: CSSProperties, value: string | number, useContainer?: boolean): void {
+    _style((useContainer && container) || slide, prop, value);
   }
 
   /**
@@ -243,24 +243,24 @@ export const Slide = ( Splide: Splide, index: number, slideIndex: number, slide:
   function isActive(): boolean {
     const { index: curr } = Splide;
     const { cloneStatus = true } = options;
-    return curr === index || ( cloneStatus && curr === slideIndex );
+    return curr === index || (cloneStatus && curr === slideIndex);
   }
 
   /**
    * Checks if the slide is visible or not.
    */
-  function isVisible( partial?: boolean ): boolean {
-    if ( Splide.is( FADE ) ) {
+  function isVisible(partial?: boolean): boolean {
+    if (Splide.is(FADE)) {
       return isActive();
     }
 
-    const trackRect = rect( Elements.track );
-    const slideRect = rect( slide );
-    const left      = resolve( 'left', true );
-    const right     = resolve( 'right', true );
+    const trackRect = rect(Elements.track);
+    const slideRect = rect(slide);
+    const left = resolve('left', true);
+    const right = resolve('right', true);
 
-    return floor( trackRect[ left ] ) <= ceil( slideRect[ partial ? right : left ] )
-      && floor( slideRect[ partial ? left : right ] ) <= ceil( trackRect[ right ] );
+    return floor(trackRect[left]) <= ceil(slideRect[partial ? right : left])
+      && floor(slideRect[partial ? left : right]) <= ceil(trackRect[right]);
   }
 
   /**
@@ -272,11 +272,11 @@ export const Slide = ( Splide: Splide, index: number, slideIndex: number, slide:
    *
    * @return `true` if the slide is within the `distance` from the base slide, or otherwise `false`.
    */
-  function isWithin( from: number, distance: number ): boolean {
-    let diff = abs( from - index );
+  function isWithin(from: number, distance: number): boolean {
+    let diff = abs(from - index);
 
-    if ( ! isClone && ( options.rewind || Splide.is( LOOP ) ) ) {
-      diff = min( diff, Splide.length - diff );
+    if (!isClone && (options.rewind || Splide.is(LOOP))) {
+      diff = min(diff, Splide.length - diff);
     }
 
     return diff <= distance;

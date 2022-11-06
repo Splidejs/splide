@@ -40,16 +40,16 @@ export class SplideRenderer {
    *
    * @param splide - A Splide instance.
    */
-  static clean( splide: Splide ): void {
+  static clean(splide: Splide): void {
     const { on } = splide.event;
     const { root } = splide;
-    const clones = queryAll( root, `.${ CLASS_CLONE }` );
+    const clones = queryAll(root, `.${ CLASS_CLONE }`);
 
-    on( EVENT_MOUNTED, () => {
-      removeNode( child( root, 'style' ) );
-    } );
+    on(EVENT_MOUNTED, () => {
+      removeNode(child(root, 'style'));
+    });
 
-    removeNode( clones );
+    removeNode(clones);
   }
 
   /**
@@ -90,7 +90,7 @@ export class SplideRenderer {
   /**
    * An array with options for each breakpoint.
    */
-  private readonly breakpoints: [ string, Options ][] = [];
+  private readonly breakpoints: [string, Options][] = [];
 
   /**
    * The SplideRenderer constructor.
@@ -100,17 +100,17 @@ export class SplideRenderer {
    * @param config   - Static default options.
    * @param defaults - Default options for the slider. Pass `Splide.defaults` if you are using it.
    */
-  constructor( contents: string[] | SlideContent[], options?: Options, config?: RendererConfig, defaults?: Options ) {
-    merge( DEFAULTS, defaults || {} );
-    merge( merge( this.options, DEFAULTS ), options || {} );
+  constructor(contents: string[] | SlideContent[], options?: Options, config?: RendererConfig, defaults?: Options) {
+    merge(DEFAULTS, defaults || {});
+    merge(merge(this.options, DEFAULTS), options || {});
 
-    this.contents  = contents;
-    this.config    = assign( {}, RENDERER_DEFAULT_CONFIG, config || {} );
-    this.id        = this.config.id || uniqueId( 'splide' );
-    this.Style     = new Style( this.id, this.options );
-    this.Direction = Direction( null, null, this.options, undefined );
+    this.contents = contents;
+    this.config = assign({}, RENDERER_DEFAULT_CONFIG, config || {});
+    this.id = this.config.id || uniqueId('splide');
+    this.Style = new Style(this.id, this.options);
+    this.Direction = Direction(null, null, this.options, undefined);
 
-    assert( this.contents.length, 'Provide at least 1 content.' );
+    assert(this.contents.length, 'Provide at least 1 content.');
 
     this.init();
   }
@@ -131,25 +131,25 @@ export class SplideRenderer {
    * Initializes slides.
    */
   private initSlides(): void {
-    push( this.slides, this.contents.map( ( content, index ) => {
-      content = isString( content ) ? { html: content } : content;
+    push(this.slides, this.contents.map((content, index) => {
+      content = isString(content) ? { html: content } : content;
       content.styles = content.styles || {};
-      content.attrs  = content.attrs || {};
+      content.attrs = content.attrs || {};
 
-      this.cover( content );
+      this.cover(content);
 
       const classes = `${ this.options.classes.slide } ${ index === 0 ? CLASS_ACTIVE : '' }`;
 
-      assign( content.attrs, {
+      assign(content.attrs, {
         class: `${ classes } ${ content.attrs.class || '' }`.trim(),
-        style: this.buildStyles( content.styles ),
-      } );
+        style: this.buildStyles(content.styles),
+      });
 
       return content;
-    } ) );
+    }));
 
-    if ( this.isLoop() ) {
-      this.generateClones( this.slides );
+    if (this.isLoop()) {
+      this.generateClones(this.slides);
     }
   }
 
@@ -157,9 +157,9 @@ export class SplideRenderer {
    * Registers styles for the root element.
    */
   private registerRootStyles(): void {
-    this.breakpoints.forEach( ( [ width, options ] ) => {
-      this.Style.rule( ' ', 'max-width', unit( options.width ), width );
-    } );
+    this.breakpoints.forEach(([width, options]) => {
+      this.Style.rule(' ', 'max-width', unit(options.width), width);
+    });
   }
 
   /**
@@ -169,11 +169,11 @@ export class SplideRenderer {
     const { Style } = this;
     const selector = `.${ CLASS_TRACK }`;
 
-    this.breakpoints.forEach( ( [ width, options ] ) => {
-      Style.rule( selector, this.resolve( 'paddingLeft' ), this.cssPadding( options, false ), width );
-      Style.rule( selector, this.resolve( 'paddingRight' ), this.cssPadding( options, true ), width );
-      Style.rule( selector, 'height', this.cssTrackHeight( options ), width );
-    } );
+    this.breakpoints.forEach(([width, options]) => {
+      Style.rule(selector, this.resolve('paddingLeft'), this.cssPadding(options, false), width);
+      Style.rule(selector, this.resolve('paddingRight'), this.cssPadding(options, true), width);
+      Style.rule(selector, 'height', this.cssTrackHeight(options), width);
+    });
   }
 
   /**
@@ -183,13 +183,13 @@ export class SplideRenderer {
     const { Style } = this;
     const selector = `.${ CLASS_LIST }`;
 
-    this.breakpoints.forEach( ( [ width, options ] ) => {
-      Style.rule( selector, 'transform', this.buildTranslate( options ), width );
+    this.breakpoints.forEach(([width, options]) => {
+      Style.rule(selector, 'transform', this.buildTranslate(options), width);
 
-      if ( ! this.cssSlideHeight( options ) ) {
-        Style.rule( selector, 'aspect-ratio', this.cssAspectRatio( options ), width );
+      if (!this.cssSlideHeight(options)) {
+        Style.rule(selector, 'aspect-ratio', this.cssAspectRatio(options), width);
       }
-    } );
+    });
   }
 
   /**
@@ -199,12 +199,12 @@ export class SplideRenderer {
     const { Style } = this;
     const selector = `.${ CLASS_SLIDE }`;
 
-    this.breakpoints.forEach( ( [ width, options ] ) => {
-      Style.rule( selector, 'width', this.cssSlideWidth( options ), width );
-      Style.rule( selector, 'height', this.cssSlideHeight( options ) || '100%', width );
-      Style.rule( selector, this.resolve( 'marginRight' ), unit( options.gap ) || '0px', width );
-      Style.rule( `${ selector } > img`, 'display', options.cover ? 'none' : 'inline', width );
-    } );
+    this.breakpoints.forEach(([width, options]) => {
+      Style.rule(selector, 'width', this.cssSlideWidth(options), width);
+      Style.rule(selector, 'height', this.cssSlideHeight(options) || '100%', width);
+      Style.rule(selector, this.resolve('marginRight'), unit(options.gap) || '0px', width);
+      Style.rule(`${ selector } > img`, 'display', options.cover ? 'none' : 'inline', width);
+    });
   }
 
   /**
@@ -214,22 +214,22 @@ export class SplideRenderer {
    *
    * @return A string with multiple translate functions.
    */
-  private buildTranslate( options: Options ): string {
+  private buildTranslate(options: Options): string {
     const { resolve, orient } = this.Direction;
     const values = [];
 
-    values.push( this.cssOffsetClones( options ) );
-    values.push( this.cssOffsetGaps( options ) );
+    values.push(this.cssOffsetClones(options));
+    values.push(this.cssOffsetGaps(options));
 
-    if ( this.isCenter( options ) ) {
-      values.push( this.buildCssValue( orient( -50 ), '%' ) );
-      values.push( ...this.cssOffsetCenter( options ) );
+    if (this.isCenter(options)) {
+      values.push(this.buildCssValue(orient(-50), '%'));
+      values.push(...this.cssOffsetCenter(options));
     }
 
     return values
-      .filter( Boolean )
-      .map( value => `translate${ resolve( 'X' ) }(${ value })` )
-      .join( ' ' );
+      .filter(Boolean)
+      .map(value => `translate${ resolve('X') }(${ value })`)
+      .join(' ');
   }
 
   /**
@@ -240,17 +240,17 @@ export class SplideRenderer {
    *
    * @return The offset.
    */
-  private cssOffsetClones( options: Options ): string {
+  private cssOffsetClones(options: Options): string {
     const { resolve, orient } = this.Direction;
     const cloneCount = this.getCloneCount();
 
-    if ( this.isFixedWidth( options ) ) {
-      const { value, unit } = this.parseCssValue( options[ resolve( 'fixedWidth' ) ] );
-      return this.buildCssValue( orient( value ) * cloneCount, unit );
+    if (this.isFixedWidth(options)) {
+      const { value, unit } = this.parseCssValue(options[resolve('fixedWidth')]);
+      return this.buildCssValue(orient(value) * cloneCount, unit);
     }
 
     const percent = 100 * cloneCount / options.perPage;
-    return `${ orient( percent ) }%`;
+    return `${ orient(percent) }%`;
   }
 
   /**
@@ -265,23 +265,23 @@ export class SplideRenderer {
    *
    * @return The offset.
    */
-  private cssOffsetCenter( options: Options ): string[] {
+  private cssOffsetCenter(options: Options): string[] {
     const { resolve, orient } = this.Direction;
 
-    if ( this.isFixedWidth( options ) ) {
-      const { value, unit } = this.parseCssValue( options[ resolve( 'fixedWidth' ) ] );
-      return [ this.buildCssValue( orient( value / 2 ), unit ) ];
+    if (this.isFixedWidth(options)) {
+      const { value, unit } = this.parseCssValue(options[resolve('fixedWidth')]);
+      return [this.buildCssValue(orient(value / 2), unit)];
     }
 
     const values = [];
     const { perPage, gap } = options;
 
-    values.push( `${ orient( 50 / perPage ) }%` );
+    values.push(`${ orient(50 / perPage) }%`);
 
-    if ( gap ) {
-      const { value, unit } = this.parseCssValue( gap );
-      const gapOffset = ( value / perPage - value ) / 2;
-      values.push( this.buildCssValue( orient( gapOffset ), unit ) );
+    if (gap) {
+      const { value, unit } = this.parseCssValue(gap);
+      const gapOffset = (value / perPage - value) / 2;
+      values.push(this.buildCssValue(orient(gapOffset), unit));
     }
 
     return values;
@@ -294,20 +294,20 @@ export class SplideRenderer {
    *
    * @return The offset as `calc()`.
    */
-  private cssOffsetGaps( options: Options ): string {
+  private cssOffsetGaps(options: Options): string {
     const cloneCount = this.getCloneCount();
 
-    if ( cloneCount && options.gap ) {
+    if (cloneCount && options.gap) {
       const { orient } = this.Direction;
-      const { value, unit } = this.parseCssValue( options.gap );
+      const { value, unit } = this.parseCssValue(options.gap);
 
-      if ( this.isFixedWidth( options ) ) {
-        return this.buildCssValue( orient( value * cloneCount ), unit );
+      if (this.isFixedWidth(options)) {
+        return this.buildCssValue(orient(value * cloneCount), unit);
       }
 
       const { perPage } = options;
       const gaps = cloneCount / perPage;
-      return this.buildCssValue( orient( gaps * value ), unit );
+      return this.buildCssValue(orient(gaps * value), unit);
     }
 
     return '';
@@ -320,8 +320,8 @@ export class SplideRenderer {
    *
    * @return A resolved property name in the Kebab case.
    */
-  private resolve( prop: string ): string {
-    return camelToKebab( this.Direction.resolve( prop ) );
+  private resolve(prop: string): string {
+    return camelToKebab(this.Direction.resolve(prop));
   }
 
   /**
@@ -332,10 +332,10 @@ export class SplideRenderer {
    *
    * @return Padding in the CSS format.
    */
-  private cssPadding( options: Options, right: boolean ): string {
+  private cssPadding(options: Options, right: boolean): string {
     const { padding } = options;
-    const prop = this.Direction.resolve( right ? 'right' : 'left', true );
-    return padding && unit( padding[ prop ] || ( isObject( padding ) ? 0 : padding ) ) || '0px';
+    const prop = this.Direction.resolve(right ? 'right' : 'left', true);
+    return padding && unit(padding[prop] || (isObject(padding) ? 0 : padding)) || '0px';
   }
 
   /**
@@ -345,13 +345,13 @@ export class SplideRenderer {
    *
    * @return Height in the CSS format.
    */
-  private cssTrackHeight( options: Options ): string {
+  private cssTrackHeight(options: Options): string {
     let height = '';
 
-    if ( this.isVertical() ) {
-      height = this.cssHeight( options );
-      assert( height, '"height" is missing.' );
-      height = `calc(${ height } - ${ this.cssPadding( options, false ) } - ${ this.cssPadding( options, true ) })`;
+    if (this.isVertical()) {
+      height = this.cssHeight(options);
+      assert(height, '"height" is missing.');
+      height = `calc(${ height } - ${ this.cssPadding(options, false) } - ${ this.cssPadding(options, true) })`;
     }
 
     return height;
@@ -364,8 +364,8 @@ export class SplideRenderer {
    *
    * @return Height in the CSS format.
    */
-  private cssHeight( options: Options ): string {
-    return unit( options.height );
+  private cssHeight(options: Options): string {
+    return unit(options.height);
   }
 
   /**
@@ -375,10 +375,10 @@ export class SplideRenderer {
    *
    * @return Width in the CSS format.
    */
-  private cssSlideWidth( options: Options ): string {
+  private cssSlideWidth(options: Options): string {
     return options.autoWidth
       ? ''
-      : unit( options.fixedWidth ) || ( this.isVertical() ? '' : this.cssSlideSize( options ) );
+      : unit(options.fixedWidth) || (this.isVertical() ? '' : this.cssSlideSize(options));
   }
 
   /**
@@ -388,11 +388,11 @@ export class SplideRenderer {
    *
    * @return Height in the CSS format.
    */
-  private cssSlideHeight( options: Options ): string {
-    return unit( options.fixedHeight )
-      || ( this.isVertical()
-        ? ( options.autoHeight ? '' : this.cssSlideSize( options ) )
-        : this.cssHeight( options )
+  private cssSlideHeight(options: Options): string {
+    return unit(options.fixedHeight)
+      || (this.isVertical()
+        ? (options.autoHeight ? '' : this.cssSlideSize(options))
+        : this.cssHeight(options)
       );
   }
 
@@ -403,8 +403,8 @@ export class SplideRenderer {
    *
    * @return Width or height in the CSS format.
    */
-  private cssSlideSize( options: Options ): string {
-    const gap = unit( options.gap );
+  private cssSlideSize(options: Options): string {
+    const gap = unit(options.gap);
     return `calc((100%${ gap && ` + ${ gap }` })/${ options.perPage || 1 }${ gap && ` - ${ gap }` })`;
   }
 
@@ -415,7 +415,7 @@ export class SplideRenderer {
    *
    * @return aspectRatio in the CSS format.
    */
-  private cssAspectRatio( options: Options ): string {
+  private cssAspectRatio(options: Options): string {
     const { heightRatio } = options;
     return heightRatio ? `${ 1 / heightRatio }` : '';
   }
@@ -428,7 +428,7 @@ export class SplideRenderer {
    *
    * @return A built value for a CSS value.
    */
-  private buildCssValue( value: number, unit: string ): string {
+  private buildCssValue(value: number, unit: string): string {
     return `${ value }${ unit }`;
   }
 
@@ -439,10 +439,10 @@ export class SplideRenderer {
    *
    * @return An object with value and unit.
    */
-  private parseCssValue( value: string | number ): { value: number, unit: string } {
-    if ( isString( value ) ) {
-      const number = parseFloat( value ) || 0;
-      const unit   = value.replace( /\d*(\.\d*)?/, '' ) || 'px';
+  private parseCssValue(value: string | number): { value: number, unit: string } {
+    if (isString(value)) {
+      const number = parseFloat(value) || 0;
+      const unit = value.replace(/\d*(\.\d*)?/, '') || 'px';
       return { value: number, unit };
     }
 
@@ -455,12 +455,12 @@ export class SplideRenderer {
   private parseBreakpoints(): void {
     const { breakpoints } = this.options;
 
-    this.breakpoints.push( [ 'default', this.options ] );
+    this.breakpoints.push(['default', this.options]);
 
-    if ( breakpoints ) {
-      forOwn( breakpoints, ( options, width ) => {
-        this.breakpoints.push( [ width, merge( merge( {}, this.options ), options ) ] );
-      } );
+    if (breakpoints) {
+      forOwn(breakpoints, (options, width) => {
+        this.breakpoints.push([width, merge(merge({}, this.options), options)]);
+      });
     }
   }
 
@@ -469,8 +469,8 @@ export class SplideRenderer {
    *
    * @return `true` if the slide width is fixed, or otherwise `false`.
    */
-  private isFixedWidth( options: Options ): boolean {
-    return !! options[ this.Direction.resolve( 'fixedWidth' ) ];
+  private isFixedWidth(options: Options): boolean {
+    return !!options[this.Direction.resolve('fixedWidth')];
   }
 
   /**
@@ -487,14 +487,14 @@ export class SplideRenderer {
    *
    * @return `true` if the slide should be centered, or otherwise `false`.
    */
-  private isCenter( options: Options ): boolean {
-    if( options.focus === 'center' ) {
-      if ( this.isLoop() ) {
+  private isCenter(options: Options): boolean {
+    if (options.focus === 'center') {
+      if (this.isLoop()) {
         return true;
       }
 
-      if ( this.options.type === SLIDE ) {
-        return ! this.options.trimSpace;
+      if (this.options.type === SLIDE) {
+        return !this.options.trimSpace;
       }
     }
 
@@ -525,8 +525,8 @@ export class SplideRenderer {
       options.drag && `${ CLASS_ROOT }--draggable`,
       options.isNavigation && `${ CLASS_ROOT }--nav`,
       CLASS_ACTIVE,
-      ! this.config.hidden && CLASS_RENDERED,
-    ].filter( Boolean ).join( ' ' );
+      !this.config.hidden && CLASS_RENDERED,
+    ].filter(Boolean).join(' ');
   }
 
   /**
@@ -536,12 +536,12 @@ export class SplideRenderer {
    *
    * @return A built string.
    */
-  private buildAttrs( attrs: Record<string, string | number | boolean> ): string {
+  private buildAttrs(attrs: Record<string, string | number | boolean>): string {
     let attr = '';
 
-    forOwn( attrs, ( value, key ) => {
-      attr += value ? ` ${ camelToKebab( key ) }="${ value }"` : '';
-    } );
+    forOwn(attrs, (value, key) => {
+      attr += value ? ` ${ camelToKebab(key) }="${ value }"` : '';
+    });
 
     return attr.trim();
   }
@@ -553,12 +553,12 @@ export class SplideRenderer {
    *
    * @return A built string.
    */
-  private buildStyles( styles: Record<string, string | number> ): string {
+  private buildStyles(styles: Record<string, string | number>): string {
     let style = '';
 
-    forOwn( styles, ( value, key ) => {
-      style += ` ${ camelToKebab( key ) }:${ value };`;
-    } );
+    forOwn(styles, (value, key) => {
+      style += ` ${ camelToKebab(key) }:${ value };`;
+    });
 
     return style.trim();
   }
@@ -571,9 +571,9 @@ export class SplideRenderer {
   private renderSlides(): string {
     const { slideTag: tag } = this.config;
 
-    return this.slides.map( content => {
-      return `<${ tag } ${ this.buildAttrs( content.attrs ) }>${ content.html || '' }</${ tag }>`;
-    } ).join( '' );
+    return this.slides.map(content => {
+      return `<${ tag } ${ this.buildAttrs(content.attrs) }>${ content.html || '' }</${ tag }>`;
+    }).join('');
   }
 
   /**
@@ -581,14 +581,14 @@ export class SplideRenderer {
    *
    * @param content - A slide content.
    */
-  private cover( content: SlideContent ): void {
+  private cover(content: SlideContent): void {
     const { styles, html = '' } = content;
 
-    if ( this.options.cover && ! this.options.lazyLoad ) {
-      const src = html.match( /<img.*?src\s*=\s*(['"])(.+?)\1.*?>/ );
+    if (this.options.cover && !this.options.lazyLoad) {
+      const src = html.match(/<img.*?src\s*=\s*(['"])(.+?)\1.*?>/);
 
-      if ( src && src[ 2 ] ) {
-        styles.background = `center/cover no-repeat url('${ src[ 2 ] }')`;
+      if (src && src[2]) {
+        styles.background = `center/cover no-repeat url('${ src[2] }')`;
       }
     }
   }
@@ -598,20 +598,20 @@ export class SplideRenderer {
    *
    * @param contents - An array with SlideContent objects.
    */
-  private generateClones( contents: SlideContent[] ): void {
+  private generateClones(contents: SlideContent[]): void {
     const { classes } = this.options;
-    const count  = this.getCloneCount();
+    const count = this.getCloneCount();
     const slides = contents.slice();
 
-    while ( slides.length < count ) {
-      push( slides, slides );
+    while (slides.length < count) {
+      push(slides, slides);
     }
 
-    push( slides.slice( -count ).reverse(), slides.slice( 0, count ) ).forEach( ( content, index ) => {
-      const attrs = assign( {}, content.attrs, { class: `${ content.attrs.class } ${ classes.clone }` } );
-      const clone = assign( {}, content, { attrs } );
-      index < count ? contents.unshift( clone ) : contents.push( clone );
-    } );
+    push(slides.slice(-count).reverse(), slides.slice(0, count)).forEach((content, index) => {
+      const attrs = assign({}, content.attrs, { class: `${ content.attrs.class } ${ classes.clone }` });
+      const clone = assign({}, content, { attrs });
+      index < count ? contents.unshift(clone) : contents.push(clone);
+    });
   }
 
   /**
@@ -620,15 +620,15 @@ export class SplideRenderer {
    * @return A number of clones.
    */
   private getCloneCount(): number {
-    if ( this.isLoop() ) {
+    if (this.isLoop()) {
       const { options } = this;
 
-      if ( options.clones ) {
+      if (options.clones) {
         return options.clones;
       }
 
-      const perPage = max( ...this.breakpoints.map( ( [ , options ] ) => options.perPage ) );
-      return perPage * ( ( options.flickMaxPages || 1 ) + 1 );
+      const perPage = max(...this.breakpoints.map(([, options]) => options.perPage));
+      return perPage * ((options.flickMaxPages || 1) + 1);
     }
 
     return 0;
@@ -643,8 +643,8 @@ export class SplideRenderer {
     let html = '';
 
     html += `<div class="${ this.options.classes.arrows }">`;
-    html += this.renderArrow( true );
-    html += this.renderArrow( false );
+    html += this.renderArrow(true);
+    html += this.renderArrow(false);
     html += `</div>`;
 
     return html;
@@ -658,16 +658,16 @@ export class SplideRenderer {
    *
    * @return The HTML for the prev or next arrow.
    */
-  private renderArrow( prev: boolean ): string {
+  private renderArrow(prev: boolean): string {
     const { classes, i18n } = this.options;
     const attrs = {
-      class    : `${ classes.arrow } ${ prev ? classes.prev : classes.next }`,
-      type     : 'button',
+      class: `${ classes.arrow } ${ prev ? classes.prev : classes.next }`,
+      type: 'button',
       ariaLabel: prev ? i18n.prev : i18n.next,
     };
 
-    return `<button ${ this.buildAttrs( attrs ) }>`
-      +	`<svg xmlns="${ XML_NAME_SPACE }" viewBox="0 0 ${ SIZE } ${ SIZE }" width="${ SIZE }" height="${ SIZE }">`
+    return `<button ${ this.buildAttrs(attrs) }>`
+      + `<svg xmlns="${ XML_NAME_SPACE }" viewBox="0 0 ${ SIZE } ${ SIZE }" width="${ SIZE }" height="${ SIZE }">`
       + `<path d="${ this.options.arrowPath || PATH }" />`
       + `</svg>`
       + `</button>`;
@@ -686,14 +686,14 @@ export class SplideRenderer {
     html += `<div id="${ this.id }" class="${ this.buildClasses() } ${ rootClass || '' }">`;
     html += `<style>${ this.Style.build() }</style>`;
 
-    if ( slider ) {
+    if (slider) {
       html += beforeSlider || '';
       html += `<div class="splide__slider">`;
     }
 
     html += beforeTrack || '';
 
-    if ( arrows ) {
+    if (arrows) {
       html += this.renderArrows();
     }
 
@@ -707,7 +707,7 @@ export class SplideRenderer {
 
     html += afterTrack || '';
 
-    if ( slider ) {
+    if (slider) {
       html += `</div>`;
       html += afterSlider || '';
     }

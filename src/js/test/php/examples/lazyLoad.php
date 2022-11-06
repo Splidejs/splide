@@ -14,48 +14,48 @@ $settings = get_settings();
   <link rel="stylesheet" href="../../assets/css/styles.css">
   <script src="../../../../../dist/js/splide.js"></script>
 
-<!--  <style>-->
-<!--    .splide__slide img {-->
-<!--      width: 100%;-->
-<!--      height: 100%;-->
-<!--      object-fit: cover;-->
-<!--    }-->
-<!--  </style>-->
+  <!--  <style>-->
+  <!--    .splide__slide img {-->
+  <!--      width: 100%;-->
+  <!--      height: 100%;-->
+  <!--      object-fit: cover;-->
+  <!--    }-->
+  <!--  </style>-->
 
   <script>
-    document.addEventListener( 'DOMContentLoaded', function () {
-      var splide01 = new Splide( '#splide01', {
-        perPage    : 1,
+    document.addEventListener('DOMContentLoaded', function () {
+      var splide01 = new Splide('#splide01', {
+        perPage: 1,
         // type       : 'fade',
-        lazyLoad   : 'nearby',
+        lazyLoad: 'nearby',
         // cover      : true,
-        drag       : 'free',
-        rewind     : true,
-        heightRatio: ( 9 / 16 ) / 2,
-      } );
+        drag: 'free',
+        rewind: true,
+        heightRatio: (9 / 16) / 2,
+      });
 
       splide01.mount();
 
-      var splide02 = new Splide( '#splide02', {
-        perPage    : 2,
-        lazyLoad   : 'nearby',
-        heightRatio: ( 9 / 16 ) / 2,
-        speed      : 400,
-      } );
+      var splide02 = new Splide('#splide02', {
+        perPage: 2,
+        lazyLoad: 'nearby',
+        heightRatio: (9 / 16) / 2,
+        speed: 400,
+      });
 
       splide02.mount();
 
       let sig = 20;
 
-      splide01.on( 'moved', ( index ) => {
-        if ( index === splide01.length - 1 ) {
-          splide01.add( [
+      splide01.on('moved', (index) => {
+        if (index === splide01.length - 1) {
+          splide01.add([
             `<li class="splide__slide"><img data-splide-lazy="https://source.unsplash.com/random/960x540?sig=${ ++sig }"></li>`,
             `<li class="splide__slide"><img data-splide-lazy="https://source.unsplash.com/random/960x540?sig=${ ++sig }"></li>`,
-          ] );
+          ]);
         }
-      } );
-    } );
+      });
+    });
   </script>
 </head>
 <body>
@@ -66,9 +66,9 @@ $settings = get_settings();
   <div class="splide__track">
     <ul class="splide__list">
       <?php
-      for ( $i = 0; $i < 10; $i++ ) {
+      for ($i = 0; $i < 10; $i++) {
         echo '<li class="splide__slide">';
-        printf( '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPc9/3HfwAI1gOuq1Su+AAAAABJRU5ErkJggg==" data-splide-lazy="https://source.unsplash.com/random/960x540?sig=%s">', $i + 1 );
+        printf('<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPc9/3HfwAI1gOuq1Su+AAAAABJRU5ErkJggg==" data-splide-lazy="https://source.unsplash.com/random/960x540?sig=%s">', $i + 1);
         echo '</li>' . PHP_EOL;
       }
       ?>
@@ -82,12 +82,12 @@ $settings = get_settings();
   <div class="splide__track">
     <ul class="splide__list">
       <?php
-      for ( $i = 0; $i < 10; $i++ ) {
+      for ($i = 0; $i < 10; $i++) {
         echo '<li class="splide__slide">';
         printf(
           '<img data-splide-lazy-srcset="%s, %s">',
-          sprintf( 'https://source.unsplash.com/random/640x360?sig=%s 640w', $i + 1 ),
-          sprintf( 'https://source.unsplash.com/random/960x540?sig=%s 960w', $i + 1 )
+          sprintf('https://source.unsplash.com/random/640x360?sig=%s 640w', $i + 1),
+          sprintf('https://source.unsplash.com/random/960x540?sig=%s 960w', $i + 1)
         );
         echo '</li>' . PHP_EOL;
       }

@@ -15,30 +15,30 @@ $settings = get_settings();
   <script src="../../../../../dist/js/splide.js"></script>
 
   <script>
-    document.addEventListener( 'DOMContentLoaded', function () {
-      var splide01 = new Splide( '#splide01', {
-        perPage    : 2,
-        gap        : '1rem',
+    document.addEventListener('DOMContentLoaded', function () {
+      var splide01 = new Splide('#splide01', {
+        perPage: 2,
+        gap: '1rem',
         heightRatio: 0.2,
-        cover      : true,
-      } );
+        cover: true,
+      });
 
       splide01.mount();
 
-      var splide02 = new Splide( '#splide02', {
-        perPage      : 2,
-        gap          : '1rem',
-        heightRatio  : 0.2,
-        cover        : true,
-        autoplay     : true,
-        arrows       : 'slider',
-        pagination   : 'slider',
-        rewind       : true,
+      var splide02 = new Splide('#splide02', {
+        perPage: 2,
+        gap: '1rem',
+        heightRatio: 0.2,
+        cover: true,
+        autoplay: true,
+        arrows: 'slider',
+        pagination: 'slider',
+        rewind: true,
         resetProgress: false,
-      } );
+      });
 
       splide02.mount();
-    } );
+    });
   </script>
 </head>
 <body>
@@ -49,15 +49,15 @@ $settings = get_settings();
   <div class="splide__track">
     <ul class="splide__list">
       <?php
-      for ( $i = 0; $i < 10; $i++ ) {
+      for ($i = 0; $i < 10; $i++) {
         echo '<li class="splide__slide">';
 
         echo '<div class="splide__slide__container">';
-        printf( '<img src="../../assets/images/pics/slide%02d.jpg">', $i + 1 );
+        printf('<img src="../../assets/images/pics/slide%02d.jpg">', $i + 1);
         echo '</div>';
 
         echo '<p>';
-        if ( $i % 2 ) {
+        if ($i % 2) {
           echo 'Lorem ipsum dolor sit amet, ius cu novum splendide contentiones, vim dolorem delicata explicari no. Posidonium sadipscing delicatissimi ad vix, vim at utamur ponderum. Eu doming verear complectitur vim.';
         } else {
           echo 'Lorem ipsum dolor sit amet, in usu facilis philosophia, exerci adolescens honestatis ei eum. Et vis nulla simul, pri cu euismod accusam vulputate.';
@@ -78,9 +78,9 @@ $settings = get_settings();
     <div class="splide__track">
       <ul class="splide__list">
         <?php
-        for ( $i = 0; $i < 10; $i++ ) {
+        for ($i = 0; $i < 10; $i++) {
           echo '<li class="splide__slide">';
-          printf( '<img src="../../assets/images/pics/slide%02d.jpg">', $i + 1 );
+          printf('<img src="../../assets/images/pics/slide%02d.jpg">', $i + 1);
           echo '</li>' . PHP_EOL;
         }
         ?>

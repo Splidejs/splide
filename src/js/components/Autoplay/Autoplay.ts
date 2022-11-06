@@ -36,10 +36,10 @@ export interface AutoplayComponent extends BaseComponent {
  *
  * @return An Autoplay component object.
  */
-export const Autoplay: ComponentConstructor<AutoplayComponent> = ( Splide, Components, options, event ) => {
+export const Autoplay: ComponentConstructor<AutoplayComponent> = (Splide, Components, options, event) => {
   const { on, bind, emit } = event;
   const { interval: duration, pauseOnHover = true, pauseOnFocus = true, resetProgress = true } = options;
-  const interval = RequestInterval( duration, () => Splide.go( '>' ), onAnimationFrame );
+  const interval = RequestInterval(duration, () => Splide.go('>'), onAnimationFrame);
   const { isPaused } = interval;
   const { Elements, Elements: { root, toggle } } = Components;
   const { autoplay } = options;
@@ -64,9 +64,9 @@ export const Autoplay: ComponentConstructor<AutoplayComponent> = ( Splide, Compo
    * Called when the component is mounted.
    */
   function mount(): void {
-    if ( autoplay ) {
+    if (autoplay) {
       listen();
-      toggle && setAttribute( toggle, ARIA_CONTROLS, Elements.track.id );
+      toggle && setAttribute(toggle, ARIA_CONTROLS, Elements.track.id);
       stopped || play();
       update();
     }
@@ -76,39 +76,39 @@ export const Autoplay: ComponentConstructor<AutoplayComponent> = ( Splide, Compo
    * Listens to some events.
    */
   function listen(): void {
-    if ( pauseOnHover ) {
-      bind( root, 'mouseenter mouseleave', e => {
+    if (pauseOnHover) {
+      bind(root, 'mouseenter mouseleave', e => {
         hovered = e.type === 'mouseenter';
         autoToggle();
-      } );
+      });
     }
 
-    if ( pauseOnFocus ) {
-      bind( root, 'focusin focusout', e => {
+    if (pauseOnFocus) {
+      bind(root, 'focusin focusout', e => {
         focused = e.type === 'focusin';
         autoToggle();
-      } );
+      });
     }
 
-    if ( toggle ) {
-      bind( toggle, 'click', () => {
-        stopped ? play() : pause( true );
-      } );
+    if (toggle) {
+      bind(toggle, 'click', () => {
+        stopped ? play() : pause(true);
+      });
     }
 
-    on( [ EVENT_MOVE, EVENT_SCROLL, EVENT_REFRESH ], interval.rewind );
-    on( EVENT_MOVE, onMove );
+    on([EVENT_MOVE, EVENT_SCROLL, EVENT_REFRESH], interval.rewind);
+    on(EVENT_MOVE, onMove);
   }
 
   /**
    * Starts autoplay and clears all flags.
    */
   function play(): void {
-    if ( isPaused() && Components.Slides.isEnough() ) {
-      interval.start( ! resetProgress );
+    if (isPaused() && Components.Slides.isEnough()) {
+      interval.start(!resetProgress);
       focused = hovered = stopped = false;
       update();
-      emit( EVENT_AUTOPLAY_PLAY );
+      emit(EVENT_AUTOPLAY_PLAY);
     }
   }
 
@@ -117,13 +117,13 @@ export const Autoplay: ComponentConstructor<AutoplayComponent> = ( Splide, Compo
    *
    * @param stop - If `true`, autoplay keeps paused until `play()` is explicitly called.
    */
-  function pause( stop = true ): void {
-    stopped = !! stop;
+  function pause(stop = true): void {
+    stopped = !!stop;
     update();
 
-    if ( ! isPaused() ) {
+    if (!isPaused()) {
       interval.pause();
-      emit( EVENT_AUTOPLAY_PAUSE );
+      emit(EVENT_AUTOPLAY_PAUSE);
     }
   }
 
@@ -132,8 +132,8 @@ export const Autoplay: ComponentConstructor<AutoplayComponent> = ( Splide, Compo
    * If autoplay is manually paused, this will do nothing.
    */
   function autoToggle(): void {
-    if ( ! stopped ) {
-      hovered || focused ? pause( false ) : play();
+    if (!stopped) {
+      hovered || focused ? pause(false) : play();
     }
   }
 
@@ -141,9 +141,9 @@ export const Autoplay: ComponentConstructor<AutoplayComponent> = ( Splide, Compo
    * Updates the toggle button status.
    */
   function update(): void {
-    if ( toggle ) {
-      toggleClass( toggle, CLASS_ACTIVE, ! stopped );
-      setAttribute( toggle, ARIA_LABEL, options.i18n[ stopped ? 'play' : 'pause' ] );
+    if (toggle) {
+      toggleClass(toggle, CLASS_ACTIVE, !stopped);
+      setAttribute(toggle, ARIA_LABEL, options.i18n[stopped ? 'play' : 'pause']);
     }
   }
 
@@ -152,10 +152,10 @@ export const Autoplay: ComponentConstructor<AutoplayComponent> = ( Splide, Compo
    *
    * @param rate - The progress rate between 0 and 1.
    */
-  function onAnimationFrame( rate: number ): void {
+  function onAnimationFrame(rate: number): void {
     const { bar } = Elements;
-    bar && style( bar, 'width', `${ rate * 100 }%` );
-    emit( EVENT_AUTOPLAY_PLAYING, rate );
+    bar && style(bar, 'width', `${ rate * 100 }%`);
+    emit(EVENT_AUTOPLAY_PLAYING, rate);
   }
 
   /**
@@ -163,9 +163,9 @@ export const Autoplay: ComponentConstructor<AutoplayComponent> = ( Splide, Compo
    *
    * @param index - An index to move to.
    */
-  function onMove( index: number ): void {
-    const Slide = Components.Slides.getAt( index );
-    interval.set( Slide && +getAttribute( Slide.slide, INTERVAL_DATA_ATTRIBUTE ) || options.interval );
+  function onMove(index: number): void {
+    const Slide = Components.Slides.getAt(index);
+    interval.set(Slide && +getAttribute(Slide.slide, INTERVAL_DATA_ATTRIBUTE) || options.interval);
   }
 
   return {

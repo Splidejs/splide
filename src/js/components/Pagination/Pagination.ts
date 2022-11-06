@@ -45,7 +45,7 @@ import {
  */
 export interface PaginationComponent extends BaseComponent {
   readonly items: PaginationItem[];
-  getAt( index: number ): PaginationItem;
+  getAt(index: number): PaginationItem;
   update(): void;
 }
 
@@ -82,7 +82,7 @@ export interface PaginationItem {
  *
  * @return A Pagination component object.
  */
-export const Pagination: ComponentConstructor<PaginationComponent> = ( Splide, Components, options, event ) => {
+export const Pagination: ComponentConstructor<PaginationComponent> = (Splide, Components, options, event) => {
   const { on, emit, bind } = event;
   const { Slides, Elements, Controller } = Components;
   const { hasFocus, getIndex, go } = Controller;
@@ -109,16 +109,16 @@ export const Pagination: ComponentConstructor<PaginationComponent> = ( Splide, C
    */
   function mount(): void {
     destroy();
-    on( [ EVENT_UPDATED, EVENT_REFRESH, EVENT_END_INDEX_CHANGED ], mount );
+    on([EVENT_UPDATED, EVENT_REFRESH, EVENT_END_INDEX_CHANGED], mount);
 
     const { pagination: enabled = true } = options;
-    placeholder && display( placeholder, enabled ? '' : 'none' );
+    placeholder && display(placeholder, enabled ? '' : 'none');
 
-    if ( enabled ) {
-      on( [ EVENT_MOVE, EVENT_SCROLL, EVENT_SCROLLED ], update );
+    if (enabled) {
+      on([EVENT_MOVE, EVENT_SCROLL, EVENT_SCROLLED], update);
       createPagination();
       update();
-      emit( EVENT_PAGINATION_MOUNTED, { list, items }, getAt( Splide.index ) );
+      emit(EVENT_PAGINATION_MOUNTED, { list, items }, getAt(Splide.index));
     }
   }
 
@@ -126,10 +126,10 @@ export const Pagination: ComponentConstructor<PaginationComponent> = ( Splide, C
    * Destroys the component.
    */
   function destroy(): void {
-    if ( list ) {
-      removeNode( placeholder ? slice( list.children ) : list );
-      removeClass( list, paginationClasses );
-      empty( items );
+    if (list) {
+      removeNode(placeholder ? slice(list.children) : list);
+      removeClass(list, paginationClasses);
+      empty(items);
       list = null;
     }
 
@@ -142,32 +142,32 @@ export const Pagination: ComponentConstructor<PaginationComponent> = ( Splide, C
   function createPagination(): void {
     const { length } = Splide;
     const { classes, i18n, perPage, paginationKeyboard = true } = options;
-    const max = hasFocus() ? Controller.getEnd() + 1 : ceil( length / perPage );
+    const max = hasFocus() ? Controller.getEnd() + 1 : ceil(length / perPage);
     const dir = getDirection();
 
-    list = placeholder || create( 'ul', classes.pagination, Elements.track.parentElement );
+    list = placeholder || create('ul', classes.pagination, Elements.track.parentElement);
 
-    addClass( list, ( paginationClasses = `${ CLASS_PAGINATION }--${ dir }` ) );
-    setAttribute( list, ROLE, 'tablist' );
-    setAttribute( list, ARIA_LABEL, i18n.select );
-    setAttribute( list, ARIA_ORIENTATION, dir === TTB ? 'vertical' : '' );
+    addClass(list, (paginationClasses = `${ CLASS_PAGINATION }--${ dir }`));
+    setAttribute(list, ROLE, 'tablist');
+    setAttribute(list, ARIA_LABEL, i18n.select);
+    setAttribute(list, ARIA_ORIENTATION, dir === TTB ? 'vertical' : '');
 
-    for ( let i = 0; i < max; i++ ) {
-      const li       = create( 'li', null, list );
-      const button   = create( 'button', { class: classes.page, type: 'button' }, li );
-      const controls = Slides.getIn( i ).map( Slide => Slide.slide.id );
-      const text     = ! hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
+    for (let i = 0; i < max; i++) {
+      const li = create('li', null, list);
+      const button = create('button', { class: classes.page, type: 'button' }, li);
+      const controls = Slides.getIn(i).map(Slide => Slide.slide.id);
+      const text = !hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
 
-      bind( button, 'click', () => { go( `>${ i }` ) } );
-      paginationKeyboard && bind( button, 'keydown', apply( onKeydown, i ) );
+      bind(button, 'click', () => go(`>${ i }`));
+      paginationKeyboard && bind(button, 'keydown', apply(onKeydown, i));
 
-      setAttribute( li, ROLE, 'presentation' );
-      setAttribute( button, ROLE, 'tab' );
-      setAttribute( button, ARIA_CONTROLS, controls.join( ' ' ) );
-      setAttribute( button, ARIA_LABEL, format( text, i + 1 ) );
-      setAttribute( button, TAB_INDEX, -1 );
+      setAttribute(li, ROLE, 'presentation');
+      setAttribute(button, ROLE, 'tab');
+      setAttribute(button, ARIA_CONTROLS, controls.join(' '));
+      setAttribute(button, ARIA_LABEL, format(text, i + 1));
+      setAttribute(button, TAB_INDEX, -1);
 
-      items.push( { li, button, page: i } );
+      items.push({ li, button, page: i });
     }
   }
 
@@ -179,29 +179,29 @@ export const Pagination: ComponentConstructor<PaginationComponent> = ( Splide, C
    * @param page - A page index.
    * @param e    - A KeyboardEvent object.
    */
-  function onKeydown( page: number, e: KeyboardEvent ): void {
+  function onKeydown(page: number, e: KeyboardEvent): void {
     const { length } = items;
     const { key } = e;
     const dir = getDirection();
 
     let nextPage = -1;
 
-    if ( key === resolve( ARROW_RIGHT, false, dir ) ) {
+    if (key === resolve(ARROW_RIGHT, false, dir)) {
       nextPage = ++page % length;
-    } else if ( key === resolve( ARROW_LEFT, false, dir ) ) {
-      nextPage = ( --page + length ) % length;
-    } else if ( key === 'Home' ) {
+    } else if (key === resolve(ARROW_LEFT, false, dir)) {
+      nextPage = (--page + length) % length;
+    } else if (key === 'Home') {
       nextPage = 0;
-    } else if ( key === 'End' ) {
+    } else if (key === 'End') {
       nextPage = length - 1;
     }
 
-    const item = items[ nextPage ];
+    const item = items[nextPage];
 
-    if ( item ) {
-      focus( item.button );
-      go( `>${ nextPage }` );
-      prevent( e, true );
+    if (item) {
+      focus(item.button);
+      go(`>${ nextPage }`);
+      prevent(e, true);
     }
   }
 
@@ -221,32 +221,32 @@ export const Pagination: ComponentConstructor<PaginationComponent> = ( Splide, C
    *
    * @return A pagination item object if available, or otherwise `undefined`.
    */
-  function getAt( index: number ): PaginationItem | undefined {
-    return items[ Controller.toPage( index ) ];
+  function getAt(index: number): PaginationItem | undefined {
+    return items[Controller.toPage(index)];
   }
 
   /**
    * Updates the pagination status.
    */
   function update(): void {
-    const prev = getAt( getIndex( true ) );
-    const curr = getAt( getIndex() );
+    const prev = getAt(getIndex(true));
+    const curr = getAt(getIndex());
 
-    if ( prev ) {
+    if (prev) {
       const { button } = prev;
-      removeClass( button, CLASS_ACTIVE );
-      removeAttribute( button, ARIA_SELECTED );
-      setAttribute( button, TAB_INDEX, -1 );
+      removeClass(button, CLASS_ACTIVE);
+      removeAttribute(button, ARIA_SELECTED);
+      setAttribute(button, TAB_INDEX, -1);
     }
 
-    if ( curr ) {
+    if (curr) {
       const { button } = curr;
-      addClass( button, CLASS_ACTIVE );
-      setAttribute( button, ARIA_SELECTED, true );
-      setAttribute( button, TAB_INDEX, '' );
+      addClass(button, CLASS_ACTIVE);
+      setAttribute(button, ARIA_SELECTED, true);
+      setAttribute(button, TAB_INDEX, '');
     }
 
-    emit( EVENT_PAGINATION_UPDATED, { list, items }, prev, curr );
+    emit(EVENT_PAGINATION_UPDATED, { list, items }, prev, curr);
   }
 
   return {

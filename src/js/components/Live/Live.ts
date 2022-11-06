@@ -11,7 +11,7 @@ import { append, apply, create, removeAttribute, removeNode, RequestInterval, se
  * @since 4.0.0
  */
 export interface LiveComponent extends BaseComponent {
-  disable( disabled: boolean ): void;
+  disable(disabled: boolean): void;
 }
 
 /**
@@ -33,7 +33,7 @@ const SR_REMOVAL_DELAY = 90;
  *
  * @return A Live component object.
  */
-export const Live: ComponentConstructor<LiveComponent> = ( Splide, Components, options, event ) => {
+export const Live: ComponentConstructor<LiveComponent> = (Splide, Components, options, event) => {
   const { on } = event;
   const { track } = Components.Elements;
   const { live = true } = options;
@@ -41,17 +41,17 @@ export const Live: ComponentConstructor<LiveComponent> = ( Splide, Components, o
   /**
    * Indicates whether the live region is enabled or not.
    */
-  const enabled = live && ! options.isNavigation;
+  const enabled = live && !options.isNavigation;
 
   /**
    * The span element for the SR only text.
    */
-  const sr = create( 'span', CLASS_SR );
+  const sr = create('span', CLASS_SR);
 
   /**
    * Holds the RequestInterval instance.
    */
-  const interval = RequestInterval( SR_REMOVAL_DELAY, apply( toggle, false ) );
+  const interval = RequestInterval(SR_REMOVAL_DELAY, apply(toggle, false));
 
   /**
    * Called when the component is mounted.
@@ -59,14 +59,14 @@ export const Live: ComponentConstructor<LiveComponent> = ( Splide, Components, o
    * - Immediately removing the SR makes Windows Narrator silent, hence requires the delay around 50ms.
    */
   function mount(): void {
-    if ( enabled ) {
-      disable( ! Components.Autoplay.isPaused() );
-      setAttribute( track, ARIA_ATOMIC, true );
+    if (enabled) {
+      disable(!Components.Autoplay.isPaused());
+      setAttribute(track, ARIA_ATOMIC, true);
       sr.textContent = '…';
 
-      on( EVENT_AUTOPLAY_PLAY, apply( disable, true ) );
-      on( EVENT_AUTOPLAY_PAUSE, apply( disable, false ) );
-      on( [ EVENT_MOVED, EVENT_SCROLLED ], apply( toggle, true ) );
+      on(EVENT_AUTOPLAY_PLAY, apply(disable, true));
+      on(EVENT_AUTOPLAY_PAUSE, apply(disable, false));
+      on([EVENT_MOVED, EVENT_SCROLLED], apply(toggle, true));
     }
   }
 
@@ -75,14 +75,14 @@ export const Live: ComponentConstructor<LiveComponent> = ( Splide, Components, o
    *
    * @param active - Determines whether to activate the field or not.
    */
-  function toggle( active: boolean ): void {
-    setAttribute( track, ARIA_BUSY, active );
+  function toggle(active: boolean): void {
+    setAttribute(track, ARIA_BUSY, active);
 
-    if ( active ) {
-      append( track, sr );
+    if (active) {
+      append(track, sr);
       interval.start();
     } else {
-      removeNode( sr );
+      removeNode(sr);
       interval.cancel();
     }
   }
@@ -91,8 +91,8 @@ export const Live: ComponentConstructor<LiveComponent> = ( Splide, Components, o
    * Destroys the component.
    */
   function destroy(): void {
-    removeAttribute( track, [ ARIA_LIVE, ARIA_ATOMIC, ARIA_BUSY ] );
-    removeNode( sr );
+    removeAttribute(track, [ARIA_LIVE, ARIA_ATOMIC, ARIA_BUSY]);
+    removeNode(sr);
   }
 
   /**
@@ -101,9 +101,9 @@ export const Live: ComponentConstructor<LiveComponent> = ( Splide, Components, o
    *
    * @param disabled - `true` to disable the live region or `false` to enable it again.
    */
-  function disable( disabled: boolean ): void {
-    if ( enabled ) {
-      setAttribute( track, ARIA_LIVE, disabled ? 'off' : 'polite' );
+  function disable(disabled: boolean): void {
+    if (enabled) {
+      setAttribute(track, ARIA_LIVE, disabled ? 'off' : 'polite');
     }
   }
 

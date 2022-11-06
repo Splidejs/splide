@@ -12,8 +12,8 @@ import { EVENT_OVERFLOW, EVENT_UPDATED } from '../../constants/events';
  */
 export interface BreakpointsComponent extends BaseComponent {
   /** @internal */
-  reduce( reduced: boolean ): void;
-  set( options: Options, base?: boolean, notify?: boolean ): void;
+  reduce(reduced: boolean): void;
+  set(options: Options, base?: boolean, notify?: boolean): void;
 }
 
 /**
@@ -36,16 +36,16 @@ const NOT_OVERFLOW_KEY = '!overflow';
  *
  * @return A Media component object.
  */
-export const Breakpoints: ComponentConstructor<BreakpointsComponent> = ( Splide, Components, options, event ) => {
+export const Breakpoints: ComponentConstructor<BreakpointsComponent> = (Splide, Components, options, event) => {
   const { state } = Splide;
-  const breakpoints   = options.breakpoints || {};
+  const breakpoints = options.breakpoints || {};
   const reducedMotion = options.reducedMotion || {};
-  const binder        = EventBinder();
+  const binder = EventBinder();
 
   /**
    * Stores options and a predicate function.
    */
-  const entries: Array<[ Options, () => boolean ]> = [];
+  const entries: Array<[Options, () => boolean]> = [];
 
   /**
    * Called when the component is constructed.
@@ -53,20 +53,20 @@ export const Breakpoints: ComponentConstructor<BreakpointsComponent> = ( Splide,
   function setup(): void {
     const isMin = options.mediaQuery === 'min';
 
-    ownKeys( breakpoints )
-      .sort( ( n, m ) => isMin ? +n - +m : +m - +n )
-      .forEach( key => {
-        if ( key !== NOT_OVERFLOW_KEY ) {
-          register( breakpoints[ key ], `(${ isMin ? 'min' : 'max' }-width:${ key }px)` );
+    ownKeys(breakpoints)
+      .sort((n, m) => isMin ? +n - +m : +m - +n)
+      .forEach(key => {
+        if (key !== NOT_OVERFLOW_KEY) {
+          register(breakpoints[key], `(${ isMin ? 'min' : 'max' }-width:${ key }px)`);
         }
-      } );
+      });
 
-    if ( breakpoints[ NOT_OVERFLOW_KEY ] ) {
-      entries.push( [ breakpoints[ NOT_OVERFLOW_KEY ], () => Components.Layout && ! Components.Layout.isOverflow() ] );
-      event.on( EVENT_OVERFLOW, update );
+    if (breakpoints[NOT_OVERFLOW_KEY]) {
+      entries.push([breakpoints[NOT_OVERFLOW_KEY], () => Components.Layout && !Components.Layout.isOverflow()]);
+      event.on(EVENT_OVERFLOW, update);
     }
 
-    register( reducedMotion, MEDIA_PREFERS_REDUCED_MOTION );
+    register(reducedMotion, MEDIA_PREFERS_REDUCED_MOTION);
     update();
   }
 
@@ -75,8 +75,8 @@ export const Breakpoints: ComponentConstructor<BreakpointsComponent> = ( Splide,
    *
    * @param completely - Will be `true` for complete destruction.
    */
-  function destroy( completely: boolean ): void {
-    if ( completely ) {
+  function destroy(completely: boolean): void {
+    if (completely) {
       binder.destroy();
     }
   }
@@ -87,29 +87,29 @@ export const Breakpoints: ComponentConstructor<BreakpointsComponent> = ( Splide,
    * @param options - Options merged to current options when the document matches the query.
    * @param query   - A query string.
    */
-  function register( options: Options, query: string ): void {
-    const queryList = matchMedia( query );
-    binder.bind( queryList, 'change', update );
-    entries.push( [ options,  () => queryList.matches ] );
+  function register(options: Options, query: string): void {
+    const queryList = matchMedia(query);
+    binder.bind(queryList, 'change', update);
+    entries.push([options, () => queryList.matches]);
   }
 
   /**
    * Checks all media queries in entries and updates options.
    */
   function update(): void {
-    const destroyed = state.is( DESTROYED );
+    const destroyed = state.is(DESTROYED);
     const direction = options.direction;
-    const merged = entries.reduce<Options>( ( merged, entry ) => {
-      return merge( merged, entry[ 1 ]() ? entry[ 0 ] : {} );
-    }, {} );
+    const merged = entries.reduce<Options>((merged, entry) => {
+      return merge(merged, entry[1]() ? entry[0] : {});
+    }, {});
 
-    omit( options );
-    set( merged, false, ! state.is( CREATED ) );
+    omit(options);
+    set(merged, false, !state.is(CREATED));
 
-    if ( options.destroy ) {
-      Splide.destroy( options.destroy === 'completely' );
-    } else if ( destroyed ) {
-      destroy( true );
+    if (options.destroy) {
+      Splide.destroy(options.destroy === 'completely');
+    } else if (destroyed) {
+      destroy(true);
       Splide.mount();
     } else {
       direction !== options.direction && Splide.refresh();
@@ -124,9 +124,9 @@ export const Breakpoints: ComponentConstructor<BreakpointsComponent> = ( Splide,
    *
    * @param enable - Determines whether to apply `reducedMotion` options or not.
    */
-  function reduce( enable: boolean ): void {
-    if ( matchMedia( MEDIA_PREFERS_REDUCED_MOTION ).matches ) {
-      enable ? merge( options, reducedMotion ) : omit( options, ownKeys( reducedMotion ) );
+  function reduce(enable: boolean): void {
+    if (matchMedia(MEDIA_PREFERS_REDUCED_MOTION).matches) {
+      enable ? merge(options, reducedMotion) : omit(options, ownKeys(reducedMotion));
     }
   }
 
@@ -140,12 +140,12 @@ export const Breakpoints: ComponentConstructor<BreakpointsComponent> = ( Splide,
    * @param base   - Optional. Determines whether to also update base options or not.
    * @param notify - Optional. If `true`, emits the `update` event.
    */
-  function set( opts: Options, base?: boolean, notify?: boolean ): void {
-    merge( options, opts );
-    base && merge( Object.getPrototypeOf( options ), opts );
+  function set(opts: Options, base?: boolean, notify?: boolean): void {
+    merge(options, opts);
+    base && merge(Object.getPrototypeOf(options), opts);
 
-    if ( notify ) {
-      Splide.emit( EVENT_UPDATED, options );
+    if (notify) {
+      Splide.emit(EVENT_UPDATED, options);
     }
   }
 
