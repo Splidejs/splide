@@ -2444,7 +2444,7 @@
   class Splide {
     static defaults = {};
     static STATES = STATES;
-    static Extensions;
+    static Extensions = {};
     root;
     event = EventInterface();
     Components = {};

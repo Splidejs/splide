@@ -43,7 +43,7 @@ export class Splide {
   /**
    * Stores extension constructors.
    */
-  static readonly Extensions: Record<string, ComponentConstructor>;
+  static readonly Extensions: Record<string, ComponentConstructor> = {};
 
   /**
    * The root element where the Splide is applied.
