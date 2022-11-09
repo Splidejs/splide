@@ -1,0 +1,26 @@
+body {
+  margin: 2rem;
+}
+
+.splide {
+  margin: 0 auto;
+
+  &__slide {
+    padding: 1rem;
+    background: #ecf3fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+.nest1, .nest2 {
+  .splide {
+    width: 90%;
+
+    &__slide {
+      background: #c6d7e5;
+      font-size: 3rem;
+    }
+  }
+}

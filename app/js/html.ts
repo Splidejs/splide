@@ -41,7 +41,11 @@ interface GenerateSlidesConfig {
   onRenderSlide?: (index: number) => IterateeReturnType;
 }
 
-type IterateeReturnType = { attrs?: Parameters<typeof buildAttrs>[0], classes?: string | string[] };
+interface IterateeReturnType {
+  attrs?: Parameters<typeof buildAttrs>[0],
+  classes?: string | string[],
+  content?: string;
+}
 
 const RANDOM_SIZES = ['300px', '200px', '400px', '600px'];
 
@@ -55,7 +59,7 @@ export function generateSlides(config: GenerateSlidesConfig = {}): string {
   } = config;
 
   return Array.from<string>({ length }).reduce((html, item, index) => {
-    const { attrs = {}, classes } = onRenderSlide ? onRenderSlide(index) : {} as IterateeReturnType;
+    const { attrs = {}, classes, content } = onRenderSlide ? onRenderSlide(index) : {} as IterateeReturnType;
 
     if (autoWidth) {
       const sizes = typeof autoWidth === 'boolean' ? RANDOM_SIZES : autoWidth;
@@ -71,7 +75,13 @@ export function generateSlides(config: GenerateSlidesConfig = {}): string {
     const classesString = classNames(classes);
 
     html += `<div class="splide__slide ${ classesString }" ${ attrsString }>`;
-    html += useImage ? `<img src="${ SLIDES[index] }" alt>` : index;
+
+    if (content) {
+      html += content;
+    } else {
+      html += useImage ? `<img src="${ SLIDES[index] }" alt>` : index;
+    }
+
     html += `</div>\n`;
 
     return html;
