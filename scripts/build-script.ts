@@ -23,6 +23,7 @@ async function build(): Promise<void> {
     outDir: './dist/js',
     formats: ['iife'],
     minify: true,
+    sourcemap: true,
     info,
   });
 
