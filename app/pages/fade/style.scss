@@ -1,0 +1,16 @@
+body {
+  margin: 2rem;
+}
+
+.splide {
+  margin: 0 auto;
+
+  &__slide {
+    padding: 1rem;
+    background: #ecf3fa;
+
+    img {
+      width: 100%;
+    }
+  }
+}
