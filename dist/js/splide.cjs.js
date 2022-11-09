@@ -1,12 +1,12 @@
 /*!
- * Splide.js
+ * @splidejs/splide
  * Version  : 4.1.3
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
  */
 'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
+Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
 
 const MEDIA_PREFERS_REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
 
@@ -3015,4 +3015,4 @@ exports.STATUS_CLASS_PREFIX = STATUS_CLASS_PREFIX;
 exports.Splide = Splide;
 exports.SplideRenderer = SplideRenderer;
 exports.TTB = TTB;
-exports["default"] = Splide;
+exports.default = Splide;

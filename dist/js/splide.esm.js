@@ -1,5 +1,5 @@
 /*!
- * Splide.js
+ * @splidejs/splide
  * Version  : 4.1.3
  * License  : MIT
  * Copyright: 2022 Naotoshi Fujita
