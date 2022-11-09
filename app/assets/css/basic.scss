@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200..700&display=swap');
+
+body {
+  color: #3d4b56;
+  font-family: Inter, sans-serif;
+  margin: 2rem;
+}
+
+h2 {
+  margin-top: 6rem;
+  text-align: center;
+}
+
+%numbered-slide {
+
+}
+
+.splide {
+  $root: &;
+  margin: 2rem auto;
+
+  &__slide {
+    align-items: center;
+    background: #ecf3fa;
+    display: flex;
+    font-size: 3rem;
+    justify-content: center;
+
+    &.is-active {
+      background: #e1e9f3;
+    }
+
+    @extend %numbered-slide;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+}
+
+.controls {
+  text-align: center;
+}
