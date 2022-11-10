@@ -15,9 +15,6 @@
     "browser": true,
     "node": true
   },
-  "ignorePatterns": [
-    "*.esm.js"
-  ],
   "rules": {
     "semi": [
       "error",

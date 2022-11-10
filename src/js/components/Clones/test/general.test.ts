@@ -1,5 +1,5 @@
 import { CLASS_CLONE } from '../../../constants/classes';
-import { init } from '../../../test';
+import { init } from '@test';
 import { MULTIPLIER } from '../Clones';
 
 

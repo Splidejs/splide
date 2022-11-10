@@ -1,5 +1,5 @@
 import { ALL_ATTRIBUTES } from '../../../constants/attributes';
-import { buildHtml, init } from '../../../test';
+import { buildHtml, init } from '@test';
 
 
 describe('Elements', () => {

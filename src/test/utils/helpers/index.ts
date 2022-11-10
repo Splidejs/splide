@@ -1,12 +1,10 @@
-import { CLASS_LIST, CLASS_ROOT, CLASS_SLIDE, CLASS_TRACK } from '../../constants/classes';
-import { Splide } from '../../core/Splide/Splide';
-import { Options } from '../../types';
 import { assign } from '@splidejs/utils';
-import { buildHtml, BuildHtmlArgs } from '../fixtures';
-import { SLIDER_WIDTH } from '../fixtures/constants';
+import { CLASS_LIST, CLASS_ROOT, CLASS_SLIDE, CLASS_TRACK, Options, Splide } from '../../../js';
+import { buildHtml, BuildHtmlConfig } from '../html';
+import { SLIDER_WIDTH } from '../constants';
 
 
-interface InitArgs extends BuildHtmlArgs {
+interface InitConfig extends BuildHtmlConfig {
   mount?: boolean;
   html?: string;
   insertHtml?: boolean;
@@ -27,33 +25,18 @@ const DOM_RECT = {
 /**
  * Creates a new splide instance.
  *
- * @param args    - Arguments for initialization.
  * @param options - Options for Splide.
+ * @param config  - Config for initialization.
  *
  * @return A created Splide instance.
  */
-export function init(options: Options = {}, args: InitArgs = {}): Splide {
+export function init(options: Options = {}, config: InitConfig = {}): Splide {
   const { width = SLIDER_WIDTH, height = 0 } = options;
-  const {
-    id,
-    length = 10,
-    arrows,
-    autoplay,
-    progress,
-    mount = true,
-    html,
-    src,
-    dataSrc,
-    dataSrcset,
-    json,
-    insertHtml,
-    dataInterval,
-  } = args;
+  const { id, mount = true, html, insertHtml } = config;
 
   const slideWidth = +width / (options.perPage || 1);
   const slideHeight = +height / (options.perPage || 1);
-  const innerHtml = html
-    || buildHtml({ length, arrows, autoplay, progress, src, dataSrc, dataSrcset, json, id, dataInterval });
+  const innerHtml = html || buildHtml(config);
 
   if (insertHtml) {
     if (!document.body.innerHTML) {

@@ -1,5 +1,5 @@
 import { EVENT_MOVED } from '../../../constants/events';
-import { fire, init } from '../../../test';
+import { fire, init } from '@test';
 
 
 describe('Arrows', () => {

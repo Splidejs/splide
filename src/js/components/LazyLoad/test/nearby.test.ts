@@ -1,13 +1,12 @@
 import { CLASS_LOADING, CLASS_SPINNER } from '../../../constants/classes';
 import { EVENT_LAZYLOAD_LOADED } from '../../../constants/events';
-import { fire, init } from '../../../test';
-import { URL } from '../../../test/fixtures/constants';
+import { fire, init, FAKE_URL } from '@test';
 import { SRC_DATA_ATTRIBUTE, SRCSET_DATA_ATTRIBUTE } from '../constants';
 
 
 describe('LazyLoad in the `nearby` mode', () => {
   test('does nothing if the lazyLoad option is falsy.', () => {
-    init({}, { src: false, dataSrc: true });
+    init({}, { useImage: true, src:false, dataSrc: true });
     const images = document.getElementsByTagName('img');
 
     expect(images[0].src).toBe('');
@@ -15,40 +14,40 @@ describe('LazyLoad in the `nearby` mode', () => {
   });
 
   test('can find the src data attribute and set the value to the src.', () => {
-    init({ lazyLoad: true }, { src: false, dataSrc: true });
+    init({ lazyLoad: true }, { useImage: true, src:false, dataSrc: true });
     const images = document.getElementsByTagName('img');
 
-    expect(images[0].src).toBe(`${ URL }/0.jpg`);
+    expect(images[0].src).toBe(`${ FAKE_URL }/0.jpg`);
     expect(images[0].getAttribute(SRC_DATA_ATTRIBUTE)).toBeNull();
 
-    expect(images[1].src).toBe(`${ URL }/1.jpg`);
+    expect(images[1].src).toBe(`${ FAKE_URL }/1.jpg`);
     expect(images[1].getAttribute(SRC_DATA_ATTRIBUTE)).toBeNull();
   });
 
   test('can find the srcset data attribute and set the value to the src.', () => {
-    init({ lazyLoad: true }, { src: false, dataSrcset: true });
+    init({ lazyLoad: true }, { useImage: true, src:false, dataSrcset: true });
     const images = document.getElementsByTagName('img');
 
-    expect(images[0].srcset).toBe(`${ URL }/0.jpg 320w`);
+    expect(images[0].srcset).toBe(`${ FAKE_URL }/0.jpg 320w`);
     expect(images[0].getAttribute(SRCSET_DATA_ATTRIBUTE)).toBeNull();
 
-    expect(images[1].srcset).toBe(`${ URL }/1.jpg 320w`);
+    expect(images[1].srcset).toBe(`${ FAKE_URL }/1.jpg 320w`);
     expect(images[1].getAttribute(SRCSET_DATA_ATTRIBUTE)).toBeNull();
   });
 
   test('should set the src if the value is not same with the one provided by the data attribute.', () => {
-    init({ lazyLoad: true }, { src: 'placeholder', dataSrc: true });
+    init({ lazyLoad: true }, { useImage: true, src:['placeholder'], dataSrc: true });
     const images = document.getElementsByTagName('img');
 
-    expect(images[0].src).toBe(`${ URL }/0.jpg`);
+    expect(images[0].src).toBe(`${ FAKE_URL }/0.jpg`);
     expect(images[0].getAttribute(SRC_DATA_ATTRIBUTE)).toBeNull();
 
-    expect(images[1].src).toBe(`${ URL }/1.jpg`);
+    expect(images[1].src).toBe(`${ FAKE_URL }/1.jpg`);
     expect(images[1].getAttribute(SRC_DATA_ATTRIBUTE)).toBeNull();
   });
 
   test('can append a loading spinner and add a loading class to slides.', () => {
-    const splide = init({ lazyLoad: true }, { src: false, dataSrc: true });
+    const splide = init({ lazyLoad: true }, { useImage: true, src:false, dataSrc: true });
     const slide1 = splide.Components.Slides.getAt(0).slide;
     const slide2 = splide.Components.Slides.getAt(1).slide;
     const spinner1 = slide1.querySelector(`.${ CLASS_SPINNER }`);
@@ -62,7 +61,7 @@ describe('LazyLoad in the `nearby` mode', () => {
   });
 
   test('can remove a loading spinner and a loading class on load.', () => {
-    const splide = init({ lazyLoad: true }, { src: false, dataSrc: true });
+    const splide = init({ lazyLoad: true }, { useImage: true, src:false, dataSrc: true });
     const images = document.getElementsByTagName('img');
     const slide1 = splide.Components.Slides.getAt(0).slide;
     const slide2 = splide.Components.Slides.getAt(1).slide;
@@ -83,7 +82,7 @@ describe('LazyLoad in the `nearby` mode', () => {
   });
 
   test('can remove a loading class on error.', () => {
-    const splide = init({ lazyLoad: true }, { src: false, dataSrc: true });
+    const splide = init({ lazyLoad: true }, { useImage: true, src:false, dataSrc: true });
     const images = document.getElementsByTagName('img');
     const slide1 = splide.Components.Slides.getAt(0).slide;
     const slide2 = splide.Components.Slides.getAt(1).slide;
@@ -101,7 +100,7 @@ describe('LazyLoad in the `nearby` mode', () => {
   });
 
   test('can start loading an image if the slide is close to the current location.', () => {
-    const splide = init({ lazyLoad: true, speed: 0 }, { src: false, dataSrc: true });
+    const splide = init({ lazyLoad: true, speed: 0 }, { useImage: true, src:false, dataSrc: true });
     const images = document.getElementsByTagName('img');
 
     expect(images[3].src).toBe('');
@@ -109,7 +108,7 @@ describe('LazyLoad in the `nearby` mode', () => {
 
     splide.go(2);
 
-    expect(images[3].src).toBe(`${ URL }/3.jpg`);
+    expect(images[3].src).toBe(`${ FAKE_URL }/3.jpg`);
     expect(images[3].getAttribute(SRC_DATA_ATTRIBUTE)).toBeNull();
 
     expect(images[4].src).toBe('');
@@ -117,26 +116,26 @@ describe('LazyLoad in the `nearby` mode', () => {
 
     splide.go(3);
 
-    expect(images[4].src).toBe(`${ URL }/4.jpg`);
+    expect(images[4].src).toBe(`${ FAKE_URL }/4.jpg`);
     expect(images[4].getAttribute(SRC_DATA_ATTRIBUTE)).toBeNull();
   });
 
   test('can start loading images of previous slides in the loop mode.', () => {
-    const splide = init({ type: 'loop', lazyLoad: true, perPage: 3 }, { src: false, dataSrc: true });
+    const splide = init({ type: 'loop', lazyLoad: true, perPage: 3 }, { useImage: true, src:false, dataSrc: true });
     const prev1 = splide.Components.Slides.getAt(-1);
     const prev2 = splide.Components.Slides.getAt(-2);
     const last1 = splide.Components.Slides.getAt(splide.length - 1);
     const last2 = splide.Components.Slides.getAt(splide.length - 2);
 
-    expect(prev1.slide.querySelector('img').src).toBe(`${ URL }/${ splide.length - 1 }.jpg`);
-    expect(prev2.slide.querySelector('img').src).toBe(`${ URL }/${ splide.length - 2 }.jpg`);
+    expect(prev1.slide.querySelector('img').src).toBe(`${ FAKE_URL }/${ splide.length - 1 }.jpg`);
+    expect(prev2.slide.querySelector('img').src).toBe(`${ FAKE_URL }/${ splide.length - 2 }.jpg`);
 
-    expect(last1.slide.querySelector('img').src).toBe(`${ URL }/${ splide.length - 1 }.jpg`);
-    expect(last2.slide.querySelector('img').src).toBe(`${ URL }/${ splide.length - 2 }.jpg`);
+    expect(last1.slide.querySelector('img').src).toBe(`${ FAKE_URL }/${ splide.length - 1 }.jpg`);
+    expect(last2.slide.querySelector('img').src).toBe(`${ FAKE_URL }/${ splide.length - 2 }.jpg`);
   });
 
   test('should not start loading an image if the slide is not close to the current location.', () => {
-    init({ lazyLoad: true }, { src: false, dataSrc: true });
+    init({ lazyLoad: true }, { useImage: true, src:false, dataSrc: true });
     const images = document.getElementsByTagName('img');
 
     expect(images[3].src).toBe('');
@@ -147,7 +146,7 @@ describe('LazyLoad in the `nearby` mode', () => {
   });
 
   test('should emit an event after load.', done => {
-    const splide = init({ lazyLoad: true }, { src: false, dataSrc: true });
+    const splide = init({ lazyLoad: true }, { useImage: true, src:false, dataSrc: true });
     const Slide1 = splide.Components.Slides.getAt(0);
     const Slide2 = splide.Components.Slides.getAt(1);
 

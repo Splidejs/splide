@@ -1,4 +1,4 @@
-import { init } from '../../../test';
+import { init } from '@test';
 
 
 describe('Controller#getAdjacent()', () => {

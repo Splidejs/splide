@@ -1,4 +1,4 @@
-import { init, setSlidesRect } from '../../../test';
+import { init, setSlidesRect } from '@test';
 
 
 describe('Move', () => {

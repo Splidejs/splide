@@ -1,6 +1,6 @@
 import { ARIA_ATOMIC, ARIA_BUSY, ARIA_LIVE } from '../../../constants/attributes';
 import { CLASS_SR } from '../../../constants/classes';
-import { init, wait } from '../../../test';
+import { init, wait } from '@test';
 
 
 describe('Live', () => {

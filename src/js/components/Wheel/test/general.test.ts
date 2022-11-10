@@ -1,4 +1,4 @@
-import { fire, init } from '../../../test';
+import { fire, init } from '@test';
 
 
 describe('Wheel', () => {

@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "declarationDir": null,
+    "declaration": false
+  },
+  "include": [
+    "src/js/**/*.ts",
+    "app/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+}

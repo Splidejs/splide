@@ -1,10 +1,10 @@
 import { CLASS_FOCUS_IN } from '../../../constants/classes';
-import { fire, init } from '../../../test';
+import { fire, init } from '@test';
 
 
 describe('Focus', () => {
   test('can add the status class to the root when focus comes into it by a key.', () => {
-    const splide = init({}, { arrows: true });
+    const splide = init({}, { hasArrows: true });
 
     fire(document, 'keydown');
     fire(splide.root, 'focusin');
@@ -13,7 +13,7 @@ describe('Focus', () => {
   });
 
   test('can remove the status class from the root when detecting pointerdown.', () => {
-    const splide = init({}, { arrows: true });
+    const splide = init({}, { hasArrows: true });
 
     fire(document, 'keydown');
     fire(splide.root, 'focusin');
@@ -27,7 +27,7 @@ describe('Focus', () => {
   });
 
   test('should not add the status class when focus comes into the root by pointing devices.', () => {
-    const splide = init({}, { arrows: true });
+    const splide = init({}, { hasArrows: true });
 
     fire(document, 'mousedown');
     fire(splide.root, 'focusin');

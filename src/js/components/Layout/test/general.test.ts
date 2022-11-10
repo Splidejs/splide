@@ -1,5 +1,5 @@
 import { EVENT_RESIZE } from '../../../constants/events';
-import { init } from '../../../test';
+import { init } from '@test';
 
 
 describe('Layout', () => {

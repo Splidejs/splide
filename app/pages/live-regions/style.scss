@@ -1,21 +1,21 @@
 body {
-  background: linear-gradient(0deg, #8cde1d, #c0e900);
-  height: 200vh;
-  font-family: SplideBody, sans-serif;
-  padding: 2rem;
+  background: linear-gradient( 0deg, #8cde1d, #c0e900 );
   color: #d7e9f5;
-  line-height: 1.8;
+  font-family: SplideBody, sans-serif;
   font-weight: normal;
+  height: 200vh;
+  line-height: 1.8;
   overflow-x: hidden;
+  padding: 2rem;
 }
 
 img {
-  width: 100%;
   height: auto;
+  width: 100%;
 }
 
 p {
-  margin: 0 0 1em 0;
+  margin: 0 0 1em;
 }
 
 cite {
@@ -25,9 +25,9 @@ cite {
 }
 
 .wrapper {
-  margin-top: 10rem;
   display: flex;
   justify-content: center;
+  margin-top: 10rem;
 }
 
 .splide {
@@ -36,8 +36,8 @@ cite {
   }
 
   &__slide {
-    padding: 2rem 1rem;
     height: 100%;
+    padding: 2rem 1rem;
 
     &:focus-visible {
       outline: #fff dotted 3px !important;
@@ -46,29 +46,29 @@ cite {
     &__inner {
       background: #000;
       border-radius: 10px;
-      overflow: hidden;
       height: 100%;
-      transform: scale(.8);
       opacity: 0;
-      transition: all .5s cubic-bezier(.17, .67, .44, 1);
+      overflow: hidden;
+      transform: scale( .8 );
+      transition: all .5s cubic-bezier( .17, .67, .44, 1 );
     }
 
     &.is-active {
       .splide__slide__inner {
-        box-shadow: 0 0 15px 4px rgba(0, 0, 0, .25);
-        transform: scale(1);
+        box-shadow: 0 0 15px 4px rgba( 0, 0, 0, .25 );
         opacity: 1;
+        transform: scale( 1 );
       }
     }
   }
 
   &__heading {
-    font-family: SplideHeading, sans-serif;
     color: #fff;
-    margin: 0;
-    padding: 1rem 1.5rem .5rem;
+    font-family: SplideHeading, sans-serif;
     font-size: 2rem;
     line-height: 1;
+    margin: 0;
+    padding: 1rem 1.5rem .5rem;
   }
 
   &__desc {
@@ -78,23 +78,23 @@ cite {
 
   &__arrow {
     background: transparent;
+    border-radius: 0;
+    height: 2rem;
     opacity: 1;
     width: 2rem;
-    height: 2rem;
-    border-radius: 0;
 
     &:focus-visible {
       outline: #fff dotted 3px !important;
     }
 
     svg {
-      width: 2rem;
-      height: 2rem;
       fill: none;
+      height: 2rem;
       stroke: #fff;
       stroke-linecap: square;
       stroke-width: 8px;
       vertical-align: middle;
+      width: 2rem;
     }
 
     &--prev {
@@ -110,9 +110,9 @@ cite {
     bottom: 3rem;
 
     &__page {
-      width: 10px;
-      height: 10px;
       background: #d7e9f5;
+      height: 10px;
+      width: 10px;
 
       &.is-active {
         background: #8cde1d;

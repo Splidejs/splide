@@ -1,5 +1,4 @@
-import { init } from '../../../test';
-import { SLIDER_WIDTH } from '../../../test/fixtures/constants';
+import { init, SLIDER_WIDTH } from '@test';
 
 
 describe('Layout in the LTR mode', () => {

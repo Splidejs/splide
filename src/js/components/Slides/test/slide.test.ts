@@ -8,7 +8,7 @@ import {
   EVENT_VISIBLE,
 } from '../../../constants/events';
 import { Splide } from '../../../core/Splide/Splide';
-import { fire, init, keydown } from '../../../test';
+import { fire, init, keydown } from '@test';
 import { format } from '@splidejs/utils';
 import { SlideComponent } from '../Slide';
 

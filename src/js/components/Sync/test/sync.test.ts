@@ -1,6 +1,6 @@
 import { EVENT_MOVE } from '../../../constants/events';
 import { Splide } from '../../../core/Splide/Splide';
-import { init } from '../../../test';
+import { init } from '@test';
 
 
 describe('Sync#sync()', () => {

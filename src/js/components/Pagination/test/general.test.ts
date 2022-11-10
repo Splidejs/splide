@@ -1,5 +1,5 @@
 import { CLASS_ACTIVE, CLASS_PAGINATION, CLASS_PAGINATION_PAGE } from '../../../constants/classes';
-import { fire, init } from '../../../test';
+import { fire, init } from '@test';
 
 
 describe('Pagination', () => {

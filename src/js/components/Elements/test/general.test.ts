@@ -9,12 +9,12 @@ import {
   CLASS_TRACK,
 } from '../../../constants/classes';
 import { RTL } from '../../../constants/directions';
-import { init } from '../../../test';
+import { init } from '@test';
 
 
 describe('Elements', () => {
   test('can collect essential elements.', () => {
-    const splide = init({}, { autoplay: true, arrows: true, progress: true });
+    const splide = init({}, { hasToggle: true, hasArrows: true, hasProgress: true });
     const { Elements } = splide.Components;
 
     expect(Elements.root.classList.contains(CLASS_ROOT)).toBe(true);
@@ -28,7 +28,7 @@ describe('Elements', () => {
   });
 
   test('can assign unique IDs to root, track and list elements.', () => {
-    const splide = init({}, { autoplay: true, arrows: true, progress: true });
+    const splide = init();
     const { Elements } = splide.Components;
     const { id } = Elements.root;
 

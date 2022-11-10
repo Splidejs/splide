@@ -1,5 +1,5 @@
 import { Splide } from '../../../core/Splide/Splide';
-import { fire, init, wait } from '../../../test';
+import { fire, init, wait } from '@test';
 import { AutoplayComponent } from '../Autoplay';
 
 

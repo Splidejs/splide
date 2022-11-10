@@ -1,6 +1,6 @@
 import { EVENT_MOVE, EVENT_MOVED } from '../../../constants/events';
 import { IDLE, MOVING } from '../../../constants/states';
-import { fire, init } from '../../../test';
+import { fire, init } from '@test';
 
 
 describe('Move#move()', () => {

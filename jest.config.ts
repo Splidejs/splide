@@ -7,9 +7,10 @@ const config: Config = {
   },
   testEnvironment: 'jsdom',
   setupFiles: [
-    './js/test/jest/setup.ts',
+    './test/jest/setup.ts',
   ],
   moduleNameMapper: {
+    '^@test$': '<rootDir>/test',
     '^@test/(.*)$': '<rootDir>/test/$1',
   },
   rootDir: './src',

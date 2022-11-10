@@ -1,5 +1,5 @@
 import { RTL } from '../../../constants/directions';
-import { init } from '../../../test';
+import { init } from '@test';
 
 
 describe('Layout in the RTL mode', () => {

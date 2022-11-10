@@ -5,6 +5,7 @@
     "stylelint-order"
   ],
   "rules": {
+    "selector-class-pattern": "[a-z_\\-]+",
     "number-leading-zero": "never",
     "max-nesting-depth": 7,
     "selector-max-compound-selectors": null,

@@ -1,5 +1,5 @@
 import { DESTROYED } from '../../../constants/states';
-import { init } from '../../../test';
+import { init } from '@test';
 
 
 describe('Breakpoints', () => {

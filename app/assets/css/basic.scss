@@ -11,10 +11,6 @@ h2 {
   text-align: center;
 }
 
-%numbered-slide {
-
-}
-
 .splide {
   $root: &;
   margin: 2rem auto;
@@ -30,12 +26,10 @@ h2 {
       background: #e1e9f3;
     }
 
-    @extend %numbered-slide;
-
     img {
-      width: 100%;
       height: 100%;
       object-fit: cover;
+      width: 100%;
     }
   }
 }

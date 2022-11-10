@@ -1,4 +1,4 @@
-import { init } from '../../../test';
+import { init } from '@test';
 import { fail } from 'assert';
 
 

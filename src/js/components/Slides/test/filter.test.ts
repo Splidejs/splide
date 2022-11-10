@@ -1,5 +1,5 @@
 import { CLASS_SLIDE } from '../../../constants/classes';
-import { init } from '../../../test';
+import { init } from '@test';
 
 
 describe('Slides#filter()', () => {

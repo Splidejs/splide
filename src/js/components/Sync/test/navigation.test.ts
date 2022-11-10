@@ -1,4 +1,4 @@
-import { fire, init, keydown } from '../../../test';
+import { fire, init, keydown } from '@test';
 
 
 describe('Sync#navigate()', () => {

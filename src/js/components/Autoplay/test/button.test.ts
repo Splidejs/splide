@@ -1,24 +1,24 @@
 import { CLASS_ACTIVE } from '../../../constants/classes';
-import { fire, init } from '../../../test';
+import { fire, init } from '@test';
 
 
 describe('Autoplay toggle button.', () => {
   test('should be active if `autoplay` option is `true`.', () => {
-    const splide = init({ autoplay: true }, { autoplay: true });
+    const splide = init({ autoplay: true }, { hasToggle: true });
     const { toggle } = splide.Components.Elements;
 
     expect(toggle.classList.contains(CLASS_ACTIVE)).toBe(true);
   });
 
   test('should be inactive if `autoplay` option is `false`.', () => {
-    const splide = init({ autoplay: 'pause' }, { autoplay: true });
+    const splide = init({ autoplay: 'pause' }, { hasToggle: true });
     const { toggle } = splide.Components.Elements;
 
     expect(toggle.classList.contains(CLASS_ACTIVE)).toBe(false);
   });
 
   test('can start/pause autoplay and update the button status.', () => {
-    const splide = init({ autoplay: true }, { autoplay: true });
+    const splide = init({ autoplay: true }, { hasToggle: true });
     const { Autoplay } = splide.Components;
     const { toggle } = splide.Components.Elements;
 
@@ -38,7 +38,7 @@ describe('Autoplay toggle button.', () => {
   });
 
   test('should not be inactive("Play" button) when the autoplay is just paused.', () => {
-    const splide = init({ autoplay: true }, { autoplay: true });
+    const splide = init({ autoplay: true }, { hasToggle: true });
     const { Autoplay } = splide.Components;
     const { toggle } = splide.Components.Elements;
 

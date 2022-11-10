@@ -13,7 +13,11 @@
     "strictNullChecks": false,
     "suppressImplicitAnyIndexErrors": true,
     "declarationDir": "./dist/types",
-    "declaration": true
+    "declaration": true,
+    "paths": {
+      "@test": [ "./src/test" ],
+      "@test/*": [ "./src/test/*" ]
+    }
   },
   "include": [
     "src/js/**/*.ts",

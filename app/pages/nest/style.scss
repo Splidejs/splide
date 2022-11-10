@@ -6,15 +6,16 @@ body {
   margin: 0 auto;
 
   &__slide {
-    padding: 1rem;
+    align-items: center;
     background: #ecf3fa;
     display: flex;
     justify-content: center;
-    align-items: center;
+    padding: 1rem;
   }
 }
 
-.nest1, .nest2 {
+.nest1,
+.nest2 {
   .splide {
     width: 90%;
 

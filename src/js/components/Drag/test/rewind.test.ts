@@ -1,4 +1,4 @@
-import { fire, init, wait } from '../../../test';
+import { fire, init, wait } from '@test';
 
 
 describe('Drag', () => {

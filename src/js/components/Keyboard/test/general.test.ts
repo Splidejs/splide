@@ -1,5 +1,5 @@
 import { RTL, TTB } from '../../../constants/directions';
-import { init, keydown, wait } from '../../../test';
+import { init, keydown, wait } from '@test';
 
 
 describe('Keyboard', () => {

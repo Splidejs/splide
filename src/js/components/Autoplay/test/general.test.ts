@@ -1,4 +1,4 @@
-import { init, wait } from '../../../test';
+import { init, wait } from '@test';
 
 
 describe('Autoplay', () => {
