@@ -1504,71 +1504,76 @@ const XML_NAME_SPACE = "http://www.w3.org/2000/svg";
 const PATH = "m15.5 0.932-4.3 4.38 14.5 14.6-14.5 14.5 4.3 4.4 14.6-14.6 4.4-4.3-4.4-4.4-14.6-14.6z";
 const SIZE = 40;
 
+const I18N = {
+  prev: "Previous slide",
+  next: "Next slide",
+  first: "Go to first slide",
+  last: "Go to last slide",
+  slideX: "Go to slide %s",
+  pageX: "Go to page %s",
+  play: "Start autoplay",
+  pause: "Pause autoplay",
+  carousel: "carousel",
+  slide: "slide",
+  select: "Select a slide to show",
+  slideLabel: "%s of %s"
+};
+
 const Arrows = (Splide, Components, options, event) => {
   const { on, bind, emit } = event;
-  const { classes, i18n } = options;
+  const { classes = CLASSES, i18n = I18N } = options;
   const { Elements, Controller } = Components;
   const { arrows: placeholder, track } = Elements;
-  let wrapper = placeholder;
-  let prev = Elements.prev;
-  let next = Elements.next;
-  let created;
+  const wrapper = placeholder || create("div", classes.arrows);
+  const prev = Elements.prev || createArrow(true);
+  const next = Elements.next || createArrow(false);
+  const arrows = { prev, next };
   let wrapperClasses;
-  const arrows = {};
   function mount() {
     init();
-    on(EVENT_UPDATED, remount);
-  }
-  function remount() {
-    destroy();
-    mount();
+    on(EVENT_UPDATED, () => {
+      destroy();
+      mount();
+    });
   }
   function init() {
     const { arrows: enabled = true } = options;
-    if (enabled && !(prev && next)) {
-      createArrows();
-    }
-    if (prev && next) {
-      assign(arrows, { prev, next });
-      display(wrapper, enabled ? "" : "none");
-      addClass(wrapper, wrapperClasses = `${CLASS_ARROWS}--${options.direction}`);
-      if (enabled) {
-        listen();
-        update();
-        setAttribute([prev, next], ARIA_CONTROLS, track.id);
-        emit(EVENT_ARROWS_MOUNTED, prev, next);
-      }
+    wrapperClasses = `${CLASS_ARROWS}--${options.direction}`;
+    addClass(wrapper, wrapperClasses);
+    if (enabled) {
+      display(wrapper, "");
+      append(wrapper, prev, next);
+      !placeholder && before(track, wrapper);
+      listen();
+      update();
+      setAttribute([prev, next], ARIA_CONTROLS, track.id);
+      emit(EVENT_ARROWS_MOUNTED, prev, next);
+    } else {
+      display(wrapper, "none");
     }
   }
   function destroy() {
     event.destroy();
     removeClass(wrapper, wrapperClasses);
-    if (created) {
-      removeNode(placeholder ? [prev, next] : wrapper);
-      prev = next = null;
-    } else {
+    if (Elements.prev) {
       removeAttribute([prev, next], ALL_ATTRIBUTES);
+    } else {
+      removeNode(placeholder ? [prev, next] : wrapper);
     }
   }
   function listen() {
+    const { go } = Controller;
     on([EVENT_MOUNTED, EVENT_MOVED, EVENT_REFRESH, EVENT_SCROLLED, EVENT_END_INDEX_CHANGED], update);
-    bind(next, "click", apply(go, ">"));
-    bind(prev, "click", apply(go, "<"));
-  }
-  function go(control) {
-    Controller.go(control);
-  }
-  function createArrows() {
-    wrapper = placeholder || create("div", classes.arrows);
-    prev = createArrow(true);
-    next = createArrow(false);
-    created = true;
-    append(wrapper, prev, next);
-    !placeholder && before(track, wrapper);
+    bind(next, "click", () => go(">"));
+    bind(prev, "click", () => go("<"));
   }
   function createArrow(prev2) {
-    const arrow = `<button class="${classes.arrow} ${prev2 ? classes.prev : classes.next}" type="button"><svg xmlns="${XML_NAME_SPACE}" viewBox="0 0 ${SIZE} ${SIZE}" width="${SIZE}" height="${SIZE}"><path d="${options.arrowPath || PATH}" />`;
-    return parseHtml(arrow);
+    const { arrowPath = PATH } = options;
+    const button = `<button class="${classes.arrow} ${prev2 ? classes.prev : classes.next}" type="button">`;
+    const svg = arrowPath ? `<svg xmlns="${XML_NAME_SPACE}" viewBox="0 0 ${SIZE} ${SIZE}" width="${SIZE}" height="${SIZE}"><path d="${arrowPath}" />` : "";
+    const html = parseHtml(button + svg);
+    assert(html);
+    return html;
   }
   function update() {
     if (prev && next) {
@@ -2332,21 +2337,6 @@ const COMPONENTS = {
   Sync,
   Wheel,
   Live
-};
-
-const I18N = {
-  prev: "Previous slide",
-  next: "Next slide",
-  first: "Go to first slide",
-  last: "Go to last slide",
-  slideX: "Go to slide %s",
-  pageX: "Go to page %s",
-  play: "Start autoplay",
-  pause: "Pause autoplay",
-  carousel: "carousel",
-  slide: "slide",
-  select: "Select a slide to show",
-  slideLabel: "%s of %s"
 };
 
 const DEFAULTS = {

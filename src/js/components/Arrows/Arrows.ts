@@ -1,5 +1,5 @@
 import { ALL_ATTRIBUTES, ARIA_CONTROLS, ARIA_LABEL } from '../../constants/attributes';
-import { CLASS_ARROWS } from '../../constants/classes';
+import { CLASS_ARROWS, CLASSES } from '../../constants/classes';
 import {
   EVENT_ARROWS_MOUNTED,
   EVENT_ARROWS_UPDATED,
@@ -14,8 +14,6 @@ import { BaseComponent, ComponentConstructor } from '../../types';
 import {
   addClass,
   append,
-  apply,
-  assign,
   before,
   create,
   display,
@@ -26,6 +24,8 @@ import {
   setAttribute,
 } from '@splidejs/utils';
 import { PATH, SIZE, XML_NAME_SPACE } from './path';
+import { assert } from '../../utils';
+import { I18N } from '../../constants/i18n';
 
 
 /**
@@ -54,29 +54,29 @@ export interface ArrowsComponent extends BaseComponent {
  */
 export const Arrows: ComponentConstructor<ArrowsComponent> = (Splide, Components, options, event) => {
   const { on, bind, emit } = event;
-  const { classes, i18n } = options;
+  const { classes = CLASSES, i18n = I18N } = options;
   const { Elements, Controller } = Components;
   const { arrows: placeholder, track } = Elements;
 
   /**
    * The wrapper element.
    */
-  let wrapper = placeholder;
+  const wrapper = placeholder || create('div', classes.arrows);
 
   /**
    * The previous arrow element.
    */
-  let prev = Elements.prev;
+  const prev = Elements.prev || createArrow(true);
 
   /**
    * The next arrow element.
    */
-  let next = Elements.next;
+  const next = Elements.next || createArrow(false);
 
   /**
-   * Indicates whether the component creates arrows or retrieved from the DOM.
+   * An object with previous and next arrows.
    */
-  let created: boolean;
+  const arrows: ArrowsComponent['arrows'] = { prev, next };
 
   /**
    * Holds modifier classes.
@@ -84,24 +84,15 @@ export const Arrows: ComponentConstructor<ArrowsComponent> = (Splide, Components
   let wrapperClasses: string;
 
   /**
-   * An object with previous and next arrows.
-   */
-  const arrows: ArrowsComponent[ 'arrows' ] = {};
-
-  /**
    * Called when the component is mounted.
    */
   function mount(): void {
     init();
-    on(EVENT_UPDATED, remount);
-  }
 
-  /**
-   * Remounts the component.
-   */
-  function remount(): void {
-    destroy();
-    mount();
+    on(EVENT_UPDATED, () => {
+      destroy();
+      mount();
+    });
   }
 
   /**
@@ -110,21 +101,19 @@ export const Arrows: ComponentConstructor<ArrowsComponent> = (Splide, Components
   function init(): void {
     const { arrows: enabled = true } = options;
 
-    if (enabled && !(prev && next)) {
-      createArrows();
-    }
+    wrapperClasses = `${ CLASS_ARROWS }--${ options.direction }`;
+    addClass(wrapper, wrapperClasses);
 
-    if (prev && next) {
-      assign(arrows, { prev, next });
-      display(wrapper, enabled ? '' : 'none');
-      addClass(wrapper, (wrapperClasses = `${ CLASS_ARROWS }--${ options.direction }`));
-
-      if (enabled) {
-        listen();
-        update();
-        setAttribute([prev, next], ARIA_CONTROLS, track.id);
-        emit(EVENT_ARROWS_MOUNTED, prev, next);
-      }
+    if (enabled) {
+      display(wrapper, '');
+      append(wrapper, prev, next);
+      !placeholder && before(track, wrapper);
+      listen();
+      update();
+      setAttribute([prev, next], ARIA_CONTROLS, track.id);
+      emit(EVENT_ARROWS_MOUNTED, prev, next);
+    } else {
+      display(wrapper, 'none');
     }
   }
 
@@ -135,11 +124,10 @@ export const Arrows: ComponentConstructor<ArrowsComponent> = (Splide, Components
     event.destroy();
     removeClass(wrapper, wrapperClasses);
 
-    if (created) {
-      removeNode(placeholder ? [prev, next] : wrapper);
-      prev = next = null;
-    } else {
+    if (Elements.prev) {
       removeAttribute([prev, next], ALL_ATTRIBUTES);
+    } else {
+      removeNode(placeholder ? [prev, next] : wrapper);
     }
   }
 
@@ -147,31 +135,10 @@ export const Arrows: ComponentConstructor<ArrowsComponent> = (Splide, Components
    * Listens to some events.
    */
   function listen(): void {
+    const { go } = Controller;
     on([EVENT_MOUNTED, EVENT_MOVED, EVENT_REFRESH, EVENT_SCROLLED, EVENT_END_INDEX_CHANGED], update);
-    bind(next, 'click', apply(go, '>'));
-    bind(prev, 'click', apply(go, '<'));
-  }
-
-  /**
-   * The wrapper function of Controller#go().
-   *
-   * @param control - The control pattern.
-   */
-  function go(control: string): void {
-    Controller.go(control);
-  }
-
-  /**
-   * Create arrows and append them to the slider.
-   */
-  function createArrows(): void {
-    wrapper = placeholder || create('div', classes.arrows);
-    prev = createArrow(true);
-    next = createArrow(false);
-    created = true;
-
-    append(wrapper, prev, next);
-    !placeholder && before(track, wrapper);
+    bind(next, 'click', () => go('>'));
+    bind(prev, 'click', () => go('<'));
   }
 
   /**
@@ -183,32 +150,32 @@ export const Arrows: ComponentConstructor<ArrowsComponent> = (Splide, Components
    * @return A created button element.
    */
   function createArrow(prev: boolean): HTMLButtonElement {
-    const arrow = `<button class="${ classes.arrow } ${ prev ? classes.prev : classes.next }" type="button">`
-      + `<svg xmlns="${ XML_NAME_SPACE }" viewBox="0 0 ${ SIZE } ${ SIZE }" width="${ SIZE }" height="${ SIZE }">`
-      + `<path d="${ options.arrowPath || PATH }" />`;
+    const { arrowPath = PATH } = options;
+    const button = `<button class="${ classes.arrow } ${ prev ? classes.prev : classes.next }" type="button">`;
+    const svg = arrowPath ? `<svg xmlns="${ XML_NAME_SPACE }" viewBox="0 0 ${ SIZE } ${ SIZE }" width="${ SIZE }" height="${ SIZE }"><path d="${ arrowPath }" />` : '';
+    const html = parseHtml<HTMLButtonElement>(button + svg);
 
-    return parseHtml<HTMLButtonElement>(arrow);
+    assert(html);
+    return html;
   }
 
   /**
    * Updates status of arrows, such as `disabled` and `aria-label`.
    */
   function update(): void {
-    if (prev && next) {
-      const index = Splide.index;
-      const prevIndex = Controller.getPrev();
-      const nextIndex = Controller.getNext();
-      const prevLabel = prevIndex > -1 && index < prevIndex ? i18n.last : i18n.prev;
-      const nextLabel = nextIndex > -1 && index > nextIndex ? i18n.first : i18n.next;
+    const index = Splide.index;
+    const prevIndex = Controller.getPrev();
+    const nextIndex = Controller.getNext();
+    const prevLabel = prevIndex > -1 && index < prevIndex ? i18n.last : i18n.prev;
+    const nextLabel = nextIndex > -1 && index > nextIndex ? i18n.first : i18n.next;
 
-      prev.disabled = prevIndex < 0;
-      next.disabled = nextIndex < 0;
+    prev.disabled = prevIndex < 0;
+    next.disabled = nextIndex < 0;
 
-      setAttribute(prev, ARIA_LABEL, prevLabel);
-      setAttribute(next, ARIA_LABEL, nextLabel);
+    setAttribute(prev, ARIA_LABEL, prevLabel);
+    setAttribute(next, ARIA_LABEL, nextLabel);
 
-      emit(EVENT_ARROWS_UPDATED, prev, next, prevIndex, nextIndex);
-    }
+    emit(EVENT_ARROWS_UPDATED, prev, next, prevIndex, nextIndex);
   }
 
   return {
