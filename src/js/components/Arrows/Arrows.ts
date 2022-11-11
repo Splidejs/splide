@@ -50,7 +50,7 @@ export interface ArrowsComponent extends BaseComponent {
  * @param options    - Options.
  * @param event      - An EventInterface instance.
  *
- * @return An Arrows component object.
+ * @return An Arrows instance.
  */
 export const Arrows: ComponentConstructor<ArrowsComponent> = (Splide, Components, options, event) => {
   const { on, bind, emit } = event;
