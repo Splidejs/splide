@@ -8,3 +8,4 @@ export * from './constants/classes';
 export * from './constants/defaults';
 export * from './constants/directions';
 export * from './constants/types';
+export { STATES } from './constants/states';

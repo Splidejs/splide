@@ -57,13 +57,14 @@
     "build": "ts-node-esm scripts/build-script.ts",
     "build:types": "ts-node-esm scripts/build-types.ts",
     "build:all": "npm run build && npm run build:types",
-    "check:types": "tsc --noEmit --project tsconfig.dev.json",
+    "check:types": "tsc --noEmit",
+    "check:types:all": "tsc --noEmit --project tsconfig.dev.json",
     "jest": "jest",
     "eslint": "eslint src",
     "stylelint": "npx stylelint ./src/css/**/*.scss && npx stylelint ./app/**/*.scss",
     "stylelint:fix": "npx stylelint --fix ./src/css/**/*.scss && npx stylelint --fix ./app/**/*.scss",
     "lint": "npm run check:types && npm run eslint && npx stylelint ./src/css/**/*.scss",
-    "beforecommit": "npm run lint && npm run build:all"
+    "beforecommit": "npm run lint && npm run jest && npm run build:all"
   },
   "browserslist": [
     "> 5%"
