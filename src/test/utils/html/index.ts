@@ -54,7 +54,7 @@ export interface GenerateSlidesConfig {
   src?: boolean | string[];
   dataSrc?: boolean | string[];
   dataSrcset?: boolean | string[];
-  dataInterval?: number[];
+  dataInterval?: Array<undefined | number>;
   onRenderSlide?: (index: number) => RenderSlideReturnType;
 }
 
