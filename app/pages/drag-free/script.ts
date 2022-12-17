@@ -4,7 +4,7 @@ import '../../js/common';
 import './style.scss';
 
 
-insertHtml();
+insertHtml({ id: 'splide01', heading: 'Drag Free - Slide' });
 
 const splide01 = new Splide('#splide01', {
   width: 1000,
@@ -27,3 +27,15 @@ if (bar) {
 } else {
   throw new Error('Could not find a bar element');
 }
+
+insertHtml({ id: 'splide02', heading: 'Drag Free - Loop' });
+
+new Splide('#splide02', {
+  width: 1000,
+  height: 400,
+  type: 'loop',
+  parPage: 3,
+  drag: 'free',
+  snap: false,
+  gap: '2rem',
+}).mount();
