@@ -400,6 +400,13 @@ export interface ResponsiveOptions {
   flickMaxPages?: number;
 
   /**
+   * Determines whether to release the touch event when the carousel reaches the first or last slide.
+   * If `true`, the bounce effect will not play.
+   * Note that this does not affect mouse drag events.
+   */
+  releaseTouch?: boolean;
+
+  /**
    * If `drag` is `'free'`, determines whether to activate the closest slide after drag or not.
    * The default value is `true`.
    */
