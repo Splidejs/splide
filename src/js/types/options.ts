@@ -413,33 +413,6 @@ export interface ResponsiveOptions {
   updateOnDragged?: boolean;
 
   /**
-   * Enables navigation by the mouse wheel.
-   * You'll need to set `waitForTransition` to `ture` or provide the `wheelSleep` duration to avoid quick change.
-   */
-  wheel?: boolean;
-
-  /**
-   * Determines the wheel axis. The default value is 'y'.
-   */
-  wheelAxis?: 'x' | 'y' | 'xy';
-
-  /**
-   * The threshold to cut off the small delta produced by inertia scroll.
-   */
-  wheelMinThreshold?: number;
-
-  /**
-   * The sleep time in milliseconds until accepting next wheel.
-   * The timer starts when the transition begins.
-   */
-  wheelSleep?: number;
-
-  /**
-   * Determines whether to release the wheel event when the carousel reaches the first or last slide.
-   */
-  releaseWheel?: boolean;
-
-  /**
    * Destroys the slider.
    */
   destroy?: boolean | 'completely';

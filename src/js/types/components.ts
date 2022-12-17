@@ -25,7 +25,6 @@ export interface Components {
   LazyLoad: Types.LazyLoadComponent;
   Pagination: Types.PaginationComponent;
   Sync: Types.SyncComponent;
-  Wheel: Types.WheelComponent;
   Live: Types.LiveComponent;
   Transition: TransitionComponent;
 }

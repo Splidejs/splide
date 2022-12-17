@@ -14,20 +14,4 @@ new Splide('#splide01', {
   gap: '1rem',
   direction: 'ttb',
   height: '90vh',
-  wheel: true,
-  wheelSleep: 200,
-}).mount();
-
-insertHtml({ id: 'splide02', heading: 'Release Wheel' });
-
-new Splide('#splide02', {
-  width: 400,
-  perPage: 2,
-  gap: '1rem',
-  direction: 'ttb',
-  height: '90vh',
-  releaseWheel: true,
-  releaseTouch: true,
-  wheel: true,
-  wheelSleep: 200,
 }).mount();

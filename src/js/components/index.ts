@@ -16,7 +16,6 @@ import { Keyboard } from './Keyboard/Keyboard';
 import { LazyLoad } from './LazyLoad/LazyLoad';
 import { Pagination } from './Pagination/Pagination';
 import { Sync } from './Sync/Sync';
-import { Wheel } from './Wheel/Wheel';
 import { Live } from './Live/Live';
 
 
@@ -36,7 +35,6 @@ export { Keyboard } from './Keyboard/Keyboard';
 export { LazyLoad } from './LazyLoad/LazyLoad';
 export { Pagination } from './Pagination/Pagination';
 export { Sync } from './Sync/Sync';
-export { Wheel } from './Wheel/Wheel';
 export { Live } from './Live/Live';
 
 
@@ -62,6 +60,5 @@ export const COMPONENTS: Record<string, ComponentConstructor> = {
   LazyLoad,
   Pagination,
   Sync,
-  Wheel,
   Live,
 };

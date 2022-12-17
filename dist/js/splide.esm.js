@@ -2234,44 +2234,6 @@ const Sync = (Splide2, Components, options, event) => {
   };
 };
 
-const Wheel = (Splide, Components, options, event) => {
-  let lastTime = 0;
-  function mount() {
-    event.destroy();
-    if (options.wheel) {
-      event.bind(Components.Elements.track, "wheel", onWheel, SCROLL_LISTENER_OPTIONS);
-    }
-    event.on(EVENT_UPDATED, mount);
-  }
-  function onWheel(e) {
-    if (e.cancelable) {
-      const delta = parse(e);
-      const backwards = delta < 0;
-      const timeStamp = timeOf(e);
-      const min = options.wheelMinThreshold || 0;
-      const sleep = options.wheelSleep || 0;
-      if (abs(delta) > min && timeStamp - lastTime > sleep) {
-        Splide.go(delta < 0 ? "<" : ">");
-        lastTime = timeStamp;
-      }
-      shouldPrevent(backwards) && prevent(e);
-    }
-  }
-  function parse(e) {
-    const { wheelAxis = "y" } = options;
-    const { deltaX, deltaY } = e;
-    const x = includes(wheelAxis, "x") ? Components.Direction.orient(-deltaX) : 0;
-    const y = includes(wheelAxis, "y") ? deltaY : 0;
-    return x || y;
-  }
-  function shouldPrevent(backwards) {
-    return !options.releaseWheel || Splide.state.is(MOVING) || Components.Controller.getAdjacent(backwards) !== -1;
-  }
-  return {
-    mount
-  };
-};
-
 const SR_REMOVAL_DELAY = 90;
 const Live = (Splide, Components, options, event) => {
   const { on } = event;
@@ -2333,7 +2295,6 @@ const COMPONENTS = {
   LazyLoad,
   Pagination,
   Sync,
-  Wheel,
   Live
 };
 
