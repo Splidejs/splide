@@ -39,11 +39,6 @@ export const Drag: ComponentConstructor<DragComponent> = (Splide, Components, op
   const { getPosition, exceededLimit } = Move;
 
   /**
-   * The position where the pointer gets active.
-   */
-  let startCoord: number;
-
-  /**
    * The base slider position to calculate the delta of coords.
    */
   let basePosition: number;
@@ -129,7 +124,6 @@ export const Drag: ComponentConstructor<DragComponent> = (Splide, Components, op
           target = isTouch ? track : window;
           dragging = state.is([MOVING, SCROLLING]);
           prevBaseEvent = null;
-          startCoord = coordOf(e);
 
           binder.bind(target, POINTER_MOVE_EVENTS, onPointerMove, SCROLL_LISTENER_OPTIONS);
           binder.bind(target, POINTER_UP_EVENTS, onPointerUp, SCROLL_LISTENER_OPTIONS);
@@ -238,7 +232,7 @@ export const Drag: ComponentConstructor<DragComponent> = (Splide, Components, op
     const { updateOnDragged = true } = options;
     const velocity = computeVelocity(e);
     const destination = computeDestination(velocity);
-    const forwards = orient(coordOf(e) - startCoord) > 0;
+    const forwards = orient(diffCoord(e)) > 0;
     const rewind = options.rewind && options.rewindByDrag;
     const scroll = updateOnDragged ? Controller.scroll : Scroll.scroll;
 
@@ -249,7 +243,7 @@ export const Drag: ComponentConstructor<DragComponent> = (Splide, Components, op
     } else if (Splide.is(FADE)) {
       go(forwards ? (rewind ? '>' : '+') : (rewind ? '<' : '-'));
     } else if (Splide.is(SLIDE) && exceeded && rewind) {
-      go(exceededLimit(true) ? '>' : '<'); // todo
+      go(forwards ? '>' : '<');
     } else {
       go(`${ forwards ? '>>' : '<<' }${ Controller.toDest(destination) }`);
     }
