@@ -66,14 +66,7 @@
         "VariableDeclarator": "first"
       }
     ],
-    "no-console": [
-      "error",
-      {
-        "allow": [
-          "error"
-        ]
-      }
-    ],
+    "no-console": "error",
     "no-empty-function": [
       "error",
       {
