@@ -1,7 +1,7 @@
 import { ARROW_LEFT, ARROW_RIGHT } from '../../constants/arrows';
 import { EVENT_UPDATED } from '../../constants/events';
 import { BaseComponent, ComponentConstructor } from '../../types';
-import { prevent } from '../../../../../utils';
+import { prevent } from '@splidejs/utils';
 
 
 /**
