@@ -10,7 +10,7 @@ import {
 import { IDLE, MOVING } from '../../constants/states';
 import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { AnyFunction, BaseComponent, ComponentConstructor, TransitionComponent } from '../../types';
-import { abs, ceil, clamp, isUndefined, rect, style } from '@splidejs/utils';
+import { abs, ceil, clamp, isUndefined, rect, style, toNumber } from '@splidejs/utils';
 
 
 /**
@@ -293,7 +293,7 @@ export const Move: ComponentConstructor<MoveComponent> = (Splide, Components, op
     const { focus } = options;
     return focus === 'center'
       ? (listSize() - slideSize(index, true)) / 2
-      : Number(focus) * slideSize(index) || 0;
+      : toNumber(focus) * slideSize(index);
   }
 
   /**

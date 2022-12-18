@@ -4,7 +4,7 @@ import { SCROLL_LISTENER_OPTIONS } from '../../constants/listener-options';
 import { DRAGGING, IDLE, MOVING, SCROLLING } from '../../constants/states';
 import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { BaseComponent, ComponentConstructor } from '../../types';
-import { abs, isObject, matches, min, noop, prevent, sign, timeOf } from '@splidejs/utils';
+import { abs, isObject, matches, min, noop, prevent, sign, timeOf, toNumber } from '@splidejs/utils';
 import { FRICTION, LOG_INTERVAL, POINTER_DOWN_EVENTS, POINTER_MOVE_EVENTS, POINTER_UP_EVENTS } from './constants';
 
 
@@ -286,7 +286,7 @@ export const Drag: ComponentConstructor<DragComponent> = (Splide, Components, op
     const { dragMinThreshold: thresholds } = options;
     const isObj = isObject(thresholds);
     const mouse = isObj && thresholds.mouse || 0;
-    const touch = (isObj ? thresholds.touch : Number(thresholds)) || 10;
+    const touch = (isObj ? thresholds.touch : toNumber(thresholds)) || 10;
     return abs(diffCoord(e)) > (isTouchEvent(e) ? touch : mouse);
   }
 

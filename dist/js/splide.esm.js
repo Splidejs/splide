@@ -73,6 +73,9 @@ function slice(arrayLike, start, end) {
 function includes(arrayLike, value) {
   return arrayProto.includes.call(arrayLike, value);
 }
+function toNumber(value) {
+  return Number(value) || 0;
+}
 function assert$1(assertion, message) {
   if (!assertion) {
     throw new Error(message);
@@ -1288,7 +1291,7 @@ const Move = (Splide, Components, options, event) => {
   }
   function offset(index) {
     const { focus } = options;
-    return focus === "center" ? (listSize() - slideSize(index, true)) / 2 : Number(focus) * slideSize(index) || 0;
+    return focus === "center" ? (listSize() - slideSize(index, true)) / 2 : toNumber(focus) * slideSize(index);
   }
   function getLimit(max) {
     return toPosition(max ? Components.Controller.getEnd() : 0);
@@ -1693,7 +1696,7 @@ const Autoplay = (Splide, Components, options, event) => {
   }
   function updateInterval(index = Splide.index) {
     const Slide = Components.Slides.getAt(index);
-    interval.set(Slide && Number(getAttribute(Slide.slide, INTERVAL_DATA_ATTRIBUTE)) || duration);
+    interval.set(Slide && toNumber(getAttribute(Slide.slide, INTERVAL_DATA_ATTRIBUTE)) || duration);
   }
   return {
     mount,
@@ -1919,7 +1922,7 @@ const Drag = (Splide, Components, options, event) => {
     const { dragMinThreshold: thresholds } = options;
     const isObj = isObject(thresholds);
     const mouse = isObj && thresholds.mouse || 0;
-    const touch = (isObj ? thresholds.touch : Number(thresholds)) || 10;
+    const touch = (isObj ? thresholds.touch : toNumber(thresholds)) || 10;
     return abs(diffCoord(e)) > (isTouchEvent(e) ? touch : mouse);
   }
   function isSliderDirection(e) {

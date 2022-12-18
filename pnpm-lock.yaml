@@ -1,7 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@splidejs/utils': ^1.1.6
+  '@splidejs/utils': ^1.2.0
   '@swc/core': ^1.3.23
   '@swc/jest': ^0.2.24
   '@types/jest': ^29.2.4
@@ -26,7 +26,7 @@ specifiers:
   vite: ^3.2.5
 
 dependencies:
-  '@splidejs/utils': 1.1.6
+  '@splidejs/utils': 1.2.0
 
 devDependencies:
   '@swc/core': 1.3.23
@@ -795,8 +795,8 @@ packages:
       '@sinonjs/commons': 1.8.6
     dev: true
 
-  /@splidejs/utils/1.1.6:
-    resolution: {integrity: sha512-7eyMkc/JZk1gUGeioCF5eJ7TMzHK3fo//E8v0gGArX0aOBa5ABe3vf+KGWTskuPel0gwmf/Zr4OrYotnClFy0Q==}
+  /@splidejs/utils/1.2.0:
+    resolution: {integrity: sha512-YBGFRLzmn9HdSRGylHca3hyE7J8ln+izontmJwS0rUbUo7O6G11TnHNVkhq8vry0gd1jr35w1GH3Y79/rLJGow==}
     dev: false
 
   /@swc/core-darwin-arm64/1.3.23:

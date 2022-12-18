@@ -85,6 +85,6 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
-    "@splidejs/utils": "^1.1.6"
+    "@splidejs/utils": "^1.2.0"
   }
 }

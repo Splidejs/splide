@@ -9,7 +9,7 @@ import {
   EVENT_SCROLL,
 } from '../../constants/events';
 import { BaseComponent, ComponentConstructor } from '../../types';
-import { getAttribute, RequestInterval, setAttribute, style, toggleClass } from '@splidejs/utils';
+import { getAttribute, RequestInterval, setAttribute, style, toggleClass, toNumber } from '@splidejs/utils';
 import { INTERVAL_DATA_ATTRIBUTE } from './constants';
 
 
@@ -169,7 +169,7 @@ export const Autoplay: ComponentConstructor<AutoplayComponent> = (Splide, Compon
    */
   function updateInterval(index = Splide.index): void {
     const Slide = Components.Slides.getAt(index);
-    interval.set(Slide && Number(getAttribute(Slide.slide, INTERVAL_DATA_ATTRIBUTE)) || duration);
+    interval.set(Slide && toNumber(getAttribute(Slide.slide, INTERVAL_DATA_ATTRIBUTE)) || duration);
   }
 
   return {
