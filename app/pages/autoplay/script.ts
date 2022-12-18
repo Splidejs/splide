@@ -7,7 +7,7 @@ insertHtml({
   hasProgress: true,
   hasToggle: true,
   onRenderSlide(index) {
-    if (index === 1) {
+    if (index === 0) {
       return { attrs: { 'data-splide-interval': 1000 } };
     }
 
@@ -19,7 +19,7 @@ insertHtml({
   },
 });
 
-new Splide('#splide01', {
+const splide01 = new Splide('#splide01', {
   width: 1000,
   height: 400,
   gap: '1rem',
@@ -27,3 +27,10 @@ new Splide('#splide01', {
   // pauseOnFocus: false,
   // pauseOnHover: false,
 }).mount();
+
+const rateElm = document.createElement('pre');
+splide01.root.append(rateElm);
+
+splide01.on('autoplay:playing', rate => {
+  rateElm.textContent = rate.toFixed(3);
+});

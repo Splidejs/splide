@@ -1,4 +1,4 @@
-import { buildHtml as _buildHtml, BuildHtmlConfig, insertHtml as _insertHtml, InsertHtmlConfig } from '../../src/test';
+import { buildHtml as _buildHtml, BuildHtmlConfig, insertHtml as _insertHtml, InsertHtmlConfig } from '@test';
 import { SLIDES } from './pics';
 
 

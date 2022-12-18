@@ -39,7 +39,7 @@ export interface AutoplayComponent extends BaseComponent {
 export const Autoplay: ComponentConstructor<AutoplayComponent> = (Splide, Components, options, event) => {
   const { on, bind, emit } = event;
   const { interval: duration, pauseOnHover = true, pauseOnFocus = true, resetProgress = true } = options;
-  const interval = RequestInterval(duration, () => Splide.go('>'), onAnimationFrame);
+  const interval = RequestInterval(duration, () => Splide.go('>'), updateRate);
   const { isPaused } = interval;
   const { Elements, Elements: { root, toggle } } = Components;
   const { autoplay } = options;
@@ -68,7 +68,7 @@ export const Autoplay: ComponentConstructor<AutoplayComponent> = (Splide, Compon
       listen();
       toggle && setAttribute(toggle, ARIA_CONTROLS, Elements.track.id);
       stopped || play();
-      update();
+      updateButton();
     }
   }
 
@@ -97,7 +97,7 @@ export const Autoplay: ComponentConstructor<AutoplayComponent> = (Splide, Compon
     }
 
     on([EVENT_MOVE, EVENT_SCROLL, EVENT_REFRESH], interval.rewind);
-    on(EVENT_MOVE, onMove);
+    on(EVENT_MOVE, updateInterval);
   }
 
   /**
@@ -105,9 +105,10 @@ export const Autoplay: ComponentConstructor<AutoplayComponent> = (Splide, Compon
    */
   function play(): void {
     if (isPaused() && Components.Slides.isEnough()) {
+      updateInterval();
       interval.start(!resetProgress);
       focused = hovered = stopped = false;
-      update();
+      updateButton();
       emit(EVENT_AUTOPLAY_PLAY);
     }
   }
@@ -119,7 +120,7 @@ export const Autoplay: ComponentConstructor<AutoplayComponent> = (Splide, Compon
    */
   function pause(stop = true): void {
     stopped = !!stop;
-    update();
+    updateButton();
 
     if (!isPaused()) {
       interval.pause();
@@ -140,7 +141,7 @@ export const Autoplay: ComponentConstructor<AutoplayComponent> = (Splide, Compon
   /**
    * Updates the toggle button status.
    */
-  function update(): void {
+  function updateButton(): void {
     if (toggle) {
       toggleClass(toggle, CLASS_ACTIVE, !stopped);
       setAttribute(toggle, ARIA_LABEL, options.i18n[stopped ? 'play' : 'pause']);
@@ -152,7 +153,7 @@ export const Autoplay: ComponentConstructor<AutoplayComponent> = (Splide, Compon
    *
    * @param rate - The progress rate between 0 and 1.
    */
-  function onAnimationFrame(rate: number): void {
+  function updateRate(rate: number): void {
     const { bar } = Elements;
     bar && style(bar, 'width', `${ rate * 100 }%`);
     emit(EVENT_AUTOPLAY_PLAYING, rate);
@@ -161,9 +162,9 @@ export const Autoplay: ComponentConstructor<AutoplayComponent> = (Splide, Compon
   /**
    * Updates or restores the interval duration.
    *
-   * @param index - An index to move to.
+   * @param index - Optional. A slide index.
    */
-  function onMove(index: number): void {
+  function updateInterval(index = Splide.index): void {
     const Slide = Components.Slides.getAt(index);
     interval.set(Slide && +getAttribute(Slide.slide, INTERVAL_DATA_ATTRIBUTE) || options.interval);
   }

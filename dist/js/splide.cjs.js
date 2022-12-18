@@ -1604,7 +1604,7 @@ const INTERVAL_DATA_ATTRIBUTE = `${DATA_ATTRIBUTE}-interval`;
 const Autoplay = (Splide, Components, options, event) => {
   const { on, bind, emit } = event;
   const { interval: duration, pauseOnHover = true, pauseOnFocus = true, resetProgress = true } = options;
-  const interval = RequestInterval(duration, () => Splide.go(">"), onAnimationFrame);
+  const interval = RequestInterval(duration, () => Splide.go(">"), updateRate);
   const { isPaused } = interval;
   const { Elements, Elements: { root, toggle } } = Components;
   const { autoplay } = options;
@@ -1616,7 +1616,7 @@ const Autoplay = (Splide, Components, options, event) => {
       listen();
       toggle && setAttribute(toggle, ARIA_CONTROLS, Elements.track.id);
       stopped || play();
-      update();
+      updateButton();
     }
   }
   function listen() {
@@ -1638,19 +1638,20 @@ const Autoplay = (Splide, Components, options, event) => {
       });
     }
     on([EVENT_MOVE, EVENT_SCROLL, EVENT_REFRESH], interval.rewind);
-    on(EVENT_MOVE, onMove);
+    on(EVENT_MOVE, updateInterval);
   }
   function play() {
     if (isPaused() && Components.Slides.isEnough()) {
+      updateInterval();
       interval.start(!resetProgress);
       focused = hovered = stopped = false;
-      update();
+      updateButton();
       emit(EVENT_AUTOPLAY_PLAY);
     }
   }
   function pause(stop = true) {
     stopped = !!stop;
-    update();
+    updateButton();
     if (!isPaused()) {
       interval.pause();
       emit(EVENT_AUTOPLAY_PAUSE);
@@ -1661,18 +1662,18 @@ const Autoplay = (Splide, Components, options, event) => {
       hovered || focused ? pause(false) : play();
     }
   }
-  function update() {
+  function updateButton() {
     if (toggle) {
       toggleClass(toggle, CLASS_ACTIVE, !stopped);
       setAttribute(toggle, ARIA_LABEL, options.i18n[stopped ? "play" : "pause"]);
     }
   }
-  function onAnimationFrame(rate) {
+  function updateRate(rate) {
     const { bar } = Elements;
     bar && style(bar, "width", `${rate * 100}%`);
     emit(EVENT_AUTOPLAY_PLAYING, rate);
   }
-  function onMove(index) {
+  function updateInterval(index = Splide.index) {
     const Slide = Components.Slides.getAt(index);
     interval.set(Slide && +getAttribute(Slide.slide, INTERVAL_DATA_ATTRIBUTE) || options.interval);
   }

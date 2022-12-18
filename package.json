@@ -62,7 +62,7 @@
     "stylelint": "npx stylelint ./src/css/**/*.scss && npx stylelint ./app/**/*.scss",
     "stylelint:fix": "npx stylelint --fix ./src/css/**/*.scss && npx stylelint --fix ./app/**/*.scss",
     "lint": "pnpm run check:types && pnpm run eslint && npx stylelint ./src/css/**/*.scss",
-    "beforecommit": "pnpm run lint && pnpm run jest && npm run build:all"
+    "beforecommit": "pnpm run lint && pnpm run jest && npm run build"
   },
   "browserslist": [
     "> 5%"
