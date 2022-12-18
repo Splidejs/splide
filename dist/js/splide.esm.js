@@ -26,7 +26,7 @@ const STATES = {
 function empty(array) {
   array.length = 0;
 }
-function apply(func, ...args) {
+function apply$1(func, ...args) {
   return func.bind(null, ...args);
 }
 const nextTick = setTimeout;
@@ -35,17 +35,17 @@ const noop = () => {
 function raf(func) {
   return requestAnimationFrame(func);
 }
-function typeOf(type, subject) {
+function typeOf$1(type, subject) {
   return typeof subject === type;
 }
 function isObject(subject) {
-  return !isNull(subject) && typeOf("object", subject);
+  return !isNull(subject) && typeOf$1("object", subject);
 }
 const isArray = Array.isArray;
-const isFunction = apply(typeOf, "function");
-const isString = apply(typeOf, "string");
-apply(typeOf, "boolean");
-const isUndefined = apply(typeOf, "undefined");
+const isFunction = apply$1(typeOf$1, "function");
+const isString = apply$1(typeOf$1, "string");
+apply$1(typeOf$1, "boolean");
+const isUndefined = apply$1(typeOf$1, "undefined");
 function isNull(subject) {
   return subject === null;
 }
@@ -195,7 +195,7 @@ function removeNode(nodes) {
 function parseHtml(html) {
   return child(new DOMParser().parseFromString(html, "text/html").body);
 }
-function prevent(e, stopPropagation) {
+function prevent$1(e, stopPropagation) {
   e.preventDefault();
   if (stopPropagation) {
     e.stopPropagation();
@@ -271,7 +271,7 @@ function EventBinder(removersRef) {
   }
   return {
     bind,
-    lock: apply(EventBinder, removers),
+    lock: apply$1(EventBinder, removers),
     destroy
   };
 }
@@ -311,7 +311,7 @@ function EventBus(listenersRef) {
     on,
     off,
     emit,
-    lock: apply(EventBus, listeners),
+    lock: apply$1(EventBus, listeners),
     destroy
   };
 }
@@ -512,6 +512,24 @@ const ARROW_DOWN = `${ARROW}Down`;
 const LTR = "ltr";
 const RTL = "rtl";
 const TTB = "ttb";
+
+function apply(func, ...args) {
+  return func.bind(null, ...args);
+}
+function typeOf(type, subject) {
+  return typeof subject === type;
+}
+apply(typeOf, "function");
+apply(typeOf, "string");
+apply(typeOf, "boolean");
+apply(typeOf, "undefined");
+function prevent(e, stopPropagation) {
+  e.preventDefault();
+  if (stopPropagation) {
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+  }
+}
 
 const ORIENTATION_MAP = {
   width: ["height"],
@@ -757,8 +775,8 @@ const Slide$1 = (Splide2, index, slideIndex, slide) => {
     listen();
   }
   function listen() {
-    bind(slide, "click", apply(emit, EVENT_CLICK, self));
-    bind(slide, "keydown", apply(emit, EVENT_SLIDE_KEYDOWN, self));
+    bind(slide, "click", apply$1(emit, EVENT_CLICK, self));
+    bind(slide, "keydown", apply$1(emit, EVENT_SLIDE_KEYDOWN, self));
     on([EVENT_MOVED, EVENT_SHIFTED, EVENT_SCROLLED], update);
     on(EVENT_NAVIGATION_MOUNTED, initNavigation);
     if (updateOnMove) {
@@ -911,7 +929,7 @@ const Slides = (Splide, Components, options, event) => {
         const ref = slides[index];
         ref ? before(ref, slide) : append(list, slide);
         addClass(slide, options.classes.slide);
-        observeImages(slide, apply(emit, EVENT_RESIZE));
+        observeImages(slide, apply$1(emit, EVENT_RESIZE));
       }
     });
     emit(EVENT_REFRESH);
@@ -981,7 +999,7 @@ const Layout = (Splide, Components, options, event) => {
   let overflow;
   function mount() {
     init();
-    bind(window, "resize load", Throttle(apply(emit, EVENT_RESIZE)));
+    bind(window, "resize load", Throttle(apply$1(emit, EVENT_RESIZE)));
     on([EVENT_UPDATED, EVENT_REFRESH], init);
     on(EVENT_RESIZE, resize);
   }
@@ -1315,8 +1333,8 @@ const Controller = (Splide, Components, options, event) => {
   const { omitEnd } = options;
   const isLoop = Splide.is(LOOP);
   const isSlide = Splide.is(SLIDE);
-  const getNext = apply(getAdjacent, false);
-  const getPrev = apply(getAdjacent, true);
+  const getNext = apply$1(getAdjacent, false);
+  const getPrev = apply$1(getAdjacent, true);
   let currIndex = options.start || 0;
   let endIndex;
   let prevIndex = currIndex;
@@ -1708,7 +1726,7 @@ const Scroll = (Splide, Components, options, event) => {
     friction = 1;
     duration = immediately ? 0 : duration || max(abs(dest - from) / BASE_VELOCITY, MIN_DURATION);
     callback = onScrolled;
-    interval = RequestInterval(duration, onEnd, apply(update, from, dest, noConstrain), 1);
+    interval = RequestInterval(duration, onEnd, apply$1(update, from, dest, noConstrain), 1);
     set(SCROLLING);
     emit(EVENT_SCROLL);
     interval.start();
@@ -1785,7 +1803,7 @@ const Drag = (Splide, Components, options, event) => {
     bind(track, POINTER_UP_EVENTS, noop, SCROLL_LISTENER_OPTIONS);
     bind(track, POINTER_DOWN_EVENTS, onPointerDown, SCROLL_LISTENER_OPTIONS);
     bind(track, "click", onClick, { capture: true });
-    bind(track, "dragstart", prevent);
+    bind(track, "dragstart", prevent$1);
     on([EVENT_MOUNTED, EVENT_UPDATED], init);
   }
   function init() {
@@ -1809,7 +1827,7 @@ const Drag = (Splide, Components, options, event) => {
           Scroll.cancel();
           save(e);
         } else {
-          prevent(e, true);
+          prevent$1(e, true);
         }
       }
     }
@@ -1832,10 +1850,10 @@ const Drag = (Splide, Components, options, event) => {
         }
         clickPrevented = true;
         emit(EVENT_DRAGGING);
-        prevent(e);
+        prevent$1(e);
       } else if (isSliderDirection(e)) {
         dragging = shouldStart(e);
-        prevent(e);
+        prevent$1(e);
       }
     }
   }
@@ -1846,7 +1864,7 @@ const Drag = (Splide, Components, options, event) => {
     }
     if (dragging) {
       move(e);
-      prevent(e);
+      prevent$1(e);
     }
     binder.destroy();
     dragging = false;
@@ -1854,7 +1872,7 @@ const Drag = (Splide, Components, options, event) => {
   }
   function onClick(e) {
     if (!disabled && clickPrevented) {
-      prevent(e, true);
+      prevent$1(e, true);
     }
   }
   function save(e) {
@@ -2031,7 +2049,7 @@ const LazyLoad = (Splide, Components, options, event) => {
   function load(data) {
     const [img] = data;
     addClass(data[1].slide, CLASS_LOADING);
-    bind(img, "load error", apply(onLoad, data));
+    bind(img, "load error", apply$1(onLoad, data));
     setAttribute(img, "src", getAttribute(img, SRC_DATA_ATTRIBUTE));
     setAttribute(img, "srcset", getAttribute(img, SRCSET_DATA_ATTRIBUTE));
     removeAttribute(img, [SRC_DATA_ATTRIBUTE, SRCSET_DATA_ATTRIBUTE]);
@@ -2054,7 +2072,7 @@ const LazyLoad = (Splide, Components, options, event) => {
   }
   return {
     mount,
-    destroy: apply(empty, entries),
+    destroy: apply$1(empty, entries),
     check
   };
 };
@@ -2105,7 +2123,7 @@ const Pagination = (Splide, Components, options, event) => {
       const controls = Slides.getIn(i).map((Slide) => Slide.slide.id);
       const text = !hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
       bind(button, "click", () => go(`>${i}`));
-      paginationKeyboard && bind(button, "keydown", apply(onKeydown, i));
+      paginationKeyboard && bind(button, "keydown", apply$1(onKeydown, i));
       setAttribute(li, ROLE, "presentation");
       setAttribute(button, ROLE, "tab");
       setAttribute(button, ARIA_CONTROLS, controls.join(" "));
@@ -2132,7 +2150,7 @@ const Pagination = (Splide, Components, options, event) => {
     if (item) {
       focus(item.button);
       go(`>${nextPage}`);
-      prevent(e, true);
+      prevent$1(e, true);
     }
   }
   function getDirection() {
@@ -2219,11 +2237,11 @@ const Sync = (Splide2, Components, options, event) => {
   function onKeydown(Slide, e) {
     if (includes(TRIGGER_KEYS, e.key)) {
       onClick(Slide);
-      prevent(e);
+      prevent$1(e);
     }
   }
   return {
-    setup: apply(
+    setup: apply$1(
       Components.Breakpoints.set,
       { slideFocus: isUndefined(slideFocus) ? isNavigation : slideFocus },
       true
@@ -2241,15 +2259,15 @@ const Live = (Splide, Components, options, event) => {
   const { live = true } = options;
   const enabled = live && !options.isNavigation;
   const sr = create("span", CLASS_SR);
-  const interval = RequestInterval(SR_REMOVAL_DELAY, apply(toggle, false));
+  const interval = RequestInterval(SR_REMOVAL_DELAY, apply$1(toggle, false));
   function mount() {
     if (enabled) {
       disable(!Components.Autoplay.isPaused());
       setAttribute(track, ARIA_ATOMIC, true);
       sr.textContent = "\u2026";
-      on(EVENT_AUTOPLAY_PLAY, apply(disable, true));
-      on(EVENT_AUTOPLAY_PAUSE, apply(disable, false));
-      on([EVENT_MOVED, EVENT_SCROLLED], apply(toggle, true));
+      on(EVENT_AUTOPLAY_PLAY, apply$1(disable, true));
+      on(EVENT_AUTOPLAY_PAUSE, apply$1(disable, false));
+      on([EVENT_MOVED, EVENT_SCROLLED], apply$1(toggle, true));
     }
   }
   function toggle(active) {
@@ -2341,7 +2359,7 @@ const Fade = (Splide, Components, options, event) => {
 const Slide = (Splide, Components, options, event) => {
   const { Move, Controller, Scroll } = Components;
   const { list } = Components.Elements;
-  const transition = apply(style, list, "transition");
+  const transition = apply$1(style, list, "transition");
   let endCallback;
   function mount() {
     event.bind(list, "transitionend", (e) => {

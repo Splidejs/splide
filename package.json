@@ -40,6 +40,7 @@
     "eslint": "^8.23.0",
     "jest": "^29.1.1",
     "jest-environment-jsdom": "^29.1.1",
+    "postcss": "^8.4.20",
     "rollup": "^2.79.0",
     "rollup-plugin-dts": "^4.2.2",
     "sass": "^1.54.8",
@@ -54,17 +55,14 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "ts-node-esm scripts/build-script.ts",
-    "build:types": "ts-node-esm scripts/build-types.ts",
-    "build:all": "npm run build && npm run build:types",
-    "check:types": "tsc --noEmit",
-    "check:types:all": "tsc --noEmit --project tsconfig.dev.json",
+    "build": "ts-node-esm scripts/build-script.ts && ts-node-esm scripts/build-types.ts",
+    "check:types": "tsc --project tsconfig.dev.json",
     "jest": "jest",
     "eslint": "eslint src",
     "stylelint": "npx stylelint ./src/css/**/*.scss && npx stylelint ./app/**/*.scss",
     "stylelint:fix": "npx stylelint --fix ./src/css/**/*.scss && npx stylelint --fix ./app/**/*.scss",
-    "lint": "npm run check:types && npm run eslint && npx stylelint ./src/css/**/*.scss",
-    "beforecommit": "npm run lint && npm run jest && npm run build:all"
+    "lint": "pnpm run check:types && pnpm run eslint && npx stylelint ./src/css/**/*.scss",
+    "beforecommit": "pnpm run lint && pnpm run jest && npm run build:all"
   },
   "browserslist": [
     "> 5%"

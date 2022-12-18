@@ -3,7 +3,8 @@
   "compilerOptions": {
     "moduleResolution": "node",
     "declarationDir": null,
-    "declaration": false
+    "declaration": false,
+    "noEmit": true
   },
   "include": [
     "src/js/**/*.ts",

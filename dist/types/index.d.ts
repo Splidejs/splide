@@ -848,20 +848,20 @@ interface EventMap {
  *
  * @since 5.0.0
  */
-declare type EventInterface = EventInterface$1<EventMap & Record<string, AnyFunction>>;
+type EventInterface = EventInterface$1<EventMap & Record<string, AnyFunction>>;
 
 /**
  * The type for any function.
  *
  * @since 3.0.0
  */
-declare type AnyFunction = (...args: any[]) => any;
+type AnyFunction = (...args: any[]) => any;
 /**
  * The type for a component.
  *
  * @since 3.0.0
  */
-declare type ComponentConstructor<R extends BaseComponent = BaseComponent> = (Splide: Splide, Components: Components, options: Options, event: EventInterface) => R;
+type ComponentConstructor<R extends BaseComponent = BaseComponent> = (Splide: Splide, Components: Components, options: Options, event: EventInterface) => R;
 /**
  * The interface for any component.
  *
@@ -923,11 +923,11 @@ interface Components {
  *
  * @internal
  */
-declare type Cast<T, U> = T extends U ? T : U;
+type Cast<T, U> = T extends U ? T : U;
 /**
  * Makes the T easy to read.
  */
-declare type Resolve<T> = {
+type Resolve<T> = {
     [K in keyof T]: T[K];
 } & unknown;
 /**
@@ -935,25 +935,25 @@ declare type Resolve<T> = {
  *
  * @internal
  */
-declare type Push<T extends any[], U = any> = [...T, U];
+type Push<T extends any[], U = any> = [...T, U];
 /**
  * Returns the first type of the tuple.
  *
  * @internal
  */
-declare type Head<T extends any[]> = ((...args: T) => any) extends (arg: infer A, ...args: any[]) => any ? A : never;
+type Head<T extends any[]> = ((...args: T) => any) extends (arg: infer A, ...args: any[]) => any ? A : never;
 /**
  * Removes the first type from the tuple T.
  *
  * @internal
  */
-declare type Shift<T extends any[]> = ((...args: T) => any) extends (arg: any, ...args: infer A) => any ? A : never;
+type Shift<T extends any[]> = ((...args: T) => any) extends (arg: any, ...args: infer A) => any ? A : never;
 /**
  * Removes the N types from the tuple T.
  *
  * @internal
  */
-declare type ShiftN<T extends any[], N extends number, C extends any[] = []> = {
+type ShiftN<T extends any[], N extends number, C extends any[] = []> = {
     0: T;
     1: ShiftN<Shift<T>, N, Push<C>>;
 }[C['length'] extends N ? 0 : 1] extends infer A ? Cast<A, any[]> : never;
@@ -982,19 +982,19 @@ interface SlidesComponent extends BaseComponent {
  *
  * @since 3.0.0
  */
-declare type SlidesIteratee = (Slide: SlideComponent, index: number, Slides: SlideComponent[]) => void;
+type SlidesIteratee = (Slide: SlideComponent, index: number, Slides: SlideComponent[]) => void;
 /**
  * The predicate function for Slides.
  *
  * @since 3.0.0
  */
-declare type SlidesPredicate = (Slide: SlideComponent, index: number, Slides: SlideComponent[]) => any;
+type SlidesPredicate = (Slide: SlideComponent, index: number, Slides: SlideComponent[]) => any;
 /**
  * The type for filtering SlideComponent objects.
  *
  * @since 3.0.0
  */
-declare type SlideMatcher = number | number[] | string | SlidesPredicate;
+type SlideMatcher = number | number[] | string | SlidesPredicate;
 
 /**
  * The frontend class for the Splide slider.
