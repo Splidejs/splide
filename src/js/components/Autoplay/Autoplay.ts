@@ -147,7 +147,7 @@ export const Autoplay: ComponentConstructor<AutoplayComponent> = (Splide, Compon
   function updateButton(): void {
     if (toggle) {
       toggleClass(toggle, CLASS_ACTIVE, !stopped);
-      setAttribute(toggle, ARIA_LABEL, Splide.i18n[stopped ? 'play' : 'pause']);
+      setAttribute(toggle, ARIA_LABEL, Splide.i18n(stopped ? 'play' : 'pause'));
     }
   }
 

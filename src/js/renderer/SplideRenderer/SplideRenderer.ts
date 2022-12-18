@@ -343,7 +343,7 @@ export class SplideRenderer {
   private cssPadding(options: Options, right: boolean): string {
     const { padding } = options;
     const prop = this.Direction.resolve(right ? 'right' : 'left', true);
-    return padding && unit(padding[prop] || (isObject(padding) ? 0 : padding)) || '0px';
+    return unit(isObject(padding) ? padding[prop] || 0 : padding) || '0px';
   }
 
   /**

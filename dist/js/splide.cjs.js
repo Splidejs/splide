@@ -532,13 +532,17 @@ const ORIENTATION_MAP = {
   ArrowLeft: [ARROW_UP, ARROW_RIGHT],
   ArrowRight: [ARROW_DOWN, ARROW_LEFT]
 };
-const Direction = (Splide2, Components2, options) => {
+const Direction = (Splide, Components, options) => {
   function resolve(prop, axisOnly, direction = options.direction) {
     const index = direction === RTL && !axisOnly ? 1 : direction === TTB ? 0 : -1;
-    return ORIENTATION_MAP[prop] && ORIENTATION_MAP[prop][index] || prop.replace(/width|left|right/i, (match, offset) => {
-      const replacement = ORIENTATION_MAP[match.toLowerCase()][index] || match;
+    return find(prop, index) || prop.replace(/width|left|right/i, (match, offset) => {
+      const replacement = find(match.toLowerCase(), index) || match;
       return offset > 0 ? replacement.charAt(0).toUpperCase() + replacement.slice(1) : replacement;
     });
+  }
+  function find(prop, index) {
+    const props = ORIENTATION_MAP[prop];
+    return props && index > -1 ? props[index] : "";
   }
   function orient(value, direction = options.direction) {
     return value * (direction === RTL ? 1 : -1);
@@ -691,7 +695,7 @@ const Elements = (Splide, Components, options, event) => {
   }
   function collect() {
     const trackElm = find(CLASS_TRACK);
-    const listElm = child(track, `.${CLASS_LIST}`);
+    const listElm = trackElm && child(trackElm, `.${CLASS_LIST}`);
     if (trackElm && listElm) {
       track = trackElm;
       list = listElm;
@@ -1023,7 +1027,7 @@ const Layout = (Splide, Components, options, event) => {
   function cssPadding(rightPadding) {
     const { padding } = options;
     const prop = rightPadding ? right() : left();
-    return padding && unit(padding[prop] || (isObject(padding) ? 0 : padding)) || "0px";
+    return unit(isObject(padding) ? padding[prop] : padding) || "0px";
   }
   function cssTrackHeight() {
     let height = "";
@@ -1365,7 +1369,8 @@ const Controller = (Splide, Components, options, event) => {
       const [dest, forwards] = parse(control);
       const index = loop(dest);
       const canGo = dest === index || Move.exceededLimit(!forwards) || Move.canShift(forwards);
-      if (index > -1 && canGo) {
+      const heading = isMoving() && currIndex === index;
+      if (index > -1 && canGo && !heading) {
         Scroll.cancel();
         setIndex(index);
         Move.move(dest, index, prevIndex, forwards, callback);
@@ -1455,7 +1460,13 @@ const Controller = (Splide, Components, options, event) => {
     return dest;
   }
   function loop(index) {
-    return isLoop ? (index + slideCount) % slideCount || 0 : index;
+    if (isLoop) {
+      while (slideCount && index < 0) {
+        index += slideCount;
+      }
+      index = index % slideCount;
+    }
+    return index;
   }
   function getEnd() {
     let end = slideCount - (hasFocus() || isLoop && perMove ? 1 : perPage);
@@ -1676,7 +1687,7 @@ const Autoplay = (Splide, Components, options, event) => {
   function updateButton() {
     if (toggle) {
       toggleClass(toggle, CLASS_ACTIVE, !stopped);
-      setAttribute(toggle, ARIA_LABEL, Splide.i18n[stopped ? "play" : "pause"]);
+      setAttribute(toggle, ARIA_LABEL, Splide.i18n(stopped ? "play" : "pause"));
     }
   }
   function updateRate(rate) {
@@ -2031,7 +2042,7 @@ const LazyLoad = (Splide, Components, options, event) => {
         if (src !== img.src || srcset !== img.srcset) {
           const parent = img.parentElement;
           if (parent) {
-            const spinner = child(parent, `.${CLASS_SPINNER}`) || create("span", Splide.classes["spinner"], parent);
+            const spinner = child(parent, `.${CLASS_SPINNER}`) || create("span", Splide.classes("spinner"), parent);
             entries.push([img, Slide, spinner]);
             img.src || display(img, "none");
           }
@@ -2400,7 +2411,7 @@ const Slide = (Splide, Components, options, event) => {
         return rewindSpeed;
       }
     }
-    return options.speed || 400;
+    return options.speed || 0;
   }
   return {
     mount,
@@ -2421,7 +2432,7 @@ class Splide {
   _o = {};
   _C;
   _E = {};
-  _T = Slide;
+  _T;
   constructor(target, options = {}) {
     const root = isString(target) ? query(document, target) : target;
     assert(root, `${root} is invalid.`);
@@ -2431,7 +2442,8 @@ class Splide {
       labelledby: getAttribute(root, ARIA_LABELLEDBY) || ""
     }, DEFAULTS, Splide.defaults, options);
     try {
-      merge(options, JSON.parse(getAttribute(root, DATA_ATTRIBUTE) || ""));
+      const json = getAttribute(root, DATA_ATTRIBUTE);
+      json && merge(options, JSON.parse(json));
     } catch (e) {
       assert(false, "Invalid JSON");
     }
@@ -2739,7 +2751,7 @@ class SplideRenderer {
   cssPadding(options, right) {
     const { padding } = options;
     const prop = this.Direction.resolve(right ? "right" : "left", true);
-    return padding && unit(padding[prop] || (isObject(padding) ? 0 : padding)) || "0px";
+    return unit(isObject(padding) ? padding[prop] || 0 : padding) || "0px";
   }
   cssTrackHeight(options) {
     let height = "";

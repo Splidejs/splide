@@ -1,7 +1,6 @@
 import { ARROW_DOWN, ARROW_LEFT, ARROW_RIGHT, ARROW_UP } from '../../constants/arrows';
 import { RTL, TTB } from '../../constants/directions';
-import { Splide } from '../../core/Splide/Splide';
-import { BaseComponent, ComponentConstructor, Components, Options } from '../../types';
+import { BaseComponent, ComponentConstructor, Options } from '../../types';
 import { apply } from '@splidejs/utils';
 
 
@@ -11,13 +10,15 @@ import { apply } from '@splidejs/utils';
  * @since 3.0.0
  */
 export interface DirectionComponent extends BaseComponent {
-  resolve<K extends keyof typeof ORIENTATION_MAP>(prop: K, axisOnly?: boolean, direction?: Options['direction']): typeof ORIENTATION_MAP[ K ][ number ] | K;
+  resolve<K extends OrientationMapKeys>(prop: K, axisOnly?: boolean, direction?: Options['direction']): typeof ORIENTATION_MAP[ K ][ number ] | K;
   resolve<R extends string>(prop: R, axisOnly?: boolean, direction?: Options['direction']): R;
 
   orient(value: number): number;
-  left(): string;
-  right(): string;
-  width(): string;
+
+  /** @internal */
+  left(): 'left' | 'right' | 'top';
+  right(): 'left' | 'right' | 'bottom';
+  width(): 'width' | 'height';
 }
 
 /**
@@ -37,6 +38,13 @@ export const ORIENTATION_MAP = {
 } as const;
 
 /**
+ * Keys in ORIENTATION_MAP.
+ *
+ * @since 5.0.0
+ */
+type OrientationMapKeys = keyof typeof ORIENTATION_MAP;
+
+/**
  * The component that absorbs the difference among directions.
  *
  * @since 3.0.0
@@ -47,7 +55,7 @@ export const ORIENTATION_MAP = {
  *
  * @return A Direction component object.
  */
-export const Direction: ComponentConstructor<DirectionComponent> = (Splide: Splide, Components: Components, options: Options) => {
+export const Direction: ComponentConstructor<DirectionComponent> = (Splide, Components, options) => {
   /**
    * Resolves the provided property name.
    *
@@ -58,15 +66,29 @@ export const Direction: ComponentConstructor<DirectionComponent> = (Splide: Spli
   function resolve(
     prop: string,
     axisOnly?: boolean,
-    direction: Options[ 'direction' ] = options.direction,
+    direction: Options['direction'] = options.direction,
   ): string {
-    const index = direction === RTL && !axisOnly ? 1 : direction === TTB ? 0 : -1;
+    const index = direction === RTL && !axisOnly
+      ? 1
+      : direction === TTB ? 0 : -1;
 
-    return ORIENTATION_MAP[prop] && ORIENTATION_MAP[prop][index]
-      || prop.replace(/width|left|right/i, (match, offset) => {
-        const replacement = ORIENTATION_MAP[match.toLowerCase()][index] || match;
-        return offset > 0 ? replacement.charAt(0).toUpperCase() + replacement.slice(1) : replacement;
-      });
+    return find(prop, index) || prop.replace(/width|left|right/i, (match, offset) => {
+      const replacement = find(match.toLowerCase(), index) || match;
+      return offset > 0 ? replacement.charAt(0).toUpperCase() + replacement.slice(1) : replacement;
+    });
+  }
+
+  /**
+   * Finds the prop in the orientation map.
+   *
+   * @param prop  - A prop to find.
+   * @param index - An index for direction.
+   *
+   * @return A found value if available, or otherwise an empty string.
+   */
+  function find(prop: string, index: number): string {
+    const props = ORIENTATION_MAP[prop as OrientationMapKeys];
+    return props && index > -1 ? props[index] : '';
   }
 
   /**
@@ -84,8 +106,8 @@ export const Direction: ComponentConstructor<DirectionComponent> = (Splide: Spli
   return {
     resolve,
     orient,
-    left: apply(resolve, 'left'),
-    right: apply(resolve, 'right'),
-    width: apply(resolve, 'width'),
+    left: apply(resolve, 'left') as () => 'left' | 'right' | 'top',
+    right: apply(resolve, 'right') as () => 'left' | 'right' | 'bottom',
+    width: apply(resolve, 'width') as () => 'width' | 'height',
   };
 };

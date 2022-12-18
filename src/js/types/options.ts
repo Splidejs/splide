@@ -335,8 +335,7 @@ export interface ResponsiveOptions {
   padding?:
     | number
     | string
-    | { left?: number | string, right?: number | string }
-    | { top?: number | string, bottom?: number | string };
+    | { left?: number | string, right?: number | string, top?: number | string, bottom?: number | string }
 
   /**
    * Determines whether to create/find arrows or not.

@@ -120,9 +120,7 @@ export const Layout: ComponentConstructor<LayoutComponent> = (Splide, Components
   function cssPadding(rightPadding: boolean): string {
     const { padding } = options;
     const prop = rightPadding ? right() : left();
-    return padding
-      && unit(padding[prop] || (isObject(padding) ? 0 : padding))
-      || '0px';
+    return unit(isObject(padding) ? padding[prop] : padding) || '0px';
   }
 
   /**

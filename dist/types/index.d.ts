@@ -15,12 +15,13 @@ interface BreakpointsComponent extends BaseComponent {
  * @since 3.0.0
  */
 interface DirectionComponent extends BaseComponent {
-    resolve<K extends keyof typeof ORIENTATION_MAP>(prop: K, axisOnly?: boolean, direction?: Options['direction']): typeof ORIENTATION_MAP[K][number] | K;
+    resolve<K extends OrientationMapKeys>(prop: K, axisOnly?: boolean, direction?: Options['direction']): typeof ORIENTATION_MAP[K][number] | K;
     resolve<R extends string>(prop: R, axisOnly?: boolean, direction?: Options['direction']): R;
     orient(value: number): number;
-    left(): string;
-    right(): string;
-    width(): string;
+    /** @internal */
+    left(): 'left' | 'right' | 'top';
+    right(): 'left' | 'right' | 'bottom';
+    width(): 'width' | 'height';
 }
 /**
  * The translation map for directions.
@@ -37,6 +38,12 @@ declare const ORIENTATION_MAP: {
     readonly ArrowLeft: readonly [string, string];
     readonly ArrowRight: readonly [string, string];
 };
+/**
+ * Keys in ORIENTATION_MAP.
+ *
+ * @since 5.0.0
+ */
+type OrientationMapKeys = keyof typeof ORIENTATION_MAP;
 
 /**
  * The interface for elements which the slider consists of.
@@ -694,7 +701,6 @@ interface ResponsiveOptions {
     padding?: number | string | {
         left?: number | string;
         right?: number | string;
-    } | {
         top?: number | string;
         bottom?: number | string;
     };
@@ -1076,7 +1082,7 @@ declare class Splide {
      *
      * @return `this`
      */
-    mount(Extensions?: Record<string, ComponentConstructor>, Transition?: ComponentConstructor): this;
+    mount(Extensions?: Record<string, ComponentConstructor>, Transition?: ComponentConstructor | undefined): this;
     /**
      * Syncs the slider with the provided one.
      * This method must be called before the `mount()`.
