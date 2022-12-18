@@ -11,7 +11,7 @@ describe('Pagination', () => {
   test('can set the `tablist` role to the pagination root.', () => {
     init();
     const pagination = document.querySelector(`.${ CLASS_PAGINATION }`);
-    expect(pagination.getAttribute('role')).toBe('tablist');
+    expect(pagination?.getAttribute('role')).toBe('tablist');
   });
 
   test('can set the `tab` role to each item in pagination.', () => {
@@ -107,7 +107,7 @@ describe('Pagination', () => {
       init({ speed: 0, direction: direction as Options[ 'direction' ], height: 300 });
       const pagination = document.querySelector(`.${ CLASS_PAGINATION }`);
 
-      expect(pagination.getAttribute('aria-orientation'))
+      expect(pagination?.getAttribute('aria-orientation'))
         .toBe(direction === 'ttb' ? 'vertical' : null);
     });
   });

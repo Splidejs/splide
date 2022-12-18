@@ -46,7 +46,7 @@ describe('Autoplay', () => {
   test('can emit the playing event while the interval timer is ticking.', async () => {
     const splide = init({ autoplay: true, interval: 2000 });
 
-    let progressRate: number;
+    let progressRate = 0;
 
     splide.on(EVENT_AUTOPLAY_PLAYING, rate => {
       progressRate = rate;

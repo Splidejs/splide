@@ -15,7 +15,7 @@ describe('Slides', () => {
     expect(Slides.getLength(false)).toBe(1);
 
     const Slide = Slides.getAt(0);
-    expect(Slide.slide === slide).toBe(true);
+    expect(Slide?.slide === slide).toBe(true);
   });
 
   test('can provide all Slide components with/without clones.', () => {
@@ -53,10 +53,10 @@ describe('Slides', () => {
     const slides = document.getElementsByClassName(CLASS_SLIDE);
 
     const Slide0 = Slides.getAt(0);
-    expect(Slide0.slide === slides[0]).toBe(true);
+    expect(Slide0?.slide === slides[0]).toBe(true);
 
     const Slide2 = Slides.getAt(2);
-    expect(Slide2.slide === slides[2]).toBe(true);
+    expect(Slide2?.slide === slides[2]).toBe(true);
 
     const Slide100 = Slides.getAt(100);
     expect(Slide100).toBeUndefined();

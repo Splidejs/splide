@@ -25,10 +25,9 @@ describe('Pagination', () => {
     expect(splide.Components.Elements.pagination === placeholder).toBe(true);
 
     const { items } = splide.Components.Pagination;
-    const { children } = placeholder;
 
-    expect(items.length === children.length).toBe(true);
-    expect(items[0].li === children[0]).toBe(true);
+    expect(items.length === placeholder?.children.length).toBe(true);
+    expect(items[0].li === placeholder?.children[0]).toBe(true);
   });
 
   test('should toggle a placeholder according to `pagination` options.', () => {

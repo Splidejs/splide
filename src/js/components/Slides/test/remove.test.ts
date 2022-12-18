@@ -11,9 +11,12 @@ describe('Slides#remove()', () => {
 
     Slides.remove(1);
 
+    expect(Slide1).not.toBeUndefined();
+    expect(Slide2).not.toBeUndefined();
+
     expect(Slides.getLength()).toBe(length - 1);
-    expect(Slides.getAt(1).slide).not.toBe(Slide1.slide);
-    expect(Slides.getAt(1).slide).toBe(Slide2.slide);
+    expect(Slides.getAt(1)?.slide).not.toBe(Slide1?.slide);
+    expect(Slides.getAt(1)?.slide).toBe(Slide2?.slide);
   });
 
   test('can remove slides at the specified indices.', () => {
@@ -24,8 +27,9 @@ describe('Slides#remove()', () => {
 
     Slides.remove([1, 2, 3]);
 
+    expect(Slide4).not.toBeUndefined();
     expect(Slides.getLength()).toBe(length - 3);
-    expect(Slides.getAt(1).slide).toBe(Slide4.slide);
+    expect(Slides.getAt(1)?.slide).toBe(Slide4?.slide);
   });
 
   test('can remove slides by a selector.', () => {
@@ -36,8 +40,9 @@ describe('Slides#remove()', () => {
 
     Slides.remove('li:nth-child( 1 ), li:nth-child( 2 )');
 
+    expect(Slide3).not.toBeUndefined();
     expect(Slides.getLength()).toBe(length - 2);
-    expect(Slides.getAt(1).slide).toBe(Slide3.slide);
+    expect(Slides.getAt(1)?.slide).toBe(Slide3?.slide);
   });
 
   test('can remove slides by a predicate function.', () => {
@@ -48,7 +53,8 @@ describe('Slides#remove()', () => {
 
     Slides.remove(Slide => Slide.index < 3);
 
+    expect(Slide3).not.toBeUndefined();
     expect(Slides.getLength()).toBe(length - 3);
-    expect(Slides.getAt(0).slide).toBe(Slide3.slide);
+    expect(Slides.getAt(0)?.slide).toBe(Slide3?.slide);
   });
 });

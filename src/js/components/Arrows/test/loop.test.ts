@@ -1,4 +1,5 @@
 import { init } from '@test';
+import { assert } from '@splidejs/utils';
 
 
 describe.each([['loop'], ['rewind']])('Arrows in "%s" mode', (mode: string) => {
@@ -8,6 +9,10 @@ describe.each([['loop'], ['rewind']])('Arrows in "%s" mode', (mode: string) => {
   const { Arrows } = splide.Components;
   const { next, prev } = Arrows.arrows;
   const { i18n } = splide.options;
+
+  assert(next);
+  assert(prev);
+  assert(i18n);
 
   test('should not disable arrows.', () => {
     splide.go(0);

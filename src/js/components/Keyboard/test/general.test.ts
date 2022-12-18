@@ -84,7 +84,7 @@ describe('Keyboard', () => {
 
     await wait();
 
-    splide.Components.Arrows.arrows.prev.focus();
+    splide.Components.Arrows.arrows.prev?.focus();
 
     await wait();
 

@@ -1,5 +1,6 @@
 import { CLASS_ACTIVE } from '../../../constants/classes';
 import { fire, init } from '@test';
+import { assert } from '@splidejs/utils';
 
 
 describe('Autoplay toggle button.', () => {
@@ -7,13 +8,14 @@ describe('Autoplay toggle button.', () => {
     const splide = init({ autoplay: true }, { hasToggle: true });
     const { toggle } = splide.Components.Elements;
 
+    assert(toggle);
     expect(toggle.classList.contains(CLASS_ACTIVE)).toBe(true);
   });
 
   test('should be inactive if `autoplay` option is `false`.', () => {
     const splide = init({ autoplay: 'pause' }, { hasToggle: true });
     const { toggle } = splide.Components.Elements;
-
+    assert(toggle);
     expect(toggle.classList.contains(CLASS_ACTIVE)).toBe(false);
   });
 
@@ -22,6 +24,7 @@ describe('Autoplay toggle button.', () => {
     const { Autoplay } = splide.Components;
     const { toggle } = splide.Components.Elements;
 
+    assert(toggle);
     expect(Autoplay.isPaused()).toBe(false);
 
     fire(toggle, 'click');
@@ -42,6 +45,7 @@ describe('Autoplay toggle button.', () => {
     const { Autoplay } = splide.Components;
     const { toggle } = splide.Components.Elements;
 
+    assert(toggle);
     expect(Autoplay.isPaused()).toBe(false);
 
     fire(splide.Components.Elements.root, 'focusin');

@@ -9,7 +9,7 @@ describe('Slides#add()', () => {
 
     Slides.add(slide);
 
-    expect(Slides.getAt(Slides.getLength() - 1).slide).toBe(slide);
+    expect(Slides.getAt(Slides.getLength() - 1)?.slide).toBe(slide);
   });
 
   test('can append elements to the slider.', () => {
@@ -20,8 +20,8 @@ describe('Slides#add()', () => {
 
     Slides.add([slide1, slide2]);
 
-    expect(Slides.getAt(Slides.getLength() - 2).slide).toBe(slide1);
-    expect(Slides.getAt(Slides.getLength() - 1).slide).toBe(slide2);
+    expect(Slides.getAt(Slides.getLength() - 2)?.slide).toBe(slide1);
+    expect(Slides.getAt(Slides.getLength() - 1)?.slide).toBe(slide2);
   });
 
   test('can append a new slide by HTML.', () => {
@@ -30,7 +30,7 @@ describe('Slides#add()', () => {
 
     add(['<div class="slide1">']);
 
-    expect(getAt(getLength() - 1).slide.classList.contains('slide1')).toBe(true);
+    expect(getAt(getLength() - 1)?.slide.classList.contains('slide1')).toBe(true);
   });
 
   test('can append new slides by HTML.', () => {
@@ -39,8 +39,8 @@ describe('Slides#add()', () => {
 
     add(['<div class="slide1">', '<div class="slide2">']);
 
-    expect(getAt(getLength() - 2).slide.classList.contains('slide1')).toBe(true);
-    expect(getAt(getLength() - 1).slide.classList.contains('slide2')).toBe(true);
+    expect(getAt(getLength() - 2)?.slide.classList.contains('slide1')).toBe(true);
+    expect(getAt(getLength() - 1)?.slide.classList.contains('slide2')).toBe(true);
   });
 
   test('can insert a new element at the specific index.', () => {
@@ -50,7 +50,7 @@ describe('Slides#add()', () => {
 
     Slides.add(slide, 1);
 
-    expect(Slides.getAt(1).slide).toBe(slide);
+    expect(Slides.getAt(1)?.slide).toBe(slide);
   });
 
   test('can insert new elements at the specific index.', () => {
@@ -61,8 +61,8 @@ describe('Slides#add()', () => {
 
     Slides.add([slide1, slide2], 1);
 
-    expect(Slides.getAt(1).slide).toBe(slide1);
-    expect(Slides.getAt(2).slide).toBe(slide2);
+    expect(Slides.getAt(1)?.slide).toBe(slide1);
+    expect(Slides.getAt(2)?.slide).toBe(slide2);
   });
 
   test('should not break the order of Slides.', () => {

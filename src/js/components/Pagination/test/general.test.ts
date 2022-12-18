@@ -8,7 +8,7 @@ describe('Pagination', () => {
     const pagination = document.querySelector(`.${ CLASS_PAGINATION }`);
     const items = document.getElementsByClassName(CLASS_PAGINATION_PAGE);
 
-    expect(pagination.children.length).toBe(splide.length);
+    expect(pagination?.children.length).toBe(splide.length);
     expect(items.length).toBe(splide.length);
   });
 

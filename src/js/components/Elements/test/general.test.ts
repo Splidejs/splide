@@ -10,6 +10,7 @@ import {
 } from '../../../constants/classes';
 import { RTL } from '../../../constants/directions';
 import { init } from '@test';
+import { assert } from '@splidejs/utils';
 
 
 describe('Elements', () => {
@@ -21,9 +22,17 @@ describe('Elements', () => {
     expect(Elements.track.classList.contains(CLASS_TRACK)).toBe(true);
     expect(Elements.list.classList.contains(CLASS_LIST)).toBe(true);
     expect(Elements.slides.length).toBe(splide.length);
+
+    assert(Elements.prev);
     expect(Elements.prev.classList.contains(CLASS_ARROW_PREV)).toBe(true);
+
+    assert(Elements.next);
     expect(Elements.next.classList.contains(CLASS_ARROW_NEXT)).toBe(true);
+
+    assert(Elements.bar);
     expect(Elements.bar.classList.contains(CLASS_PROGRESS_BAR)).toBe(true);
+
+    assert(Elements.toggle);
     expect(Elements.toggle.classList.contains(CLASS_TOGGLE)).toBe(true);
   });
 

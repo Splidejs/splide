@@ -19,8 +19,9 @@ describe('Clones', () => {
     const clones = splide.root.getElementsByClassName(CLASS_CLONE);
     const Slides = splide.Components.Slides.get(true);
     const count = clones.length / 2; // each side.
+    const { perPage = 1 } = splide.options;
 
-    expect(count).toBe(splide.options.perPage * MULTIPLIER);
+    expect(count).toBe(perPage * MULTIPLIER);
     expect(clones[count - 1].nextElementSibling).toBe(Slides[0].slide);
     expect(clones[count].previousElementSibling).toBe(Slides[Slides.length - 1].slide);
   });
@@ -28,7 +29,7 @@ describe('Clones', () => {
   test('can generate clones according to the perPage option.', () => {
     const splide = init({ type: 'loop', perPage: 3 });
     const clones = splide.root.getElementsByClassName(CLASS_CLONE);
-    const { perPage } = splide.options;
+    const { perPage = 1 } = splide.options;
 
     expect(clones.length / 2).toBe(perPage * MULTIPLIER);
   });
