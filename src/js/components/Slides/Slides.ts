@@ -37,7 +37,7 @@ export interface SlidesComponent extends BaseComponent {
   remove(selector: SlideMatcher): void;
   forEach(iteratee: SlidesIteratee, excludeClones?: boolean): void;
   filter(matcher: SlideMatcher): SlideComponent[];
-  style(prop: string, value: string | number, useContainer?: boolean): void
+  style(prop: string, value: string | number | null, useContainer?: boolean): void
   getLength(excludeClones?: boolean): number;
   isEnough(): boolean;
 }
@@ -124,9 +124,9 @@ export const Slides: ComponentConstructor<SlidesComponent> = (Splide, Components
    * @param slideIndex - A slide index for clones. This must be `-1` for regular slides.
    */
   function register(slide: HTMLElement, index: number, slideIndex: number): void {
-    const object = Slide(Splide, index, slideIndex, slide);
-    object.mount();
-    Slides.push(object);
+    const instance = Slide(Splide, index, slideIndex, slide);
+    instance.mount();
+    Slides.push(instance);
     Slides.sort((Slide1, Slide2) => Slide1.index - Slide2.index);
   }
 
@@ -151,7 +151,7 @@ export const Slides: ComponentConstructor<SlidesComponent> = (Splide, Components
   function getIn(page: number): SlideComponent[] {
     const { Controller } = Components;
     const index = Controller.toIndex(page);
-    const max = Controller.hasFocus() ? 1 : options.perPage;
+    const max = Controller.hasFocus() ? 1 : options.perPage || 1;
     return filter(Slide => between(Slide.index, index, index + max - 1));
   }
 
@@ -175,13 +175,13 @@ export const Slides: ComponentConstructor<SlidesComponent> = (Splide, Components
   function add(items: string | Element | Array<string | Element>, index?: number): void {
     forEachItem(items, slide => {
       if (isString(slide)) {
-        slide = parseHtml(slide);
+        slide = parseHtml(slide) || '';
       }
 
       if (isHTMLElement(slide)) {
-        const ref = slides[index];
+        const ref = slides[index || -1];
         ref ? before(ref, slide) : append(list, slide);
-        addClass(slide, options.classes.slide);
+        addClass(slide, Splide.classes('slide'));
         observeImages(slide, apply(emit, EVENT_RESIZE));
       }
     });
@@ -234,7 +234,7 @@ export const Slides: ComponentConstructor<SlidesComponent> = (Splide, Components
    * @param value        - A CSS value to add.
    * @param useContainer - Optional. Determines whether to apply the rule to the container or not.
    */
-  function style(prop: CSSProperties, value: string | number, useContainer?: boolean): void {
+  function style(prop: CSSProperties, value: string | number | null, useContainer?: boolean): void {
     forEach(Slide => Slide.style(prop, value, useContainer));
   }
 
@@ -278,7 +278,7 @@ export const Slides: ComponentConstructor<SlidesComponent> = (Splide, Components
    * @return `true` if there are enough slides, or otherwise `false`.
    */
   function isEnough(): boolean {
-    return Slides.length > options.perPage;
+    return Slides.length > (options.perPage || 1);
   }
 
   return {

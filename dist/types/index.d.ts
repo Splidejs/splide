@@ -66,21 +66,21 @@ interface ElementsComponent extends BaseComponent, Readonly<ElementCollection> {
 /**
  * The type that matches any function.
  */
-declare type AnyFunction$1 = (...args: any[]) => any;
+type AnyFunction$1 = (...args: any[]) => any;
 
 /**
  * The union for CSS properties.
  *
  * @since 0.0.1
  */
-declare type CSSProperties = Exclude<keyof CSSStyleDeclaration, number | 'length' | 'parentRule' | 'getPropertyPriority' | 'getPropertyValue' | 'item' | 'removeProperty' | 'setProperty'>;
+type CSSProperties = Exclude<keyof CSSStyleDeclaration, number | 'length' | 'parentRule' | 'getPropertyPriority' | 'getPropertyValue' | 'item' | 'removeProperty' | 'setProperty'>;
 
 /**
  * The type for an array with remover functions.
  *
  * @since 0.0.1
  */
-declare type Removers = Set<[() => void, object?]>;
+type Removers = Set<[() => void, object?]>;
 /**
  * The interface for the EventBinder instance.
  *
@@ -106,13 +106,13 @@ declare function EventBinder(removersRef?: Removers): EventBinder;
  *
  * @since 0.0.1
  */
-declare type Listener = [AnyFunction$1, object?];
+type Listener = [AnyFunction$1, object?];
 /**
  * The collection of listeners.
  *
  * @since 0.0.1
  */
-declare type Listeners = Record<string, Listener[]>;
+type Listeners = Record<string, Listener[]>;
 /**
  * The interface for the EventBus instance.
  *
@@ -196,12 +196,15 @@ interface SlideComponent extends BaseComponent {
     readonly index: number;
     readonly slideIndex: number;
     readonly slide: HTMLElement;
-    readonly container: HTMLElement;
+    readonly container: HTMLElement | undefined;
     readonly isClone: boolean;
     update(): void;
-    style(prop: CSSProperties, value: string | number, useContainer?: boolean): void;
+    style(prop: CSSProperties, value: string | number | null, useContainer?: boolean): void;
     isWithin(from: number, distance: number): boolean;
     isVisible(partial?: boolean): boolean;
+    /** @internal */
+    mount(): void;
+    destroy(): void;
 }
 
 /**
@@ -345,7 +348,7 @@ interface LazyLoadComponent extends BaseComponent {
  */
 interface PaginationComponent extends BaseComponent {
     readonly items: PaginationItem[];
-    getAt(index: number): PaginationItem;
+    getAt(index: number): PaginationItem | undefined;
     update(): void;
 }
 /**
@@ -973,7 +976,7 @@ interface SlidesComponent extends BaseComponent {
     remove(selector: SlideMatcher): void;
     forEach(iteratee: SlidesIteratee, excludeClones?: boolean): void;
     filter(matcher: SlideMatcher): SlideComponent[];
-    style(prop: string, value: string | number, useContainer?: boolean): void;
+    style(prop: string, value: string | number | null, useContainer?: boolean): void;
     getLength(excludeClones?: boolean): number;
     isEnough(): boolean;
 }
@@ -1245,6 +1248,27 @@ declare class Splide {
      * @return `this`
      */
     destroy(completely?: boolean): this;
+    /**
+     * Returns the i18n string of the specified key.
+     *
+     * @internal
+     *
+     * @param key          - A key to find.
+     * @param replacements - Replaces `%s` in the found string if available.
+     *
+     * @return A string if found, or otherwise an empty string.
+     */
+    i18n(key: string, ...replacements: Array<string | number>): string;
+    /**
+     * Returns classes in options.
+     *
+     * @internal
+     *
+     * @param key - A key to find.
+     *
+     * @return A class or classes if found, or otherwise an empty string.
+     */
+    classes(key: string): string;
     /**
      * Returns options.
      *

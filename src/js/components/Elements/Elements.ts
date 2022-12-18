@@ -32,6 +32,7 @@ import {
   setAttribute,
   toggleClass,
   uniqueId,
+  classNames,
 } from '@splidejs/utils';
 import { assert } from '../../utils';
 import { POINTER_DOWN_EVENTS } from '../Drag/constants';
@@ -78,7 +79,6 @@ export interface ElementsComponent extends BaseComponent, Readonly<ElementCollec
 export const Elements: ComponentConstructor<ElementsComponent> = (Splide, Components, options, event) => {
   const { on, bind } = event;
   const { root } = Splide;
-  const { i18n } = options;
   const elements: ElementCollection = {} as ElementCollection;
 
   /**
@@ -89,12 +89,12 @@ export const Elements: ComponentConstructor<ElementsComponent> = (Splide, Compon
   /**
    * Stores all root classes.
    */
-  let rootClasses: string[] = [];
+  let rootClasses: string;
 
   /**
    * Stores all list classes.
    */
-  let trackClasses: string[] = [];
+  let trackClasses: string;
 
   /**
    * The track element.
@@ -133,7 +133,7 @@ export const Elements: ComponentConstructor<ElementsComponent> = (Splide, Compon
     }, { capture: true });
 
     bind(root, 'focusin', () => {
-      toggleClass(root, CLASS_FOCUS_IN, !!isUsingKey);
+      toggleClass(root, CLASS_FOCUS_IN, isUsingKey);
     });
   }
 
@@ -173,24 +173,30 @@ export const Elements: ComponentConstructor<ElementsComponent> = (Splide, Compon
    * Collects elements which the slider consists of.
    */
   function collect(): void {
-    track = find(CLASS_TRACK);
-    list = child(track, `.${ CLASS_LIST }`);
+    const trackElm = find(CLASS_TRACK);
+    const listElm = trackElm && child(trackElm, `.${ CLASS_LIST }`);
 
-    assert(track && list, 'A track/list element is missing.');
-    push(slides, children(list, `.${ CLASS_SLIDE }:not(.${ CLASS_CLONE })`));
+    if (trackElm && listElm) {
+      track = trackElm;
+      list = listElm;
 
-    assign(elements, {
-      root,
-      track,
-      list,
-      slides,
-      arrows: find(CLASS_ARROWS),
-      pagination: find(CLASS_PAGINATION),
-      prev: find(CLASS_ARROW_PREV),
-      next: find(CLASS_ARROW_NEXT),
-      bar: find(CLASS_PROGRESS_BAR),
-      toggle: find(CLASS_TOGGLE),
-    });
+      push(slides, children(list, `.${ CLASS_SLIDE }:not(.${ CLASS_CLONE })`));
+
+      assign(elements, {
+        root,
+        track,
+        list,
+        slides,
+        arrows: find(CLASS_ARROWS),
+        pagination: find(CLASS_PAGINATION),
+        prev: find(CLASS_ARROW_PREV),
+        next: find(CLASS_ARROW_NEXT),
+        bar: find(CLASS_PROGRESS_BAR),
+        toggle: find(CLASS_TOGGLE),
+      });
+    } else {
+      assert(0, 'A track/list element is missing.');
+    }
   }
 
   /**
@@ -210,7 +216,7 @@ export const Elements: ComponentConstructor<ElementsComponent> = (Splide, Compon
       setAttribute(root, ROLE, role);
     }
 
-    setAttribute(root, ARIA_ROLEDESCRIPTION, i18n.carousel);
+    setAttribute(root, ARIA_ROLEDESCRIPTION, Splide.i18n('carousel'));
     setAttribute(list, ROLE, 'presentation');
   }
 
@@ -233,14 +239,14 @@ export const Elements: ComponentConstructor<ElementsComponent> = (Splide, Compon
    *
    * @return An array with classes.
    */
-  function getClasses(base: string): string[] {
-    return [
+  function getClasses(base: string): string {
+    return classNames(
       `${ base }--${ options.type }`,
       `${ base }--${ options.direction }`,
       options.drag && `${ base }--draggable`,
       options.isNavigation && `${ base }--nav`,
       base === CLASS_ROOT && CLASS_ACTIVE,
-    ];
+    );
   }
 
   return assign(elements, {

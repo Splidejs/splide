@@ -95,7 +95,7 @@ export const LazyLoad: ComponentConstructor<LazyLoadComponent> = (Splide, Compon
 
   /**
    * Finds images and register them as entries with creating spinner elements.
-   * Note that spinner can be already available because of `refresh()`.
+   * Note that a spinner can be already available because of `refresh()`.
    */
   function register(): void {
     Components.Slides.forEach(Slide => {
@@ -105,10 +105,12 @@ export const LazyLoad: ComponentConstructor<LazyLoadComponent> = (Splide, Compon
 
         if (src !== img.src || srcset !== img.srcset) {
           const parent = img.parentElement;
-          const spinner = child(parent, `.${ CLASS_SPINNER }`) || create('span', options.classes.spinner, parent);
 
-          entries.push([img, Slide, spinner]);
-          img.src || display(img, 'none');
+          if(parent) {
+            const spinner = child(parent, `.${ CLASS_SPINNER }`) || create('span', Splide.classes('spinner'), parent);
+            entries.push([img, Slide, spinner]);
+            img.src || display(img, 'none');
+          }
         }
       });
     });
@@ -120,7 +122,7 @@ export const LazyLoad: ComponentConstructor<LazyLoadComponent> = (Splide, Compon
    */
   function check(): void {
     entries = entries.filter(data => {
-      const distance = options.perPage * ((options.preloadPages || 1) + 1) - 1;
+      const distance = (options.perPage || 1) * ((options.preloadPages || 1) + 1) - 1;
       return data[1].isWithin(Splide.index, distance) ? load(data) : true;
     });
 
@@ -171,7 +173,8 @@ export const LazyLoad: ComponentConstructor<LazyLoadComponent> = (Splide, Compon
    * Starts loading a next image.
    */
   function loadNext(): void {
-    entries.length && load(entries.shift());
+    const next = entries.shift();
+    next && load(next);
   }
 
   return {

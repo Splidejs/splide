@@ -65,13 +65,17 @@ export interface SlideComponent extends BaseComponent {
   readonly index: number;
   readonly slideIndex: number;
   readonly slide: HTMLElement;
-  readonly container: HTMLElement;
+  readonly container: HTMLElement | undefined;
   readonly isClone: boolean;
 
   update(): void;
-  style(prop: CSSProperties, value: string | number, useContainer?: boolean): void
+  style(prop: CSSProperties, value: string | number | null, useContainer?: boolean): void
   isWithin(from: number, distance: number): boolean;
   isVisible(partial?: boolean): boolean;
+
+  /** @internal */
+  mount(): void;
+  destroy(): void;
 }
 
 /**
@@ -90,7 +94,7 @@ export const Slide = (Splide: Splide, index: number, slideIndex: number, slide: 
   const event = Splide.event.lock();
   const { on, emit, bind } = event;
   const { Components, root, options } = Splide;
-  const { isNavigation, updateOnMove, i18n, pagination, slideFocus } = options;
+  const { isNavigation, updateOnMove, pagination, slideFocus } = options;
   const { Elements } = Components;
   const { resolve } = Components.Direction;
   const styles = getAttribute(slide, 'style');
@@ -110,8 +114,8 @@ export const Slide = (Splide: Splide, index: number, slideIndex: number, slide: 
     if (!isClone) {
       slide.id = `${ root.id }-slide${ pad(index + 1) }`;
       setAttribute(slide, ROLE, pagination ? 'tabpanel' : 'group');
-      setAttribute(slide, ARIA_ROLEDESCRIPTION, i18n.slide);
-      setAttribute(slide, ARIA_LABEL, label || format(i18n.slideLabel, index + 1, Splide.length));
+      setAttribute(slide, ARIA_ROLEDESCRIPTION, Splide.i18n('slide'));
+      setAttribute(slide, ARIA_LABEL, label || format(Splide.i18n('slideLabel'), index + 1, Splide.length));
     }
 
     listen();
@@ -152,7 +156,7 @@ export const Slide = (Splide: Splide, index: number, slideIndex: number, slide: 
       return Slide ? Slide.slide.id : '';
     }).join(' ');
 
-    setAttribute(slide, ARIA_LABEL, format(i18n.slideX, (isClone ? slideIndex : index) + 1));
+    setAttribute(slide, ARIA_LABEL, format(Splide.i18n('slideX'), (isClone ? slideIndex : index) + 1));
     setAttribute(slide, ARIA_CONTROLS, controls);
     setAttribute(slide, ROLE, slideFocus ? 'button' : '');
     slideFocus && removeAttribute(slide, ARIA_ROLEDESCRIPTION);
@@ -231,7 +235,7 @@ export const Slide = (Splide: Splide, index: number, slideIndex: number, slide: 
    * @param value        - A CSS value to add.
    * @param useContainer - Optional. Determines whether to apply the rule to the container or not.
    */
-  function style(prop: CSSProperties, value: string | number, useContainer?: boolean): void {
+  function style(prop: CSSProperties, value: string | number | null, useContainer?: boolean): void {
     _style((useContainer && container) || slide, prop, value);
   }
 

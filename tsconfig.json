@@ -10,7 +10,6 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "strict": true,
-    "strictNullChecks": false,
     "suppressImplicitAnyIndexErrors": true,
     "declarationDir": "./dist/types",
     "declaration": true,

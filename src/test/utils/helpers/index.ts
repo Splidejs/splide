@@ -1,4 +1,4 @@
-import { assign } from '@splidejs/utils';
+import { assign, assert } from '@splidejs/utils';
 import { CLASS_LIST, CLASS_ROOT, CLASS_SLIDE, CLASS_TRACK, Options, Splide } from '../../../js';
 import { buildHtml, BuildHtmlConfig } from '../html';
 import { SLIDER_WIDTH } from '../constants';
@@ -49,10 +49,17 @@ export function init(options: Options = {}, config: InitConfig = {}): Splide {
     document.body.innerHTML = innerHtml;
   }
 
+
   const root = id ? document.getElementById(id) : document.querySelector(`.${ CLASS_ROOT }`);
+
+  assert(root);
+
   const track = root.querySelector(`.${ CLASS_TRACK }`);
   const list = root.querySelector<HTMLElement>(`.${ CLASS_LIST }`);
   const slides = root.querySelectorAll<HTMLElement>(`.${ CLASS_SLIDE }`);
+
+  assert(track);
+  assert(list);
 
   root.getBoundingClientRect = (): DOMRect => {
     return assign({}, DOM_RECT, { width: +width });

@@ -148,7 +148,7 @@ export const Layout: ComponentConstructor<LayoutComponent> = (Splide, Components
    * @return The height as a CSS string if available, or otherwise an empty string.
    */
   function cssHeight(): string {
-    return unit(options.height || rect(list).width * options.heightRatio);
+    return unit(options.height || rect(list).width * (options.heightRatio || 0));
   }
 
   /**

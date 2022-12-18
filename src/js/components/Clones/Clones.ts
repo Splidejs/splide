@@ -127,7 +127,7 @@ export const Clones: ComponentConstructor<ClonesComponent> = (Splide, Components
    */
   function cloneDeep(elm: HTMLElement, index: number): HTMLElement {
     const clone = elm.cloneNode(true) as HTMLElement;
-    addClass(clone, options.classes.clone);
+    addClass(clone, Splide.classes('clone'));
     clone.id = `${ Splide.root.id }-clone${ pad(index + 1) }`;
     return clone;
   }
@@ -144,9 +144,10 @@ export const Clones: ComponentConstructor<ClonesComponent> = (Splide, Components
     if (!Splide.is(LOOP)) {
       clones = 0;
     } else if (isUndefined(clones)) {
+      const { perPage = 1 } = options;
       const fixedSize = options[resolve('fixedWidth')] && Components.Layout.slideSize(0);
       const fixedCount = fixedSize && ceil(trackSize() / fixedSize);
-      clones = fixedCount || (options[resolve('autoWidth')] && Splide.length) || options.perPage * MULTIPLIER;
+      clones = fixedCount || (options[resolve('autoWidth')] && Splide.length) || perPage * MULTIPLIER;
     }
 
     return clones;

@@ -38,11 +38,10 @@ export interface AutoplayComponent extends BaseComponent {
  */
 export const Autoplay: ComponentConstructor<AutoplayComponent> = (Splide, Components, options, event) => {
   const { on, bind, emit } = event;
-  const { interval: duration, pauseOnHover = true, pauseOnFocus = true, resetProgress = true } = options;
+  const duration = options.interval || 5000;
   const interval = RequestInterval(duration, () => Splide.go('>'), updateRate);
   const { isPaused } = interval;
   const { Elements, Elements: { root, toggle } } = Components;
-  const { autoplay } = options;
 
   /**
    * Indicates whether the slider is hovered or not.
@@ -58,13 +57,13 @@ export const Autoplay: ComponentConstructor<AutoplayComponent> = (Splide, Compon
    * Indicates whether the autoplay is stopped or not.
    * If stopped, autoplay won't start automatically unless `play()` is explicitly called.
    */
-  let stopped = autoplay === 'pause';
+  let stopped = options.autoplay === 'pause';
 
   /**
    * Called when the component is mounted.
    */
   function mount(): void {
-    if (autoplay) {
+    if (options.autoplay) {
       listen();
       toggle && setAttribute(toggle, ARIA_CONTROLS, Elements.track.id);
       stopped || play();
@@ -76,6 +75,8 @@ export const Autoplay: ComponentConstructor<AutoplayComponent> = (Splide, Compon
    * Listens to some events.
    */
   function listen(): void {
+    const { pauseOnHover = true, pauseOnFocus = true } = options;
+
     if (pauseOnHover) {
       bind(root, 'mouseenter mouseleave', e => {
         hovered = e.type === 'mouseenter';
@@ -105,6 +106,8 @@ export const Autoplay: ComponentConstructor<AutoplayComponent> = (Splide, Compon
    */
   function play(): void {
     if (isPaused() && Components.Slides.isEnough()) {
+      const { resetProgress = true } = options;
+
       updateInterval();
       interval.start(!resetProgress);
       focused = hovered = stopped = false;
@@ -119,7 +122,7 @@ export const Autoplay: ComponentConstructor<AutoplayComponent> = (Splide, Compon
    * @param stop - If `true`, autoplay keeps paused until `play()` is explicitly called.
    */
   function pause(stop = true): void {
-    stopped = !!stop;
+    stopped = stop;
     updateButton();
 
     if (!isPaused()) {
@@ -144,7 +147,7 @@ export const Autoplay: ComponentConstructor<AutoplayComponent> = (Splide, Compon
   function updateButton(): void {
     if (toggle) {
       toggleClass(toggle, CLASS_ACTIVE, !stopped);
-      setAttribute(toggle, ARIA_LABEL, options.i18n[stopped ? 'play' : 'pause']);
+      setAttribute(toggle, ARIA_LABEL, Splide.i18n[stopped ? 'play' : 'pause']);
     }
   }
 
@@ -166,7 +169,7 @@ export const Autoplay: ComponentConstructor<AutoplayComponent> = (Splide, Compon
    */
   function updateInterval(index = Splide.index): void {
     const Slide = Components.Slides.getAt(index);
-    interval.set(Slide && +getAttribute(Slide.slide, INTERVAL_DATA_ATTRIBUTE) || options.interval);
+    interval.set(Slide && Number(getAttribute(Slide.slide, INTERVAL_DATA_ATTRIBUTE)) || duration);
   }
 
   return {

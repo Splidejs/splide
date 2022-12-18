@@ -13,6 +13,7 @@ import {
   assign,
   empty,
   EventInterface,
+  format,
   forOwn,
   getAttribute,
   isString,
@@ -88,7 +89,7 @@ export class Splide {
   /**
    * The Transition component.
    */
-  private _T: ComponentConstructor;
+  private _T: ComponentConstructor | undefined;
 
   /**
    * The Splide constructor.
@@ -108,11 +109,13 @@ export class Splide {
     }, DEFAULTS, Splide.defaults, options);
 
     try {
-      merge(options, JSON.parse(getAttribute(root, DATA_ATTRIBUTE)));
+      const json = getAttribute(root, DATA_ATTRIBUTE);
+      json && merge(options, JSON.parse(json));
     } catch (e) {
       assert(false, 'Invalid JSON');
     }
 
+    this._C = this.Components;
     this._o = Object.create(merge({}, options));
   }
 
@@ -124,7 +127,10 @@ export class Splide {
    *
    * @return `this`
    */
-  mount(Extensions: Record<string, ComponentConstructor> = this._E, Transition: ComponentConstructor = this._T): this {
+  mount(
+    Extensions: Record<string, ComponentConstructor> = this._E,
+    Transition: ComponentConstructor | undefined = this._T,
+  ): this {
     const { state, Components } = this;
     assert(state.is([CREATED, DESTROYED]), 'Already mounted!');
 
@@ -143,7 +149,7 @@ export class Splide {
     });
 
     forOwn(Components, component => {
-      component.mount && component.mount();
+      component && component.mount && component.mount();
     });
 
     this.emit(EVENT_MOUNTED);
@@ -382,7 +388,7 @@ export class Splide {
       this.on(EVENT_READY, this.destroy.bind(this, completely));
     } else {
       forOwn(this._C, component => {
-        component.destroy && component.destroy(completely);
+        component && component.destroy && component.destroy(completely);
       }, true);
 
       event.emit(EVENT_DESTROY);
@@ -392,6 +398,35 @@ export class Splide {
     }
 
     return this;
+  }
+
+  /**
+   * Returns the i18n string of the specified key.
+   *
+   * @internal
+   *
+   * @param key          - A key to find.
+   * @param replacements - Replaces `%s` in the found string if available.
+   *
+   * @return A string if found, or otherwise an empty string.
+   */
+  i18n(key: string, ...replacements: Array<string | number>): string {
+    const { i18n } = this._o;
+    return i18n ? format(i18n[key], ...replacements) : '';
+  }
+
+  /**
+   * Returns classes in options.
+   *
+   * @internal
+   *
+   * @param key - A key to find.
+   *
+   * @return A class or classes if found, or otherwise an empty string.
+   */
+  classes(key: string): string {
+    const { classes } = this._o;
+    return classes ? classes[key] : '';
   }
 
   /**

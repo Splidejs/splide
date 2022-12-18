@@ -66,7 +66,10 @@ export const Move: ComponentConstructor<MoveComponent> = (Splide, Components, op
    */
   let indices: [number, number, number];
 
-  let callback: AnyFunction;
+  /**
+   * Keeps the `onMoved` callback function.
+   */
+  let callback: AnyFunction | undefined;
 
   /**
    * Called when the component is mounted.
@@ -290,7 +293,7 @@ export const Move: ComponentConstructor<MoveComponent> = (Splide, Components, op
     const { focus } = options;
     return focus === 'center'
       ? (listSize() - slideSize(index, true)) / 2
-      : +focus * slideSize(index) || 0;
+      : Number(focus) * slideSize(index) || 0;
   }
 
   /**

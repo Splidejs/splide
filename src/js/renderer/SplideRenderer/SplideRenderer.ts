@@ -46,7 +46,8 @@ export class SplideRenderer {
     const clones = queryAll(root, `.${ CLASS_CLONE }`);
 
     on(EVENT_MOUNTED, () => {
-      removeNode(child(root, 'style'));
+      const style = child(root, 'style');
+      style && removeNode(style);
     });
 
     removeNode(clones);
@@ -104,11 +105,16 @@ export class SplideRenderer {
     merge(DEFAULTS, defaults || {});
     merge(merge(this.options, DEFAULTS), options || {});
 
+    // todo
+    const splide = new Splide('');
+
     this.contents = contents;
     this.config = assign({}, RENDERER_DEFAULT_CONFIG, config || {});
     this.id = this.config.id || uniqueId('splide');
     this.Style = new Style(this.id, this.options);
-    this.Direction = Direction(null, null, this.options, undefined);
+
+    // todo
+    this.Direction = Direction(splide, splide.Components, this.options, splide.event.lock());
 
     assert(this.contents.length, 'Provide at least 1 content.');
 
@@ -132,16 +138,18 @@ export class SplideRenderer {
    */
   private initSlides(): void {
     push(this.slides, this.contents.map((content, index) => {
+      const { classes = {} } = this.options;
+
       content = isString(content) ? { html: content } : content;
       content.styles = content.styles || {};
       content.attrs = content.attrs || {};
 
       this.cover(content);
 
-      const classes = `${ this.options.classes.slide } ${ index === 0 ? CLASS_ACTIVE : '' }`;
+      const classNames = `${ classes.slide } ${ index === 0 ? CLASS_ACTIVE : '' }`;
 
       assign(content.attrs, {
-        class: `${ classes } ${ content.attrs.class || '' }`.trim(),
+        class: `${ classNames } ${ content.attrs.class || '' }`.trim(),
         style: this.buildStyles(content.styles),
       });
 
@@ -249,7 +257,7 @@ export class SplideRenderer {
       return this.buildCssValue(orient(value) * cloneCount, unit);
     }
 
-    const percent = 100 * cloneCount / options.perPage;
+    const percent = 100 * cloneCount / (options.perPage || 1);
     return `${ orient(percent) }%`;
   }
 
@@ -274,7 +282,7 @@ export class SplideRenderer {
     }
 
     const values = [];
-    const { perPage, gap } = options;
+    const { perPage = 1, gap } = options;
 
     values.push(`${ orient(50 / perPage) }%`);
 
@@ -305,7 +313,7 @@ export class SplideRenderer {
         return this.buildCssValue(orient(value * cloneCount), unit);
       }
 
-      const { perPage } = options;
+      const { perPage = 1 } = options;
       const gaps = cloneCount / perPage;
       return this.buildCssValue(orient(gaps * value), unit);
     }
@@ -439,14 +447,14 @@ export class SplideRenderer {
    *
    * @return An object with value and unit.
    */
-  private parseCssValue(value: string | number): { value: number, unit: string } {
+  private parseCssValue(value: string | number | undefined): { value: number, unit: string } {
     if (isString(value)) {
       const number = parseFloat(value) || 0;
       const unit = value.replace(/\d*(\.\d*)?/, '') || 'px';
       return { value: number, unit };
     }
 
-    return { value, unit: 'px' };
+    return { value: value || 0, unit: 'px' };
   }
 
   /**
@@ -572,7 +580,7 @@ export class SplideRenderer {
     const { slideTag: tag } = this.config;
 
     return this.slides.map(content => {
-      return `<${ tag } ${ this.buildAttrs(content.attrs) }>${ content.html || '' }</${ tag }>`;
+      return `<${ tag } ${ this.buildAttrs(content.attrs || {}) }>${ content.html || '' }</${ tag }>`;
     }).join('');
   }
 
@@ -587,7 +595,7 @@ export class SplideRenderer {
     if (this.options.cover && !this.options.lazyLoad) {
       const src = html.match(/<img.*?src\s*=\s*(['"])(.+?)\1.*?>/);
 
-      if (src && src[2]) {
+      if (src && src[2] && styles) {
         styles.background = `center/cover no-repeat url('${ src[2] }')`;
       }
     }
@@ -599,7 +607,7 @@ export class SplideRenderer {
    * @param contents - An array with SlideContent objects.
    */
   private generateClones(contents: SlideContent[]): void {
-    const { classes } = this.options;
+    const { classes = {} } = this.options;
     const count = this.getCloneCount();
     const slides = contents.slice();
 
@@ -608,8 +616,9 @@ export class SplideRenderer {
     }
 
     push(slides.slice(-count).reverse(), slides.slice(0, count)).forEach((content, index) => {
-      const attrs = assign({}, content.attrs, { class: `${ content.attrs.class } ${ classes.clone }` });
-      const clone = assign({}, content, { attrs });
+      const { attrs = {} } = content;
+      const attributes = assign({}, content.attrs || {}, { class: `${ attrs.class } ${ classes.clone }` });
+      const clone = assign({}, content, { attrs: attributes });
       index < count ? contents.unshift(clone) : contents.push(clone);
     });
   }
@@ -627,7 +636,7 @@ export class SplideRenderer {
         return options.clones;
       }
 
-      const perPage = max(...this.breakpoints.map(([, options]) => options.perPage));
+      const perPage = max(...this.breakpoints.map(([, options]) => options.perPage || 1));
       return perPage * ((options.flickMaxPages || 1) + 1);
     }
 
@@ -640,9 +649,11 @@ export class SplideRenderer {
    * @return The HTML for arrows.
    */
   private renderArrows(): string {
+    const { classes = {} } = this.options;
+
     let html = '';
 
-    html += `<div class="${ this.options.classes.arrows }">`;
+    html += `<div class="${ classes.arrows }">`;
     html += this.renderArrow(true);
     html += this.renderArrow(false);
     html += `</div>`;
@@ -659,7 +670,7 @@ export class SplideRenderer {
    * @return The HTML for the prev or next arrow.
    */
   private renderArrow(prev: boolean): string {
-    const { classes, i18n } = this.options;
+    const { classes = {}, i18n = {} } = this.options;
     const attrs = {
       class: `${ classes.arrow } ${ prev ? classes.prev : classes.next }`,
       type: 'button',

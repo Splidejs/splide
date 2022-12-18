@@ -88,7 +88,7 @@ export const Slide: ComponentConstructor<TransitionComponent> = (Splide, Compone
       }
     }
 
-    return options.speed;
+    return options.speed || 0;
   }
 
   return {

@@ -85,7 +85,7 @@ export const Controller: ComponentConstructor<ControllerComponent> = (Splide, Co
   /**
    * The latest `perMove` value.
    */
-  let perMove: number;
+  let perMove: number | undefined;
 
   /**
    * The latest `perMove` value.
@@ -109,7 +109,7 @@ export const Controller: ComponentConstructor<ControllerComponent> = (Splide, Co
   function init(): void {
     slideCount = getLength(true);
     perMove = options.perMove;
-    perPage = options.perPage;
+    perPage = options.perPage || 1;
     endIndex = getEnd();
 
     const end = omitEnd ? endIndex : slideCount - 1;
@@ -135,8 +135,9 @@ export const Controller: ComponentConstructor<ControllerComponent> = (Splide, Co
 
   /**
    * Moves the carousel by the control pattern.
-   * - `Move.exceededLimit( ! forwards )` checks if the carousel is already shifted
-   * - `Move.canShift( forwards )` checks if there is enough space to shift the carousel.
+   * - `Move.exceededLimit(!forwards)` checks if the carousel is already shifted
+   * - `Move.canShift(forwards)` checks if there is enough space to shift the carousel.
+   * - `heading` checks if the carousel is already moving towards the calculated index.
    *
    * @see `Splide#go()`
    *
@@ -148,8 +149,9 @@ export const Controller: ComponentConstructor<ControllerComponent> = (Splide, Co
       const [dest, forwards] = parse(control);
       const index = loop(dest);
       const canGo = dest === index || Move.exceededLimit(!forwards) || Move.canShift(forwards);
+      const heading = isMoving() && currIndex === index;
 
-      if (index > -1 && canGo) {
+      if (index > -1 && canGo && !heading) {
         Scroll.cancel();
         setIndex(index);
         Move.move(dest, index, prevIndex, forwards, callback);
@@ -319,7 +321,15 @@ export const Controller: ComponentConstructor<ControllerComponent> = (Splide, Co
    * @return A looped index.
    */
   function loop(index: number): number {
-    return isLoop ? (index + slideCount) % slideCount || 0 : index;
+    if (isLoop) {
+      while(slideCount && index < 0) {
+        index += slideCount;
+      }
+
+      index = index % slideCount;
+    }
+
+    return index;
   }
 
   /**
@@ -406,7 +416,7 @@ export const Controller: ComponentConstructor<ControllerComponent> = (Splide, Co
    * @return `true` if the slider has the focus option.
    */
   function hasFocus(): boolean {
-    return !isUndefined(options.focus) || options.isNavigation;
+    return !isUndefined(options.focus) || !! options.isNavigation;
   }
 
   /**

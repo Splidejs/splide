@@ -113,7 +113,7 @@ export function generateSlides(config: GenerateSlidesConfig): string {
 function generateImage(config: GenerateSlidesConfig, index: number): string {
   const { src, dataSrc, dataSrcset } = config;
 
-  const attrs: Record<string, number | string> = {};
+  const attrs: Record<string, number | string | undefined> = {};
   attrs.src = generateImageUrl(src, index);
   attrs[SRC_DATA_ATTRIBUTE] = generateImageUrl(dataSrc, index);
 

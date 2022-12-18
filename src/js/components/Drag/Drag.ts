@@ -56,7 +56,7 @@ export const Drag: ComponentConstructor<DragComponent> = (Splide, Components, op
   /**
    * Holds the previous base event object.
    */
-  let prevBaseEvent: TouchEvent | MouseEvent;
+  let prevBaseEvent: TouchEvent | MouseEvent | null;
 
   /**
    * Indicates whether the drag mode is `free` or not.
@@ -286,7 +286,7 @@ export const Drag: ComponentConstructor<DragComponent> = (Splide, Components, op
     const { dragMinThreshold: thresholds } = options;
     const isObj = isObject(thresholds);
     const mouse = isObj && thresholds.mouse || 0;
-    const touch = (isObj ? thresholds.touch : +thresholds) || 10;
+    const touch = (isObj ? thresholds.touch : Number(thresholds)) || 10;
     return abs(diffCoord(e)) > (isTouchEvent(e) ? touch : mouse);
   }
 
@@ -401,10 +401,10 @@ export const Drag: ComponentConstructor<DragComponent> = (Splide, Components, op
    *
    * @return `true` if the target is draggable.
    */
-  function isDraggable(target: EventTarget): boolean {
+  function isDraggable(target: EventTarget | null): boolean {
     const { noDrag } = options;
 
-    return !matches(target, `.${ CLASS_PAGINATION_PAGE }, .${ CLASS_ARROW }`)
+    return !! target && !matches(target, `.${ CLASS_PAGINATION_PAGE }, .${ CLASS_ARROW }`)
       && (!noDrag || !matches(target, noDrag));
   }
 

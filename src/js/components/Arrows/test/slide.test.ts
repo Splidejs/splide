@@ -1,5 +1,6 @@
 import { EVENT_MOVED } from '../../../constants/events';
 import { fire, init } from '@test';
+import { assert } from '@splidejs/utils';
 
 
 describe('Arrows', () => {
@@ -7,6 +8,10 @@ describe('Arrows', () => {
   const { Arrows } = splide.Components;
   const { next, prev } = Arrows.arrows;
   const { i18n } = splide.options;
+
+  assert(next);
+  assert(prev);
+  assert(i18n);
 
   test('can generate arrows.', () => {
     expect(prev instanceof HTMLButtonElement).toBe(true);

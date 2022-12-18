@@ -150,7 +150,7 @@ function setAttribute(elms, attrs, value) {
     });
   } else {
     forEach(elms, (elm) => {
-      isNull(value) || value === "" ? removeAttribute(elm, attrs) : elm.setAttribute(attrs, String(value));
+      isNull(value) || isUndefined(value) || value === "" ? removeAttribute(elm, attrs) : elm.setAttribute(attrs, String(value));
     });
   }
 }
@@ -216,6 +216,11 @@ function timeOf(e) {
 }
 function unit(value) {
   return isString(value) ? value : value ? `${value}px` : "";
+}
+function classNames(...args) {
+  return args.reduce((classes, value) => {
+    return `${classes} ${isArray(value) ? classNames(...value) : value || ""}`.trim();
+  }, "");
 }
 const { min, max, floor, ceil, abs, sign } = Math;
 function approximatelyEqual(x, y, epsilon) {
@@ -639,11 +644,10 @@ const POINTER_UP_EVENTS = "touchend touchcancel mouseup click";
 const Elements = (Splide, Components, options, event) => {
   const { on, bind } = event;
   const { root } = Splide;
-  const { i18n } = options;
   const elements = {};
   const slides = [];
-  let rootClasses = [];
-  let trackClasses = [];
+  let rootClasses;
+  let trackClasses;
   let track;
   let list;
   let isUsingKey;
@@ -660,7 +664,7 @@ const Elements = (Splide, Components, options, event) => {
       isUsingKey = e.type === "keydown";
     }, { capture: true });
     bind(root, "focusin", () => {
-      toggleClass(root, CLASS_FOCUS_IN, !!isUsingKey);
+      toggleClass(root, CLASS_FOCUS_IN, isUsingKey);
     });
   }
   function destroy(completely) {
@@ -682,22 +686,27 @@ const Elements = (Splide, Components, options, event) => {
     setAttribute(root, ARIA_LABELLEDBY, options.labelledby);
   }
   function collect() {
-    track = find(CLASS_TRACK);
-    list = child(track, `.${CLASS_LIST}`);
-    assert(track && list, "A track/list element is missing.");
-    push(slides, children(list, `.${CLASS_SLIDE}:not(.${CLASS_CLONE})`));
-    assign(elements, {
-      root,
-      track,
-      list,
-      slides,
-      arrows: find(CLASS_ARROWS),
-      pagination: find(CLASS_PAGINATION),
-      prev: find(CLASS_ARROW_PREV),
-      next: find(CLASS_ARROW_NEXT),
-      bar: find(CLASS_PROGRESS_BAR),
-      toggle: find(CLASS_TOGGLE)
-    });
+    const trackElm = find(CLASS_TRACK);
+    const listElm = child(track, `.${CLASS_LIST}`);
+    if (trackElm && listElm) {
+      track = trackElm;
+      list = listElm;
+      push(slides, children(list, `.${CLASS_SLIDE}:not(.${CLASS_CLONE})`));
+      assign(elements, {
+        root,
+        track,
+        list,
+        slides,
+        arrows: find(CLASS_ARROWS),
+        pagination: find(CLASS_PAGINATION),
+        prev: find(CLASS_ARROW_PREV),
+        next: find(CLASS_ARROW_NEXT),
+        bar: find(CLASS_PROGRESS_BAR),
+        toggle: find(CLASS_TOGGLE)
+      });
+    } else {
+      assert(0, "A track/list element is missing.");
+    }
   }
   function init() {
     const { role = "region" } = options;
@@ -708,7 +717,7 @@ const Elements = (Splide, Components, options, event) => {
     if (!getAttribute(root, ROLE) && root.tagName !== "SECTION" && role) {
       setAttribute(root, ROLE, role);
     }
-    setAttribute(root, ARIA_ROLEDESCRIPTION, i18n.carousel);
+    setAttribute(root, ARIA_ROLEDESCRIPTION, Splide.i18n("carousel"));
     setAttribute(list, ROLE, "presentation");
   }
   function find(className) {
@@ -716,13 +725,13 @@ const Elements = (Splide, Components, options, event) => {
     return elm && closest(elm, `.${CLASS_ROOT}`) === root ? elm : void 0;
   }
   function getClasses(base) {
-    return [
+    return classNames(
       `${base}--${options.type}`,
       `${base}--${options.direction}`,
       options.drag && `${base}--draggable`,
       options.isNavigation && `${base}--nav`,
       base === CLASS_ROOT && CLASS_ACTIVE
-    ];
+    );
   }
   return assign(elements, {
     setup,
@@ -739,7 +748,7 @@ const Slide$1 = (Splide2, index, slideIndex, slide) => {
   const event = Splide2.event.lock();
   const { on, emit, bind } = event;
   const { Components, root, options } = Splide2;
-  const { isNavigation, updateOnMove, i18n, pagination, slideFocus } = options;
+  const { isNavigation, updateOnMove, pagination, slideFocus } = options;
   const { Elements } = Components;
   const { resolve } = Components.Direction;
   const styles = getAttribute(slide, "style");
@@ -751,8 +760,8 @@ const Slide$1 = (Splide2, index, slideIndex, slide) => {
     if (!isClone) {
       slide.id = `${root.id}-slide${pad(index + 1)}`;
       setAttribute(slide, ROLE, pagination ? "tabpanel" : "group");
-      setAttribute(slide, ARIA_ROLEDESCRIPTION, i18n.slide);
-      setAttribute(slide, ARIA_LABEL, label || format(i18n.slideLabel, index + 1, Splide2.length));
+      setAttribute(slide, ARIA_ROLEDESCRIPTION, Splide2.i18n("slide"));
+      setAttribute(slide, ARIA_LABEL, label || format(Splide2.i18n("slideLabel"), index + 1, Splide2.length));
     }
     listen();
   }
@@ -778,7 +787,7 @@ const Slide$1 = (Splide2, index, slideIndex, slide) => {
       const Slide2 = target.splide.Components.Slides.getAt(index);
       return Slide2 ? Slide2.slide.id : "";
     }).join(" ");
-    setAttribute(slide, ARIA_LABEL, format(i18n.slideX, (isClone ? slideIndex : index) + 1));
+    setAttribute(slide, ARIA_LABEL, format(Splide2.i18n("slideX"), (isClone ? slideIndex : index) + 1));
     setAttribute(slide, ARIA_CONTROLS, controls);
     setAttribute(slide, ROLE, slideFocus ? "button" : "");
     slideFocus && removeAttribute(slide, ARIA_ROLEDESCRIPTION);
@@ -885,9 +894,9 @@ const Slides = (Splide, Components, options, event) => {
     forEach$1((Slide2) => Slide2.update());
   }
   function register(slide, index, slideIndex) {
-    const object = Slide$1(Splide, index, slideIndex, slide);
-    object.mount();
-    Slides2.push(object);
+    const instance = Slide$1(Splide, index, slideIndex, slide);
+    instance.mount();
+    Slides2.push(instance);
     Slides2.sort((Slide1, Slide2) => Slide1.index - Slide2.index);
   }
   function get(excludeClones) {
@@ -896,7 +905,7 @@ const Slides = (Splide, Components, options, event) => {
   function getIn(page) {
     const { Controller } = Components;
     const index = Controller.toIndex(page);
-    const max = Controller.hasFocus() ? 1 : options.perPage;
+    const max = Controller.hasFocus() ? 1 : options.perPage || 1;
     return filter((Slide2) => between(Slide2.index, index, index + max - 1));
   }
   function getAt(index) {
@@ -905,12 +914,12 @@ const Slides = (Splide, Components, options, event) => {
   function add(items, index) {
     forEach(items, (slide) => {
       if (isString(slide)) {
-        slide = parseHtml(slide);
+        slide = parseHtml(slide) || "";
       }
       if (isHTMLElement(slide)) {
-        const ref = slides[index];
+        const ref = slides[index || -1];
         ref ? before(ref, slide) : append(list, slide);
-        addClass(slide, options.classes.slide);
+        addClass(slide, Splide.classes("slide"));
         observeImages(slide, apply(emit, EVENT_RESIZE));
       }
     });
@@ -950,7 +959,7 @@ const Slides = (Splide, Components, options, event) => {
     return excludeClones ? slides.length : Slides2.length;
   }
   function isEnough() {
-    return Slides2.length > options.perPage;
+    return Slides2.length > (options.perPage || 1);
   }
   return {
     mount,
@@ -1022,7 +1031,7 @@ const Layout = (Splide, Components, options, event) => {
     return height;
   }
   function cssHeight() {
-    return unit(options.height || rect(list).width * options.heightRatio);
+    return unit(options.height || rect(list).width * (options.heightRatio || 0));
   }
   function cssSlideWidth() {
     return options.autoWidth ? null : unit(options.fixedWidth) || (vertical ? "" : cssSlideSize());
@@ -1135,7 +1144,7 @@ const Clones = (Splide, Components, options, event) => {
   }
   function cloneDeep(elm, index) {
     const clone = elm.cloneNode(true);
-    addClass(clone, options.classes.clone);
+    addClass(clone, Splide.classes("clone"));
     clone.id = `${Splide.root.id}-clone${pad(index + 1)}`;
     return clone;
   }
@@ -1144,9 +1153,10 @@ const Clones = (Splide, Components, options, event) => {
     if (!Splide.is(LOOP)) {
       clones2 = 0;
     } else if (isUndefined(clones2)) {
+      const { perPage = 1 } = options;
       const fixedSize = options[resolve("fixedWidth")] && Components.Layout.slideSize(0);
       const fixedCount = fixedSize && ceil(trackSize() / fixedSize);
-      clones2 = fixedCount || options[resolve("autoWidth")] && Splide.length || options.perPage * MULTIPLIER;
+      clones2 = fixedCount || options[resolve("autoWidth")] && Splide.length || perPage * MULTIPLIER;
     }
     return clones2;
   }
@@ -1274,7 +1284,7 @@ const Move = (Splide, Components, options, event) => {
   }
   function offset(index) {
     const { focus } = options;
-    return focus === "center" ? (listSize() - slideSize(index, true)) / 2 : +focus * slideSize(index) || 0;
+    return focus === "center" ? (listSize() - slideSize(index, true)) / 2 : Number(focus) * slideSize(index) || 0;
   }
   function getLimit(max) {
     return toPosition(max ? Components.Controller.getEnd() : 0);
@@ -1331,7 +1341,7 @@ const Controller = (Splide, Components, options, event) => {
   function init() {
     slideCount = getLength(true);
     perMove = options.perMove;
-    perPage = options.perPage;
+    perPage = options.perPage || 1;
     endIndex = getEnd();
     const end = omitEnd ? endIndex : slideCount - 1;
     const index = clamp(currIndex, 0, end);
@@ -1473,7 +1483,7 @@ const Controller = (Splide, Components, options, event) => {
     return prev ? prevIndex : currIndex;
   }
   function hasFocus() {
-    return !isUndefined(options.focus) || options.isNavigation;
+    return !isUndefined(options.focus) || !!options.isNavigation;
   }
   function isMoving() {
     return Splide.state.is([MOVING, SCROLLING]);
@@ -1599,16 +1609,15 @@ const INTERVAL_DATA_ATTRIBUTE = `${DATA_ATTRIBUTE}-interval`;
 
 const Autoplay = (Splide, Components, options, event) => {
   const { on, bind, emit } = event;
-  const { interval: duration, pauseOnHover = true, pauseOnFocus = true, resetProgress = true } = options;
+  const duration = options.interval || 5e3;
   const interval = RequestInterval(duration, () => Splide.go(">"), updateRate);
   const { isPaused } = interval;
   const { Elements, Elements: { root, toggle } } = Components;
-  const { autoplay } = options;
   let hovered;
   let focused;
-  let stopped = autoplay === "pause";
+  let stopped = options.autoplay === "pause";
   function mount() {
-    if (autoplay) {
+    if (options.autoplay) {
       listen();
       toggle && setAttribute(toggle, ARIA_CONTROLS, Elements.track.id);
       stopped || play();
@@ -1616,6 +1625,7 @@ const Autoplay = (Splide, Components, options, event) => {
     }
   }
   function listen() {
+    const { pauseOnHover = true, pauseOnFocus = true } = options;
     if (pauseOnHover) {
       bind(root, "mouseenter mouseleave", (e) => {
         hovered = e.type === "mouseenter";
@@ -1638,6 +1648,7 @@ const Autoplay = (Splide, Components, options, event) => {
   }
   function play() {
     if (isPaused() && Components.Slides.isEnough()) {
+      const { resetProgress = true } = options;
       updateInterval();
       interval.start(!resetProgress);
       focused = hovered = stopped = false;
@@ -1646,7 +1657,7 @@ const Autoplay = (Splide, Components, options, event) => {
     }
   }
   function pause(stop = true) {
-    stopped = !!stop;
+    stopped = stop;
     updateButton();
     if (!isPaused()) {
       interval.pause();
@@ -1661,7 +1672,7 @@ const Autoplay = (Splide, Components, options, event) => {
   function updateButton() {
     if (toggle) {
       toggleClass(toggle, CLASS_ACTIVE, !stopped);
-      setAttribute(toggle, ARIA_LABEL, options.i18n[stopped ? "play" : "pause"]);
+      setAttribute(toggle, ARIA_LABEL, Splide.i18n[stopped ? "play" : "pause"]);
     }
   }
   function updateRate(rate) {
@@ -1671,7 +1682,7 @@ const Autoplay = (Splide, Components, options, event) => {
   }
   function updateInterval(index = Splide.index) {
     const Slide = Components.Slides.getAt(index);
-    interval.set(Slide && +getAttribute(Slide.slide, INTERVAL_DATA_ATTRIBUTE) || options.interval);
+    interval.set(Slide && Number(getAttribute(Slide.slide, INTERVAL_DATA_ATTRIBUTE)) || duration);
   }
   return {
     mount,
@@ -1897,7 +1908,7 @@ const Drag = (Splide, Components, options, event) => {
     const { dragMinThreshold: thresholds } = options;
     const isObj = isObject(thresholds);
     const mouse = isObj && thresholds.mouse || 0;
-    const touch = (isObj ? thresholds.touch : +thresholds) || 10;
+    const touch = (isObj ? thresholds.touch : Number(thresholds)) || 10;
     return abs(diffCoord(e)) > (isTouchEvent(e) ? touch : mouse);
   }
   function isSliderDirection(e) {
@@ -1935,7 +1946,7 @@ const Drag = (Splide, Components, options, event) => {
   }
   function isDraggable(target2) {
     const { noDrag } = options;
-    return !matches(target2, `.${CLASS_PAGINATION_PAGE}, .${CLASS_ARROW}`) && (!noDrag || !matches(target2, noDrag));
+    return !!target2 && !matches(target2, `.${CLASS_PAGINATION_PAGE}, .${CLASS_ARROW}`) && (!noDrag || !matches(target2, noDrag));
   }
   function isTouchEvent(e) {
     return typeof TouchEvent !== "undefined" && e instanceof TouchEvent;
@@ -2015,16 +2026,18 @@ const LazyLoad = (Splide, Components, options, event) => {
         const srcset = getAttribute(img, SRCSET_DATA_ATTRIBUTE);
         if (src !== img.src || srcset !== img.srcset) {
           const parent = img.parentElement;
-          const spinner = child(parent, `.${CLASS_SPINNER}`) || create("span", options.classes.spinner, parent);
-          entries.push([img, Slide, spinner]);
-          img.src || display(img, "none");
+          if (parent) {
+            const spinner = child(parent, `.${CLASS_SPINNER}`) || create("span", Splide.classes["spinner"], parent);
+            entries.push([img, Slide, spinner]);
+            img.src || display(img, "none");
+          }
         }
       });
     });
   }
   function check() {
     entries = entries.filter((data) => {
-      const distance = options.perPage * ((options.preloadPages || 1) + 1) - 1;
+      const distance = (options.perPage || 1) * ((options.preloadPages || 1) + 1) - 1;
       return data[1].isWithin(Splide.index, distance) ? load(data) : true;
     });
     entries.length || off(events);
@@ -2051,7 +2064,8 @@ const LazyLoad = (Splide, Components, options, event) => {
     isSequential && loadNext();
   }
   function loadNext() {
-    entries.length && load(entries.shift());
+    const next = entries.shift();
+    next && load(next);
   }
   return {
     mount,
@@ -2092,19 +2106,19 @@ const Pagination = (Splide, Components, options, event) => {
   }
   function createPagination() {
     const { length } = Splide;
-    const { classes, i18n, perPage, paginationKeyboard = true } = options;
+    const { perPage = 1, paginationKeyboard = true } = options;
     const max = hasFocus() ? Controller.getEnd() + 1 : ceil(length / perPage);
     const dir = getDirection();
-    list = placeholder || create("ul", classes.pagination, Elements.track.parentElement);
+    list = placeholder || create("ul", Splide.classes("pagination"), Elements.track.parentElement);
     addClass(list, paginationClasses = `${CLASS_PAGINATION}--${dir}`);
     setAttribute(list, ROLE, "tablist");
-    setAttribute(list, ARIA_LABEL, i18n.select);
+    setAttribute(list, ARIA_LABEL, Splide.i18n("select"));
     setAttribute(list, ARIA_ORIENTATION, dir === TTB ? "vertical" : "");
     for (let i = 0; i < max; i++) {
-      const li = create("li", null, list);
-      const button = create("button", { class: classes.page, type: "button" }, li);
+      const li = create("li", {}, list);
+      const button = create("button", { class: Splide.classes("page"), type: "button" }, li);
       const controls = Slides.getIn(i).map((Slide) => Slide.slide.id);
-      const text = !hasFocus() && perPage > 1 ? i18n.pageX : i18n.slideX;
+      const text = !hasFocus() && perPage > 1 ? Splide.i18n("pageX") : Splide.i18n("slideX");
       bind(button, "click", () => go(`>${i}`));
       paginationKeyboard && bind(button, "keydown", apply(onKeydown, i));
       setAttribute(li, ROLE, "presentation");
@@ -2382,7 +2396,7 @@ const Slide = (Splide, Components, options, event) => {
         return rewindSpeed;
       }
     }
-    return options.speed;
+    return options.speed || 400;
   }
   return {
     mount,
@@ -2403,7 +2417,7 @@ class Splide {
   _o = {};
   _C;
   _E = {};
-  _T;
+  _T = Slide;
   constructor(target, options = {}) {
     const root = isString(target) ? query(document, target) : target;
     assert(root, `${root} is invalid.`);
@@ -2413,10 +2427,11 @@ class Splide {
       labelledby: getAttribute(root, ARIA_LABELLEDBY) || ""
     }, DEFAULTS, Splide.defaults, options);
     try {
-      merge(options, JSON.parse(getAttribute(root, DATA_ATTRIBUTE)));
+      merge(options, JSON.parse(getAttribute(root, DATA_ATTRIBUTE) || ""));
     } catch (e) {
       assert(false, "Invalid JSON");
     }
+    this._C = this.Components;
     this._o = Object.create(merge({}, options));
   }
   mount(Extensions = this._E, Transition = this._T) {
@@ -2433,7 +2448,7 @@ class Splide {
       component.setup && component.setup();
     });
     forOwn(Components2, (component) => {
-      component.mount && component.mount();
+      component && component.mount && component.mount();
     });
     this.emit(EVENT_MOUNTED);
     addClass(this.root, CLASS_INITIALIZED);
@@ -2491,7 +2506,7 @@ class Splide {
       this.on(EVENT_READY, this.destroy.bind(this, completely));
     } else {
       forOwn(this._C, (component) => {
-        component.destroy && component.destroy(completely);
+        component && component.destroy && component.destroy(completely);
       }, true);
       event.emit(EVENT_DESTROY);
       event.destroy();
@@ -2499,6 +2514,14 @@ class Splide {
       state.set(DESTROYED);
     }
     return this;
+  }
+  i18n(key, ...replacements) {
+    const { i18n } = this._o;
+    return i18n ? format(i18n[key], ...replacements) : "";
+  }
+  classes(key) {
+    const { classes } = this._o;
+    return classes ? classes[key] : "";
   }
   get options() {
     return this._o;
@@ -2570,7 +2593,8 @@ class SplideRenderer {
     const { root } = splide;
     const clones = queryAll(root, `.${CLASS_CLONE}`);
     on(EVENT_MOUNTED, () => {
-      removeNode(child(root, "style"));
+      const style = child(root, "style");
+      style && removeNode(style);
     });
     removeNode(clones);
   }
@@ -2585,11 +2609,12 @@ class SplideRenderer {
   constructor(contents, options, config, defaults) {
     merge(DEFAULTS, defaults || {});
     merge(merge(this.options, DEFAULTS), options || {});
+    const splide = new Splide("");
     this.contents = contents;
     this.config = assign({}, RENDERER_DEFAULT_CONFIG, config || {});
     this.id = this.config.id || uniqueId("splide");
     this.Style = new Style(this.id, this.options);
-    this.Direction = Direction(null, null, this.options);
+    this.Direction = Direction(splide, splide.Components, this.options, splide.event.lock());
     assert(this.contents.length, "Provide at least 1 content.");
     this.init();
   }
@@ -2603,13 +2628,14 @@ class SplideRenderer {
   }
   initSlides() {
     push(this.slides, this.contents.map((content, index) => {
+      const { classes = {} } = this.options;
       content = isString(content) ? { html: content } : content;
       content.styles = content.styles || {};
       content.attrs = content.attrs || {};
       this.cover(content);
-      const classes = `${this.options.classes.slide} ${index === 0 ? CLASS_ACTIVE : ""}`;
+      const classNames = `${classes.slide} ${index === 0 ? CLASS_ACTIVE : ""}`;
       assign(content.attrs, {
-        class: `${classes} ${content.attrs.class || ""}`.trim(),
+        class: `${classNames} ${content.attrs.class || ""}`.trim(),
         style: this.buildStyles(content.styles)
       });
       return content;
@@ -2670,7 +2696,7 @@ class SplideRenderer {
       const { value, unit: unit2 } = this.parseCssValue(options[resolve("fixedWidth")]);
       return this.buildCssValue(orient(value) * cloneCount, unit2);
     }
-    const percent = 100 * cloneCount / options.perPage;
+    const percent = 100 * cloneCount / (options.perPage || 1);
     return `${orient(percent)}%`;
   }
   cssOffsetCenter(options) {
@@ -2680,7 +2706,7 @@ class SplideRenderer {
       return [this.buildCssValue(orient(value / 2), unit2)];
     }
     const values = [];
-    const { perPage, gap } = options;
+    const { perPage = 1, gap } = options;
     values.push(`${orient(50 / perPage)}%`);
     if (gap) {
       const { value, unit: unit2 } = this.parseCssValue(gap);
@@ -2697,7 +2723,7 @@ class SplideRenderer {
       if (this.isFixedWidth(options)) {
         return this.buildCssValue(orient(value * cloneCount), unit2);
       }
-      const { perPage } = options;
+      const { perPage = 1 } = options;
       const gaps = cloneCount / perPage;
       return this.buildCssValue(orient(gaps * value), unit2);
     }
@@ -2746,7 +2772,7 @@ class SplideRenderer {
       const unit2 = value.replace(/\d*(\.\d*)?/, "") || "px";
       return { value: number, unit: unit2 };
     }
-    return { value, unit: "px" };
+    return { value: value || 0, unit: "px" };
   }
   parseBreakpoints() {
     const { breakpoints } = this.options;
@@ -2806,28 +2832,29 @@ class SplideRenderer {
   renderSlides() {
     const { slideTag: tag } = this.config;
     return this.slides.map((content) => {
-      return `<${tag} ${this.buildAttrs(content.attrs)}>${content.html || ""}</${tag}>`;
+      return `<${tag} ${this.buildAttrs(content.attrs || {})}>${content.html || ""}</${tag}>`;
     }).join("");
   }
   cover(content) {
     const { styles, html = "" } = content;
     if (this.options.cover && !this.options.lazyLoad) {
       const src = html.match(/<img.*?src\s*=\s*(['"])(.+?)\1.*?>/);
-      if (src && src[2]) {
+      if (src && src[2] && styles) {
         styles.background = `center/cover no-repeat url('${src[2]}')`;
       }
     }
   }
   generateClones(contents) {
-    const { classes } = this.options;
+    const { classes = {} } = this.options;
     const count = this.getCloneCount();
     const slides = contents.slice();
     while (slides.length < count) {
       push(slides, slides);
     }
     push(slides.slice(-count).reverse(), slides.slice(0, count)).forEach((content, index) => {
-      const attrs = assign({}, content.attrs, { class: `${content.attrs.class} ${classes.clone}` });
-      const clone = assign({}, content, { attrs });
+      const { attrs = {} } = content;
+      const attributes = assign({}, content.attrs || {}, { class: `${attrs.class} ${classes.clone}` });
+      const clone = assign({}, content, { attrs: attributes });
       index < count ? contents.unshift(clone) : contents.push(clone);
     });
   }
@@ -2837,21 +2864,22 @@ class SplideRenderer {
       if (options.clones) {
         return options.clones;
       }
-      const perPage = max(...this.breakpoints.map(([, options2]) => options2.perPage));
+      const perPage = max(...this.breakpoints.map(([, options2]) => options2.perPage || 1));
       return perPage * ((options.flickMaxPages || 1) + 1);
     }
     return 0;
   }
   renderArrows() {
+    const { classes = {} } = this.options;
     let html = "";
-    html += `<div class="${this.options.classes.arrows}">`;
+    html += `<div class="${classes.arrows}">`;
     html += this.renderArrow(true);
     html += this.renderArrow(false);
     html += `</div>`;
     return html;
   }
   renderArrow(prev) {
-    const { classes, i18n } = this.options;
+    const { classes = {}, i18n = {} } = this.options;
     const attrs = {
       class: `${classes.arrow} ${prev ? classes.prev : classes.next}`,
       type: "button",

@@ -50,7 +50,7 @@ export const Scroll: ComponentConstructor<ScrollComponent> = (Splide, Components
   /**
    * Holds the callback function.
    */
-  let callback: AnyFunction;
+  let callback: AnyFunction | undefined;
 
   /**
    * The current friction (<= 1).
