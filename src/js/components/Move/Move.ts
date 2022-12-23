@@ -110,7 +110,10 @@ export const Move: ComponentConstructor<MoveComponent> = (Splide, Components, op
     const shiftBackwards = dest !== index ? dest > index : forwards;
     const shouldShift = (dest !== index || exceededLimit(forwards)) && canShift(shiftBackwards);
 
-    shouldShift && translate(shift(getPosition(), shiftBackwards), true);
+    if (shouldShift) {
+      translate(shift(getPosition(), shiftBackwards), true);
+      emit(EVENT_SHIFTED);
+    }
 
     indices = [index, prev, dest];
     callback = onMoved;
