@@ -243,7 +243,7 @@ export const Drag: ComponentConstructor<DragComponent> = (Splide, Components, op
     } else if (Splide.is(FADE)) {
       go(forwards ? (rewind ? '>' : '+') : (rewind ? '<' : '-'));
     } else if (Splide.is(SLIDE) && exceeded && rewind) {
-      go(forwards ? '>' : '<');
+      go(forwards ? '>' : '<'); // todo
     } else {
       go(`${ forwards ? '>>' : '<<' }${ Controller.toDest(destination) }`);
     }
