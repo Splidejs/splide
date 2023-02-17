@@ -6,7 +6,7 @@ import { FADE, LOOP, SLIDE } from '../../constants/types';
 import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { abs, isObject, matches, min, noop, prevent, sign, timeOf } from '../../utils';
+import { abs, isObject, matches, min, max, noop, prevent, sign, timeOf } from '../../utils';
 import { FRICTION, LOG_INTERVAL, POINTER_DOWN_EVENTS, POINTER_MOVE_EVENTS, POINTER_UP_EVENTS } from './constants';
 
 
@@ -237,7 +237,11 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
     } else if ( Splide.is( SLIDE ) && exceeded && rewind ) {
       Controller.go( exceededLimit( true ) ? '>' : '<' );
     } else {
-      Controller.go( Controller.toDest( destination ), true );
+      const sign1 = sign( velocity );
+      const expectedDestination = Controller.toDest( destination );
+      const maxPages = options.flickMaxPages || 1;
+      const goTo = sign1 < 0 ? min( expectedDestination, Splide.index + maxPages ) : max( expectedDestination, Splide.index - maxPages );
+      Controller.go( goTo, true );
     }
 
     reduce( true );

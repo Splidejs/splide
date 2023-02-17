@@ -2,7 +2,7 @@
  * Splide.js
  * Version  : 4.1.4
  * License  : MIT
- * Copyright: 2022 Naotoshi Fujita
+ * Copyright: 2023 Naotoshi Fujita
  */
 'use strict';
 
@@ -2264,7 +2264,11 @@ function Drag(Splide2, Components2, options) {
     } else if (Splide2.is(SLIDE) && exceeded && rewind) {
       Controller.go(exceededLimit(true) ? ">" : "<");
     } else {
-      Controller.go(Controller.toDest(destination), true);
+      var sign1 = sign(velocity);
+      var expectedDestination = Controller.toDest(destination);
+      var maxPages = options.flickMaxPages || 1;
+      var goTo = sign1 < 0 ? min(expectedDestination, Splide2.index + maxPages) : max(expectedDestination, Splide2.index - maxPages);
+      Controller.go(goTo, true);
     }
 
     reduce(true);
