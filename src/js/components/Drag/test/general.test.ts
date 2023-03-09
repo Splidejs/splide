@@ -60,6 +60,20 @@ describe( 'Drag', () => {
     expect( splide.index ).toBe( 0 );
   } );
 
+  test.each( [ 1, 2 ] )( 'should change the slide index no longer than flickMaxPages (%s).', ( flickMaxPages ) => {
+    const width = 600;
+    const xOffset = width * flickMaxPages;
+    const splide = init( { speed: 0, width, flickMaxPages } );
+    const track  = splide.Components.Elements.track;
+
+    fireWithCoord( track, 'mousedown', { x: 0, timeStamp: 1 } );
+    fireWithCoord( window, 'mousemove', { x: 1, timeStamp: 1 } );
+    fireWithCoord( window, 'mousemove', { x: -20 - xOffset, timeStamp: 100 } );
+    fireWithCoord( window, 'mouseup',   { x: -20 - xOffset, timeStamp: 100 } );
+
+    expect( splide.index ).toBe( flickMaxPages );
+  } );
+
   test( 'should start moving the slider immediately if the pointing device is a mouse.', () => {
     const splide = init();
     const onDrag = jest.fn();
