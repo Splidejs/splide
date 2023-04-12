@@ -5,13 +5,14 @@ import {
   EVENT_AUTOPLAY_PLAY,
   EVENT_AUTOPLAY_PLAYING,
   EVENT_MOVE,
+  EVENT_MOVED,
   EVENT_REFRESH,
   EVENT_SCROLL,
 } from '../../constants/events';
 import { EventInterface, RequestInterval } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { getAttribute, setAttribute, style, toggleClass } from '../../utils';
+import { apply, getAttribute, setAttribute, style, toggleClass } from '../../utils';
 import { INTERVAL_DATA_ATTRIBUTE } from './constants';
 
 
@@ -98,13 +99,15 @@ export function Autoplay( Splide: Splide, Components: Components, options: Optio
 
     on( [ EVENT_MOVE, EVENT_SCROLL, EVENT_REFRESH ], interval.rewind );
     on( EVENT_MOVE, onMove );
+    on( EVENT_MOVED, apply( play, false ) );
   }
 
   /**
    * Starts autoplay and clears all flags.
+   * @param isRestart - Determines whether to restart autoplay or not.
    */
-  function play(): void {
-    if ( isPaused() && Components.Slides.isEnough() ) {
+  function play(isRestart = true): void {
+    if ( ( isRestart && isPaused() && Components.Slides.isEnough() ) || ( ! isRestart && ! stopped && Components.Slides.isEnough() ) ) {
       interval.start( ! options.resetProgress );
       focused = hovered = stopped = false;
       update();
