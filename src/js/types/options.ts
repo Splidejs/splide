@@ -1,4 +1,5 @@
 import { I18N } from '../constants/i18n';
+import { SliderType } from './general';
 
 
 /**
@@ -13,7 +14,7 @@ export interface Options extends ResponsiveOptions {
    * - 'loop' : A carousel slider
    * - 'fade' : A slider with the fade transition. This does not support the perPage option.
    */
-  type?: string;
+  type?: SliderType;
 
   /**
    * The `role` attribute for the root element.
