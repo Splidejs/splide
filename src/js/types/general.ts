@@ -18,6 +18,13 @@ export type AnyFunction = ( ...args: any[] ) => any;
 export type ComponentConstructor = ( Splide: Splide, Components: Components, options: Options ) => BaseComponent;
 
 /**
+ * The type for a slider.
+ * 
+ * @since 4.1.5
+ */
+export type SliderType = 'slide' | 'loop' | 'fade';
+
+/**
  * The interface for any component.
  *
  * @since 3.0.0

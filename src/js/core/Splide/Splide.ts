@@ -8,7 +8,7 @@ import { CREATED, DESTROYED, IDLE, STATES } from '../../constants/states';
 import { FADE } from '../../constants/types';
 import { EventInterface, EventInterfaceObject, State, StateObject } from '../../constructors';
 import { Fade, Slide } from '../../transitions';
-import { AnyFunction, ComponentConstructor, Components, EventMap, Options, SyncTarget } from '../../types';
+import { AnyFunction, ComponentConstructor, Components, EventMap, Options, SliderType, SyncTarget } from '../../types';
 import { addClass, assert, assign, empty, forOwn, getAttribute, isString, merge, query, slice } from '../../utils';
 import { ARIA_LABEL, ARIA_LABELLEDBY } from '../../constants/attributes';
 
@@ -323,7 +323,7 @@ export class Splide {
    *
    * @return `true` if the type matches the current one, or otherwise `false`.
    */
-  is( type: string ): boolean {
+  is( type: SliderType ): boolean {
     return this._o.type === type;
   }
 
