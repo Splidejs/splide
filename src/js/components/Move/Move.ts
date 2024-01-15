@@ -122,7 +122,7 @@ export function Move( Splide: Splide, Components: Components, options: Options )
   function translate( position: number, preventLoop?: boolean ): void {
     if ( ! Splide.is( FADE ) ) {
       const destination = preventLoop ? position : loop( position );
-      style( list, 'transform', `translate${ resolve( 'X' ) }(${ destination }px)` );
+      style( list, 'transform', `translate${ resolve( 'X' ) }(${ Math.round( destination ) }px)` );
       position !== destination && emit( EVENT_SHIFTED );
     }
   }
