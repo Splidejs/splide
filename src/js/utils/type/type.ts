@@ -82,7 +82,10 @@ export function isNull( subject: unknown ): subject is null {
  */
 export function isHTMLElement( subject: unknown ): subject is HTMLElement {
   try {
-    return subject instanceof ( ( subject as Node ).ownerDocument.defaultView || window ).HTMLElement;
+    if ( subject instanceof ( subject as Node ) .ownerDocument.defaultView.HTMLElement )
+      return true;
+    else if ( subject instanceof ( window as any ) .top.HTMLElement )
+      return true;
   } catch ( e ) {
     return false;
   }
