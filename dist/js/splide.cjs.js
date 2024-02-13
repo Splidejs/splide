@@ -844,7 +844,7 @@ function Elements(Splide2, Components2, options) {
     }
 
     setAttribute(root, ARIA_ROLEDESCRIPTION, i18n.carousel);
-    setAttribute(list, ROLE, "presentation");
+    // setAttribute(list, ROLE, "presentation");
   }
 
   function find(selector) {
@@ -2588,7 +2588,7 @@ function Pagination(Splide2, Components2, options) {
         bind(button, "keydown", apply(onKeydown, i));
       }
 
-      setAttribute(li, ROLE, "presentation");
+      // setAttribute(li, ROLE, "presentation");
       setAttribute(button, ROLE, "tab");
       setAttribute(button, ARIA_CONTROLS, controls.join(" "));
       setAttribute(button, ARIA_LABEL, format(text, i + 1));

@@ -213,7 +213,7 @@ export function Elements( Splide: Splide, Components: Components, options: Optio
     }
 
     setAttribute( root, ARIA_ROLEDESCRIPTION, i18n.carousel );
-    setAttribute( list, ROLE, 'presentation' );
+    // setAttribute( list, ROLE, 'presentation' );
   }
 
   /**

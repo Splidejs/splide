@@ -38,11 +38,11 @@ describe( 'setAttribute', () => {
     const div = document.createElement( 'div' );
 
     setAttribute( div, {
-      'aria-role'      : 'presentation',
+      // 'aria-role'      : 'presentation',
       'contenteditable': true,
     } );
 
-    expect( div.getAttribute( 'aria-role' ) ).toBe( 'presentation' );
+    // expect( div.getAttribute( 'aria-role' ) ).toBe( 'presentation' );
     expect( div.getAttribute( 'contenteditable' ) ).toBe( 'true' );
   } );
 

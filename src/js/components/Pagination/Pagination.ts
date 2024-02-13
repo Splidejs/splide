@@ -167,7 +167,7 @@ export function Pagination( Splide: Splide, Components: Components, options: Opt
         bind( button, 'keydown', apply( onKeydown, i ) );
       }
 
-      setAttribute( li, ROLE, 'presentation' );
+      // setAttribute( li, ROLE, 'presentation' );
       setAttribute( button, ROLE, 'tab' );
       setAttribute( button, ARIA_CONTROLS, controls.join( ' ' ) );
       setAttribute( button, ARIA_LABEL, format( text, i + 1 ) );
