@@ -837,7 +837,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }
 
       setAttribute(root, ARIA_ROLEDESCRIPTION, i18n.carousel);
-      setAttribute(list, ROLE, "presentation");
+      // setAttribute(list, ROLE, "presentation");
     }
 
     function find(selector) {
@@ -2581,7 +2581,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           bind(button, "keydown", apply(onKeydown, i));
         }
 
-        setAttribute(li, ROLE, "presentation");
+        // setAttribute(li, ROLE, "presentation");
         setAttribute(button, ROLE, "tab");
         setAttribute(button, ARIA_CONTROLS, controls.join(" "));
         setAttribute(button, ARIA_LABEL, format(text, i + 1));
