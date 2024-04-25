@@ -94,7 +94,8 @@
       "types": "./dist/types/index.d.ts",
       "require": "./dist/js/splide.cjs.js",
       "import": "./dist/js/splide.esm.js",
-      "default": "./dist/js/splide.esm.js"
+      "default": "./dist/js/splide.esm.js",
+      "svelte": "./dist/js/splide.esm.js"
     },
     "./src/js/utils": {
       "types": "./src/js/utils/index.ts",
