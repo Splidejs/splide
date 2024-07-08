@@ -256,11 +256,11 @@ describe( 'Slide', () => {
   } );
 
 
-  test( 'should assign the tabpanel role if the pagination option is enabled.', () => {
+  test( 'should assign the presentation role if the pagination option is enabled.', () => {
     const splide = init( { pagination: true } );
 
     splide.Components.Slides.forEach( ( { slide } ) => {
-      expect( slide.getAttribute( 'role' ) ).toBe( 'tabpanel' );
+      expect( slide.getAttribute( 'role' ) ).toBe( 'presentation' );
     } );
   } );
 
