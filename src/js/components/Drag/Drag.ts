@@ -148,7 +148,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
       emit( EVENT_DRAG );
     }
 
-    if ( e.cancelable ) {
+    if ( e.cancelable && ! disabled ) {
       if ( dragging ) {
         Move.translate( basePosition + constrain( diffCoord( e ) ) );
 
@@ -183,7 +183,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
       emit( EVENT_DRAGGED );
     }
 
-    if ( dragging ) {
+    if ( dragging && ! disabled ) {
       move( e );
       prevent( e );
     }
