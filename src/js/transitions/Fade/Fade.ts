@@ -3,7 +3,7 @@ import { EventInterface } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { Components, Options, TransitionComponent } from '../../types';
 import { nextTick, noop } from '../../utils';
-
+import { LTR, TTB, RTL } from '../../constants/directions';
 
 /**
  * The component for the fade transition.
@@ -33,7 +33,17 @@ export function Fade( Splide: Splide, Components: Components, options: Options )
    */
   function init(): void {
     Slides.forEach( Slide => {
-      Slide.style( 'transform', `translateX(-${ 100 * Slide.index }%)` );
+      switch (options.direction) {
+        case LTR:
+          Slide.style( 'transform', `translateX(-${ 100 * Slide.index }%)` );
+          break;
+        case RTL:
+          Slide.style( 'transform', `translateX(${ 100 * Slide.index }%)` );
+          break;
+        case TTB:
+          Slide.style( 'transform', `translateY(-${ 100 * Slide.index }%)` );
+          break;
+      }
     } );
   }
 

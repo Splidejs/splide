@@ -11,7 +11,7 @@ import { Splide } from '../../../core/Splide/Splide';
 import { fire, init, keydown } from '../../../test';
 import { format } from '../../../utils';
 import { SlideComponent } from '../Slide';
-
+import { LTR, RTL, TTB } from '../../../constants/directions';
 
 describe( 'Slide', () => {
   test( 'can assign the unique ID to the slide element.', () => {
@@ -382,4 +382,47 @@ describe( 'Slide', () => {
     expect( Clone.isWithin( 0, 1 ) ).toBe( true );
     expect( Clone.isWithin( 0, 2 ) ).toBe( true );
   } );
+
+
+  // #1095
+  test( 'shows slides correctly when type is `fade` and direction is `TTB`', () => {
+    const splide = init( { speed: 0, perPage: 2, direction: TTB,  type: 'fade', height: '100px', heightRatio: 0.3 } );
+    const { Slides } = splide.Components;
+
+    const Slide0 = Slides.getAt( 0 );
+    const Slide1 = Slides.getAt( 1 );
+    const Slide2 = Slides.getAt( 2 );
+
+    expect( Slide0.slide.style.transform).toBe('translateY(-0%)');
+    expect( Slide1.slide.style.transform).toBe('translateY(-100%)');
+    expect( Slide2.slide.style.transform).toBe('translateY(-200%)');
+  } );
+
+    // #1095
+    test( 'shows slides correctly when type is `fade` and direction is `RTL`', () => {
+      const splide = init( { speed: 0, perPage: 2, direction: RTL,  type: 'fade', height: '100px', heightRatio: 0.3 } );
+      const { Slides } = splide.Components;
+  
+      const Slide0 = Slides.getAt( 0 );
+      const Slide1 = Slides.getAt( 1 );
+      const Slide2 = Slides.getAt( 2 );
+  
+      expect( Slide0.slide.style.transform).toBe('translateX(0%)');
+      expect( Slide1.slide.style.transform).toBe('translateX(100%)');
+      expect( Slide2.slide.style.transform).toBe('translateX(200%)');
+    } );
+
+    // #1095
+    test( 'shows slides correctly when type is `fade` and direction is `LTR`', () => {
+      const splide = init( { speed: 0, perPage: 2, direction: LTR,  type: 'fade', height: '100px', heightRatio: 0.3 } );
+      const { Slides } = splide.Components;
+  
+      const Slide0 = Slides.getAt( 0 );
+      const Slide1 = Slides.getAt( 1 );
+      const Slide2 = Slides.getAt( 2 );
+  
+      expect( Slide0.slide.style.transform).toBe('translateX(-0%)');
+      expect( Slide1.slide.style.transform).toBe('translateX(-100%)');
+      expect( Slide2.slide.style.transform).toBe('translateX(-200%)');
+    } );
 } );
