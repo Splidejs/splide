@@ -1,18 +1,14 @@
-import { ARIA_ORIENTATION } from '../../constants/attributes';
-import { TTB } from '../../constants/directions';
 import {
   EVENT_CLICK,
-  EVENT_MOUNTED,
   EVENT_MOVE,
   EVENT_NAVIGATION_MOUNTED,
   EVENT_SLIDE_KEYDOWN,
-  EVENT_UPDATED,
 } from '../../constants/events';
 import { LOOP } from '../../constants/types';
 import { EventInterface, EventInterfaceObject } from '../../constructors';
 import { Splide } from '../../core/Splide/Splide';
 import { BaseComponent, Components, Options } from '../../types';
-import { apply, empty, includes, isUndefined, prevent, setAttribute } from '../../utils';
+import { apply, empty, includes, isUndefined, prevent } from '../../utils';
 import { normalizeKey } from '../../utils/dom/normalizeKey/normalizeKey';
 import { SlideComponent } from '../Slides/Slide';
 
@@ -104,7 +100,6 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
 
   /**
    * Makes slides clickable and moves the slider to the index of clicked slide.
-   * Note that the direction of `menu` is implicitly `vertical` as default.
    */
   function navigate(): void {
     const event = EventInterface( Splide );
@@ -112,17 +107,9 @@ export function Sync( Splide: Splide, Components: Components, options: Options )
 
     on( EVENT_CLICK, onClick );
     on( EVENT_SLIDE_KEYDOWN, onKeydown );
-    on( [ EVENT_MOUNTED, EVENT_UPDATED ], update );
 
     events.push( event );
     event.emit( EVENT_NAVIGATION_MOUNTED, Splide.splides );
-  }
-
-  /**
-   * Update attributes.
-   */
-  function update(): void {
-    setAttribute( Components.Elements.list, ARIA_ORIENTATION, options.direction === TTB ? 'vertical' : '' );
   }
 
   /**
