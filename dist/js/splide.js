@@ -6,7 +6,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
  * Splide.js
  * Version  : 4.1.4
  * License  : MIT
- * Copyright: 2022 Naotoshi Fujita
+ * Copyright: 2026 Naotoshi Fujita
  */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() : typeof define === 'function' && define.amd ? define(factory) : (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Splide = factory());
@@ -2145,6 +2145,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     var prevBaseEvent;
     var isFree;
     var dragging;
+    var interrupted;
     var exceeded = false;
     var clickPrevented;
     var disabled;
@@ -2177,6 +2178,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           if (!Controller.isBusy()) {
             target = isTouch ? track : window;
             dragging = state.is([MOVING, SCROLLING]);
+            interrupted = isTouch && dragging;
+            dragging = dragging && !interrupted;
             prevBaseEvent = null;
             bind(target, POINTER_MOVE_EVENTS, onPointerMove, SCROLL_LISTENER_OPTIONS);
             bind(target, POINTER_UP_EVENTS, onPointerUp, SCROLL_LISTENER_OPTIONS);
@@ -2191,6 +2194,20 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function onPointerMove(e) {
+      if (interrupted) {
+        if (!diffCoord(e) && !diffCoord(e, true)) {
+          return;
+        }
+
+        if (!e.cancelable || !isSliderDirection(e)) {
+          endDrag(e, true);
+          return;
+        }
+
+        interrupted = false;
+        dragging = true;
+      }
+
       if (!state.is(DRAGGING)) {
         state.set(DRAGGING);
         emit(EVENT_DRAG);
@@ -2217,19 +2234,27 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     function onPointerUp(e) {
+      endDrag(e, false);
+    }
+
+    function endDrag(e, pageScroll) {
       if (state.is(DRAGGING)) {
         state.set(IDLE);
         emit(EVENT_DRAGGED);
       }
 
-      if (dragging) {
-        move(e);
-        prevent(e);
+      if (dragging || interrupted) {
+        move(pageScroll ? 0 : computeVelocity(e));
+
+        if (!pageScroll) {
+          prevent(e);
+        }
       }
 
       unbind(target, POINTER_MOVE_EVENTS, onPointerMove);
       unbind(target, POINTER_UP_EVENTS, onPointerUp);
       dragging = false;
+      interrupted = false;
     }
 
     function onClick(e) {
@@ -2244,8 +2269,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       basePosition = getPosition();
     }
 
-    function move(e) {
-      var velocity = computeVelocity(e);
+    function move(velocity) {
       var destination = computeDestination(velocity);
       var rewind = options.rewind && options.rewindByDrag;
       reduce(false);
