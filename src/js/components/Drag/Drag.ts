@@ -64,6 +64,11 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
   let dragging: boolean;
 
   /**
+   * Indicates that a touch interrupted motion and has yet to choose a direction.
+   */
+  let interrupted: boolean;
+
+  /**
    * Indicates whether the slider exceeds limits or not.
    * This must not be `undefined` for strict comparison.
    */
@@ -109,7 +114,7 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    * Called when the user clicks or touches the slider.
    * - Needs to prevent the default behaviour when the slider is busy to deny any action, such as dragging images
    * - IE does not support MouseEvent and TouchEvent constructors
-   * - The `dragging` state always becomes `true` when the user starts dragging while the slider is moving
+   * - A touch that interrupts motion waits for the first movement to determine its direction
    *
    * @param e - A TouchEvent or MouseEvent object
    */
@@ -123,6 +128,8 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
         if ( ! Controller.isBusy() ) {
           target        = isTouch ? track : window;
           dragging      = state.is( [ MOVING, SCROLLING ] );
+          interrupted   = isTouch && dragging;
+          dragging      = dragging && ! interrupted;
           prevBaseEvent = null;
 
           bind( target, POINTER_MOVE_EVENTS, onPointerMove, SCROLL_LISTENER_OPTIONS );
@@ -143,6 +150,20 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    * @param e - A TouchEvent or MouseEvent object
    */
   function onPointerMove( e: TouchEvent | MouseEvent ): void {
+    if ( interrupted ) {
+      if ( ! diffCoord( e ) && ! diffCoord( e, true ) ) {
+        return;
+      }
+
+      if ( ! e.cancelable || ! isSliderDirection( e ) ) {
+        endDrag( e, true );
+        return;
+      }
+
+      interrupted = false;
+      dragging = true;
+    }
+
     if ( ! state.is( DRAGGING ) ) {
       state.set( DRAGGING );
       emit( EVENT_DRAG );
@@ -178,19 +199,27 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    * @param e - A TouchEvent or MouseEvent object
    */
   function onPointerUp( e: TouchEvent | MouseEvent ): void {
+    endDrag( e, false );
+  }
+
+  function endDrag( e: TouchEvent | MouseEvent, pageScroll: boolean ): void {
     if ( state.is( DRAGGING ) ) {
       state.set( IDLE );
       emit( EVENT_DRAGGED );
     }
 
-    if ( dragging ) {
-      move( e );
-      prevent( e );
+    if ( dragging || interrupted ) {
+      move( pageScroll ? 0 : computeVelocity( e ) );
+
+      if ( ! pageScroll ) {
+        prevent( e );
+      }
     }
 
     unbind( target, POINTER_MOVE_EVENTS, onPointerMove );
     unbind( target, POINTER_UP_EVENTS, onPointerUp );
     dragging = false;
+    interrupted = false;
   }
 
   /**
@@ -221,10 +250,9 @@ export function Drag( Splide: Splide, Components: Components, options: Options )
    * If motion is reduced, restores transition speed to the initial value
    * because it's "essential" motion for the user to recognize what happens on the carousel.
    *
-   * @param e - A TouchEvent or MouseEvent object.
+   * @param velocity - The drag velocity.
    */
-  function move( e: TouchEvent | MouseEvent ): void {
-    const velocity    = computeVelocity( e );
+  function move( velocity: number ): void {
     const destination = computeDestination( velocity );
     const rewind      = options.rewind && options.rewindByDrag;
 
